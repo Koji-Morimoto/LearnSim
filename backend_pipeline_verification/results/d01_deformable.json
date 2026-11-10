@@ -1,0 +1,31 @@
+{
+ "group": "d01_deformable",
+ "items": [
+  {
+   "id": "D-00",
+   "description": "バージョンと設定",
+   "omni.physx": "omni.physx-110.4.4",
+   "omni.physx.fabric": "(disabled)",
+   "omni.physics.tensors": "omni.physics.tensors-110.4.4",
+   "usdrt.scenegraph": "usdrt.scenegraph-7.6.3",
+   "omni.hydra.usdrt_delegate": "omni.hydra.usdrt_delegate-7.5.2",
+   "isaacsim.core.experimental.prims": "isaacsim.core.experimental.prims-1.12.1",
+   "isaacsim.core.experimental.utils": "isaacsim.core.experimental.utils-0.23.3",
+   "isaacsim.core.simulation_manager": "isaacsim.core.simulation_manager-1.17.4",
+   "isaac_sim_VERSION": "6.2.0-rc.14+release.52805.02189a84.gl",
+   "/app/useFabricSceneDelegate": true,
+   "/physics/resetOnStop": true,
+   "/physics/updateToUsd": true,
+   "/physics/updateVelocitiesToUsd": true,
+   "/physics/fabricEnabled": null,
+   "/physics/suppressReadback": false,
+   "/physics/cudaDevice": 0,
+   "config": "default",
+   "simulation_device": "cpu"
+  },
+  {
+   "id": "D-SKIP",
+   "description": "変形体は GPU 物理でしか動かないので --gpu なしでは測らない"
+  }
+ ]
+}

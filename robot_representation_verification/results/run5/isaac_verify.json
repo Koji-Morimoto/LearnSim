@@ -1,0 +1,2734 @@
+{
+ "results": {
+  "V0_home_touching_pairs": {
+   "dh/nested": [
+    [
+     "base",
+     "link1"
+    ],
+    [
+     "link1",
+     "link2"
+    ],
+    [
+     "link2",
+     "link3"
+    ],
+    [
+     "link3",
+     "link4"
+    ],
+    [
+     "link4",
+     "link5"
+    ],
+    [
+     "link5",
+     "link6"
+    ]
+   ],
+   "screw/flat": [
+    [
+     "base",
+     "link1"
+    ],
+    [
+     "link1",
+     "link2"
+    ],
+    [
+     "link2",
+     "link3"
+    ],
+    [
+     "link3",
+     "link4"
+    ],
+    [
+     "link4",
+     "link5"
+    ],
+    [
+     "link5",
+     "link6"
+    ]
+   ],
+   "swing/nested": [
+    [
+     "base",
+     "link1"
+    ],
+    [
+     "link1",
+     "link2"
+    ],
+    [
+     "link2",
+     "link3"
+    ],
+    [
+     "link3",
+     "link4"
+    ],
+    [
+     "link4",
+     "link5"
+    ],
+    [
+     "link5",
+     "link6"
+    ]
+   ],
+   "dh/flat": [
+    [
+     "base",
+     "link1"
+    ],
+    [
+     "link1",
+     "link2"
+    ],
+    [
+     "link2",
+     "link3"
+    ],
+    [
+     "link3",
+     "link4"
+    ],
+    [
+     "link4",
+     "link5"
+    ],
+    [
+     "link5",
+     "link6"
+    ]
+   ],
+   "screw/nested": [
+    [
+     "base",
+     "link1"
+    ],
+    [
+     "link1",
+     "link2"
+    ],
+    [
+     "link2",
+     "link3"
+    ],
+    [
+     "link3",
+     "link4"
+    ],
+    [
+     "link4",
+     "link5"
+    ],
+    [
+     "link5",
+     "link6"
+    ]
+   ],
+   "swing/flat": [
+    [
+     "base",
+     "link1"
+    ],
+    [
+     "link1",
+     "link2"
+    ],
+    [
+     "link2",
+     "link3"
+    ],
+    [
+     "link3",
+     "link4"
+    ],
+    [
+     "link4",
+     "link5"
+    ],
+    [
+     "link5",
+     "link6"
+    ]
+   ]
+  },
+  "V1_usd_endpoints": {
+   "samples": 60,
+   "max_err_vs_numpy_m": 1.1102230246251565e-15,
+   "max_err_between_reps_m": 1.1102230246251565e-15
+  },
+  "V2_static_overlap": {
+   "samples": 60,
+   "agree": 60,
+   "disagree": 0,
+   "samples_with_hit": 9,
+   "samples_with_self_hit": 8,
+   "samples_with_obstacle_hit": 1,
+   "skipped_boundary_pairs": 0,
+   "disagree_examples": []
+  },
+  "V5_timing": {
+   "set_joint_positions_ms_median": 0.6191000029502902,
+   "check_ms_median": 0.8834500004013535,
+   "colliders_per_robot": 17
+  },
+  "V2_immediate_reflection": {
+   "trials": 20,
+   "correct": 20,
+   "timeline_stopped": true
+  },
+  "V3_kinematic_stop_overlap": {
+   "dh/flat": {
+    "immediate": 10,
+    "after_update": 10,
+    "trials": 10
+   },
+   "screw/flat": {
+    "immediate": 10,
+    "after_update": 10,
+    "trials": 10
+   },
+   "swing/flat": {
+    "immediate": 10,
+    "after_update": 10,
+    "trials": 10
+   }
+  },
+  "V3_kinematic_pose": {
+   "frames": 212,
+   "max_err_physx_vs_usd": 7.143526152830759e-07
+  },
+  "V3_kinematic_overlap": {
+   "frames": 212,
+   "agree_with_current_q": 212,
+   "agree_with_previous_q": 210
+  },
+  "V4_contact_monitor_obstacle_events": {
+   "dh/flat": [
+    [
+     64,
+     "found"
+    ],
+    [
+     66,
+     "found"
+    ],
+    [
+     68,
+     "found"
+    ],
+    [
+     130,
+     "lost"
+    ],
+    [
+     132,
+     "lost"
+    ],
+    [
+     134,
+     "lost"
+    ]
+   ],
+   "screw/flat": [
+    [
+     64,
+     "found"
+    ],
+    [
+     66,
+     "found"
+    ],
+    [
+     68,
+     "found"
+    ],
+    [
+     130,
+     "lost"
+    ],
+    [
+     132,
+     "lost"
+    ],
+    [
+     134,
+     "lost"
+    ]
+   ],
+   "swing/flat": [
+    [
+     64,
+     "found"
+    ],
+    [
+     66,
+     "found"
+    ],
+    [
+     68,
+     "found"
+    ],
+    [
+     130,
+     "lost"
+    ],
+    [
+     132,
+     "lost"
+    ],
+    [
+     134,
+     "lost"
+    ]
+   ]
+  },
+  "V4_contact_monitor_by_phase": {
+   "approach": {
+    "frames": 61,
+    "truth": 5,
+    "dh/flat": 4,
+    "screw/flat": 4,
+    "swing/flat": 4
+   },
+   "hold_hit": {
+    "frames": 60,
+    "truth": 60,
+    "dh/flat": 60,
+    "screw/flat": 60,
+    "swing/flat": 60
+   },
+   "leave": {
+    "frames": 61,
+    "truth": 5,
+    "dh/flat": 4,
+    "screw/flat": 4,
+    "swing/flat": 4
+   },
+   "hold_free": {
+    "frames": 30,
+    "truth": 0,
+    "dh/flat": 0,
+    "screw/flat": 0,
+    "swing/flat": 0
+   }
+  },
+  "V4_contact_monitor_other_pairs": {
+   "dh/flat": [],
+   "screw/flat": [],
+   "swing/flat": []
+  },
+  "V3_stop_reset": {
+   "q_at_play_end": [
+    -3.1085097693055483,
+    1.2849136735310651,
+    0.10941388575040926,
+    -0.16673824521265201,
+    -1.2375837617997092,
+    -0.8862975515969067
+   ],
+   "q_after_stop": [
+    -3.1085097693055483,
+    1.2849136735310651,
+    0.10941388575040926,
+    -0.16673824521265201,
+    -1.2375837617997092,
+    -0.8862975515969067
+   ],
+   "ops_same_as_before_play": {
+    "dh/flat": true,
+    "screw/flat": true,
+    "swing/flat": true
+   },
+   "ops_consistent_with_joint_attr": {
+    "dh/flat": true,
+    "screw/flat": true,
+    "swing/flat": true
+   }
+  },
+  "V6_nested_kinematic": {
+   "contact_report_headers": {
+    "dh/nested": 34,
+    "swing/nested": 34,
+    "screw/nested": 34,
+    "dh/flat": 8,
+    "swing/flat": 8,
+    "screw/flat": 8
+   },
+   "ball_displacement_m": {
+    "dh/nested": 0.09385331476912978,
+    "swing/nested": 0.09389891492437905,
+    "screw/nested": 0.0938988154417569,
+    "dh/flat": 0.4549480515831226,
+    "swing/flat": 0.45494747246863976,
+    "screw/flat": 0.45494553800920545
+   }
+  }
+ },
+ "examples": {
+  "self": [
+   0.7859979977652181,
+   1.588855203878302,
+   0.10513713804903872,
+   -1.4289226120489225,
+   -1.2555922625248999,
+   1.4942137815850476
+  ],
+  "env": [
+   0.47094317256449614,
+   -0.21490785484146135,
+   0.1000784382655666,
+   -1.6091023095778105,
+   2.603926422320611,
+   -1.1312206147691102
+  ],
+  "free": [
+   -3.1085097693055483,
+   1.2849136735310651,
+   0.10941388575040926,
+   -0.16673824521265201,
+   -1.2375837617997092,
+   -0.8862975515969067
+  ]
+ },
+ "kinematic_frames": [
+  {
+   "frame": 0,
+   "phase": "approach",
+   "truth_obstacle": false,
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "min_margin_obstacle": 0.36368092477478514
+  },
+  {
+   "frame": 1,
+   "phase": "approach",
+   "truth_obstacle": false,
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "min_margin_obstacle": 0.36368092477478514
+  },
+  {
+   "frame": 2,
+   "phase": "approach",
+   "truth_obstacle": false,
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "min_margin_obstacle": 0.36368092477478514
+  },
+  {
+   "frame": 3,
+   "phase": "approach",
+   "truth_obstacle": false,
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "min_margin_obstacle": 0.36368092477478514
+  },
+  {
+   "frame": 4,
+   "phase": "approach",
+   "truth_obstacle": false,
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "min_margin_obstacle": 0.36368092477478514
+  },
+  {
+   "frame": 5,
+   "phase": "approach",
+   "truth_obstacle": false,
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "min_margin_obstacle": 0.36368092477478514
+  },
+  {
+   "frame": 6,
+   "phase": "approach",
+   "truth_obstacle": false,
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "min_margin_obstacle": 0.36368092477478514
+  },
+  {
+   "frame": 7,
+   "phase": "approach",
+   "truth_obstacle": false,
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "min_margin_obstacle": 0.36368092477478514
+  },
+  {
+   "frame": 8,
+   "phase": "approach",
+   "truth_obstacle": false,
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "min_margin_obstacle": 0.36368092477478514
+  },
+  {
+   "frame": 9,
+   "phase": "approach",
+   "truth_obstacle": false,
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "min_margin_obstacle": 0.36368092477478514
+  },
+  {
+   "frame": 10,
+   "phase": "approach",
+   "truth_obstacle": false,
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "min_margin_obstacle": 0.36368092477478514
+  },
+  {
+   "frame": 11,
+   "phase": "approach",
+   "truth_obstacle": false,
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "min_margin_obstacle": 0.36368092477478514
+  },
+  {
+   "frame": 12,
+   "phase": "approach",
+   "truth_obstacle": false,
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "min_margin_obstacle": 0.36368092477478514
+  },
+  {
+   "frame": 13,
+   "phase": "approach",
+   "truth_obstacle": false,
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "min_margin_obstacle": 0.36368092477478514
+  },
+  {
+   "frame": 14,
+   "phase": "approach",
+   "truth_obstacle": false,
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "min_margin_obstacle": 0.36368092477478514
+  },
+  {
+   "frame": 15,
+   "phase": "approach",
+   "truth_obstacle": false,
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "min_margin_obstacle": 0.36368092477478514
+  },
+  {
+   "frame": 16,
+   "phase": "approach",
+   "truth_obstacle": false,
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "min_margin_obstacle": 0.36368092477478514
+  },
+  {
+   "frame": 17,
+   "phase": "approach",
+   "truth_obstacle": false,
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "min_margin_obstacle": 0.3615488617020345
+  },
+  {
+   "frame": 18,
+   "phase": "approach",
+   "truth_obstacle": false,
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "min_margin_obstacle": 0.3534200175425199
+  },
+  {
+   "frame": 19,
+   "phase": "approach",
+   "truth_obstacle": false,
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "min_margin_obstacle": 0.3453283400927884
+  },
+  {
+   "frame": 20,
+   "phase": "approach",
+   "truth_obstacle": false,
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "min_margin_obstacle": 0.3373107360766468
+  },
+  {
+   "frame": 21,
+   "phase": "approach",
+   "truth_obstacle": false,
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "min_margin_obstacle": 0.32940544616430223
+  },
+  {
+   "frame": 22,
+   "phase": "approach",
+   "truth_obstacle": false,
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "min_margin_obstacle": 0.32165194303215117
+  },
+  {
+   "frame": 23,
+   "phase": "approach",
+   "truth_obstacle": false,
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "min_margin_obstacle": 0.31409078607533353
+  },
+  {
+   "frame": 24,
+   "phase": "approach",
+   "truth_obstacle": false,
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "min_margin_obstacle": 0.3067634244210157
+  },
+  {
+   "frame": 25,
+   "phase": "approach",
+   "truth_obstacle": false,
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "min_margin_obstacle": 0.2997119399315935
+  },
+  {
+   "frame": 26,
+   "phase": "approach",
+   "truth_obstacle": false,
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "min_margin_obstacle": 0.2929787226231763
+  },
+  {
+   "frame": 27,
+   "phase": "approach",
+   "truth_obstacle": false,
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "min_margin_obstacle": 0.28660607259007503
+  },
+  {
+   "frame": 28,
+   "phase": "approach",
+   "truth_obstacle": false,
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "min_margin_obstacle": 0.2806357253383783
+  },
+  {
+   "frame": 29,
+   "phase": "approach",
+   "truth_obstacle": false,
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "min_margin_obstacle": 0.2751083015427322
+  },
+  {
+   "frame": 30,
+   "phase": "approach",
+   "truth_obstacle": false,
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "min_margin_obstacle": 0.27006268767116726
+  },
+  {
+   "frame": 31,
+   "phase": "approach",
+   "truth_obstacle": false,
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "min_margin_obstacle": 0.26553536049303744
+  },
+  {
+   "frame": 32,
+   "phase": "approach",
+   "truth_obstacle": false,
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "min_margin_obstacle": 0.26155967575370426
+  },
+  {
+   "frame": 33,
+   "phase": "approach",
+   "truth_obstacle": false,
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "min_margin_obstacle": 0.25816514853966827
+  },
+  {
+   "frame": 34,
+   "phase": "approach",
+   "truth_obstacle": false,
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "min_margin_obstacle": 0.2553767590934488
+  },
+  {
+   "frame": 35,
+   "phase": "approach",
+   "truth_obstacle": false,
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "min_margin_obstacle": 0.25321432196013305
+  },
+  {
+   "frame": 36,
+   "phase": "approach",
+   "truth_obstacle": false,
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "min_margin_obstacle": 0.2516919573118018
+  },
+  {
+   "frame": 37,
+   "phase": "approach",
+   "truth_obstacle": false,
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "min_margin_obstacle": 0.25081770036376005
+  },
+  {
+   "frame": 38,
+   "phase": "approach",
+   "truth_obstacle": false,
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "min_margin_obstacle": 0.24689671199362007
+  },
+  {
+   "frame": 39,
+   "phase": "approach",
+   "truth_obstacle": false,
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "min_margin_obstacle": 0.23917571515570563
+  },
+  {
+   "frame": 40,
+   "phase": "approach",
+   "truth_obstacle": false,
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "min_margin_obstacle": 0.23133924493718344
+  },
+  {
+   "frame": 41,
+   "phase": "approach",
+   "truth_obstacle": false,
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "min_margin_obstacle": 0.22392543253162916
+  },
+  {
+   "frame": 42,
+   "phase": "approach",
+   "truth_obstacle": false,
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "min_margin_obstacle": 0.2169994405021191
+  },
+  {
+   "frame": 43,
+   "phase": "approach",
+   "truth_obstacle": false,
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "min_margin_obstacle": 0.2100541264000773
+  },
+  {
+   "frame": 44,
+   "phase": "approach",
+   "truth_obstacle": false,
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "min_margin_obstacle": 0.20146899559432002
+  },
+  {
+   "frame": 45,
+   "phase": "approach",
+   "truth_obstacle": false,
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "min_margin_obstacle": 0.19113797062204613
+  },
+  {
+   "frame": 46,
+   "phase": "approach",
+   "truth_obstacle": false,
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "min_margin_obstacle": 0.1797264298044779
+  },
+  {
+   "frame": 47,
+   "phase": "approach",
+   "truth_obstacle": false,
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "min_margin_obstacle": 0.168912917702289
+  },
+  {
+   "frame": 48,
+   "phase": "approach",
+   "truth_obstacle": false,
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "min_margin_obstacle": 0.15891189736439698
+  },
+  {
+   "frame": 49,
+   "phase": "approach",
+   "truth_obstacle": false,
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "min_margin_obstacle": 0.14781686343837996
+  },
+  {
+   "frame": 50,
+   "phase": "approach",
+   "truth_obstacle": false,
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "min_margin_obstacle": 0.12923314524221685
+  },
+  {
+   "frame": 51,
+   "phase": "approach",
+   "truth_obstacle": false,
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "min_margin_obstacle": 0.109197263638058
+  },
+  {
+   "frame": 52,
+   "phase": "approach",
+   "truth_obstacle": false,
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "min_margin_obstacle": 0.08781076056854116
+  },
+  {
+   "frame": 53,
+   "phase": "approach",
+   "truth_obstacle": false,
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "min_margin_obstacle": 0.06519455218975441
+  },
+  {
+   "frame": 54,
+   "phase": "approach",
+   "truth_obstacle": false,
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "min_margin_obstacle": 0.04149705660249636
+  },
+  {
+   "frame": 55,
+   "phase": "approach",
+   "truth_obstacle": false,
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "min_margin_obstacle": 0.016914608378850962
+  },
+  {
+   "frame": 56,
+   "phase": "approach",
+   "truth_obstacle": true,
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "min_margin_obstacle": -0.00825125018359367
+  },
+  {
+   "frame": 57,
+   "phase": "approach",
+   "truth_obstacle": true,
+   "monitor_obstacle": {
+    "dh/flat": true,
+    "screw/flat": true,
+    "swing/flat": true
+   },
+   "min_margin_obstacle": -0.03340055016860495
+  },
+  {
+   "frame": 58,
+   "phase": "approach",
+   "truth_obstacle": true,
+   "monitor_obstacle": {
+    "dh/flat": true,
+    "screw/flat": true,
+    "swing/flat": true
+   },
+   "min_margin_obstacle": -0.05678330473551496
+  },
+  {
+   "frame": 59,
+   "phase": "approach",
+   "truth_obstacle": true,
+   "monitor_obstacle": {
+    "dh/flat": true,
+    "screw/flat": true,
+    "swing/flat": true
+   },
+   "min_margin_obstacle": -0.07110587998639523
+  },
+  {
+   "frame": 60,
+   "phase": "approach",
+   "truth_obstacle": true,
+   "monitor_obstacle": {
+    "dh/flat": true,
+    "screw/flat": true,
+    "swing/flat": true
+   },
+   "min_margin_obstacle": -0.0621903670468293
+  },
+  {
+   "frame": 61,
+   "phase": "hold_hit",
+   "truth_obstacle": true,
+   "monitor_obstacle": {
+    "dh/flat": true,
+    "screw/flat": true,
+    "swing/flat": true
+   },
+   "min_margin_obstacle": -0.0621903670468293
+  },
+  {
+   "frame": 62,
+   "phase": "hold_hit",
+   "truth_obstacle": true,
+   "monitor_obstacle": {
+    "dh/flat": true,
+    "screw/flat": true,
+    "swing/flat": true
+   },
+   "min_margin_obstacle": -0.0621903670468293
+  },
+  {
+   "frame": 63,
+   "phase": "hold_hit",
+   "truth_obstacle": true,
+   "monitor_obstacle": {
+    "dh/flat": true,
+    "screw/flat": true,
+    "swing/flat": true
+   },
+   "min_margin_obstacle": -0.0621903670468293
+  },
+  {
+   "frame": 64,
+   "phase": "hold_hit",
+   "truth_obstacle": true,
+   "monitor_obstacle": {
+    "dh/flat": true,
+    "screw/flat": true,
+    "swing/flat": true
+   },
+   "min_margin_obstacle": -0.0621903670468293
+  },
+  {
+   "frame": 65,
+   "phase": "hold_hit",
+   "truth_obstacle": true,
+   "monitor_obstacle": {
+    "dh/flat": true,
+    "screw/flat": true,
+    "swing/flat": true
+   },
+   "min_margin_obstacle": -0.0621903670468293
+  },
+  {
+   "frame": 66,
+   "phase": "hold_hit",
+   "truth_obstacle": true,
+   "monitor_obstacle": {
+    "dh/flat": true,
+    "screw/flat": true,
+    "swing/flat": true
+   },
+   "min_margin_obstacle": -0.0621903670468293
+  },
+  {
+   "frame": 67,
+   "phase": "hold_hit",
+   "truth_obstacle": true,
+   "monitor_obstacle": {
+    "dh/flat": true,
+    "screw/flat": true,
+    "swing/flat": true
+   },
+   "min_margin_obstacle": -0.0621903670468293
+  },
+  {
+   "frame": 68,
+   "phase": "hold_hit",
+   "truth_obstacle": true,
+   "monitor_obstacle": {
+    "dh/flat": true,
+    "screw/flat": true,
+    "swing/flat": true
+   },
+   "min_margin_obstacle": -0.0621903670468293
+  },
+  {
+   "frame": 69,
+   "phase": "hold_hit",
+   "truth_obstacle": true,
+   "monitor_obstacle": {
+    "dh/flat": true,
+    "screw/flat": true,
+    "swing/flat": true
+   },
+   "min_margin_obstacle": -0.0621903670468293
+  },
+  {
+   "frame": 70,
+   "phase": "hold_hit",
+   "truth_obstacle": true,
+   "monitor_obstacle": {
+    "dh/flat": true,
+    "screw/flat": true,
+    "swing/flat": true
+   },
+   "min_margin_obstacle": -0.0621903670468293
+  },
+  {
+   "frame": 71,
+   "phase": "hold_hit",
+   "truth_obstacle": true,
+   "monitor_obstacle": {
+    "dh/flat": true,
+    "screw/flat": true,
+    "swing/flat": true
+   },
+   "min_margin_obstacle": -0.0621903670468293
+  },
+  {
+   "frame": 72,
+   "phase": "hold_hit",
+   "truth_obstacle": true,
+   "monitor_obstacle": {
+    "dh/flat": true,
+    "screw/flat": true,
+    "swing/flat": true
+   },
+   "min_margin_obstacle": -0.0621903670468293
+  },
+  {
+   "frame": 73,
+   "phase": "hold_hit",
+   "truth_obstacle": true,
+   "monitor_obstacle": {
+    "dh/flat": true,
+    "screw/flat": true,
+    "swing/flat": true
+   },
+   "min_margin_obstacle": -0.0621903670468293
+  },
+  {
+   "frame": 74,
+   "phase": "hold_hit",
+   "truth_obstacle": true,
+   "monitor_obstacle": {
+    "dh/flat": true,
+    "screw/flat": true,
+    "swing/flat": true
+   },
+   "min_margin_obstacle": -0.0621903670468293
+  },
+  {
+   "frame": 75,
+   "phase": "hold_hit",
+   "truth_obstacle": true,
+   "monitor_obstacle": {
+    "dh/flat": true,
+    "screw/flat": true,
+    "swing/flat": true
+   },
+   "min_margin_obstacle": -0.0621903670468293
+  },
+  {
+   "frame": 76,
+   "phase": "hold_hit",
+   "truth_obstacle": true,
+   "monitor_obstacle": {
+    "dh/flat": true,
+    "screw/flat": true,
+    "swing/flat": true
+   },
+   "min_margin_obstacle": -0.0621903670468293
+  },
+  {
+   "frame": 77,
+   "phase": "hold_hit",
+   "truth_obstacle": true,
+   "monitor_obstacle": {
+    "dh/flat": true,
+    "screw/flat": true,
+    "swing/flat": true
+   },
+   "min_margin_obstacle": -0.0621903670468293
+  },
+  {
+   "frame": 78,
+   "phase": "hold_hit",
+   "truth_obstacle": true,
+   "monitor_obstacle": {
+    "dh/flat": true,
+    "screw/flat": true,
+    "swing/flat": true
+   },
+   "min_margin_obstacle": -0.0621903670468293
+  },
+  {
+   "frame": 79,
+   "phase": "hold_hit",
+   "truth_obstacle": true,
+   "monitor_obstacle": {
+    "dh/flat": true,
+    "screw/flat": true,
+    "swing/flat": true
+   },
+   "min_margin_obstacle": -0.0621903670468293
+  },
+  {
+   "frame": 80,
+   "phase": "hold_hit",
+   "truth_obstacle": true,
+   "monitor_obstacle": {
+    "dh/flat": true,
+    "screw/flat": true,
+    "swing/flat": true
+   },
+   "min_margin_obstacle": -0.0621903670468293
+  },
+  {
+   "frame": 81,
+   "phase": "hold_hit",
+   "truth_obstacle": true,
+   "monitor_obstacle": {
+    "dh/flat": true,
+    "screw/flat": true,
+    "swing/flat": true
+   },
+   "min_margin_obstacle": -0.0621903670468293
+  },
+  {
+   "frame": 82,
+   "phase": "hold_hit",
+   "truth_obstacle": true,
+   "monitor_obstacle": {
+    "dh/flat": true,
+    "screw/flat": true,
+    "swing/flat": true
+   },
+   "min_margin_obstacle": -0.0621903670468293
+  },
+  {
+   "frame": 83,
+   "phase": "hold_hit",
+   "truth_obstacle": true,
+   "monitor_obstacle": {
+    "dh/flat": true,
+    "screw/flat": true,
+    "swing/flat": true
+   },
+   "min_margin_obstacle": -0.0621903670468293
+  },
+  {
+   "frame": 84,
+   "phase": "hold_hit",
+   "truth_obstacle": true,
+   "monitor_obstacle": {
+    "dh/flat": true,
+    "screw/flat": true,
+    "swing/flat": true
+   },
+   "min_margin_obstacle": -0.0621903670468293
+  },
+  {
+   "frame": 85,
+   "phase": "hold_hit",
+   "truth_obstacle": true,
+   "monitor_obstacle": {
+    "dh/flat": true,
+    "screw/flat": true,
+    "swing/flat": true
+   },
+   "min_margin_obstacle": -0.0621903670468293
+  },
+  {
+   "frame": 86,
+   "phase": "hold_hit",
+   "truth_obstacle": true,
+   "monitor_obstacle": {
+    "dh/flat": true,
+    "screw/flat": true,
+    "swing/flat": true
+   },
+   "min_margin_obstacle": -0.0621903670468293
+  },
+  {
+   "frame": 87,
+   "phase": "hold_hit",
+   "truth_obstacle": true,
+   "monitor_obstacle": {
+    "dh/flat": true,
+    "screw/flat": true,
+    "swing/flat": true
+   },
+   "min_margin_obstacle": -0.0621903670468293
+  },
+  {
+   "frame": 88,
+   "phase": "hold_hit",
+   "truth_obstacle": true,
+   "monitor_obstacle": {
+    "dh/flat": true,
+    "screw/flat": true,
+    "swing/flat": true
+   },
+   "min_margin_obstacle": -0.0621903670468293
+  },
+  {
+   "frame": 89,
+   "phase": "hold_hit",
+   "truth_obstacle": true,
+   "monitor_obstacle": {
+    "dh/flat": true,
+    "screw/flat": true,
+    "swing/flat": true
+   },
+   "min_margin_obstacle": -0.0621903670468293
+  },
+  {
+   "frame": 90,
+   "phase": "hold_hit",
+   "truth_obstacle": true,
+   "monitor_obstacle": {
+    "dh/flat": true,
+    "screw/flat": true,
+    "swing/flat": true
+   },
+   "min_margin_obstacle": -0.0621903670468293
+  },
+  {
+   "frame": 91,
+   "phase": "hold_hit",
+   "truth_obstacle": true,
+   "monitor_obstacle": {
+    "dh/flat": true,
+    "screw/flat": true,
+    "swing/flat": true
+   },
+   "min_margin_obstacle": -0.0621903670468293
+  },
+  {
+   "frame": 92,
+   "phase": "hold_hit",
+   "truth_obstacle": true,
+   "monitor_obstacle": {
+    "dh/flat": true,
+    "screw/flat": true,
+    "swing/flat": true
+   },
+   "min_margin_obstacle": -0.0621903670468293
+  },
+  {
+   "frame": 93,
+   "phase": "hold_hit",
+   "truth_obstacle": true,
+   "monitor_obstacle": {
+    "dh/flat": true,
+    "screw/flat": true,
+    "swing/flat": true
+   },
+   "min_margin_obstacle": -0.0621903670468293
+  },
+  {
+   "frame": 94,
+   "phase": "hold_hit",
+   "truth_obstacle": true,
+   "monitor_obstacle": {
+    "dh/flat": true,
+    "screw/flat": true,
+    "swing/flat": true
+   },
+   "min_margin_obstacle": -0.0621903670468293
+  },
+  {
+   "frame": 95,
+   "phase": "hold_hit",
+   "truth_obstacle": true,
+   "monitor_obstacle": {
+    "dh/flat": true,
+    "screw/flat": true,
+    "swing/flat": true
+   },
+   "min_margin_obstacle": -0.0621903670468293
+  },
+  {
+   "frame": 96,
+   "phase": "hold_hit",
+   "truth_obstacle": true,
+   "monitor_obstacle": {
+    "dh/flat": true,
+    "screw/flat": true,
+    "swing/flat": true
+   },
+   "min_margin_obstacle": -0.0621903670468293
+  },
+  {
+   "frame": 97,
+   "phase": "hold_hit",
+   "truth_obstacle": true,
+   "monitor_obstacle": {
+    "dh/flat": true,
+    "screw/flat": true,
+    "swing/flat": true
+   },
+   "min_margin_obstacle": -0.0621903670468293
+  },
+  {
+   "frame": 98,
+   "phase": "hold_hit",
+   "truth_obstacle": true,
+   "monitor_obstacle": {
+    "dh/flat": true,
+    "screw/flat": true,
+    "swing/flat": true
+   },
+   "min_margin_obstacle": -0.0621903670468293
+  },
+  {
+   "frame": 99,
+   "phase": "hold_hit",
+   "truth_obstacle": true,
+   "monitor_obstacle": {
+    "dh/flat": true,
+    "screw/flat": true,
+    "swing/flat": true
+   },
+   "min_margin_obstacle": -0.0621903670468293
+  },
+  {
+   "frame": 100,
+   "phase": "hold_hit",
+   "truth_obstacle": true,
+   "monitor_obstacle": {
+    "dh/flat": true,
+    "screw/flat": true,
+    "swing/flat": true
+   },
+   "min_margin_obstacle": -0.0621903670468293
+  },
+  {
+   "frame": 101,
+   "phase": "hold_hit",
+   "truth_obstacle": true,
+   "monitor_obstacle": {
+    "dh/flat": true,
+    "screw/flat": true,
+    "swing/flat": true
+   },
+   "min_margin_obstacle": -0.0621903670468293
+  },
+  {
+   "frame": 102,
+   "phase": "hold_hit",
+   "truth_obstacle": true,
+   "monitor_obstacle": {
+    "dh/flat": true,
+    "screw/flat": true,
+    "swing/flat": true
+   },
+   "min_margin_obstacle": -0.0621903670468293
+  },
+  {
+   "frame": 103,
+   "phase": "hold_hit",
+   "truth_obstacle": true,
+   "monitor_obstacle": {
+    "dh/flat": true,
+    "screw/flat": true,
+    "swing/flat": true
+   },
+   "min_margin_obstacle": -0.0621903670468293
+  },
+  {
+   "frame": 104,
+   "phase": "hold_hit",
+   "truth_obstacle": true,
+   "monitor_obstacle": {
+    "dh/flat": true,
+    "screw/flat": true,
+    "swing/flat": true
+   },
+   "min_margin_obstacle": -0.0621903670468293
+  },
+  {
+   "frame": 105,
+   "phase": "hold_hit",
+   "truth_obstacle": true,
+   "monitor_obstacle": {
+    "dh/flat": true,
+    "screw/flat": true,
+    "swing/flat": true
+   },
+   "min_margin_obstacle": -0.0621903670468293
+  },
+  {
+   "frame": 106,
+   "phase": "hold_hit",
+   "truth_obstacle": true,
+   "monitor_obstacle": {
+    "dh/flat": true,
+    "screw/flat": true,
+    "swing/flat": true
+   },
+   "min_margin_obstacle": -0.0621903670468293
+  },
+  {
+   "frame": 107,
+   "phase": "hold_hit",
+   "truth_obstacle": true,
+   "monitor_obstacle": {
+    "dh/flat": true,
+    "screw/flat": true,
+    "swing/flat": true
+   },
+   "min_margin_obstacle": -0.0621903670468293
+  },
+  {
+   "frame": 108,
+   "phase": "hold_hit",
+   "truth_obstacle": true,
+   "monitor_obstacle": {
+    "dh/flat": true,
+    "screw/flat": true,
+    "swing/flat": true
+   },
+   "min_margin_obstacle": -0.0621903670468293
+  },
+  {
+   "frame": 109,
+   "phase": "hold_hit",
+   "truth_obstacle": true,
+   "monitor_obstacle": {
+    "dh/flat": true,
+    "screw/flat": true,
+    "swing/flat": true
+   },
+   "min_margin_obstacle": -0.0621903670468293
+  },
+  {
+   "frame": 110,
+   "phase": "hold_hit",
+   "truth_obstacle": true,
+   "monitor_obstacle": {
+    "dh/flat": true,
+    "screw/flat": true,
+    "swing/flat": true
+   },
+   "min_margin_obstacle": -0.0621903670468293
+  },
+  {
+   "frame": 111,
+   "phase": "hold_hit",
+   "truth_obstacle": true,
+   "monitor_obstacle": {
+    "dh/flat": true,
+    "screw/flat": true,
+    "swing/flat": true
+   },
+   "min_margin_obstacle": -0.0621903670468293
+  },
+  {
+   "frame": 112,
+   "phase": "hold_hit",
+   "truth_obstacle": true,
+   "monitor_obstacle": {
+    "dh/flat": true,
+    "screw/flat": true,
+    "swing/flat": true
+   },
+   "min_margin_obstacle": -0.0621903670468293
+  },
+  {
+   "frame": 113,
+   "phase": "hold_hit",
+   "truth_obstacle": true,
+   "monitor_obstacle": {
+    "dh/flat": true,
+    "screw/flat": true,
+    "swing/flat": true
+   },
+   "min_margin_obstacle": -0.0621903670468293
+  },
+  {
+   "frame": 114,
+   "phase": "hold_hit",
+   "truth_obstacle": true,
+   "monitor_obstacle": {
+    "dh/flat": true,
+    "screw/flat": true,
+    "swing/flat": true
+   },
+   "min_margin_obstacle": -0.0621903670468293
+  },
+  {
+   "frame": 115,
+   "phase": "hold_hit",
+   "truth_obstacle": true,
+   "monitor_obstacle": {
+    "dh/flat": true,
+    "screw/flat": true,
+    "swing/flat": true
+   },
+   "min_margin_obstacle": -0.0621903670468293
+  },
+  {
+   "frame": 116,
+   "phase": "hold_hit",
+   "truth_obstacle": true,
+   "monitor_obstacle": {
+    "dh/flat": true,
+    "screw/flat": true,
+    "swing/flat": true
+   },
+   "min_margin_obstacle": -0.0621903670468293
+  },
+  {
+   "frame": 117,
+   "phase": "hold_hit",
+   "truth_obstacle": true,
+   "monitor_obstacle": {
+    "dh/flat": true,
+    "screw/flat": true,
+    "swing/flat": true
+   },
+   "min_margin_obstacle": -0.0621903670468293
+  },
+  {
+   "frame": 118,
+   "phase": "hold_hit",
+   "truth_obstacle": true,
+   "monitor_obstacle": {
+    "dh/flat": true,
+    "screw/flat": true,
+    "swing/flat": true
+   },
+   "min_margin_obstacle": -0.0621903670468293
+  },
+  {
+   "frame": 119,
+   "phase": "hold_hit",
+   "truth_obstacle": true,
+   "monitor_obstacle": {
+    "dh/flat": true,
+    "screw/flat": true,
+    "swing/flat": true
+   },
+   "min_margin_obstacle": -0.0621903670468293
+  },
+  {
+   "frame": 120,
+   "phase": "hold_hit",
+   "truth_obstacle": true,
+   "monitor_obstacle": {
+    "dh/flat": true,
+    "screw/flat": true,
+    "swing/flat": true
+   },
+   "min_margin_obstacle": -0.0621903670468293
+  },
+  {
+   "frame": 121,
+   "phase": "leave",
+   "truth_obstacle": true,
+   "monitor_obstacle": {
+    "dh/flat": true,
+    "screw/flat": true,
+    "swing/flat": true
+   },
+   "min_margin_obstacle": -0.0621903670468293
+  },
+  {
+   "frame": 122,
+   "phase": "leave",
+   "truth_obstacle": true,
+   "monitor_obstacle": {
+    "dh/flat": true,
+    "screw/flat": true,
+    "swing/flat": true
+   },
+   "min_margin_obstacle": -0.07110587998639523
+  },
+  {
+   "frame": 123,
+   "phase": "leave",
+   "truth_obstacle": true,
+   "monitor_obstacle": {
+    "dh/flat": true,
+    "screw/flat": true,
+    "swing/flat": true
+   },
+   "min_margin_obstacle": -0.056783304735514975
+  },
+  {
+   "frame": 124,
+   "phase": "leave",
+   "truth_obstacle": true,
+   "monitor_obstacle": {
+    "dh/flat": true,
+    "screw/flat": true,
+    "swing/flat": true
+   },
+   "min_margin_obstacle": -0.03340055016860495
+  },
+  {
+   "frame": 125,
+   "phase": "leave",
+   "truth_obstacle": true,
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "min_margin_obstacle": -0.008251250183593586
+  },
+  {
+   "frame": 126,
+   "phase": "leave",
+   "truth_obstacle": false,
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "min_margin_obstacle": 0.01691460837885088
+  },
+  {
+   "frame": 127,
+   "phase": "leave",
+   "truth_obstacle": false,
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "min_margin_obstacle": 0.04149705660249636
+  },
+  {
+   "frame": 128,
+   "phase": "leave",
+   "truth_obstacle": false,
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "min_margin_obstacle": 0.06519455218975444
+  },
+  {
+   "frame": 129,
+   "phase": "leave",
+   "truth_obstacle": false,
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "min_margin_obstacle": 0.08781076056854124
+  },
+  {
+   "frame": 130,
+   "phase": "leave",
+   "truth_obstacle": false,
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "min_margin_obstacle": 0.109197263638058
+  },
+  {
+   "frame": 131,
+   "phase": "leave",
+   "truth_obstacle": false,
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "min_margin_obstacle": 0.12923314524221685
+  },
+  {
+   "frame": 132,
+   "phase": "leave",
+   "truth_obstacle": false,
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "min_margin_obstacle": 0.14781686343837985
+  },
+  {
+   "frame": 133,
+   "phase": "leave",
+   "truth_obstacle": false,
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "min_margin_obstacle": 0.1589118973643971
+  },
+  {
+   "frame": 134,
+   "phase": "leave",
+   "truth_obstacle": false,
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "min_margin_obstacle": 0.16891291770228894
+  },
+  {
+   "frame": 135,
+   "phase": "leave",
+   "truth_obstacle": false,
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "min_margin_obstacle": 0.179726429804478
+  },
+  {
+   "frame": 136,
+   "phase": "leave",
+   "truth_obstacle": false,
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "min_margin_obstacle": 0.19113797062204602
+  },
+  {
+   "frame": 137,
+   "phase": "leave",
+   "truth_obstacle": false,
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "min_margin_obstacle": 0.20146899559432002
+  },
+  {
+   "frame": 138,
+   "phase": "leave",
+   "truth_obstacle": false,
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "min_margin_obstacle": 0.2100541264000773
+  },
+  {
+   "frame": 139,
+   "phase": "leave",
+   "truth_obstacle": false,
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "min_margin_obstacle": 0.2169994405021191
+  },
+  {
+   "frame": 140,
+   "phase": "leave",
+   "truth_obstacle": false,
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "min_margin_obstacle": 0.22392543253162916
+  },
+  {
+   "frame": 141,
+   "phase": "leave",
+   "truth_obstacle": false,
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "min_margin_obstacle": 0.23133924493718344
+  },
+  {
+   "frame": 142,
+   "phase": "leave",
+   "truth_obstacle": false,
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "min_margin_obstacle": 0.23917571515570563
+  },
+  {
+   "frame": 143,
+   "phase": "leave",
+   "truth_obstacle": false,
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "min_margin_obstacle": 0.24689671199362007
+  },
+  {
+   "frame": 144,
+   "phase": "leave",
+   "truth_obstacle": false,
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "min_margin_obstacle": 0.25081770036376005
+  },
+  {
+   "frame": 145,
+   "phase": "leave",
+   "truth_obstacle": false,
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "min_margin_obstacle": 0.2516919573118018
+  },
+  {
+   "frame": 146,
+   "phase": "leave",
+   "truth_obstacle": false,
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "min_margin_obstacle": 0.25321432196013305
+  },
+  {
+   "frame": 147,
+   "phase": "leave",
+   "truth_obstacle": false,
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "min_margin_obstacle": 0.2553767590934488
+  },
+  {
+   "frame": 148,
+   "phase": "leave",
+   "truth_obstacle": false,
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "min_margin_obstacle": 0.25816514853966827
+  },
+  {
+   "frame": 149,
+   "phase": "leave",
+   "truth_obstacle": false,
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "min_margin_obstacle": 0.26155967575370426
+  },
+  {
+   "frame": 150,
+   "phase": "leave",
+   "truth_obstacle": false,
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "min_margin_obstacle": 0.2655353604930374
+  },
+  {
+   "frame": 151,
+   "phase": "leave",
+   "truth_obstacle": false,
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "min_margin_obstacle": 0.27006268767116726
+  },
+  {
+   "frame": 152,
+   "phase": "leave",
+   "truth_obstacle": false,
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "min_margin_obstacle": 0.2751083015427322
+  },
+  {
+   "frame": 153,
+   "phase": "leave",
+   "truth_obstacle": false,
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "min_margin_obstacle": 0.2806357253383783
+  },
+  {
+   "frame": 154,
+   "phase": "leave",
+   "truth_obstacle": false,
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "min_margin_obstacle": 0.2866060725900751
+  },
+  {
+   "frame": 155,
+   "phase": "leave",
+   "truth_obstacle": false,
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "min_margin_obstacle": 0.2929787226231763
+  },
+  {
+   "frame": 156,
+   "phase": "leave",
+   "truth_obstacle": false,
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "min_margin_obstacle": 0.2997119399315935
+  },
+  {
+   "frame": 157,
+   "phase": "leave",
+   "truth_obstacle": false,
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "min_margin_obstacle": 0.3067634244210157
+  },
+  {
+   "frame": 158,
+   "phase": "leave",
+   "truth_obstacle": false,
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "min_margin_obstacle": 0.3140907860753336
+  },
+  {
+   "frame": 159,
+   "phase": "leave",
+   "truth_obstacle": false,
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "min_margin_obstacle": 0.32165194303215117
+  },
+  {
+   "frame": 160,
+   "phase": "leave",
+   "truth_obstacle": false,
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "min_margin_obstacle": 0.32940544616430223
+  },
+  {
+   "frame": 161,
+   "phase": "leave",
+   "truth_obstacle": false,
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "min_margin_obstacle": 0.3373107360766468
+  },
+  {
+   "frame": 162,
+   "phase": "leave",
+   "truth_obstacle": false,
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "min_margin_obstacle": 0.3453283400927884
+  },
+  {
+   "frame": 163,
+   "phase": "leave",
+   "truth_obstacle": false,
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "min_margin_obstacle": 0.3534200175425198
+  },
+  {
+   "frame": 164,
+   "phase": "leave",
+   "truth_obstacle": false,
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "min_margin_obstacle": 0.3615488617020345
+  },
+  {
+   "frame": 165,
+   "phase": "leave",
+   "truth_obstacle": false,
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "min_margin_obstacle": 0.36368092477478514
+  },
+  {
+   "frame": 166,
+   "phase": "leave",
+   "truth_obstacle": false,
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "min_margin_obstacle": 0.36368092477478514
+  },
+  {
+   "frame": 167,
+   "phase": "leave",
+   "truth_obstacle": false,
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "min_margin_obstacle": 0.36368092477478514
+  },
+  {
+   "frame": 168,
+   "phase": "leave",
+   "truth_obstacle": false,
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "min_margin_obstacle": 0.36368092477478514
+  },
+  {
+   "frame": 169,
+   "phase": "leave",
+   "truth_obstacle": false,
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "min_margin_obstacle": 0.36368092477478514
+  },
+  {
+   "frame": 170,
+   "phase": "leave",
+   "truth_obstacle": false,
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "min_margin_obstacle": 0.36368092477478514
+  },
+  {
+   "frame": 171,
+   "phase": "leave",
+   "truth_obstacle": false,
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "min_margin_obstacle": 0.36368092477478514
+  },
+  {
+   "frame": 172,
+   "phase": "leave",
+   "truth_obstacle": false,
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "min_margin_obstacle": 0.36368092477478514
+  },
+  {
+   "frame": 173,
+   "phase": "leave",
+   "truth_obstacle": false,
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "min_margin_obstacle": 0.36368092477478514
+  },
+  {
+   "frame": 174,
+   "phase": "leave",
+   "truth_obstacle": false,
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "min_margin_obstacle": 0.36368092477478514
+  },
+  {
+   "frame": 175,
+   "phase": "leave",
+   "truth_obstacle": false,
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "min_margin_obstacle": 0.36368092477478514
+  },
+  {
+   "frame": 176,
+   "phase": "leave",
+   "truth_obstacle": false,
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "min_margin_obstacle": 0.36368092477478514
+  },
+  {
+   "frame": 177,
+   "phase": "leave",
+   "truth_obstacle": false,
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "min_margin_obstacle": 0.36368092477478514
+  },
+  {
+   "frame": 178,
+   "phase": "leave",
+   "truth_obstacle": false,
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "min_margin_obstacle": 0.36368092477478514
+  },
+  {
+   "frame": 179,
+   "phase": "leave",
+   "truth_obstacle": false,
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "min_margin_obstacle": 0.36368092477478514
+  },
+  {
+   "frame": 180,
+   "phase": "leave",
+   "truth_obstacle": false,
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "min_margin_obstacle": 0.36368092477478514
+  },
+  {
+   "frame": 181,
+   "phase": "leave",
+   "truth_obstacle": false,
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "min_margin_obstacle": 0.36368092477478514
+  },
+  {
+   "frame": 182,
+   "phase": "hold_free",
+   "truth_obstacle": false,
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "min_margin_obstacle": 0.36368092477478514
+  },
+  {
+   "frame": 183,
+   "phase": "hold_free",
+   "truth_obstacle": false,
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "min_margin_obstacle": 0.36368092477478514
+  },
+  {
+   "frame": 184,
+   "phase": "hold_free",
+   "truth_obstacle": false,
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "min_margin_obstacle": 0.36368092477478514
+  },
+  {
+   "frame": 185,
+   "phase": "hold_free",
+   "truth_obstacle": false,
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "min_margin_obstacle": 0.36368092477478514
+  },
+  {
+   "frame": 186,
+   "phase": "hold_free",
+   "truth_obstacle": false,
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "min_margin_obstacle": 0.36368092477478514
+  },
+  {
+   "frame": 187,
+   "phase": "hold_free",
+   "truth_obstacle": false,
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "min_margin_obstacle": 0.36368092477478514
+  },
+  {
+   "frame": 188,
+   "phase": "hold_free",
+   "truth_obstacle": false,
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "min_margin_obstacle": 0.36368092477478514
+  },
+  {
+   "frame": 189,
+   "phase": "hold_free",
+   "truth_obstacle": false,
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "min_margin_obstacle": 0.36368092477478514
+  },
+  {
+   "frame": 190,
+   "phase": "hold_free",
+   "truth_obstacle": false,
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "min_margin_obstacle": 0.36368092477478514
+  },
+  {
+   "frame": 191,
+   "phase": "hold_free",
+   "truth_obstacle": false,
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "min_margin_obstacle": 0.36368092477478514
+  },
+  {
+   "frame": 192,
+   "phase": "hold_free",
+   "truth_obstacle": false,
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "min_margin_obstacle": 0.36368092477478514
+  },
+  {
+   "frame": 193,
+   "phase": "hold_free",
+   "truth_obstacle": false,
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "min_margin_obstacle": 0.36368092477478514
+  },
+  {
+   "frame": 194,
+   "phase": "hold_free",
+   "truth_obstacle": false,
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "min_margin_obstacle": 0.36368092477478514
+  },
+  {
+   "frame": 195,
+   "phase": "hold_free",
+   "truth_obstacle": false,
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "min_margin_obstacle": 0.36368092477478514
+  },
+  {
+   "frame": 196,
+   "phase": "hold_free",
+   "truth_obstacle": false,
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "min_margin_obstacle": 0.36368092477478514
+  },
+  {
+   "frame": 197,
+   "phase": "hold_free",
+   "truth_obstacle": false,
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "min_margin_obstacle": 0.36368092477478514
+  },
+  {
+   "frame": 198,
+   "phase": "hold_free",
+   "truth_obstacle": false,
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "min_margin_obstacle": 0.36368092477478514
+  },
+  {
+   "frame": 199,
+   "phase": "hold_free",
+   "truth_obstacle": false,
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "min_margin_obstacle": 0.36368092477478514
+  },
+  {
+   "frame": 200,
+   "phase": "hold_free",
+   "truth_obstacle": false,
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "min_margin_obstacle": 0.36368092477478514
+  },
+  {
+   "frame": 201,
+   "phase": "hold_free",
+   "truth_obstacle": false,
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "min_margin_obstacle": 0.36368092477478514
+  },
+  {
+   "frame": 202,
+   "phase": "hold_free",
+   "truth_obstacle": false,
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "min_margin_obstacle": 0.36368092477478514
+  },
+  {
+   "frame": 203,
+   "phase": "hold_free",
+   "truth_obstacle": false,
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "min_margin_obstacle": 0.36368092477478514
+  },
+  {
+   "frame": 204,
+   "phase": "hold_free",
+   "truth_obstacle": false,
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "min_margin_obstacle": 0.36368092477478514
+  },
+  {
+   "frame": 205,
+   "phase": "hold_free",
+   "truth_obstacle": false,
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "min_margin_obstacle": 0.36368092477478514
+  },
+  {
+   "frame": 206,
+   "phase": "hold_free",
+   "truth_obstacle": false,
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "min_margin_obstacle": 0.36368092477478514
+  },
+  {
+   "frame": 207,
+   "phase": "hold_free",
+   "truth_obstacle": false,
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "min_margin_obstacle": 0.36368092477478514
+  },
+  {
+   "frame": 208,
+   "phase": "hold_free",
+   "truth_obstacle": false,
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "min_margin_obstacle": 0.36368092477478514
+  },
+  {
+   "frame": 209,
+   "phase": "hold_free",
+   "truth_obstacle": false,
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "min_margin_obstacle": 0.36368092477478514
+  },
+  {
+   "frame": 210,
+   "phase": "hold_free",
+   "truth_obstacle": false,
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "min_margin_obstacle": 0.36368092477478514
+  },
+  {
+   "frame": 211,
+   "phase": "hold_free",
+   "truth_obstacle": false,
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "min_margin_obstacle": 0.36368092477478514
+  }
+ ]
+}

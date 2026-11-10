@@ -1,0 +1,563 @@
+status: ok
+{
+ "started": "2026-11-02 21:01:48",
+ "phases": {
+  "P0": {
+   "demo": "C:\\isaacsim-6.2.0\\CodeByClaude\\geometric_mode_verification\\demo\\geometric_mode_demo.usda",
+   "root_dirty": true,
+   "session_sublayers": [],
+   "initial_pos": {
+    "Mover": [
+     -2.5,
+     0.0,
+     0.6
+    ],
+    "Target": [
+     0.0,
+     0.0,
+     0.6
+    ],
+    "Wall": [
+     2.0,
+     0.0,
+     0.6
+    ],
+    "OverlapA": [
+     -0.225,
+     2.5,
+     0.6
+    ],
+    "OverlapB": [
+     0.225,
+     2.5,
+     0.6
+    ],
+    "Floating": [
+     0.0,
+     -2.5,
+     2.0
+    ],
+    "Base": [
+     0.0,
+     -5.0,
+     1.5
+    ],
+    "Link": [
+     0.65,
+     -5.0,
+     1.5
+    ]
+   }
+  },
+  "P1_physics": {
+   "timeline_time": 2.017,
+   "app_frames": 119,
+   "pos": {
+    "Mover": [
+     -2.4999,
+     -0.0,
+     0.25
+    ],
+    "Target": [
+     0.0001,
+     -0.0,
+     0.25
+    ],
+    "Wall": [
+     2.0,
+     0.0,
+     0.6
+    ],
+    "OverlapA": [
+     -0.2675,
+     2.5018,
+     0.25
+    ],
+    "OverlapB": [
+     0.2686,
+     2.4982,
+     0.25
+    ],
+    "Floating": [
+     0.7462,
+     -2.5,
+     0.25
+    ],
+    "Base": [
+     0.0,
+     -5.0,
+     1.5
+    ],
+    "Link": [
+     0.6424,
+     -5.0,
+     1.4132
+    ]
+   },
+   "moved": {
+    "Mover": 0.35,
+    "Target": 0.35,
+    "Wall": 0.0,
+    "OverlapA": 0.3526,
+    "OverlapB": 0.3527,
+    "Floating": 1.9024,
+    "Base": 0.0,
+    "Link": 0.0871
+   },
+   "contacts": {},
+   "pos_after_stop_equals_initial": true,
+   "root_unchanged_after_stop": true
+  },
+  "P2_geometric": {
+   "report": {
+    "layer_identifier": "anon:000003D0A4AB6A80:geometric_mode",
+    "changes": [
+     {
+      "path": "/World/PhysicsScene",
+      "name": "physics:gravityMagnitude",
+      "before": 9.8100004196167,
+      "after": 0.0,
+      "before_authored": true
+     },
+     {
+      "path": "/World/PhysicsScene",
+      "name": "physxScene:reportKinematicKinematicPairs",
+      "before": false,
+      "after": true,
+      "before_authored": false
+     },
+     {
+      "path": "/World/PhysicsScene",
+      "name": "physxScene:reportKinematicStaticPairs",
+      "before": false,
+      "after": true,
+      "before_authored": false
+     },
+     {
+      "path": "/World/Lane1/Mover",
+      "name": "physics:kinematicEnabled",
+      "before": false,
+      "after": true,
+      "before_authored": false
+     },
+     {
+      "path": "/World/Lane1/Mover",
+      "name": "physxContactReport:threshold",
+      "before": 1.0,
+      "after": 0.0,
+      "before_authored": false
+     },
+     {
+      "path": "/World/Lane1/Target",
+      "name": "physics:kinematicEnabled",
+      "before": false,
+      "after": true,
+      "before_authored": false
+     },
+     {
+      "path": "/World/Lane1/Target",
+      "name": "physxContactReport:threshold",
+      "before": 1.0,
+      "after": 0.0,
+      "before_authored": false
+     },
+     {
+      "path": "/World/Lane2/OverlapA",
+      "name": "physics:kinematicEnabled",
+      "before": false,
+      "after": true,
+      "before_authored": false
+     },
+     {
+      "path": "/World/Lane2/OverlapA",
+      "name": "physxContactReport:threshold",
+      "before": 1.0,
+      "after": 0.0,
+      "before_authored": false
+     },
+     {
+      "path": "/World/Lane2/OverlapB",
+      "name": "physics:kinematicEnabled",
+      "before": false,
+      "after": true,
+      "before_authored": false
+     },
+     {
+      "path": "/World/Lane2/OverlapB",
+      "name": "physxContactReport:threshold",
+      "before": 1.0,
+      "after": 0.0,
+      "before_authored": false
+     },
+     {
+      "path": "/World/Lane3/Floating",
+      "name": "physics:kinematicEnabled",
+      "before": false,
+      "after": true,
+      "before_authored": false
+     },
+     {
+      "path": "/World/Lane3/Floating",
+      "name": "physxContactReport:threshold",
+      "before": 1.0,
+      "after": 0.0,
+      "before_authored": false
+     },
+     {
+      "path": "/World/Arm",
+      "name": "physxArticulation:articulationEnabled",
+      "before": true,
+      "after": false,
+      "before_authored": false
+     },
+     {
+      "path": "/World/Arm/Base",
+      "name": "physics:kinematicEnabled",
+      "before": false,
+      "after": true,
+      "before_authored": false
+     },
+     {
+      "path": "/World/Arm/Base",
+      "name": "physxContactReport:threshold",
+      "before": 1.0,
+      "after": 0.0,
+      "before_authored": false
+     },
+     {
+      "path": "/World/Arm/Link",
+      "name": "physics:kinematicEnabled",
+      "before": false,
+      "after": true,
+      "before_authored": false
+     },
+     {
+      "path": "/World/Arm/Link",
+      "name": "physxContactReport:threshold",
+      "before": 1.0,
+      "after": 0.0,
+      "before_authored": false
+     },
+     {
+      "path": "/World/Arm/FixToWorld",
+      "name": "physics:jointEnabled",
+      "before": true,
+      "after": false,
+      "before_authored": false
+     },
+     {
+      "path": "/World/Arm/Hinge",
+      "name": "physics:jointEnabled",
+      "before": true,
+      "after": false,
+      "before_authored": false
+     }
+    ],
+    "unused": {
+     "質量・慣性 (MassAPI)": [
+      "/World/Lane1/Mover",
+      "/World/Lane1/Target",
+      "/World/Lane2/OverlapA",
+      "/World/Lane2/OverlapB",
+      "/World/Lane3/Floating",
+      "/World/Arm/Base",
+      "/World/Arm/Link"
+     ],
+     "摩擦・反発 (MaterialAPI)": [
+      "/World/PhysicsMaterial"
+     ],
+     "ジョイントドライブ (DriveAPI)": [
+      "/World/Arm/Hinge"
+     ],
+     "初速度 (physics:velocity / angularVelocity)": [
+      "/World/Lane3/Floating"
+     ]
+    },
+    "warnings": []
+   },
+   "snapshot_diff_from_original": [
+    "/World/Arm.@api: ['PhysicsArticulationRootAPI'] -> ['PhysxArticulationAPI', 'PhysicsArticulationRootAPI']",
+    "/World/Arm.physxArticulation:articulationEnabled: None -> False",
+    "/World/Arm/Base.@api: ['PhysicsCollisionAPI', 'PhysicsRigidBodyAPI', 'PhysicsMassAPI'] -> ['PhysxContactReportAPI', 'PhysicsCollisionAPI', 'PhysicsRigidBodyAPI', 'PhysicsMassAPI']",
+    "/World/Arm/Base.physics:kinematicEnabled: None -> True",
+    "/World/Arm/Base.physxContactReport:threshold: None -> 0.0",
+    "/World/Arm/FixToWorld.physics:jointEnabled: None -> False",
+    "/World/Arm/Hinge.physics:jointEnabled: None -> False",
+    "/World/Arm/Link.@api: ['PhysicsRigidBodyAPI', 'PhysicsMassAPI'] -> ['PhysxContactReportAPI', 'PhysicsRigidBodyAPI', 'PhysicsMassAPI']",
+    "/World/Arm/Link.physics:kinematicEnabled: None -> True",
+    "/World/Arm/Link.physxContactReport:threshold: None -> 0.0",
+    "/World/Lane1/Mover.@api: ['PhysicsCollisionAPI', 'PhysicsRigidBodyAPI', 'PhysicsMassAPI', 'MaterialBindingAPI'] -> ['PhysxContactReportAPI', 'PhysicsCollisionAPI', 'PhysicsRigidBodyAPI', 'PhysicsMassAPI', 'MaterialBindingAPI']",
+    "/World/Lane1/Mover.physics:kinematicEnabled: None -> True",
+    "/World/Lane1/Mover.physxContactReport:threshold: None -> 0.0",
+    "/World/Lane1/Target.@api: ['PhysicsCollisionAPI', 'PhysicsRigidBodyAPI', 'PhysicsMassAPI', 'MaterialBindingAPI'] -> ['PhysxContactReportAPI', 'PhysicsCollisionAPI', 'PhysicsRigidBodyAPI', 'PhysicsMassAPI', 'MaterialBindingAPI']",
+    "/World/Lane1/Target.physics:kinematicEnabled: None -> True",
+    "/World/Lane1/Target.physxContactReport:threshold: None -> 0.0",
+    "/World/Lane2/OverlapA.@api: ['PhysicsCollisionAPI', 'PhysicsRigidBodyAPI', 'PhysicsMassAPI', 'MaterialBindingAPI'] -> ['PhysxContactReportAPI', 'PhysicsCollisionAPI', 'PhysicsRigidBodyAPI', 'PhysicsMassAPI', 'MaterialBindingAPI']",
+    "/World/Lane2/OverlapA.physics:kinematicEnabled: None -> True",
+    "/World/Lane2/OverlapA.physxContactReport:threshold: None -> 0.0",
+    "/World/Lane2/OverlapB.@api: ['PhysicsCollisionAPI', 'PhysicsRigidBodyAPI', 'PhysicsMassAPI', 'MaterialBindingAPI'] -> ['PhysxContactReportAPI', 'PhysicsCollisionAPI', 'PhysicsRigidBodyAPI', 'PhysicsMassAPI', 'MaterialBindingAPI']",
+    "/World/Lane2/OverlapB.physics:kinematicEnabled: None -> True",
+    "/World/Lane2/OverlapB.physxContactReport:threshold: None -> 0.0",
+    "/World/Lane3/Floating.@api: ['PhysicsCollisionAPI', 'PhysicsRigidBodyAPI', 'PhysicsMassAPI', 'MaterialBindingAPI'] -> ['PhysxContactReportAPI', 'PhysicsCollisionAPI', 'PhysicsRigidBodyAPI', 'PhysicsMassAPI', 'MaterialBindingAPI']",
+    "/World/Lane3/Floating.physics:kinematicEnabled: None -> True",
+    "/World/Lane3/Floating.physxContactReport:threshold: None -> 0.0",
+    "/World/PhysicsScene.@api: ['NewtonSceneAPI', 'PhysxSceneAPI'] -> ['PhysxSceneAPI', 'NewtonSceneAPI']",
+    "/World/PhysicsScene.physics:gravityMagnitude: 9.8100004196167 -> 0.0",
+    "/World/PhysicsScene.physxScene:reportKinematicKinematicPairs: None -> True",
+    "/World/PhysicsScene.physxScene:reportKinematicStaticPairs: None -> True"
+   ],
+   "root_unchanged_after_enable": true,
+   "root_dirty": true,
+   "timeline_time": 11.0,
+   "app_frames": 658,
+   "pos": {
+    "Mover": [
+     -2.5,
+     0.0,
+     0.6
+    ],
+    "Target": [
+     0.0,
+     0.0,
+     0.6
+    ],
+    "Wall": [
+     2.0,
+     0.0,
+     0.6
+    ],
+    "OverlapA": [
+     -0.225,
+     2.5,
+     0.6
+    ],
+    "OverlapB": [
+     0.225,
+     2.5,
+     0.6
+    ],
+    "Floating": [
+     0.0,
+     -2.5,
+     2.0
+    ],
+    "Base": [
+     0.0,
+     -5.0,
+     1.5
+    ],
+    "Link": [
+     0.65,
+     -5.0,
+     1.5
+    ]
+   },
+   "moved": {
+    "Mover": 0.0,
+    "Target": 0.0,
+    "Wall": 0.0,
+    "OverlapA": 0.0,
+    "OverlapB": 0.0,
+    "Floating": 0.0,
+    "Base": 0.0,
+    "Link": 0.0
+   },
+   "contacts": {
+    "Mover - Target": {
+     "first_t": 2.0,
+     "last_t": 9.05,
+     "events": 128,
+     "min_sep": -0.5,
+     "max_sep": 0.0167,
+     "mover_x_at_first": -0.5
+    },
+    "Mover - Wall/Geom": {
+     "first_t": 4.217,
+     "last_t": 6.833,
+     "events": 76,
+     "min_sep": -0.3,
+     "max_sep": -0.0,
+     "mover_x_at_first": 1.717
+    }
+   },
+   "pos_after_stop": {
+    "Mover": [
+     -2.5,
+     0.0,
+     0.6
+    ],
+    "Target": [
+     0.0,
+     0.0,
+     0.6
+    ],
+    "Wall": [
+     2.0,
+     0.0,
+     0.6
+    ],
+    "OverlapA": [
+     -0.225,
+     2.5,
+     0.6
+    ],
+    "OverlapB": [
+     0.225,
+     2.5,
+     0.6
+    ],
+    "Floating": [
+     0.0,
+     -2.5,
+     2.0
+    ],
+    "Base": [
+     0.0,
+     -5.0,
+     1.5
+    ],
+    "Link": [
+     0.65,
+     -5.0,
+     1.5
+    ]
+   },
+   "root_unchanged_after_stop": true
+  },
+  "P3_no_kinematic_pair_flags": {
+   "timeline_time": 5.517,
+   "app_frames": 329,
+   "pos": {
+    "Mover": [
+     2.9833,
+     0.0,
+     0.6
+    ],
+    "Target": [
+     0.0,
+     0.0,
+     0.6
+    ],
+    "Wall": [
+     2.0,
+     0.0,
+     0.6
+    ],
+    "OverlapA": [
+     -0.225,
+     2.5,
+     0.6
+    ],
+    "OverlapB": [
+     0.225,
+     2.5,
+     0.6
+    ],
+    "Floating": [
+     0.0,
+     -2.5,
+     2.0
+    ],
+    "Base": [
+     0.0,
+     -5.0,
+     1.5
+    ],
+    "Link": [
+     0.65,
+     -5.0,
+     1.5
+    ]
+   },
+   "moved": {
+    "Mover": 5.4833,
+    "Target": 0.0,
+    "Wall": 0.0,
+    "OverlapA": 0.0,
+    "OverlapB": 0.0,
+    "Floating": 0.0,
+    "Base": 0.0,
+    "Link": 0.0
+   },
+   "contacts": {}
+  },
+  "P4_edit_and_save": {
+   "edit_target_is_root": true,
+   "root_has_user_edit": true,
+   "root_has_geometric_values": false,
+   "root_gravity_line": [
+    "float physics:gravityMagnitude = 9.81"
+   ],
+   "composed_gravity_after_user_sets_5_in_root": 0.0,
+   "user_edit_survives_disable": "edited while geometric mode",
+   "gravity_after_disable": 5.0
+  },
+  "P5_restored": {
+   "geometric_layer_remaining": false,
+   "session_sublayers": [],
+   "snapshot_diff_from_original": [],
+   "root_text_equals_original": true,
+   "timeline_time": 2.017,
+   "app_frames": 119,
+   "pos": {
+    "Mover": [
+     -2.4999,
+     -0.0,
+     0.25
+    ],
+    "Target": [
+     0.0001,
+     -0.0,
+     0.25
+    ],
+    "Wall": [
+     2.0,
+     0.0,
+     0.6
+    ],
+    "OverlapA": [
+     -0.2675,
+     2.5018,
+     0.25
+    ],
+    "OverlapB": [
+     0.2686,
+     2.4982,
+     0.25
+    ],
+    "Floating": [
+     0.7462,
+     -2.5,
+     0.25
+    ],
+    "Base": [
+     0.0,
+     -5.0,
+     1.5
+    ],
+    "Link": [
+     0.6424,
+     -5.0,
+     1.4132
+    ]
+   },
+   "moved": {
+    "Mover": 0.35,
+    "Target": 0.35,
+    "Wall": 0.0,
+    "OverlapA": 0.3526,
+    "OverlapB": 0.3527,
+    "Floating": 1.9024,
+    "Base": 0.0,
+    "Link": 0.0871
+   },
+   "contacts": {},
+   "root_text_equals_original_after_play": true
+  }
+ },
+ "left_in_gui": {
+  "geometric_mode": true,
+  "driver_running": true
+ },
+ "finished": "2026-11-02 21:02:12"
+}

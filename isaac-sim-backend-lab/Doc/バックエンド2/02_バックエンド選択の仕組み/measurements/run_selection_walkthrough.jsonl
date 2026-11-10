@@ -1,0 +1,7 @@
+{"label": "A Stop・指定なし・RigidPrim", "calls": [{"候補リスト": ["tensor", "usd", "usdrt", "fabric"], "返した値": "tensor"}, {"候補リスト": ["usd", "usdrt", "fabric"], "返した値": "usd"}], "kind": "case"}
+{"label": "C Stop・usdrt を指定・RigidPrim", "calls": [{"候補リスト": ["tensor", "usd", "usdrt", "fabric"], "返した値": "usdrt"}, {"候補リスト": ["usd", "usdrt", "fabric"], "返した値": "usdrt"}], "kind": "case"}
+{"label": "D Stop・tensor を指定・RigidPrim", "calls": [{"候補リスト": ["tensor", "usd", "usdrt", "fabric"], "返した値": "tensor"}, {"候補リスト": ["usd", "usdrt", "fabric"], "返した値": "usd"}], "kind": "case"}
+{"label": "B Play・指定なし・RigidPrim", "calls": [{"候補リスト": ["tensor", "usd", "usdrt", "fabric"], "返した値": "tensor"}], "kind": "case"}
+{"label": "E Play・指定なし・XformPrim", "calls": [{"候補リスト": ["usd", "usdrt", "fabric"], "返した値": "usd"}], "kind": "case"}
+{"label": "F Play・tensor を指定・XformPrim", "calls": [{"候補リスト": ["usd", "usdrt", "fabric"], "返した値": "usd"}], "kind": "case"}
+{"name": "done", "kind": "phase"}

@@ -1,0 +1,91 @@
+{
+ "group": "s01_usd_fabric_sync",
+ "items": [
+  {
+   "id": "S-00",
+   "description": "バージョンと設定",
+   "omni.physx": "omni.physx-110.4.4",
+   "omni.physx.fabric": "(disabled)",
+   "omni.physics.tensors": "omni.physics.tensors-110.4.4",
+   "usdrt.scenegraph": "usdrt.scenegraph-7.6.3",
+   "omni.hydra.usdrt_delegate": "omni.hydra.usdrt_delegate-7.5.2",
+   "isaacsim.core.experimental.prims": "isaacsim.core.experimental.prims-1.12.1",
+   "isaacsim.core.experimental.utils": "isaacsim.core.experimental.utils-0.23.3",
+   "isaacsim.core.simulation_manager": "isaacsim.core.simulation_manager-1.17.4",
+   "isaac_sim_VERSION": "6.2.0-rc.14+release.52805.02189a84.gl",
+   "/app/useFabricSceneDelegate": true,
+   "/physics/resetOnStop": true,
+   "/physics/updateToUsd": true,
+   "/physics/updateVelocitiesToUsd": true,
+   "/physics/fabricEnabled": null,
+   "/physics/suppressReadback": false,
+   "/physics/cudaDevice": 0,
+   "config": "default",
+   "simulation_device": "cpu"
+  },
+  {
+   "id": "S-01..04",
+   "description": "pxr で translate.x=2 を書いた後、何をすれば Fabric の local 行列に反映されるか",
+   "S-01 何も呼ばない": {
+    "before": 0.0,
+    "after": 0.0,
+    "usd_written_x": 2.0
+   },
+   "S-02 GetPrimAtPath": {
+    "before": 0.0,
+    "after": 0.0,
+    "usd_written_x": 2.0
+   },
+   "S-03 SynchronizeToFabric": {
+    "before": 0.0,
+    "after": 2.0,
+    "usd_written_x": 2.0
+   },
+   "S-04 app.update": {
+    "before": 0.0,
+    "after": 2.0,
+    "usd_written_x": 2.0
+   }
+  },
+  {
+   "id": "S-05",
+   "description": "pxr で質量 5 を書いた後の Fabric の値",
+   "usd_written": 5.0,
+   "1_old_attr_object": 1.0,
+   "2_GetAttributeAtPath": 5.0,
+   "3_after_SynchronizeToFabric": 5.0
+  },
+  {
+   "id": "S-06",
+   "description": "暗黙同期は 1 回限りか(x=2 → x=3 と 2 回書く)",
+   "1_after_implicit_sync": 0.0,
+   "2_after_second_write": 0.0,
+   "3_after_second_GetPrimAtPath": 0.0,
+   "4_after_SynchronizeToFabric": 3.0
+  },
+  {
+   "id": "S-07",
+   "description": "pxr で x=2 を書いた直後に、XformPrim.get_world_poses を各バックエンドで読む",
+   "usd_written_x": 2.0,
+   "usd": 2.0,
+   "usd_warnings": [],
+   "usdrt": 0.0,
+   "usdrt_warnings": [],
+   "fabric": 0.0,
+   "fabric_warnings": []
+  },
+  {
+   "id": "S-08",
+   "description": "use_backend('usdrt' / 'fabric') に入れるか(FSD 無効だと RuntimeError になる実装)",
+   "usdrt": "入れた(例外なし)",
+   "fabric": "入れた(例外なし)"
+  },
+  {
+   "id": "S-09",
+   "description": "pxr で x=2 を書いた直後の Fabric の _worldPosition(OmniHydra の transform 属性)",
+   "before": null,
+   "immediately": null,
+   "after_update1": null
+  }
+ ]
+}

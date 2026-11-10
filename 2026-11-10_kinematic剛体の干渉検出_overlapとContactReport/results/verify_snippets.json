@@ -1,0 +1,438 @@
+{
+ "group": "verify_snippets",
+ "items": [
+  {
+   "id": "S1-usd",
+   "description": "Play 中、USD に書く、overlap_shape",
+   "all_ok": true,
+   "rows": [
+    {
+     "x": 0.05,
+     "hits": [],
+     "seen_from_target": false,
+     "ok": true
+    },
+    {
+     "x": 0.15,
+     "hits": [],
+     "seen_from_target": false,
+     "ok": true
+    },
+    {
+     "x": 0.25,
+     "hits": [],
+     "seen_from_target": false,
+     "ok": true
+    },
+    {
+     "x": 0.35,
+     "hits": [
+      "/World/Target/collider"
+     ],
+     "seen_from_target": true,
+     "ok": true
+    },
+    {
+     "x": 0.45,
+     "hits": [
+      "/World/Target/collider"
+     ],
+     "seen_from_target": true,
+     "ok": true
+    },
+    {
+     "x": 0.55,
+     "hits": [
+      "/World/Target/collider"
+     ],
+     "seen_from_target": true,
+     "ok": true
+    },
+    {
+     "x": 0.65,
+     "hits": [
+      "/World/Target/collider"
+     ],
+     "seen_from_target": true,
+     "ok": true
+    },
+    {
+     "x": 0.75,
+     "hits": [],
+     "seen_from_target": false,
+     "ok": true
+    },
+    {
+     "x": 0.85,
+     "hits": [
+      "/World/Wall/collider"
+     ],
+     "seen_from_target": false,
+     "ok": true
+    },
+    {
+     "x": 0.95,
+     "hits": [
+      "/World/Wall/collider"
+     ],
+     "seen_from_target": false,
+     "ok": true
+    },
+    {
+     "x": 1.05,
+     "hits": [
+      "/World/Wall/collider"
+     ],
+     "seen_from_target": false,
+     "ok": true
+    }
+   ]
+  },
+  {
+   "id": "S1-fabric",
+   "description": "Play 中、Fabric だけに書く、overlap_shape",
+   "all_ok": true,
+   "rows": [
+    {
+     "x": 0.05,
+     "hits": [],
+     "seen_from_target": false,
+     "ok": true
+    },
+    {
+     "x": 0.15,
+     "hits": [],
+     "seen_from_target": false,
+     "ok": true
+    },
+    {
+     "x": 0.25,
+     "hits": [],
+     "seen_from_target": false,
+     "ok": true
+    },
+    {
+     "x": 0.35,
+     "hits": [
+      "/World/Target/collider"
+     ],
+     "seen_from_target": true,
+     "ok": true
+    },
+    {
+     "x": 0.45,
+     "hits": [
+      "/World/Target/collider"
+     ],
+     "seen_from_target": true,
+     "ok": true
+    },
+    {
+     "x": 0.55,
+     "hits": [
+      "/World/Target/collider"
+     ],
+     "seen_from_target": true,
+     "ok": true
+    },
+    {
+     "x": 0.65,
+     "hits": [
+      "/World/Target/collider"
+     ],
+     "seen_from_target": true,
+     "ok": true
+    },
+    {
+     "x": 0.75,
+     "hits": [],
+     "seen_from_target": false,
+     "ok": true
+    },
+    {
+     "x": 0.85,
+     "hits": [
+      "/World/Wall/collider"
+     ],
+     "seen_from_target": false,
+     "ok": true
+    },
+    {
+     "x": 0.95,
+     "hits": [
+      "/World/Wall/collider"
+     ],
+     "seen_from_target": false,
+     "ok": true
+    },
+    {
+     "x": 1.05,
+     "hits": [
+      "/World/Wall/collider"
+     ],
+     "seen_from_target": false,
+     "ok": true
+    }
+   ]
+  },
+  {
+   "id": "S2",
+   "description": "Play 中、Contact Report",
+   "pairs_seen": [
+    "Mover - Target",
+    "Mover - Wall/collider"
+   ],
+   "neighbor_reported": false,
+   "rows": [
+    {
+     "x": 0.05,
+     "events": [],
+     "penetrating": []
+    },
+    {
+     "x": 0.15,
+     "events": [],
+     "penetrating": []
+    },
+    {
+     "x": 0.25,
+     "events": [],
+     "penetrating": []
+    },
+    {
+     "x": 0.35,
+     "events": [],
+     "penetrating": []
+    },
+    {
+     "x": 0.45,
+     "events": [
+      [
+       "FOUND",
+       "Mover - Target",
+       -0.05
+      ]
+     ],
+     "penetrating": [
+      "Mover - Target"
+     ]
+    },
+    {
+     "x": 0.55,
+     "events": [
+      [
+       "PERSIST",
+       "Mover - Target",
+       -0.15
+      ]
+     ],
+     "penetrating": [
+      "Mover - Target"
+     ]
+    },
+    {
+     "x": 0.65,
+     "events": [
+      [
+       "PERSIST",
+       "Mover - Target",
+       -0.15
+      ]
+     ],
+     "penetrating": [
+      "Mover - Target"
+     ]
+    },
+    {
+     "x": 0.75,
+     "events": [
+      [
+       "PERSIST",
+       "Mover - Target",
+       -0.05
+      ]
+     ],
+     "penetrating": [
+      "Mover - Target"
+     ]
+    },
+    {
+     "x": 0.85,
+     "events": [
+      [
+       "LOST",
+       "Mover - Target",
+       null
+      ]
+     ],
+     "penetrating": []
+    },
+    {
+     "x": 0.95,
+     "events": [
+      [
+       "FOUND",
+       "Mover - Wall/collider",
+       -0.05
+      ]
+     ],
+     "penetrating": [
+      "Mover - Wall/collider"
+     ]
+    },
+    {
+     "x": 1.05,
+     "events": [
+      [
+       "PERSIST",
+       "Mover - Wall/collider",
+       -0.15
+      ]
+     ],
+     "penetrating": [
+      "Mover - Wall/collider"
+     ]
+    },
+    {
+     "x": 1.05,
+     "events": [
+      [
+       "PERSIST",
+       "Mover - Wall/collider",
+       -0.15
+      ]
+     ],
+     "penetrating": [
+      "Mover - Wall/collider"
+     ]
+    },
+    {
+     "x": 1.05,
+     "events": [
+      [
+       "PERSIST",
+       "Mover - Wall/collider",
+       -0.15
+      ]
+     ],
+     "penetrating": [
+      "Mover - Wall/collider"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "S2-no-filter",
+   "description": "対照: FilteredPairs を書かない場合",
+   "pairs_seen": [
+    "Mover - Neighbor",
+    "Mover - Target",
+    "Mover - Wall/collider"
+   ],
+   "neighbor_reported": true
+  },
+  {
+   "id": "S2-no-flags",
+   "description": "対照: reportKinematicKinematicPairs を書かない場合",
+   "pairs_seen": [
+    "Mover - Wall/collider"
+   ]
+  },
+  {
+   "id": "S2-threshold-default",
+   "description": "対照: threshold を書かない(既定値)場合",
+   "pairs_seen": [
+    "Mover - Target",
+    "Mover - Wall/collider"
+   ]
+  },
+  {
+   "id": "S3",
+   "description": "Stop 中、USD に書いて update_simulation、overlap_shape",
+   "all_ok": true,
+   "timeline": "stopped",
+   "rows": [
+    {
+     "x": 0.05,
+     "hits": [],
+     "seen_from_target": false,
+     "ok": true
+    },
+    {
+     "x": 0.15,
+     "hits": [],
+     "seen_from_target": false,
+     "ok": true
+    },
+    {
+     "x": 0.25,
+     "hits": [],
+     "seen_from_target": false,
+     "ok": true
+    },
+    {
+     "x": 0.35,
+     "hits": [
+      "/World/Target/collider"
+     ],
+     "seen_from_target": true,
+     "ok": true
+    },
+    {
+     "x": 0.45,
+     "hits": [
+      "/World/Target/collider"
+     ],
+     "seen_from_target": true,
+     "ok": true
+    },
+    {
+     "x": 0.55,
+     "hits": [
+      "/World/Target/collider"
+     ],
+     "seen_from_target": true,
+     "ok": true
+    },
+    {
+     "x": 0.65,
+     "hits": [
+      "/World/Target/collider"
+     ],
+     "seen_from_target": true,
+     "ok": true
+    },
+    {
+     "x": 0.75,
+     "hits": [],
+     "seen_from_target": false,
+     "ok": true
+    },
+    {
+     "x": 0.85,
+     "hits": [
+      "/World/Wall/collider"
+     ],
+     "seen_from_target": false,
+     "ok": true
+    },
+    {
+     "x": 0.95,
+     "hits": [
+      "/World/Wall/collider"
+     ],
+     "seen_from_target": false,
+     "ok": true
+    },
+    {
+     "x": 1.05,
+     "hits": [
+      "/World/Wall/collider"
+     ],
+     "seen_from_target": false,
+     "ok": true
+    }
+   ]
+  }
+ ]
+}

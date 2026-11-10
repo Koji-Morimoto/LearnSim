@@ -1,0 +1,353 @@
+{
+ "group": "b01_pull_semantics",
+ "items": [
+  {
+   "id": "P-00",
+   "description": "バージョンと関係する設定",
+   "omni.physx": "omni.physx-110.4.4",
+   "omni.physics.physx": "omni.physics.physx-110.4.4",
+   "omni.physics.stageupdate": "omni.physics.stageupdate-110.4.4",
+   "isaac_sim_VERSION": "6.2.0-rc.14+release.52805.02189a84.gl",
+   "updateToUsd": true,
+   "fabricEnabled": false,
+   "get_contact_report_doc": "get_contact_report(self: omni.physx.bindings._physx.IPhysxSimulation) -> tuple\n\n\n            Get contact report data for current simulation step directly.\n\n            The contact buffer data are available for one simulation step\n\n            Returns:\n                Tuple with contact event vector and contact data vector::\n\n                'contact_headers': vector of contact event headers\n                'contact_data': vector of contact data\n                'friction_anchors': vector of friction anchors data\n\n    \n"
+  },
+  {
+   "id": "P-01",
+   "description": "attach 前 / attach 直後(ステップ前) / 1 ステップ後の pull",
+   "before_attach": [],
+   "after_attach_no_step": [],
+   "after_first_step": [
+    "FOUND Box-Ground n=4"
+   ],
+   "tuple_len": 2
+  },
+  {
+   "id": "P-02",
+   "description": "同じステップ内で 5 回 pull",
+   "summaries": [
+    [
+     "FOUND Box-Ground n=4"
+    ],
+    [
+     "FOUND Box-Ground n=4"
+    ],
+    [
+     "FOUND Box-Ground n=4"
+    ],
+    [
+     "FOUND Box-Ground n=4"
+    ],
+    [
+     "FOUND Box-Ground n=4"
+    ]
+   ],
+   "all_equal_including_contact_points": true,
+   "distinct_tuple_objects": true,
+   "distinct_header_vector_objects": true,
+   "first_contact_points": [
+    {
+     "pos": [
+      0.5,
+      0.5,
+      0.0
+     ],
+     "normal": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "sep": 0.001
+    },
+    {
+     "pos": [
+      0.5,
+      -0.5,
+      0.0
+     ],
+     "normal": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "sep": 0.001
+    },
+    {
+     "pos": [
+      -0.5,
+      -0.5,
+      0.0
+     ],
+     "normal": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "sep": 0.001
+    },
+    {
+     "pos": [
+      -0.5,
+      0.5,
+      0.0
+     ],
+     "normal": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "sep": 0.001
+    }
+   ]
+  },
+  {
+   "id": "P-03",
+   "description": "返り値はコピーか内部バッファへのビューか",
+   "len_before_mutation": [
+    1,
+    4
+   ],
+   "len_next_pull_after_clearing_returned_vectors": [
+    1,
+    4
+   ],
+   "kept_before_step": [
+    "PERSIST Box-Ground n=4"
+   ],
+   "kept_after_next_step": [
+    "PERSIST Box-Ground n=4"
+   ],
+   "kept_object_unchanged": true,
+   "fresh_pull_after_next_step": [
+    "LOST Box-Ground n=0"
+   ],
+   "vector_types": [
+    "ContactEventHeaderVector",
+    "ContactDataVector"
+   ]
+  },
+  {
+   "id": "P-04",
+   "description": "毎ステップ pull(基準)",
+   "schedule": {
+    "2": [
+     0.0,
+     0.0,
+     10.0
+    ],
+    "4": [
+     0.0,
+     0.0,
+     0.501
+    ]
+   },
+   "per_step": {
+    "0": [
+     "FOUND Box-Ground n=4"
+    ],
+    "1": [
+     "PERSIST Box-Ground n=4"
+    ],
+    "2": [
+     "LOST Box-Ground n=0"
+    ],
+    "3": [],
+    "4": [
+     "FOUND Box-Ground n=4"
+    ],
+    "5": [
+     "PERSIST Box-Ground n=4"
+    ],
+    "6": [
+     "PERSIST Box-Ground n=4"
+    ]
+   }
+  },
+  {
+   "id": "P-05",
+   "description": "途中のステップで pull しないと、そのステップのイベントは後から取れるか",
+   "note": "step2 は LOST、step3 は空、step6 は PERSIST が P-04 の基準。step3 で pull すると step2 の LOST は見えるか",
+   "pull_only_after_step1": [
+    "PERSIST Box-Ground n=4"
+   ],
+   "pull_only_after_step2": [
+    "LOST Box-Ground n=0"
+   ],
+   "pull_only_after_step3": [],
+   "pull_only_after_step6": [
+    "PERSIST Box-Ground n=4"
+   ]
+  },
+  {
+   "id": "P-06",
+   "description": "バッファが差し替わるタイミング",
+   "after_step1": [
+    "PERSIST Box-Ground n=4"
+   ],
+   "after_usd_teleport_before_simulate": [
+    "PERSIST Box-Ground n=4"
+   ],
+   "between_simulate_and_fetch_results": [
+    "PERSIST Box-Ground n=4"
+   ],
+   "after_fetch_results": [
+    "LOST Box-Ground n=0"
+   ]
+  },
+  {
+   "id": "P-07",
+   "description": "detach / 再 attach とバッファ",
+   "before_detach": [
+    "PERSIST Box-Ground n=4"
+   ],
+   "after_detach": [
+    "PERSIST Box-Ground n=4"
+   ],
+   "after_reattach_no_step": [
+    "PERSIST Box-Ground n=4"
+   ],
+   "after_reattach_one_step": [
+    "FOUND Box-Ground n=4"
+   ]
+  },
+  {
+   "id": "P-08",
+   "description": "push 購読と pull の併用",
+   "per_step": {
+    "0": {
+     "callbacks": 1,
+     "callback_inside_fetch_results": [
+      true
+     ],
+     "callback_summary": [
+      [
+       "FOUND Box-Ground n=4"
+      ]
+     ],
+     "pull_summary": [
+      "FOUND Box-Ground n=4"
+     ],
+     "pull_equals_callback": true,
+     "second_pull_equal": true
+    },
+    "1": {
+     "callbacks": 1,
+     "callback_inside_fetch_results": [
+      true
+     ],
+     "callback_summary": [
+      [
+       "PERSIST Box-Ground n=4"
+      ]
+     ],
+     "pull_summary": [
+      "PERSIST Box-Ground n=4"
+     ],
+     "pull_equals_callback": true,
+     "second_pull_equal": true
+    },
+    "2": {
+     "callbacks": 1,
+     "callback_inside_fetch_results": [
+      true
+     ],
+     "callback_summary": [
+      [
+       "LOST Box-Ground n=0"
+      ]
+     ],
+     "pull_summary": [
+      "LOST Box-Ground n=0"
+     ],
+     "pull_equals_callback": true,
+     "second_pull_equal": true
+    },
+    "3": {
+     "callbacks": 0,
+     "callback_inside_fetch_results": [],
+     "callback_summary": [],
+     "pull_summary": [],
+     "pull_equals_callback": false,
+     "second_pull_equal": true
+    },
+    "4": {
+     "callbacks": 1,
+     "callback_inside_fetch_results": [
+      true
+     ],
+     "callback_summary": [
+      [
+       "FOUND Box-Ground n=4"
+      ]
+     ],
+     "pull_summary": [
+      "FOUND Box-Ground n=4"
+     ],
+     "pull_equals_callback": true,
+     "second_pull_equal": true
+    },
+    "5": {
+     "callbacks": 1,
+     "callback_inside_fetch_results": [
+      true
+     ],
+     "callback_summary": [
+      [
+       "PERSIST Box-Ground n=4"
+      ]
+     ],
+     "pull_summary": [
+      "PERSIST Box-Ground n=4"
+     ],
+     "pull_equals_callback": true,
+     "second_pull_equal": true
+    },
+    "6": {
+     "callbacks": 1,
+     "callback_inside_fetch_results": [
+      true
+     ],
+     "callback_summary": [
+      [
+       "PERSIST Box-Ground n=4"
+      ]
+     ],
+     "pull_summary": [
+      "PERSIST Box-Ground n=4"
+     ],
+     "pull_equals_callback": true,
+     "second_pull_equal": true
+    }
+   },
+   "callbacks_during_app_update_after_last_step": 0
+  },
+  {
+   "id": "P-09",
+   "description": "update_simulation 経路",
+   "every_step": {
+    "0": [
+     "FOUND Box-Ground n=4"
+    ],
+    "1": [
+     "PERSIST Box-Ground n=4"
+    ],
+    "2": [
+     "LOST Box-Ground n=0"
+    ],
+    "3": [],
+    "4": [
+     "FOUND Box-Ground n=4"
+    ],
+    "5": [
+     "PERSIST Box-Ground n=4"
+    ],
+    "6": [
+     "PERSIST Box-Ground n=4"
+    ]
+   },
+   "pull_only_after_step3": {
+    "3": []
+   }
+  }
+ ]
+}

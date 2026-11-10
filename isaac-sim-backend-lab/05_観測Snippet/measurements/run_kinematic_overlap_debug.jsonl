@@ -1,0 +1,15 @@
+{"name": "kinematic=True", "kind": "phase"}
+{"step": "準備直後", "pos": [[0.0, 0.0, 1.0], [0.30000001192092896, 0.0, 1.0], [0.0, 0.30000001192092896, 1.0], [0.30000001192092896, 0.30000001192092896, 1.0]], "at_c0": ["/World/K/c_0"], "at_c1": ["/World/K/c_1"], "kind": "probe"}
+{"step": "set 直後", "tensor_c1": [0.05000000074505806, 0.0, 1.0], "at_c0": ["/World/K/c_0", "/World/K/c_1"], "at_old_c1": [], "kind": "probe"}
+{"step": "step 1 回目の後", "tensor_c1": [0.30000001192092896, 0.0, 1.0], "at_c0": ["/World/K/c_0"], "at_old_c1": ["/World/K/c_1"], "kind": "probe"}
+{"step": "step 2 回目の後", "tensor_c1": [0.30000001192092896, 0.0, 1.0], "at_c0": ["/World/K/c_0"], "at_old_c1": ["/World/K/c_1"], "kind": "probe"}
+{"step": "step 3 回目の後", "tensor_c1": [0.30000001192092896, 0.0, 1.0], "at_c0": ["/World/K/c_0"], "at_old_c1": ["/World/K/c_1"], "kind": "probe"}
+{"step": "メインループ3回の後", "at_c0": ["/World/K/c_0"], "at_old_c1": ["/World/K/c_1"], "kind": "probe"}
+{"name": "kinematic=False", "kind": "phase"}
+{"step": "準備直後", "pos": [[0.0, 0.0, 1.0], [0.30000001192092896, 0.0, 1.0], [0.0, 0.30000001192092896, 1.0], [0.30000001192092896, 0.30000001192092896, 1.0]], "at_c0": ["/World/K/c_0"], "at_c1": ["/World/K/c_1"], "kind": "probe"}
+{"step": "set 直後", "tensor_c1": [0.05000000074505806, 0.0, 1.0], "at_c0": ["/World/K/c_0", "/World/K/c_1"], "at_old_c1": [], "kind": "probe"}
+{"step": "step 1 回目の後", "tensor_c1": [0.0742107629776001, 1.866743332357146e-05, 1.000034213066101], "at_c0": ["/World/K/c_0", "/World/K/c_1"], "at_old_c1": [], "kind": "probe"}
+{"step": "step 2 回目の後", "tensor_c1": [0.07568686455488205, -0.00014496236690320075, 0.9997881054878235], "at_c0": ["/World/K/c_0", "/World/K/c_1"], "at_old_c1": [], "kind": "probe"}
+{"step": "step 3 回目の後", "tensor_c1": [0.07661231607198715, -0.00033819343661889434, 0.9994975924491882], "at_c0": ["/World/K/c_0", "/World/K/c_1"], "at_old_c1": [], "kind": "probe"}
+{"step": "メインループ3回の後", "at_c0": ["/World/K/c_0", "/World/K/c_1"], "at_old_c1": [], "kind": "probe"}
+{"name": "done", "kind": "phase"}

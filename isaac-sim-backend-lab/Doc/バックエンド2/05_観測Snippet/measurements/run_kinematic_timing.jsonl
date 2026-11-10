@@ -1,0 +1,5 @@
+{"label": "set_world_poses だけ", "median_us": 192.10000027669594, "device": "cpu", "kind": "timing"}
+{"label": "set_kinematic_targets + step(1)", "median_us": 2810.600000884733, "device": "cpu", "kind": "timing"}
+{"label": "step(1) だけ", "median_us": 710.6499997462379, "device": "cpu", "kind": "timing"}
+{"label": "overlap_box 1回", "median_us": 5.300000339047983, "device": "cpu", "kind": "timing"}
+{"name": "done", "kind": "phase"}

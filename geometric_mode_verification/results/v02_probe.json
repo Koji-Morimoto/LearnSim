@@ -1,0 +1,28 @@
+{
+ "Q1_root_text": {
+  "diff_disk_to_opened": [
+   "--- ",
+   "+++ ",
+   "@@ -87 +87,3 @@",
+   "-over \"OmniverseKit_Persp\"",
+   "+over \"OmniverseKit_Persp\" (",
+   "+    prepend apiSchemas = [\"OmniRtxCameraAutoExposureAPI_1\", \"OmniRtxCameraExposureAPI_1\"]",
+   "+)"
+  ],
+  "diff_opened_to_after_play_stop": [
+   "--- ",
+   "+++ ",
+   "@@ -49,0 +50 @@",
+   "+                bool omni:rtx:rt:ecoMode:enabled"
+  ],
+  "diff_before_to_after_geometric_play_stop": []
+ },
+ "Q2_stationary_overlap": {
+  "a_as_is": {},
+  "b_rewrite_same_pos": {},
+  "c_jitter_0.1mm": {
+   "OverlapA - OverlapB": 89
+  },
+  "d_B_static": {}
+ }
+}

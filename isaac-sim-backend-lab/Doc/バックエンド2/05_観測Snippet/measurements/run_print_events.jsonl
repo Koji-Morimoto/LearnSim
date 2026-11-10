@@ -1,0 +1,5 @@
+{"label": "print(f'...') 引数1つ", "event_count": 1, "texts": ["timeline.is_playing: True"], "kind": "print_events"}
+{"label": "print('...', 値) 引数2つ", "event_count": 1, "texts": ["timeline.is_playing: True"], "kind": "print_events"}
+{"label": "print(100行をjoinした文字列)", "event_count": 1, "texts": ["line 0\nline 1\nline 2\nline 3\nline 4\nline "], "kind": "print_events"}
+{"one_arg": 13.300013961270452, "two_args": 13.699987903237343, "join_100_lines": 34.750031773000956, "kind": "print_cost_us"}
+{"name": "done", "kind": "phase"}

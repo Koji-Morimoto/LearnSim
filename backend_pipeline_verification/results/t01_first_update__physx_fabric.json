@@ -1,0 +1,65 @@
+{
+ "group": "t01_first_update__physx_fabric",
+ "items": [
+  {
+   "id": "T-00",
+   "description": "バージョンと設定",
+   "omni.physx": "omni.physx-110.4.4",
+   "omni.physx.fabric": "omni.physx.fabric-110.4.4",
+   "omni.physics.tensors": "omni.physics.tensors-110.4.4",
+   "usdrt.scenegraph": "usdrt.scenegraph-7.6.3",
+   "omni.hydra.usdrt_delegate": "omni.hydra.usdrt_delegate-7.5.2",
+   "isaacsim.core.experimental.prims": "isaacsim.core.experimental.prims-1.12.1",
+   "isaacsim.core.experimental.utils": "isaacsim.core.experimental.utils-0.23.3",
+   "isaacsim.core.simulation_manager": "isaacsim.core.simulation_manager-1.17.4",
+   "isaac_sim_VERSION": "6.2.0-rc.14+release.52805.02189a84.gl",
+   "/app/useFabricSceneDelegate": true,
+   "/physics/resetOnStop": true,
+   "/physics/updateToUsd": false,
+   "/physics/updateVelocitiesToUsd": false,
+   "/physics/fabricEnabled": true,
+   "/physics/suppressReadback": false,
+   "/physics/cudaDevice": 0,
+   "config": "physx_fabric",
+   "simulation_device": "cpu"
+  },
+  {
+   "id": "T-01",
+   "description": "Play 後の各 update で物理ステップが何回走るか(速度 0.6 m/s、1 ステップ 0.01 m)",
+   "physics_dt": 0.016666666666666666,
+   "after_play_call_no_update": {
+    "steps_dt": []
+   },
+   "update1": {
+    "steps_dt": [
+     0.01667,
+     0.01667,
+     0.01667
+    ],
+    "time": 0.0167,
+    "y": 0.03
+   },
+   "update2": {
+    "steps_dt": [
+     0.01667
+    ],
+    "time": 0.0333,
+    "y": 0.04
+   },
+   "update3": {
+    "steps_dt": [
+     0.01667
+    ],
+    "time": 0.05,
+    "y": 0.05
+   },
+   "update4": {
+    "steps_dt": [
+     0.01667
+    ],
+    "time": 0.0667,
+    "y": 0.06
+   }
+  }
+ ]
+}

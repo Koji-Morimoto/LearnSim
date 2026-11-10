@@ -1,0 +1,39 @@
+{"name": "C1_getter_copy", "kind": "phase"}
+{"step": "read", "z": 4.923700332641602, "device": "cpu", "physx": 4.923700332641602, "kind": "getter"}
+{"step": "after_write", "z_in_array": 100.0, "physx": 4.923700332641602, "kind": "getter"}
+{"step": "read_again", "z": 4.923700332641602, "physx": 4.923700332641602, "same_object": false, "kind": "getter"}
+{"step": "after_update", "z": 4.920975208282471, "physx": 4.920975208282471, "kind": "getter"}
+{"step": "raw_view_read", "type": "<class 'warp._src.types.array'>", "z": 4.920975208282471, "kind": "getter"}
+{"step": "raw_view_after_write", "reread": 4.920975208282471, "physx": 4.920975208282471, "kind": "getter"}
+{"name": "C2_use_backend_callbacks", "kind": "phase"}
+{"case": "with の中で登録し、with の外の更新で呼ばれた", "records": [{"context_backend": null, "selected": "tensor", "same_thread": true}, {"context_backend": null, "selected": "tensor", "same_thread": true}, {"context_backend": null, "selected": "tensor", "same_thread": true}], "kind": "callback"}
+{"case": "with の中で SimulationManager.step を呼んだ", "records": [{"context_backend": "usd", "selected": "usd", "same_thread": true}, {"context_backend": "usd", "selected": "usd", "same_thread": true}], "kind": "callback"}
+{"case": "with の中で更新した（Script Editor では起きない形）", "records": [{"context_backend": "usd", "selected": "usd", "same_thread": true}, {"context_backend": "usd", "selected": "usd", "same_thread": true}], "kind": "callback"}
+{"name": "C3_fsd_cached", "kind": "phase"}
+{"module_value": true, "setting": true, "kind": "fsd"}
+{"result": "設定を false にしても use_backend('usdrt') は例外にならなかった", "module_value": true, "kind": "fsd"}
+{"name": "C4_simstate", "kind": "phase"}
+{"client": "import できない: ModuleNotFoundError: No module named 'isaacsim.mega'", "kind": "simstate"}
+{"label": "simstate disabled", "text": "", "kind": "stdout"}
+{"mode": "disabled", "written_target": 0.3, "read_target": [[0.30000001192092896]], "dof_position": [[0.29795944690704346]], "kind": "simstate"}
+{"label": "simstate mirror", "text": "", "kind": "stdout"}
+{"mode": "mirror", "written_target": 0.5, "read_target": [[0.5]], "dof_position": [[0.49863219261169434]], "kind": "simstate"}
+{"label": "simstate exclusive", "text": "", "kind": "stdout"}
+{"mode": "exclusive", "written_target": 0.8, "read_target": [[0.5]], "dof_position": [[0.4997023344039917]], "kind": "simstate"}
+{"mode": "use_backend('simstate')", "written_target": 1.0, "read_target": [[0.5]], "kind": "simstate"}
+{"name": "C5_timeline_from_code", "kind": "phase"}
+{"step": "play() の直後", "playing": false, "simulating": false, "steps": 0, "view": false, "kind": "timeline_code"}
+{"step": "commit() の直後", "playing": true, "simulating": true, "steps": 2, "view": true, "kind": "timeline_code"}
+{"step": "1回更新した後", "playing": true, "steps": 3, "kind": "timeline_code"}
+{"step": "pause() の直後", "playing": true, "stopped": false, "kind": "timeline_code"}
+{"step": "pause() 後に1回更新", "playing": false, "stopped": false, "kind": "timeline_code"}
+{"step": "stop() 後に1回更新", "stopped": true, "steps": 0, "kind": "timeline_code"}
+{"step": "async の手順", "log": [["after 30 updates of Play", "Play", 32], ["after pause", "Pause", 32], ["after 10 updates of Pause", "Pause", 32], ["after stop", "Stop", 0]], "done": true, "error": null, "kind": "timeline_code"}
+{"name": "C6_log_warn", "kind": "phase"}
+{"label": "carb.log_warn", "text": "lab-test: print から出した文字列\n", "kind": "stdout"}
+{"captured": "lab-test: print から出した文字列\n", "kind": "log_warn"}
+{"name": "C7_multi_stage", "kind": "phase"}
+{"attached": true, "main_cube_before": 9.923700332641602, "main_cube_after": null, "main_cube_usd": 9.923700332641602, "second_cube_physx": 10.0, "kind": "multi_stage"}
+{"step": "2つ目のステージを simulate で5回進めた後", "second_cube_usd": 9.959125518798828, "main_cube_physx": null, "kind": "multi_stage"}
+{"step": "detach 後", "main_cube_physx": 9.787450790405273, "playing": true, "kind": "multi_stage"}
+{"name": "done", "kind": "phase"}

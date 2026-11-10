@@ -1,0 +1,4715 @@
+{
+ "group": "n01_namespace",
+ "items": [
+  {
+   "id": "N-00",
+   "description": "バージョンと設定",
+   "omni.physx": "omni.physx-110.4.4",
+   "omni.physx.fabric": "(disabled)",
+   "omni.physics.tensors": "omni.physics.tensors-110.4.4",
+   "usdrt.scenegraph": "usdrt.scenegraph-7.6.3",
+   "omni.hydra.usdrt_delegate": "omni.hydra.usdrt_delegate-7.5.2",
+   "isaacsim.core.experimental.prims": "isaacsim.core.experimental.prims-1.12.1",
+   "isaacsim.core.experimental.utils": "isaacsim.core.experimental.utils-0.23.3",
+   "isaacsim.core.simulation_manager": "isaacsim.core.simulation_manager-1.17.4",
+   "isaac_sim_VERSION": "6.2.0-rc.14+release.52805.02189a84.gl",
+   "/app/useFabricSceneDelegate": true,
+   "/physics/resetOnStop": true,
+   "/physics/updateToUsd": true,
+   "/physics/updateVelocitiesToUsd": true,
+   "/physics/fabricEnabled": null,
+   "/physics/suppressReadback": false,
+   "/physics/cudaDevice": 0,
+   "config": "default",
+   "simulation_device": "cpu"
+  },
+  {
+   "id": "N-01",
+   "description": "docstring の Backends 表記と実装の候補リスト",
+   "rows": [
+    {
+     "class": "Prim",
+     "method": "ensure_api",
+     "defined_in": "Prim",
+     "doc_backends": [
+      "usd"
+     ],
+     "code_candidates": null,
+     "default_backend": "usd",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": null
+    },
+    {
+     "class": "Prim",
+     "method": "resolve_paths",
+     "defined_in": "Prim",
+     "doc_backends": [
+      "usd"
+     ],
+     "code_candidates": null,
+     "default_backend": "usd",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": null
+    },
+    {
+     "class": "XformPrim",
+     "method": "apply_physics_materials",
+     "defined_in": "XformPrim",
+     "doc_backends": [
+      "usd"
+     ],
+     "code_candidates": null,
+     "default_backend": "usd",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": null
+    },
+    {
+     "class": "XformPrim",
+     "method": "apply_visual_materials",
+     "defined_in": "XformPrim",
+     "doc_backends": [
+      "usd"
+     ],
+     "code_candidates": null,
+     "default_backend": "usd",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": null
+    },
+    {
+     "class": "XformPrim",
+     "method": "ensure_api",
+     "defined_in": "Prim",
+     "doc_backends": [
+      "usd"
+     ],
+     "code_candidates": null,
+     "default_backend": "usd",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": null
+    },
+    {
+     "class": "XformPrim",
+     "method": "get_applied_visual_materials",
+     "defined_in": "XformPrim",
+     "doc_backends": [
+      "usd"
+     ],
+     "code_candidates": null,
+     "default_backend": "usd",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": null
+    },
+    {
+     "class": "XformPrim",
+     "method": "get_default_state",
+     "defined_in": "XformPrim",
+     "doc_backends": [
+      "usd"
+     ],
+     "code_candidates": null,
+     "default_backend": "usd",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": null
+    },
+    {
+     "class": "XformPrim",
+     "method": "get_local_poses",
+     "defined_in": "XformPrim",
+     "doc_backends": [
+      "usd",
+      "usdrt",
+      "fabric"
+     ],
+     "code_candidates": [
+      "usd",
+      "usdrt",
+      "fabric"
+     ],
+     "default_backend": "usd",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": true
+    },
+    {
+     "class": "XformPrim",
+     "method": "get_local_scales",
+     "defined_in": "XformPrim",
+     "doc_backends": [
+      "usd",
+      "usdrt",
+      "fabric"
+     ],
+     "code_candidates": [
+      "usd",
+      "usdrt",
+      "fabric"
+     ],
+     "default_backend": "usd",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": true
+    },
+    {
+     "class": "XformPrim",
+     "method": "get_visibilities",
+     "defined_in": "XformPrim",
+     "doc_backends": [
+      "usd"
+     ],
+     "code_candidates": null,
+     "default_backend": "usd",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": null
+    },
+    {
+     "class": "XformPrim",
+     "method": "get_world_poses",
+     "defined_in": "XformPrim",
+     "doc_backends": [
+      "usd",
+      "usdrt",
+      "fabric"
+     ],
+     "code_candidates": [
+      "usd",
+      "usdrt",
+      "fabric"
+     ],
+     "default_backend": "usd",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": true
+    },
+    {
+     "class": "XformPrim",
+     "method": "get_world_scales",
+     "defined_in": "XformPrim",
+     "doc_backends": [
+      "usd",
+      "usdrt",
+      "fabric"
+     ],
+     "code_candidates": [
+      "usd",
+      "usdrt",
+      "fabric"
+     ],
+     "default_backend": "usd",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": true
+    },
+    {
+     "class": "XformPrim",
+     "method": "reset_to_default_state",
+     "defined_in": "XformPrim",
+     "doc_backends": [
+      "usd",
+      "usdrt",
+      "fabric"
+     ],
+     "code_candidates": null,
+     "default_backend": "usd",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": null
+    },
+    {
+     "class": "XformPrim",
+     "method": "reset_xform_op_properties",
+     "defined_in": "XformPrim",
+     "doc_backends": [
+      "usd"
+     ],
+     "code_candidates": null,
+     "default_backend": "usd",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": null
+    },
+    {
+     "class": "XformPrim",
+     "method": "resolve_paths",
+     "defined_in": "Prim",
+     "doc_backends": [
+      "usd"
+     ],
+     "code_candidates": null,
+     "default_backend": "usd",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": null
+    },
+    {
+     "class": "XformPrim",
+     "method": "set_default_state",
+     "defined_in": "XformPrim",
+     "doc_backends": [
+      "usd"
+     ],
+     "code_candidates": null,
+     "default_backend": "usd",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": null
+    },
+    {
+     "class": "XformPrim",
+     "method": "set_local_poses",
+     "defined_in": "XformPrim",
+     "doc_backends": [
+      "usd",
+      "usdrt",
+      "fabric"
+     ],
+     "code_candidates": [
+      "usd",
+      "usdrt",
+      "fabric"
+     ],
+     "default_backend": "usd",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": true
+    },
+    {
+     "class": "XformPrim",
+     "method": "set_local_scales",
+     "defined_in": "XformPrim",
+     "doc_backends": [
+      "usd",
+      "usdrt",
+      "fabric"
+     ],
+     "code_candidates": [
+      "usd",
+      "usdrt",
+      "fabric"
+     ],
+     "default_backend": "usd",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": true
+    },
+    {
+     "class": "XformPrim",
+     "method": "set_visibilities",
+     "defined_in": "XformPrim",
+     "doc_backends": [
+      "usd"
+     ],
+     "code_candidates": null,
+     "default_backend": "usd",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": null
+    },
+    {
+     "class": "XformPrim",
+     "method": "set_world_poses",
+     "defined_in": "XformPrim",
+     "doc_backends": [
+      "usd",
+      "usdrt",
+      "fabric"
+     ],
+     "code_candidates": [
+      "usd",
+      "usdrt",
+      "fabric"
+     ],
+     "default_backend": "usd",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": true,
+     "doc_matches_code": true
+    },
+    {
+     "class": "GeomPrim",
+     "method": "apply_collision_apis",
+     "defined_in": "GeomPrim",
+     "doc_backends": [
+      "usd"
+     ],
+     "code_candidates": null,
+     "default_backend": "usd",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": null
+    },
+    {
+     "class": "GeomPrim",
+     "method": "apply_physics_materials",
+     "defined_in": "GeomPrim",
+     "doc_backends": [
+      "usd"
+     ],
+     "code_candidates": null,
+     "default_backend": "usd",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": null
+    },
+    {
+     "class": "GeomPrim",
+     "method": "apply_visual_materials",
+     "defined_in": "XformPrim",
+     "doc_backends": [
+      "usd"
+     ],
+     "code_candidates": null,
+     "default_backend": "usd",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": null
+    },
+    {
+     "class": "GeomPrim",
+     "method": "ensure_api",
+     "defined_in": "Prim",
+     "doc_backends": [
+      "usd"
+     ],
+     "code_candidates": null,
+     "default_backend": "usd",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": null
+    },
+    {
+     "class": "GeomPrim",
+     "method": "get_applied_physics_materials",
+     "defined_in": "GeomPrim",
+     "doc_backends": [
+      "usd"
+     ],
+     "code_candidates": null,
+     "default_backend": "usd",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": null
+    },
+    {
+     "class": "GeomPrim",
+     "method": "get_applied_visual_materials",
+     "defined_in": "XformPrim",
+     "doc_backends": [
+      "usd"
+     ],
+     "code_candidates": null,
+     "default_backend": "usd",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": null
+    },
+    {
+     "class": "GeomPrim",
+     "method": "get_collision_approximations",
+     "defined_in": "GeomPrim",
+     "doc_backends": [
+      "usd"
+     ],
+     "code_candidates": null,
+     "default_backend": "usd",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": null
+    },
+    {
+     "class": "GeomPrim",
+     "method": "get_default_state",
+     "defined_in": "XformPrim",
+     "doc_backends": [
+      "usd"
+     ],
+     "code_candidates": null,
+     "default_backend": "usd",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": null
+    },
+    {
+     "class": "GeomPrim",
+     "method": "get_enabled_collisions",
+     "defined_in": "GeomPrim",
+     "doc_backends": [
+      "usd"
+     ],
+     "code_candidates": null,
+     "default_backend": "usd",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": null
+    },
+    {
+     "class": "GeomPrim",
+     "method": "get_local_poses",
+     "defined_in": "XformPrim",
+     "doc_backends": [
+      "usd",
+      "usdrt",
+      "fabric"
+     ],
+     "code_candidates": [
+      "usd",
+      "usdrt",
+      "fabric"
+     ],
+     "default_backend": "usd",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": true
+    },
+    {
+     "class": "GeomPrim",
+     "method": "get_local_scales",
+     "defined_in": "XformPrim",
+     "doc_backends": [
+      "usd",
+      "usdrt",
+      "fabric"
+     ],
+     "code_candidates": [
+      "usd",
+      "usdrt",
+      "fabric"
+     ],
+     "default_backend": "usd",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": true
+    },
+    {
+     "class": "GeomPrim",
+     "method": "get_offsets",
+     "defined_in": "GeomPrim",
+     "doc_backends": [
+      "usd"
+     ],
+     "code_candidates": null,
+     "default_backend": "usd",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": null
+    },
+    {
+     "class": "GeomPrim",
+     "method": "get_torsional_patch_radii",
+     "defined_in": "GeomPrim",
+     "doc_backends": [
+      "usd"
+     ],
+     "code_candidates": null,
+     "default_backend": "usd",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": null
+    },
+    {
+     "class": "GeomPrim",
+     "method": "get_visibilities",
+     "defined_in": "XformPrim",
+     "doc_backends": [
+      "usd"
+     ],
+     "code_candidates": null,
+     "default_backend": "usd",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": null
+    },
+    {
+     "class": "GeomPrim",
+     "method": "get_world_poses",
+     "defined_in": "XformPrim",
+     "doc_backends": [
+      "usd",
+      "usdrt",
+      "fabric"
+     ],
+     "code_candidates": [
+      "usd",
+      "usdrt",
+      "fabric"
+     ],
+     "default_backend": "usd",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": true
+    },
+    {
+     "class": "GeomPrim",
+     "method": "get_world_scales",
+     "defined_in": "XformPrim",
+     "doc_backends": [
+      "usd",
+      "usdrt",
+      "fabric"
+     ],
+     "code_candidates": [
+      "usd",
+      "usdrt",
+      "fabric"
+     ],
+     "default_backend": "usd",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": true
+    },
+    {
+     "class": "GeomPrim",
+     "method": "remove_collision_apis",
+     "defined_in": "GeomPrim",
+     "doc_backends": [
+      "usd"
+     ],
+     "code_candidates": null,
+     "default_backend": "usd",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": null
+    },
+    {
+     "class": "GeomPrim",
+     "method": "reset_to_default_state",
+     "defined_in": "XformPrim",
+     "doc_backends": [
+      "usd",
+      "usdrt",
+      "fabric"
+     ],
+     "code_candidates": null,
+     "default_backend": "usd",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": null
+    },
+    {
+     "class": "GeomPrim",
+     "method": "reset_xform_op_properties",
+     "defined_in": "XformPrim",
+     "doc_backends": [
+      "usd"
+     ],
+     "code_candidates": null,
+     "default_backend": "usd",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": null
+    },
+    {
+     "class": "GeomPrim",
+     "method": "resolve_paths",
+     "defined_in": "Prim",
+     "doc_backends": [
+      "usd"
+     ],
+     "code_candidates": null,
+     "default_backend": "usd",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": null
+    },
+    {
+     "class": "GeomPrim",
+     "method": "set_collision_approximations",
+     "defined_in": "GeomPrim",
+     "doc_backends": [
+      "usd"
+     ],
+     "code_candidates": null,
+     "default_backend": "usd",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": null
+    },
+    {
+     "class": "GeomPrim",
+     "method": "set_default_state",
+     "defined_in": "XformPrim",
+     "doc_backends": [
+      "usd"
+     ],
+     "code_candidates": null,
+     "default_backend": "usd",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": null
+    },
+    {
+     "class": "GeomPrim",
+     "method": "set_enabled_collisions",
+     "defined_in": "GeomPrim",
+     "doc_backends": [
+      "usd"
+     ],
+     "code_candidates": null,
+     "default_backend": "usd",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": null
+    },
+    {
+     "class": "GeomPrim",
+     "method": "set_local_poses",
+     "defined_in": "XformPrim",
+     "doc_backends": [
+      "usd",
+      "usdrt",
+      "fabric"
+     ],
+     "code_candidates": [
+      "usd",
+      "usdrt",
+      "fabric"
+     ],
+     "default_backend": "usd",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": true
+    },
+    {
+     "class": "GeomPrim",
+     "method": "set_local_scales",
+     "defined_in": "XformPrim",
+     "doc_backends": [
+      "usd",
+      "usdrt",
+      "fabric"
+     ],
+     "code_candidates": [
+      "usd",
+      "usdrt",
+      "fabric"
+     ],
+     "default_backend": "usd",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": true
+    },
+    {
+     "class": "GeomPrim",
+     "method": "set_offsets",
+     "defined_in": "GeomPrim",
+     "doc_backends": [
+      "usd"
+     ],
+     "code_candidates": null,
+     "default_backend": "usd",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": null
+    },
+    {
+     "class": "GeomPrim",
+     "method": "set_torsional_patch_radii",
+     "defined_in": "GeomPrim",
+     "doc_backends": [
+      "usd"
+     ],
+     "code_candidates": null,
+     "default_backend": "usd",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": null
+    },
+    {
+     "class": "GeomPrim",
+     "method": "set_visibilities",
+     "defined_in": "XformPrim",
+     "doc_backends": [
+      "usd"
+     ],
+     "code_candidates": null,
+     "default_backend": "usd",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": null
+    },
+    {
+     "class": "GeomPrim",
+     "method": "set_world_poses",
+     "defined_in": "XformPrim",
+     "doc_backends": [
+      "usd",
+      "usdrt",
+      "fabric"
+     ],
+     "code_candidates": [
+      "usd",
+      "usdrt",
+      "fabric"
+     ],
+     "default_backend": "usd",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": true,
+     "doc_matches_code": true
+    },
+    {
+     "class": "RigidPrim",
+     "method": "apply_forces",
+     "defined_in": "RigidPrim",
+     "doc_backends": [
+      "tensor"
+     ],
+     "code_candidates": null,
+     "default_backend": "tensor",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": null
+    },
+    {
+     "class": "RigidPrim",
+     "method": "apply_forces_and_torques_at_pos",
+     "defined_in": "RigidPrim",
+     "doc_backends": [
+      "tensor"
+     ],
+     "code_candidates": null,
+     "default_backend": "tensor",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": null
+    },
+    {
+     "class": "RigidPrim",
+     "method": "apply_physics_materials",
+     "defined_in": "XformPrim",
+     "doc_backends": [
+      "usd"
+     ],
+     "code_candidates": null,
+     "default_backend": "usd",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": null
+    },
+    {
+     "class": "RigidPrim",
+     "method": "apply_visual_materials",
+     "defined_in": "XformPrim",
+     "doc_backends": [
+      "usd"
+     ],
+     "code_candidates": null,
+     "default_backend": "usd",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": null
+    },
+    {
+     "class": "RigidPrim",
+     "method": "ensure_api",
+     "defined_in": "Prim",
+     "doc_backends": [
+      "usd"
+     ],
+     "code_candidates": null,
+     "default_backend": "usd",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": null
+    },
+    {
+     "class": "RigidPrim",
+     "method": "get_actor_paths_from_ids",
+     "defined_in": "RigidPrim",
+     "doc_backends": [
+      "tensor"
+     ],
+     "code_candidates": null,
+     "default_backend": "tensor",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": null
+    },
+    {
+     "class": "RigidPrim",
+     "method": "get_applied_visual_materials",
+     "defined_in": "XformPrim",
+     "doc_backends": [
+      "usd"
+     ],
+     "code_candidates": null,
+     "default_backend": "usd",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": null
+    },
+    {
+     "class": "RigidPrim",
+     "method": "get_coms",
+     "defined_in": "RigidPrim",
+     "doc_backends": [
+      "tensor"
+     ],
+     "code_candidates": null,
+     "default_backend": "tensor",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": null
+    },
+    {
+     "class": "RigidPrim",
+     "method": "get_contact_force_data",
+     "defined_in": "RigidPrim",
+     "doc_backends": [
+      "tensor"
+     ],
+     "code_candidates": null,
+     "default_backend": "tensor",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": null
+    },
+    {
+     "class": "RigidPrim",
+     "method": "get_contact_force_matrix",
+     "defined_in": "RigidPrim",
+     "doc_backends": [
+      "tensor"
+     ],
+     "code_candidates": null,
+     "default_backend": "tensor",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": null
+    },
+    {
+     "class": "RigidPrim",
+     "method": "get_default_state",
+     "defined_in": "RigidPrim",
+     "doc_backends": [
+      "usd"
+     ],
+     "code_candidates": null,
+     "default_backend": "usd",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": null
+    },
+    {
+     "class": "RigidPrim",
+     "method": "get_densities",
+     "defined_in": "RigidPrim",
+     "doc_backends": [
+      "usd"
+     ],
+     "code_candidates": null,
+     "default_backend": "usd",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": null
+    },
+    {
+     "class": "RigidPrim",
+     "method": "get_enabled_contact_tracking",
+     "defined_in": "RigidPrim",
+     "doc_backends": [
+      "usd"
+     ],
+     "code_candidates": null,
+     "default_backend": "usd",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": null
+    },
+    {
+     "class": "RigidPrim",
+     "method": "get_enabled_gravities",
+     "defined_in": "RigidPrim",
+     "doc_backends": [
+      "tensor",
+      "usd"
+     ],
+     "code_candidates": [
+      "tensor",
+      "usd"
+     ],
+     "default_backend": "tensor",
+     "tensor_fallback_to_usd": true,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": true
+    },
+    {
+     "class": "RigidPrim",
+     "method": "get_enabled_rigid_bodies",
+     "defined_in": "RigidPrim",
+     "doc_backends": [
+      "tensor",
+      "usd"
+     ],
+     "code_candidates": [
+      "tensor",
+      "usd"
+     ],
+     "default_backend": "tensor",
+     "tensor_fallback_to_usd": true,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": true
+    },
+    {
+     "class": "RigidPrim",
+     "method": "get_friction_data",
+     "defined_in": "RigidPrim",
+     "doc_backends": [
+      "tensor"
+     ],
+     "code_candidates": null,
+     "default_backend": "tensor",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": null
+    },
+    {
+     "class": "RigidPrim",
+     "method": "get_inertias",
+     "defined_in": "RigidPrim",
+     "doc_backends": [
+      "tensor"
+     ],
+     "code_candidates": null,
+     "default_backend": "tensor",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": null
+    },
+    {
+     "class": "RigidPrim",
+     "method": "get_local_poses",
+     "defined_in": "RigidPrim",
+     "doc_backends": [
+      "tensor",
+      "usd",
+      "usdrt",
+      "fabric"
+     ],
+     "code_candidates": [
+      "tensor",
+      "usd",
+      "usdrt",
+      "fabric"
+     ],
+     "default_backend": "tensor",
+     "tensor_fallback_to_usd": true,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": true
+    },
+    {
+     "class": "RigidPrim",
+     "method": "get_local_scales",
+     "defined_in": "XformPrim",
+     "doc_backends": [
+      "usd",
+      "usdrt",
+      "fabric"
+     ],
+     "code_candidates": [
+      "usd",
+      "usdrt",
+      "fabric"
+     ],
+     "default_backend": "usd",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": true
+    },
+    {
+     "class": "RigidPrim",
+     "method": "get_masses",
+     "defined_in": "RigidPrim",
+     "doc_backends": [
+      "tensor",
+      "usd"
+     ],
+     "code_candidates": [
+      "tensor",
+      "usd"
+     ],
+     "default_backend": "tensor",
+     "tensor_fallback_to_usd": true,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": true
+    },
+    {
+     "class": "RigidPrim",
+     "method": "get_net_contact_forces",
+     "defined_in": "RigidPrim",
+     "doc_backends": [
+      "tensor"
+     ],
+     "code_candidates": null,
+     "default_backend": "tensor",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": null
+    },
+    {
+     "class": "RigidPrim",
+     "method": "get_raw_contact_data",
+     "defined_in": "RigidPrim",
+     "doc_backends": [
+      "tensor"
+     ],
+     "code_candidates": null,
+     "default_backend": "tensor",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": null
+    },
+    {
+     "class": "RigidPrim",
+     "method": "get_sleep_thresholds",
+     "defined_in": "RigidPrim",
+     "doc_backends": [
+      "usd"
+     ],
+     "code_candidates": null,
+     "default_backend": "usd",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": null
+    },
+    {
+     "class": "RigidPrim",
+     "method": "get_velocities",
+     "defined_in": "RigidPrim",
+     "doc_backends": [
+      "tensor",
+      "usd"
+     ],
+     "code_candidates": [
+      "tensor",
+      "usd"
+     ],
+     "default_backend": "tensor",
+     "tensor_fallback_to_usd": true,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": true
+    },
+    {
+     "class": "RigidPrim",
+     "method": "get_visibilities",
+     "defined_in": "XformPrim",
+     "doc_backends": [
+      "usd"
+     ],
+     "code_candidates": null,
+     "default_backend": "usd",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": null
+    },
+    {
+     "class": "RigidPrim",
+     "method": "get_world_poses",
+     "defined_in": "RigidPrim",
+     "doc_backends": [
+      "tensor",
+      "usd",
+      "usdrt",
+      "fabric"
+     ],
+     "code_candidates": [
+      "tensor",
+      "usd",
+      "usdrt",
+      "fabric"
+     ],
+     "default_backend": "tensor",
+     "tensor_fallback_to_usd": true,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": true
+    },
+    {
+     "class": "RigidPrim",
+     "method": "get_world_scales",
+     "defined_in": "XformPrim",
+     "doc_backends": [
+      "usd",
+      "usdrt",
+      "fabric"
+     ],
+     "code_candidates": [
+      "usd",
+      "usdrt",
+      "fabric"
+     ],
+     "default_backend": "usd",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": true
+    },
+    {
+     "class": "RigidPrim",
+     "method": "initialize_cpp_data_view",
+     "defined_in": "RigidPrim",
+     "doc_backends": null,
+     "code_candidates": null,
+     "default_backend": null,
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": null
+    },
+    {
+     "class": "RigidPrim",
+     "method": "is_physics_tensor_entity_valid",
+     "defined_in": "RigidPrim",
+     "doc_backends": null,
+     "code_candidates": null,
+     "default_backend": null,
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": null
+    },
+    {
+     "class": "RigidPrim",
+     "method": "remove_physics_apis",
+     "defined_in": "RigidPrim",
+     "doc_backends": [
+      "usd"
+     ],
+     "code_candidates": null,
+     "default_backend": "usd",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": null
+    },
+    {
+     "class": "RigidPrim",
+     "method": "reset_to_default_state",
+     "defined_in": "RigidPrim",
+     "doc_backends": [
+      "tensor",
+      "usd"
+     ],
+     "code_candidates": null,
+     "default_backend": "tensor",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": null
+    },
+    {
+     "class": "RigidPrim",
+     "method": "reset_xform_op_properties",
+     "defined_in": "XformPrim",
+     "doc_backends": [
+      "usd"
+     ],
+     "code_candidates": null,
+     "default_backend": "usd",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": null
+    },
+    {
+     "class": "RigidPrim",
+     "method": "resolve_paths",
+     "defined_in": "Prim",
+     "doc_backends": [
+      "usd"
+     ],
+     "code_candidates": null,
+     "default_backend": "usd",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": null
+    },
+    {
+     "class": "RigidPrim",
+     "method": "set_coms",
+     "defined_in": "RigidPrim",
+     "doc_backends": [
+      "tensor"
+     ],
+     "code_candidates": null,
+     "default_backend": "tensor",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": null
+    },
+    {
+     "class": "RigidPrim",
+     "method": "set_default_state",
+     "defined_in": "RigidPrim",
+     "doc_backends": [
+      "usd"
+     ],
+     "code_candidates": null,
+     "default_backend": "usd",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": null
+    },
+    {
+     "class": "RigidPrim",
+     "method": "set_densities",
+     "defined_in": "RigidPrim",
+     "doc_backends": [
+      "usd"
+     ],
+     "code_candidates": null,
+     "default_backend": "usd",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": null
+    },
+    {
+     "class": "RigidPrim",
+     "method": "set_enabled_contact_tracking",
+     "defined_in": "RigidPrim",
+     "doc_backends": [
+      "usd"
+     ],
+     "code_candidates": null,
+     "default_backend": "usd",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": null
+    },
+    {
+     "class": "RigidPrim",
+     "method": "set_enabled_gravities",
+     "defined_in": "RigidPrim",
+     "doc_backends": [
+      "tensor",
+      "usd"
+     ],
+     "code_candidates": [
+      "tensor",
+      "usd"
+     ],
+     "default_backend": "tensor",
+     "tensor_fallback_to_usd": true,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": true
+    },
+    {
+     "class": "RigidPrim",
+     "method": "set_enabled_rigid_bodies",
+     "defined_in": "RigidPrim",
+     "doc_backends": [
+      "tensor",
+      "usd"
+     ],
+     "code_candidates": [
+      "tensor",
+      "usd"
+     ],
+     "default_backend": "tensor",
+     "tensor_fallback_to_usd": true,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": true
+    },
+    {
+     "class": "RigidPrim",
+     "method": "set_inertias",
+     "defined_in": "RigidPrim",
+     "doc_backends": [
+      "tensor"
+     ],
+     "code_candidates": null,
+     "default_backend": "tensor",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": null
+    },
+    {
+     "class": "RigidPrim",
+     "method": "set_local_poses",
+     "defined_in": "RigidPrim",
+     "doc_backends": [
+      "tensor",
+      "usd",
+      "usdrt",
+      "fabric"
+     ],
+     "code_candidates": [
+      "tensor",
+      "usd",
+      "usdrt",
+      "fabric"
+     ],
+     "default_backend": "tensor",
+     "tensor_fallback_to_usd": true,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": true
+    },
+    {
+     "class": "RigidPrim",
+     "method": "set_local_scales",
+     "defined_in": "XformPrim",
+     "doc_backends": [
+      "usd",
+      "usdrt",
+      "fabric"
+     ],
+     "code_candidates": [
+      "usd",
+      "usdrt",
+      "fabric"
+     ],
+     "default_backend": "usd",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": true
+    },
+    {
+     "class": "RigidPrim",
+     "method": "set_masses",
+     "defined_in": "RigidPrim",
+     "doc_backends": [
+      "tensor",
+      "usd"
+     ],
+     "code_candidates": [
+      "tensor",
+      "usd"
+     ],
+     "default_backend": "tensor",
+     "tensor_fallback_to_usd": true,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": true
+    },
+    {
+     "class": "RigidPrim",
+     "method": "set_sleep_thresholds",
+     "defined_in": "RigidPrim",
+     "doc_backends": [
+      "usd"
+     ],
+     "code_candidates": null,
+     "default_backend": "usd",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": null
+    },
+    {
+     "class": "RigidPrim",
+     "method": "set_velocities",
+     "defined_in": "RigidPrim",
+     "doc_backends": [
+      "tensor",
+      "usd"
+     ],
+     "code_candidates": [
+      "tensor",
+      "usd"
+     ],
+     "default_backend": "tensor",
+     "tensor_fallback_to_usd": true,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": true
+    },
+    {
+     "class": "RigidPrim",
+     "method": "set_visibilities",
+     "defined_in": "XformPrim",
+     "doc_backends": [
+      "usd"
+     ],
+     "code_candidates": null,
+     "default_backend": "usd",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": null
+    },
+    {
+     "class": "RigidPrim",
+     "method": "set_world_poses",
+     "defined_in": "RigidPrim",
+     "doc_backends": [
+      "tensor",
+      "usd",
+      "usdrt",
+      "fabric"
+     ],
+     "code_candidates": [
+      "tensor",
+      "usd",
+      "usdrt",
+      "fabric"
+     ],
+     "default_backend": "tensor",
+     "tensor_fallback_to_usd": true,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": true
+    },
+    {
+     "class": "Articulation",
+     "method": "apply_physics_materials",
+     "defined_in": "XformPrim",
+     "doc_backends": [
+      "usd"
+     ],
+     "code_candidates": null,
+     "default_backend": "usd",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": null
+    },
+    {
+     "class": "Articulation",
+     "method": "apply_visual_materials",
+     "defined_in": "XformPrim",
+     "doc_backends": [
+      "usd"
+     ],
+     "code_candidates": null,
+     "default_backend": "usd",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": null
+    },
+    {
+     "class": "Articulation",
+     "method": "ensure_api",
+     "defined_in": "Prim",
+     "doc_backends": [
+      "usd"
+     ],
+     "code_candidates": null,
+     "default_backend": "usd",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": null
+    },
+    {
+     "class": "Articulation",
+     "method": "fetch_articulation_root_api_prim_paths",
+     "defined_in": "Articulation",
+     "doc_backends": null,
+     "code_candidates": [
+      "usd",
+      "usdrt",
+      "fabric"
+     ],
+     "default_backend": "usd",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": null
+    },
+    {
+     "class": "Articulation",
+     "method": "get_applied_visual_materials",
+     "defined_in": "XformPrim",
+     "doc_backends": [
+      "usd"
+     ],
+     "code_candidates": null,
+     "default_backend": "usd",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": null
+    },
+    {
+     "class": "Articulation",
+     "method": "get_default_state",
+     "defined_in": "Articulation",
+     "doc_backends": [
+      "usd"
+     ],
+     "code_candidates": null,
+     "default_backend": "usd",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": null
+    },
+    {
+     "class": "Articulation",
+     "method": "get_dof_armatures",
+     "defined_in": "Articulation",
+     "doc_backends": [
+      "tensor",
+      "usd"
+     ],
+     "code_candidates": [
+      "tensor",
+      "usd"
+     ],
+     "default_backend": "tensor",
+     "tensor_fallback_to_usd": true,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": true
+    },
+    {
+     "class": "Articulation",
+     "method": "get_dof_coriolis_and_centrifugal_compensation_forces",
+     "defined_in": "Articulation",
+     "doc_backends": [
+      "tensor"
+     ],
+     "code_candidates": null,
+     "default_backend": "tensor",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": null
+    },
+    {
+     "class": "Articulation",
+     "method": "get_dof_drive_model_properties",
+     "defined_in": "Articulation",
+     "doc_backends": [
+      "tensor",
+      "usd"
+     ],
+     "code_candidates": [
+      "tensor",
+      "usd"
+     ],
+     "default_backend": "tensor",
+     "tensor_fallback_to_usd": true,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": true
+    },
+    {
+     "class": "Articulation",
+     "method": "get_dof_drive_types",
+     "defined_in": "Articulation",
+     "doc_backends": [
+      "tensor",
+      "usd"
+     ],
+     "code_candidates": [
+      "tensor",
+      "usd"
+     ],
+     "default_backend": "tensor",
+     "tensor_fallback_to_usd": true,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": true
+    },
+    {
+     "class": "Articulation",
+     "method": "get_dof_efforts",
+     "defined_in": "Articulation",
+     "doc_backends": [
+      "tensor"
+     ],
+     "code_candidates": null,
+     "default_backend": "tensor",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": null
+    },
+    {
+     "class": "Articulation",
+     "method": "get_dof_friction_properties",
+     "defined_in": "Articulation",
+     "doc_backends": [
+      "tensor",
+      "usd"
+     ],
+     "code_candidates": [
+      "tensor",
+      "usd"
+     ],
+     "default_backend": "tensor",
+     "tensor_fallback_to_usd": true,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": true
+    },
+    {
+     "class": "Articulation",
+     "method": "get_dof_gains",
+     "defined_in": "Articulation",
+     "doc_backends": [
+      "tensor",
+      "usd"
+     ],
+     "code_candidates": [
+      "tensor",
+      "usd"
+     ],
+     "default_backend": "tensor",
+     "tensor_fallback_to_usd": true,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": true
+    },
+    {
+     "class": "Articulation",
+     "method": "get_dof_gravity_compensation_forces",
+     "defined_in": "Articulation",
+     "doc_backends": [
+      "tensor"
+     ],
+     "code_candidates": null,
+     "default_backend": "tensor",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": null
+    },
+    {
+     "class": "Articulation",
+     "method": "get_dof_indices",
+     "defined_in": "Articulation",
+     "doc_backends": [
+      "usd",
+      "tensor"
+     ],
+     "code_candidates": null,
+     "default_backend": "usd",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": null
+    },
+    {
+     "class": "Articulation",
+     "method": "get_dof_limits",
+     "defined_in": "Articulation",
+     "doc_backends": [
+      "tensor",
+      "usd"
+     ],
+     "code_candidates": [
+      "tensor",
+      "usd"
+     ],
+     "default_backend": "tensor",
+     "tensor_fallback_to_usd": true,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": true
+    },
+    {
+     "class": "Articulation",
+     "method": "get_dof_max_efforts",
+     "defined_in": "Articulation",
+     "doc_backends": [
+      "tensor",
+      "usd"
+     ],
+     "code_candidates": [
+      "tensor",
+      "usd"
+     ],
+     "default_backend": "tensor",
+     "tensor_fallback_to_usd": true,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": true
+    },
+    {
+     "class": "Articulation",
+     "method": "get_dof_max_velocities",
+     "defined_in": "Articulation",
+     "doc_backends": [
+      "tensor",
+      "usd"
+     ],
+     "code_candidates": [
+      "tensor",
+      "usd"
+     ],
+     "default_backend": "tensor",
+     "tensor_fallback_to_usd": true,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": true
+    },
+    {
+     "class": "Articulation",
+     "method": "get_dof_position_targets",
+     "defined_in": "Articulation",
+     "doc_backends": [
+      "tensor",
+      "usd"
+     ],
+     "code_candidates": [
+      "tensor",
+      "usd"
+     ],
+     "default_backend": "tensor",
+     "tensor_fallback_to_usd": true,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": true
+    },
+    {
+     "class": "Articulation",
+     "method": "get_dof_positions",
+     "defined_in": "Articulation",
+     "doc_backends": [
+      "tensor"
+     ],
+     "code_candidates": null,
+     "default_backend": "tensor",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": null
+    },
+    {
+     "class": "Articulation",
+     "method": "get_dof_projected_joint_forces",
+     "defined_in": "Articulation",
+     "doc_backends": [
+      "tensor"
+     ],
+     "code_candidates": null,
+     "default_backend": "tensor",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": null
+    },
+    {
+     "class": "Articulation",
+     "method": "get_dof_velocities",
+     "defined_in": "Articulation",
+     "doc_backends": [
+      "tensor"
+     ],
+     "code_candidates": null,
+     "default_backend": "tensor",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": null
+    },
+    {
+     "class": "Articulation",
+     "method": "get_dof_velocity_targets",
+     "defined_in": "Articulation",
+     "doc_backends": [
+      "tensor",
+      "usd"
+     ],
+     "code_candidates": [
+      "tensor",
+      "usd"
+     ],
+     "default_backend": "tensor",
+     "tensor_fallback_to_usd": true,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": true
+    },
+    {
+     "class": "Articulation",
+     "method": "get_enabled_self_collisions",
+     "defined_in": "Articulation",
+     "doc_backends": [
+      "usd"
+     ],
+     "code_candidates": null,
+     "default_backend": "usd",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": null
+    },
+    {
+     "class": "Articulation",
+     "method": "get_fixed_tendon_dampings",
+     "defined_in": "Articulation",
+     "doc_backends": [
+      "tensor"
+     ],
+     "code_candidates": null,
+     "default_backend": "tensor",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": null
+    },
+    {
+     "class": "Articulation",
+     "method": "get_fixed_tendon_limit_stiffnesses",
+     "defined_in": "Articulation",
+     "doc_backends": [
+      "tensor"
+     ],
+     "code_candidates": null,
+     "default_backend": "tensor",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": null
+    },
+    {
+     "class": "Articulation",
+     "method": "get_fixed_tendon_limits",
+     "defined_in": "Articulation",
+     "doc_backends": [
+      "tensor"
+     ],
+     "code_candidates": null,
+     "default_backend": "tensor",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": null
+    },
+    {
+     "class": "Articulation",
+     "method": "get_fixed_tendon_offsets",
+     "defined_in": "Articulation",
+     "doc_backends": [
+      "tensor"
+     ],
+     "code_candidates": null,
+     "default_backend": "tensor",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": null
+    },
+    {
+     "class": "Articulation",
+     "method": "get_fixed_tendon_rest_lengths",
+     "defined_in": "Articulation",
+     "doc_backends": [
+      "tensor"
+     ],
+     "code_candidates": null,
+     "default_backend": "tensor",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": null
+    },
+    {
+     "class": "Articulation",
+     "method": "get_fixed_tendon_stiffnesses",
+     "defined_in": "Articulation",
+     "doc_backends": [
+      "tensor"
+     ],
+     "code_candidates": null,
+     "default_backend": "tensor",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": null
+    },
+    {
+     "class": "Articulation",
+     "method": "get_jacobian_matrices",
+     "defined_in": "Articulation",
+     "doc_backends": [
+      "tensor"
+     ],
+     "code_candidates": null,
+     "default_backend": "tensor",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": null
+    },
+    {
+     "class": "Articulation",
+     "method": "get_joint_indices",
+     "defined_in": "Articulation",
+     "doc_backends": [
+      "usd",
+      "tensor"
+     ],
+     "code_candidates": null,
+     "default_backend": "usd",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": null
+    },
+    {
+     "class": "Articulation",
+     "method": "get_link_coms",
+     "defined_in": "Articulation",
+     "doc_backends": [
+      "tensor"
+     ],
+     "code_candidates": null,
+     "default_backend": "tensor",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": null
+    },
+    {
+     "class": "Articulation",
+     "method": "get_link_enabled_gravities",
+     "defined_in": "Articulation",
+     "doc_backends": [
+      "tensor",
+      "usd"
+     ],
+     "code_candidates": [
+      "tensor",
+      "usd"
+     ],
+     "default_backend": "tensor",
+     "tensor_fallback_to_usd": true,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": true
+    },
+    {
+     "class": "Articulation",
+     "method": "get_link_incoming_joint_force",
+     "defined_in": "Articulation",
+     "doc_backends": [
+      "tensor"
+     ],
+     "code_candidates": null,
+     "default_backend": "tensor",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": null
+    },
+    {
+     "class": "Articulation",
+     "method": "get_link_indices",
+     "defined_in": "Articulation",
+     "doc_backends": [
+      "usd",
+      "tensor"
+     ],
+     "code_candidates": null,
+     "default_backend": "usd",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": null
+    },
+    {
+     "class": "Articulation",
+     "method": "get_link_inertias",
+     "defined_in": "Articulation",
+     "doc_backends": [
+      "tensor"
+     ],
+     "code_candidates": null,
+     "default_backend": "tensor",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": null
+    },
+    {
+     "class": "Articulation",
+     "method": "get_link_masses",
+     "defined_in": "Articulation",
+     "doc_backends": [
+      "tensor",
+      "usd"
+     ],
+     "code_candidates": [
+      "tensor",
+      "usd"
+     ],
+     "default_backend": "tensor",
+     "tensor_fallback_to_usd": true,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": true
+    },
+    {
+     "class": "Articulation",
+     "method": "get_local_poses",
+     "defined_in": "Articulation",
+     "doc_backends": [
+      "tensor",
+      "usd",
+      "usdrt",
+      "fabric"
+     ],
+     "code_candidates": [
+      "tensor",
+      "usd",
+      "usdrt",
+      "fabric"
+     ],
+     "default_backend": "tensor",
+     "tensor_fallback_to_usd": true,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": true
+    },
+    {
+     "class": "Articulation",
+     "method": "get_local_scales",
+     "defined_in": "XformPrim",
+     "doc_backends": [
+      "usd",
+      "usdrt",
+      "fabric"
+     ],
+     "code_candidates": [
+      "usd",
+      "usdrt",
+      "fabric"
+     ],
+     "default_backend": "usd",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": true
+    },
+    {
+     "class": "Articulation",
+     "method": "get_mass_matrices",
+     "defined_in": "Articulation",
+     "doc_backends": [
+      "tensor"
+     ],
+     "code_candidates": null,
+     "default_backend": "tensor",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": null
+    },
+    {
+     "class": "Articulation",
+     "method": "get_sleep_thresholds",
+     "defined_in": "Articulation",
+     "doc_backends": [
+      "usd"
+     ],
+     "code_candidates": null,
+     "default_backend": "usd",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": null
+    },
+    {
+     "class": "Articulation",
+     "method": "get_solver_iteration_counts",
+     "defined_in": "Articulation",
+     "doc_backends": [
+      "usd"
+     ],
+     "code_candidates": null,
+     "default_backend": "usd",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": null
+    },
+    {
+     "class": "Articulation",
+     "method": "get_stabilization_thresholds",
+     "defined_in": "Articulation",
+     "doc_backends": [
+      "usd"
+     ],
+     "code_candidates": null,
+     "default_backend": "usd",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": null
+    },
+    {
+     "class": "Articulation",
+     "method": "get_velocities",
+     "defined_in": "Articulation",
+     "doc_backends": [
+      "tensor"
+     ],
+     "code_candidates": null,
+     "default_backend": "tensor",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": null
+    },
+    {
+     "class": "Articulation",
+     "method": "get_visibilities",
+     "defined_in": "XformPrim",
+     "doc_backends": [
+      "usd"
+     ],
+     "code_candidates": null,
+     "default_backend": "usd",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": null
+    },
+    {
+     "class": "Articulation",
+     "method": "get_world_poses",
+     "defined_in": "Articulation",
+     "doc_backends": [
+      "tensor",
+      "usd",
+      "usdrt",
+      "fabric"
+     ],
+     "code_candidates": [
+      "tensor",
+      "usd",
+      "usdrt",
+      "fabric"
+     ],
+     "default_backend": "tensor",
+     "tensor_fallback_to_usd": true,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": true
+    },
+    {
+     "class": "Articulation",
+     "method": "get_world_scales",
+     "defined_in": "XformPrim",
+     "doc_backends": [
+      "usd",
+      "usdrt",
+      "fabric"
+     ],
+     "code_candidates": [
+      "usd",
+      "usdrt",
+      "fabric"
+     ],
+     "default_backend": "usd",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": true
+    },
+    {
+     "class": "Articulation",
+     "method": "initialize_cpp_data_view",
+     "defined_in": "Articulation",
+     "doc_backends": null,
+     "code_candidates": null,
+     "default_backend": null,
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": null
+    },
+    {
+     "class": "Articulation",
+     "method": "is_physics_tensor_entity_initialized",
+     "defined_in": "Articulation",
+     "doc_backends": null,
+     "code_candidates": null,
+     "default_backend": null,
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": null
+    },
+    {
+     "class": "Articulation",
+     "method": "is_physics_tensor_entity_valid",
+     "defined_in": "Articulation",
+     "doc_backends": null,
+     "code_candidates": null,
+     "default_backend": null,
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": null
+    },
+    {
+     "class": "Articulation",
+     "method": "reset_to_default_state",
+     "defined_in": "Articulation",
+     "doc_backends": [
+      "tensor"
+     ],
+     "code_candidates": null,
+     "default_backend": "tensor",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": null
+    },
+    {
+     "class": "Articulation",
+     "method": "reset_xform_op_properties",
+     "defined_in": "XformPrim",
+     "doc_backends": [
+      "usd"
+     ],
+     "code_candidates": null,
+     "default_backend": "usd",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": null
+    },
+    {
+     "class": "Articulation",
+     "method": "resolve_paths",
+     "defined_in": "Prim",
+     "doc_backends": [
+      "usd"
+     ],
+     "code_candidates": null,
+     "default_backend": "usd",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": null
+    },
+    {
+     "class": "Articulation",
+     "method": "set_default_state",
+     "defined_in": "Articulation",
+     "doc_backends": [
+      "usd"
+     ],
+     "code_candidates": null,
+     "default_backend": "usd",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": null
+    },
+    {
+     "class": "Articulation",
+     "method": "set_dof_armatures",
+     "defined_in": "Articulation",
+     "doc_backends": [
+      "tensor",
+      "usd"
+     ],
+     "code_candidates": [
+      "tensor",
+      "usd"
+     ],
+     "default_backend": "tensor",
+     "tensor_fallback_to_usd": true,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": true
+    },
+    {
+     "class": "Articulation",
+     "method": "set_dof_drive_model_properties",
+     "defined_in": "Articulation",
+     "doc_backends": [
+      "tensor",
+      "usd"
+     ],
+     "code_candidates": [
+      "tensor",
+      "usd"
+     ],
+     "default_backend": "tensor",
+     "tensor_fallback_to_usd": true,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": true
+    },
+    {
+     "class": "Articulation",
+     "method": "set_dof_drive_types",
+     "defined_in": "Articulation",
+     "doc_backends": [
+      "usd"
+     ],
+     "code_candidates": null,
+     "default_backend": "usd",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": null
+    },
+    {
+     "class": "Articulation",
+     "method": "set_dof_efforts",
+     "defined_in": "Articulation",
+     "doc_backends": [
+      "tensor"
+     ],
+     "code_candidates": null,
+     "default_backend": "tensor",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": null
+    },
+    {
+     "class": "Articulation",
+     "method": "set_dof_friction_properties",
+     "defined_in": "Articulation",
+     "doc_backends": [
+      "tensor",
+      "usd"
+     ],
+     "code_candidates": [
+      "tensor",
+      "usd"
+     ],
+     "default_backend": "tensor",
+     "tensor_fallback_to_usd": true,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": true
+    },
+    {
+     "class": "Articulation",
+     "method": "set_dof_gains",
+     "defined_in": "Articulation",
+     "doc_backends": [
+      "tensor",
+      "usd"
+     ],
+     "code_candidates": [
+      "tensor",
+      "usd"
+     ],
+     "default_backend": "tensor",
+     "tensor_fallback_to_usd": true,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": true
+    },
+    {
+     "class": "Articulation",
+     "method": "set_dof_limits",
+     "defined_in": "Articulation",
+     "doc_backends": [
+      "tensor",
+      "usd"
+     ],
+     "code_candidates": [
+      "tensor",
+      "usd"
+     ],
+     "default_backend": "tensor",
+     "tensor_fallback_to_usd": true,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": true
+    },
+    {
+     "class": "Articulation",
+     "method": "set_dof_max_efforts",
+     "defined_in": "Articulation",
+     "doc_backends": [
+      "tensor",
+      "usd"
+     ],
+     "code_candidates": [
+      "tensor",
+      "usd"
+     ],
+     "default_backend": "tensor",
+     "tensor_fallback_to_usd": true,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": true
+    },
+    {
+     "class": "Articulation",
+     "method": "set_dof_max_velocities",
+     "defined_in": "Articulation",
+     "doc_backends": [
+      "tensor",
+      "usd"
+     ],
+     "code_candidates": [
+      "tensor",
+      "usd"
+     ],
+     "default_backend": "tensor",
+     "tensor_fallback_to_usd": true,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": true
+    },
+    {
+     "class": "Articulation",
+     "method": "set_dof_position_targets",
+     "defined_in": "Articulation",
+     "doc_backends": [
+      "tensor",
+      "usd"
+     ],
+     "code_candidates": [
+      "tensor",
+      "usd"
+     ],
+     "default_backend": "tensor",
+     "tensor_fallback_to_usd": true,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": true
+    },
+    {
+     "class": "Articulation",
+     "method": "set_dof_positions",
+     "defined_in": "Articulation",
+     "doc_backends": [
+      "tensor"
+     ],
+     "code_candidates": null,
+     "default_backend": "tensor",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": null
+    },
+    {
+     "class": "Articulation",
+     "method": "set_dof_velocities",
+     "defined_in": "Articulation",
+     "doc_backends": [
+      "tensor"
+     ],
+     "code_candidates": null,
+     "default_backend": "tensor",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": null
+    },
+    {
+     "class": "Articulation",
+     "method": "set_dof_velocity_targets",
+     "defined_in": "Articulation",
+     "doc_backends": [
+      "tensor",
+      "usd"
+     ],
+     "code_candidates": [
+      "tensor",
+      "usd"
+     ],
+     "default_backend": "tensor",
+     "tensor_fallback_to_usd": true,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": true
+    },
+    {
+     "class": "Articulation",
+     "method": "set_enabled_self_collisions",
+     "defined_in": "Articulation",
+     "doc_backends": [
+      "usd"
+     ],
+     "code_candidates": null,
+     "default_backend": "usd",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": null
+    },
+    {
+     "class": "Articulation",
+     "method": "set_fixed_tendon_properties",
+     "defined_in": "Articulation",
+     "doc_backends": [
+      "tensor"
+     ],
+     "code_candidates": null,
+     "default_backend": "tensor",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": null
+    },
+    {
+     "class": "Articulation",
+     "method": "set_link_coms",
+     "defined_in": "Articulation",
+     "doc_backends": [
+      "tensor"
+     ],
+     "code_candidates": null,
+     "default_backend": "tensor",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": null
+    },
+    {
+     "class": "Articulation",
+     "method": "set_link_enabled_gravities",
+     "defined_in": "Articulation",
+     "doc_backends": [
+      "tensor",
+      "usd"
+     ],
+     "code_candidates": [
+      "tensor",
+      "usd"
+     ],
+     "default_backend": "tensor",
+     "tensor_fallback_to_usd": true,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": true
+    },
+    {
+     "class": "Articulation",
+     "method": "set_link_inertias",
+     "defined_in": "Articulation",
+     "doc_backends": [
+      "tensor"
+     ],
+     "code_candidates": null,
+     "default_backend": "tensor",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": null
+    },
+    {
+     "class": "Articulation",
+     "method": "set_link_masses",
+     "defined_in": "Articulation",
+     "doc_backends": [
+      "tensor",
+      "usd"
+     ],
+     "code_candidates": [
+      "tensor",
+      "usd"
+     ],
+     "default_backend": "tensor",
+     "tensor_fallback_to_usd": true,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": true
+    },
+    {
+     "class": "Articulation",
+     "method": "set_local_poses",
+     "defined_in": "Articulation",
+     "doc_backends": [
+      "tensor",
+      "usd",
+      "usdrt",
+      "fabric"
+     ],
+     "code_candidates": [
+      "tensor",
+      "usd",
+      "usdrt",
+      "fabric"
+     ],
+     "default_backend": "tensor",
+     "tensor_fallback_to_usd": true,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": true
+    },
+    {
+     "class": "Articulation",
+     "method": "set_local_scales",
+     "defined_in": "XformPrim",
+     "doc_backends": [
+      "usd",
+      "usdrt",
+      "fabric"
+     ],
+     "code_candidates": [
+      "usd",
+      "usdrt",
+      "fabric"
+     ],
+     "default_backend": "usd",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": true
+    },
+    {
+     "class": "Articulation",
+     "method": "set_sleep_thresholds",
+     "defined_in": "Articulation",
+     "doc_backends": [
+      "usd"
+     ],
+     "code_candidates": null,
+     "default_backend": "usd",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": null
+    },
+    {
+     "class": "Articulation",
+     "method": "set_solver_iteration_counts",
+     "defined_in": "Articulation",
+     "doc_backends": [
+      "usd"
+     ],
+     "code_candidates": null,
+     "default_backend": "usd",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": null
+    },
+    {
+     "class": "Articulation",
+     "method": "set_stabilization_thresholds",
+     "defined_in": "Articulation",
+     "doc_backends": [
+      "usd"
+     ],
+     "code_candidates": null,
+     "default_backend": "usd",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": null
+    },
+    {
+     "class": "Articulation",
+     "method": "set_velocities",
+     "defined_in": "Articulation",
+     "doc_backends": [
+      "tensor"
+     ],
+     "code_candidates": null,
+     "default_backend": "tensor",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": null
+    },
+    {
+     "class": "Articulation",
+     "method": "set_visibilities",
+     "defined_in": "XformPrim",
+     "doc_backends": [
+      "usd"
+     ],
+     "code_candidates": null,
+     "default_backend": "usd",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": null
+    },
+    {
+     "class": "Articulation",
+     "method": "set_world_poses",
+     "defined_in": "Articulation",
+     "doc_backends": [
+      "tensor",
+      "usd",
+      "usdrt",
+      "fabric"
+     ],
+     "code_candidates": [
+      "tensor",
+      "usd",
+      "usdrt",
+      "fabric"
+     ],
+     "default_backend": "tensor",
+     "tensor_fallback_to_usd": true,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": true
+    },
+    {
+     "class": "Articulation",
+     "method": "switch_dof_control_mode",
+     "defined_in": "Articulation",
+     "doc_backends": [
+      "tensor",
+      "usd"
+     ],
+     "code_candidates": null,
+     "default_backend": "tensor",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": null
+    },
+    {
+     "class": "DeformablePrim",
+     "method": "apply_physics_materials",
+     "defined_in": "DeformablePrim",
+     "doc_backends": [
+      "usd"
+     ],
+     "code_candidates": null,
+     "default_backend": "usd",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": null
+    },
+    {
+     "class": "DeformablePrim",
+     "method": "apply_visual_materials",
+     "defined_in": "XformPrim",
+     "doc_backends": [
+      "usd"
+     ],
+     "code_candidates": null,
+     "default_backend": "usd",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": null
+    },
+    {
+     "class": "DeformablePrim",
+     "method": "ensure_api",
+     "defined_in": "Prim",
+     "doc_backends": [
+      "usd"
+     ],
+     "code_candidates": null,
+     "default_backend": "usd",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": null
+    },
+    {
+     "class": "DeformablePrim",
+     "method": "get_applied_physics_materials",
+     "defined_in": "DeformablePrim",
+     "doc_backends": [
+      "usd"
+     ],
+     "code_candidates": null,
+     "default_backend": "usd",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": null
+    },
+    {
+     "class": "DeformablePrim",
+     "method": "get_applied_visual_materials",
+     "defined_in": "XformPrim",
+     "doc_backends": [
+      "usd"
+     ],
+     "code_candidates": null,
+     "default_backend": "usd",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": null
+    },
+    {
+     "class": "DeformablePrim",
+     "method": "get_default_state",
+     "defined_in": "XformPrim",
+     "doc_backends": [
+      "usd"
+     ],
+     "code_candidates": null,
+     "default_backend": "usd",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": null
+    },
+    {
+     "class": "DeformablePrim",
+     "method": "get_element_indices",
+     "defined_in": "DeformablePrim",
+     "doc_backends": [
+      "tensor"
+     ],
+     "code_candidates": null,
+     "default_backend": "tensor",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": null
+    },
+    {
+     "class": "DeformablePrim",
+     "method": "get_local_poses",
+     "defined_in": "XformPrim",
+     "doc_backends": [
+      "usd",
+      "usdrt",
+      "fabric"
+     ],
+     "code_candidates": [
+      "usd",
+      "usdrt",
+      "fabric"
+     ],
+     "default_backend": "usd",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": true
+    },
+    {
+     "class": "DeformablePrim",
+     "method": "get_local_scales",
+     "defined_in": "XformPrim",
+     "doc_backends": [
+      "usd",
+      "usdrt",
+      "fabric"
+     ],
+     "code_candidates": [
+      "usd",
+      "usdrt",
+      "fabric"
+     ],
+     "default_backend": "usd",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": true
+    },
+    {
+     "class": "DeformablePrim",
+     "method": "get_nodal_gradients",
+     "defined_in": "DeformablePrim",
+     "doc_backends": [
+      "tensor"
+     ],
+     "code_candidates": null,
+     "default_backend": "tensor",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": null
+    },
+    {
+     "class": "DeformablePrim",
+     "method": "get_nodal_kinematic_position_targets",
+     "defined_in": "DeformablePrim",
+     "doc_backends": [
+      "tensor"
+     ],
+     "code_candidates": null,
+     "default_backend": "tensor",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": null
+    },
+    {
+     "class": "DeformablePrim",
+     "method": "get_nodal_positions",
+     "defined_in": "DeformablePrim",
+     "doc_backends": [
+      "tensor"
+     ],
+     "code_candidates": null,
+     "default_backend": "tensor",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": null
+    },
+    {
+     "class": "DeformablePrim",
+     "method": "get_nodal_rotations",
+     "defined_in": "DeformablePrim",
+     "doc_backends": [
+      "tensor"
+     ],
+     "code_candidates": null,
+     "default_backend": "tensor",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": null
+    },
+    {
+     "class": "DeformablePrim",
+     "method": "get_nodal_stresses",
+     "defined_in": "DeformablePrim",
+     "doc_backends": [
+      "tensor"
+     ],
+     "code_candidates": null,
+     "default_backend": "tensor",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": null
+    },
+    {
+     "class": "DeformablePrim",
+     "method": "get_nodal_velocities",
+     "defined_in": "DeformablePrim",
+     "doc_backends": [
+      "tensor"
+     ],
+     "code_candidates": null,
+     "default_backend": "tensor",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": null
+    },
+    {
+     "class": "DeformablePrim",
+     "method": "get_visibilities",
+     "defined_in": "XformPrim",
+     "doc_backends": [
+      "usd"
+     ],
+     "code_candidates": null,
+     "default_backend": "usd",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": null
+    },
+    {
+     "class": "DeformablePrim",
+     "method": "get_world_poses",
+     "defined_in": "XformPrim",
+     "doc_backends": [
+      "usd",
+      "usdrt",
+      "fabric"
+     ],
+     "code_candidates": [
+      "usd",
+      "usdrt",
+      "fabric"
+     ],
+     "default_backend": "usd",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": true
+    },
+    {
+     "class": "DeformablePrim",
+     "method": "get_world_scales",
+     "defined_in": "XformPrim",
+     "doc_backends": [
+      "usd",
+      "usdrt",
+      "fabric"
+     ],
+     "code_candidates": [
+      "usd",
+      "usdrt",
+      "fabric"
+     ],
+     "default_backend": "usd",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": true
+    },
+    {
+     "class": "DeformablePrim",
+     "method": "is_physics_tensor_entity_valid",
+     "defined_in": "DeformablePrim",
+     "doc_backends": null,
+     "code_candidates": null,
+     "default_backend": null,
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": null
+    },
+    {
+     "class": "DeformablePrim",
+     "method": "reset_to_default_state",
+     "defined_in": "XformPrim",
+     "doc_backends": [
+      "usd",
+      "usdrt",
+      "fabric"
+     ],
+     "code_candidates": null,
+     "default_backend": "usd",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": null
+    },
+    {
+     "class": "DeformablePrim",
+     "method": "reset_xform_op_properties",
+     "defined_in": "XformPrim",
+     "doc_backends": [
+      "usd"
+     ],
+     "code_candidates": null,
+     "default_backend": "usd",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": null
+    },
+    {
+     "class": "DeformablePrim",
+     "method": "resolve_paths",
+     "defined_in": "Prim",
+     "doc_backends": [
+      "usd"
+     ],
+     "code_candidates": null,
+     "default_backend": "usd",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": null
+    },
+    {
+     "class": "DeformablePrim",
+     "method": "set_default_state",
+     "defined_in": "XformPrim",
+     "doc_backends": [
+      "usd"
+     ],
+     "code_candidates": null,
+     "default_backend": "usd",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": null
+    },
+    {
+     "class": "DeformablePrim",
+     "method": "set_local_poses",
+     "defined_in": "XformPrim",
+     "doc_backends": [
+      "usd",
+      "usdrt",
+      "fabric"
+     ],
+     "code_candidates": [
+      "usd",
+      "usdrt",
+      "fabric"
+     ],
+     "default_backend": "usd",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": true
+    },
+    {
+     "class": "DeformablePrim",
+     "method": "set_local_scales",
+     "defined_in": "XformPrim",
+     "doc_backends": [
+      "usd",
+      "usdrt",
+      "fabric"
+     ],
+     "code_candidates": [
+      "usd",
+      "usdrt",
+      "fabric"
+     ],
+     "default_backend": "usd",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": true
+    },
+    {
+     "class": "DeformablePrim",
+     "method": "set_nodal_kinematic_position_targets",
+     "defined_in": "DeformablePrim",
+     "doc_backends": [
+      "tensor"
+     ],
+     "code_candidates": null,
+     "default_backend": "tensor",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": null
+    },
+    {
+     "class": "DeformablePrim",
+     "method": "set_nodal_positions",
+     "defined_in": "DeformablePrim",
+     "doc_backends": [
+      "tensor"
+     ],
+     "code_candidates": null,
+     "default_backend": "tensor",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": null
+    },
+    {
+     "class": "DeformablePrim",
+     "method": "set_nodal_velocities",
+     "defined_in": "DeformablePrim",
+     "doc_backends": [
+      "tensor"
+     ],
+     "code_candidates": null,
+     "default_backend": "tensor",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": null
+    },
+    {
+     "class": "DeformablePrim",
+     "method": "set_visibilities",
+     "defined_in": "XformPrim",
+     "doc_backends": [
+      "usd"
+     ],
+     "code_candidates": null,
+     "default_backend": "usd",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": false,
+     "doc_matches_code": null
+    },
+    {
+     "class": "DeformablePrim",
+     "method": "set_world_poses",
+     "defined_in": "XformPrim",
+     "doc_backends": [
+      "usd",
+      "usdrt",
+      "fabric"
+     ],
+     "code_candidates": [
+      "usd",
+      "usdrt",
+      "fabric"
+     ],
+     "default_backend": "usd",
+     "tensor_fallback_to_usd": false,
+     "fabric_rewritten_to_usdrt": true,
+     "doc_matches_code": true
+    }
+   ],
+   "same_name_different_default": {
+    "get_local_poses": {
+     "XformPrim": "usd",
+     "GeomPrim": "usd",
+     "RigidPrim": "tensor",
+     "Articulation": "tensor",
+     "DeformablePrim": "usd"
+    },
+    "get_world_poses": {
+     "XformPrim": "usd",
+     "GeomPrim": "usd",
+     "RigidPrim": "tensor",
+     "Articulation": "tensor",
+     "DeformablePrim": "usd"
+    },
+    "reset_to_default_state": {
+     "XformPrim": "usd",
+     "GeomPrim": "usd",
+     "RigidPrim": "tensor",
+     "Articulation": "tensor",
+     "DeformablePrim": "usd"
+    },
+    "set_local_poses": {
+     "XformPrim": "usd",
+     "GeomPrim": "usd",
+     "RigidPrim": "tensor",
+     "Articulation": "tensor",
+     "DeformablePrim": "usd"
+    },
+    "set_world_poses": {
+     "XformPrim": "usd",
+     "GeomPrim": "usd",
+     "RigidPrim": "tensor",
+     "Articulation": "tensor",
+     "DeformablePrim": "usd"
+    }
+   },
+   "doc_code_mismatch": [],
+   "backend_combinations": {
+    "(表記なし)": {
+     "count": 7,
+     "methods": [
+      "RigidPrim.initialize_cpp_data_view",
+      "RigidPrim.is_physics_tensor_entity_valid",
+      "Articulation.fetch_articulation_root_api_prim_paths",
+      "Articulation.initialize_cpp_data_view",
+      "Articulation.is_physics_tensor_entity_initialized",
+      "Articulation.is_physics_tensor_entity_valid",
+      "DeformablePrim.is_physics_tensor_entity_valid"
+     ]
+    },
+    "tensor": {
+     "count": 48,
+     "methods": [
+      "RigidPrim.apply_forces",
+      "RigidPrim.apply_forces_and_torques_at_pos",
+      "RigidPrim.get_actor_paths_from_ids",
+      "RigidPrim.get_coms",
+      "RigidPrim.get_contact_force_data",
+      "RigidPrim.get_contact_force_matrix",
+      "RigidPrim.get_friction_data",
+      "RigidPrim.get_inertias",
+      "RigidPrim.get_net_contact_forces",
+      "RigidPrim.get_raw_contact_data",
+      "RigidPrim.set_coms",
+      "RigidPrim.set_inertias",
+      "Articulation.get_dof_coriolis_and_centrifugal_compensation_forces",
+      "Articulation.get_dof_efforts",
+      "Articulation.get_dof_gravity_compensation_forces",
+      "Articulation.get_dof_positions",
+      "Articulation.get_dof_projected_joint_forces",
+      "Articulation.get_dof_velocities",
+      "Articulation.get_fixed_tendon_dampings",
+      "Articulation.get_fixed_tendon_limit_stiffnesses",
+      "Articulation.get_fixed_tendon_limits",
+      "Articulation.get_fixed_tendon_offsets",
+      "Articulation.get_fixed_tendon_rest_lengths",
+      "Articulation.get_fixed_tendon_stiffnesses",
+      "Articulation.get_jacobian_matrices",
+      "Articulation.get_link_coms",
+      "Articulation.get_link_incoming_joint_force",
+      "Articulation.get_link_inertias",
+      "Articulation.get_mass_matrices",
+      "Articulation.get_velocities",
+      "Articulation.reset_to_default_state",
+      "Articulation.set_dof_efforts",
+      "Articulation.set_dof_positions",
+      "Articulation.set_dof_velocities",
+      "Articulation.set_fixed_tendon_properties",
+      "Articulation.set_link_coms",
+      "Articulation.set_link_inertias",
+      "Articulation.set_velocities",
+      "DeformablePrim.get_element_indices",
+      "DeformablePrim.get_nodal_gradients",
+      "DeformablePrim.get_nodal_kinematic_position_targets",
+      "DeformablePrim.get_nodal_positions",
+      "DeformablePrim.get_nodal_rotations",
+      "DeformablePrim.get_nodal_stresses",
+      "DeformablePrim.get_nodal_velocities",
+      "DeformablePrim.set_nodal_kinematic_position_targets",
+      "DeformablePrim.set_nodal_positions",
+      "DeformablePrim.set_nodal_velocities"
+     ]
+    },
+    "tensor,usd": {
+     "count": 33,
+     "methods": [
+      "RigidPrim.get_enabled_gravities",
+      "RigidPrim.get_enabled_rigid_bodies",
+      "RigidPrim.get_masses",
+      "RigidPrim.get_velocities",
+      "RigidPrim.reset_to_default_state",
+      "RigidPrim.set_enabled_gravities",
+      "RigidPrim.set_enabled_rigid_bodies",
+      "RigidPrim.set_masses",
+      "RigidPrim.set_velocities",
+      "Articulation.get_dof_armatures",
+      "Articulation.get_dof_drive_model_properties",
+      "Articulation.get_dof_drive_types",
+      "Articulation.get_dof_friction_properties",
+      "Articulation.get_dof_gains",
+      "Articulation.get_dof_limits",
+      "Articulation.get_dof_max_efforts",
+      "Articulation.get_dof_max_velocities",
+      "Articulation.get_dof_position_targets",
+      "Articulation.get_dof_velocity_targets",
+      "Articulation.get_link_enabled_gravities",
+      "Articulation.get_link_masses",
+      "Articulation.set_dof_armatures",
+      "Articulation.set_dof_drive_model_properties",
+      "Articulation.set_dof_friction_properties",
+      "Articulation.set_dof_gains",
+      "Articulation.set_dof_limits",
+      "Articulation.set_dof_max_efforts",
+      "Articulation.set_dof_max_velocities",
+      "Articulation.set_dof_position_targets",
+      "Articulation.set_dof_velocity_targets",
+      "Articulation.set_link_enabled_gravities",
+      "Articulation.set_link_masses",
+      "Articulation.switch_dof_control_mode"
+     ]
+    },
+    "tensor,usd,usdrt,fabric": {
+     "count": 8,
+     "methods": [
+      "RigidPrim.get_local_poses",
+      "RigidPrim.get_world_poses",
+      "RigidPrim.set_local_poses",
+      "RigidPrim.set_world_poses",
+      "Articulation.get_local_poses",
+      "Articulation.get_world_poses",
+      "Articulation.set_local_poses",
+      "Articulation.set_world_poses"
+     ]
+    },
+    "usd": {
+     "count": 44,
+     "methods": [
+      "Prim.ensure_api",
+      "Prim.resolve_paths",
+      "XformPrim.apply_physics_materials",
+      "XformPrim.apply_visual_materials",
+      "XformPrim.get_applied_visual_materials",
+      "XformPrim.get_default_state",
+      "XformPrim.get_visibilities",
+      "XformPrim.reset_xform_op_properties",
+      "XformPrim.set_default_state",
+      "XformPrim.set_visibilities",
+      "GeomPrim.apply_collision_apis",
+      "GeomPrim.apply_physics_materials",
+      "GeomPrim.get_applied_physics_materials",
+      "GeomPrim.get_collision_approximations",
+      "GeomPrim.get_enabled_collisions",
+      "GeomPrim.get_offsets",
+      "GeomPrim.get_torsional_patch_radii",
+      "GeomPrim.remove_collision_apis",
+      "GeomPrim.set_collision_approximations",
+      "GeomPrim.set_enabled_collisions",
+      "GeomPrim.set_offsets",
+      "GeomPrim.set_torsional_patch_radii",
+      "RigidPrim.get_default_state",
+      "RigidPrim.get_densities",
+      "RigidPrim.get_enabled_contact_tracking",
+      "RigidPrim.get_sleep_thresholds",
+      "RigidPrim.remove_physics_apis",
+      "RigidPrim.set_default_state",
+      "RigidPrim.set_densities",
+      "RigidPrim.set_enabled_contact_tracking",
+      "RigidPrim.set_sleep_thresholds",
+      "Articulation.get_default_state",
+      "Articulation.get_enabled_self_collisions",
+      "Articulation.get_sleep_thresholds",
+      "Articulation.get_solver_iteration_counts",
+      "Articulation.get_stabilization_thresholds",
+      "Articulation.set_default_state",
+      "Articulation.set_dof_drive_types",
+      "Articulation.set_enabled_self_collisions",
+      "Articulation.set_sleep_thresholds",
+      "Articulation.set_solver_iteration_counts",
+      "Articulation.set_stabilization_thresholds",
+      "DeformablePrim.apply_physics_materials",
+      "DeformablePrim.get_applied_physics_materials"
+     ]
+    },
+    "usd,tensor": {
+     "count": 3,
+     "methods": [
+      "Articulation.get_dof_indices",
+      "Articulation.get_joint_indices",
+      "Articulation.get_link_indices"
+     ]
+    },
+    "usd,usdrt,fabric": {
+     "count": 8,
+     "methods": [
+      "XformPrim.get_local_poses",
+      "XformPrim.get_local_scales",
+      "XformPrim.get_world_poses",
+      "XformPrim.get_world_scales",
+      "XformPrim.reset_to_default_state",
+      "XformPrim.set_local_poses",
+      "XformPrim.set_local_scales",
+      "XformPrim.set_world_poses"
+     ]
+    }
+   }
+  },
+  {
+   "id": "N-02",
+   "description": "バックエンドを変えたときの返り値の型(Play 中)",
+   "types": {
+    "RigidPrim.get_world_poses/(既定)": "warp._src.types.array device=cpu",
+    "RigidPrim.get_velocities/(既定)": "warp._src.types.array device=cpu",
+    "stage_utils.get_current_stage(backend=None)": "pxr.Usd.Stage",
+    "RigidPrim.get_world_poses/tensor": "warp._src.types.array device=cpu",
+    "RigidPrim.get_velocities/tensor": "warp._src.types.array device=cpu",
+    "RigidPrim.get_world_poses/usd": "warp._src.types.array device=cpu",
+    "RigidPrim.get_velocities/usd": "warp._src.types.array device=cpu",
+    "stage_utils.get_current_stage(backend='usd')": "pxr.Usd.Stage",
+    "RigidPrim.get_world_poses/usdrt": "warp._src.types.array device=cpu",
+    "RigidPrim.get_velocities/usdrt": "warp._src.types.array device=cpu",
+    "stage_utils.get_current_stage(backend='usdrt')": "usdrt.Usd._Usd.Stage",
+    "RigidPrim.get_world_poses/fabric": "warp._src.types.array device=cpu",
+    "RigidPrim.get_velocities/fabric": "warp._src.types.array device=cpu",
+    "stage_utils.get_current_stage(backend='fabric')": "usdrt.Usd._Usd.Stage"
+   }
+  },
+  {
+   "id": "N-03",
+   "description": "実際に触った名前空間(=実際に使われたバックエンド)",
+   "table": {
+    "stopped/get_world_poses/(既定)": {
+     "touched": [
+      "USD(pxr)"
+     ],
+     "warnings": [],
+     "error": null
+    },
+    "stopped/get_world_poses/tensor": {
+     "touched": [
+      "USD(pxr)"
+     ],
+     "warnings": [
+      "WARN: Physics tensor entity is not valid for use with 'tensor' backend. Falling back to 'usd' backend.",
+      "WARN: Unsupported backend: 'tensor'. Falling back to 'usd' backend."
+     ],
+     "error": null
+    },
+    "stopped/get_world_poses/usd": {
+     "touched": [
+      "USD(pxr)"
+     ],
+     "warnings": [],
+     "error": null
+    },
+    "stopped/get_world_poses/usdrt": {
+     "touched": [
+      "USDRT(usdrt)"
+     ],
+     "warnings": [],
+     "error": null
+    },
+    "stopped/get_world_poses/fabric": {
+     "touched": [
+      "USDRT(usdrt)",
+      "Fabric直接(warp.fabricarray)"
+     ],
+     "warnings": [],
+     "error": null
+    },
+    "stopped/set_world_poses/(既定)": {
+     "touched": [
+      "USD(pxr)"
+     ],
+     "warnings": [],
+     "error": null
+    },
+    "stopped/set_world_poses/tensor": {
+     "touched": [
+      "USD(pxr)"
+     ],
+     "warnings": [
+      "WARN: Physics tensor entity is not valid for use with 'tensor' backend. Falling back to 'usd' backend.",
+      "WARN: Unsupported backend: 'tensor'. Falling back to 'usd' backend."
+     ],
+     "error": null
+    },
+    "stopped/set_world_poses/usd": {
+     "touched": [
+      "USD(pxr)"
+     ],
+     "warnings": [],
+     "error": null
+    },
+    "stopped/set_world_poses/usdrt": {
+     "touched": [
+      "USDRT(usdrt)"
+     ],
+     "warnings": [],
+     "error": null
+    },
+    "stopped/set_world_poses/fabric": {
+     "touched": [
+      "USDRT(usdrt)"
+     ],
+     "warnings": [],
+     "error": null
+    },
+    "stopped/get_local_poses/(既定)": {
+     "touched": [
+      "USD(pxr)"
+     ],
+     "warnings": [],
+     "error": null
+    },
+    "stopped/get_local_poses/tensor": {
+     "touched": [
+      "USD(pxr)"
+     ],
+     "warnings": [
+      "WARN: Physics tensor entity is not valid for use with 'tensor' backend. Falling back to 'usd' backend.",
+      "WARN: Unsupported backend: 'tensor'. Falling back to 'usd' backend."
+     ],
+     "error": null
+    },
+    "stopped/get_local_poses/usd": {
+     "touched": [
+      "USD(pxr)"
+     ],
+     "warnings": [],
+     "error": null
+    },
+    "stopped/get_local_poses/usdrt": {
+     "touched": [
+      "USDRT(usdrt)"
+     ],
+     "warnings": [],
+     "error": null
+    },
+    "stopped/get_local_poses/fabric": {
+     "touched": [
+      "USDRT(usdrt)",
+      "Fabric直接(warp.fabricarray)"
+     ],
+     "warnings": [],
+     "error": null
+    },
+    "stopped/get_velocities/(既定)": {
+     "touched": [
+      "USD(pxr)"
+     ],
+     "warnings": [],
+     "error": null
+    },
+    "stopped/get_velocities/tensor": {
+     "touched": [
+      "USD(pxr)"
+     ],
+     "warnings": [
+      "WARN: Physics tensor entity is not valid for use with 'tensor' backend. Falling back to 'usd' backend."
+     ],
+     "error": null
+    },
+    "stopped/get_velocities/usd": {
+     "touched": [
+      "USD(pxr)"
+     ],
+     "warnings": [],
+     "error": null
+    },
+    "stopped/get_velocities/usdrt": {
+     "touched": [
+      "USD(pxr)"
+     ],
+     "warnings": [
+      "WARN: Physics tensor entity is not valid for use with 'tensor' backend. Falling back to 'usd' backend.",
+      "WARN: Unsupported backend: 'usdrt'. Falling back to 'tensor' backend."
+     ],
+     "error": null
+    },
+    "stopped/get_velocities/fabric": {
+     "touched": [
+      "USD(pxr)"
+     ],
+     "warnings": [
+      "WARN: Physics tensor entity is not valid for use with 'tensor' backend. Falling back to 'usd' backend.",
+      "WARN: Unsupported backend: 'fabric'. Falling back to 'tensor' backend."
+     ],
+     "error": null
+    },
+    "stopped/set_velocities/(既定)": {
+     "touched": [
+      "USD(pxr)"
+     ],
+     "warnings": [],
+     "error": null
+    },
+    "stopped/set_velocities/tensor": {
+     "touched": [
+      "USD(pxr)"
+     ],
+     "warnings": [
+      "WARN: Physics tensor entity is not valid for use with 'tensor' backend. Falling back to 'usd' backend."
+     ],
+     "error": null
+    },
+    "stopped/set_velocities/usd": {
+     "touched": [
+      "USD(pxr)"
+     ],
+     "warnings": [],
+     "error": null
+    },
+    "stopped/set_velocities/usdrt": {
+     "touched": [
+      "USD(pxr)"
+     ],
+     "warnings": [
+      "WARN: Physics tensor entity is not valid for use with 'tensor' backend. Falling back to 'usd' backend.",
+      "WARN: Unsupported backend: 'usdrt'. Falling back to 'tensor' backend."
+     ],
+     "error": null
+    },
+    "stopped/set_velocities/fabric": {
+     "touched": [
+      "USD(pxr)"
+     ],
+     "warnings": [
+      "WARN: Physics tensor entity is not valid for use with 'tensor' backend. Falling back to 'usd' backend.",
+      "WARN: Unsupported backend: 'fabric'. Falling back to 'tensor' backend."
+     ],
+     "error": null
+    },
+    "stopped/get_masses/(既定)": {
+     "touched": [
+      "USD(pxr)"
+     ],
+     "warnings": [],
+     "error": null
+    },
+    "stopped/get_masses/tensor": {
+     "touched": [
+      "USD(pxr)"
+     ],
+     "warnings": [
+      "WARN: Physics tensor entity is not valid for use with 'tensor' backend. Falling back to 'usd' backend."
+     ],
+     "error": null
+    },
+    "stopped/get_masses/usd": {
+     "touched": [
+      "USD(pxr)"
+     ],
+     "warnings": [],
+     "error": null
+    },
+    "stopped/get_masses/usdrt": {
+     "touched": [
+      "USD(pxr)"
+     ],
+     "warnings": [
+      "WARN: Physics tensor entity is not valid for use with 'tensor' backend. Falling back to 'usd' backend.",
+      "WARN: Unsupported backend: 'usdrt'. Falling back to 'tensor' backend."
+     ],
+     "error": null
+    },
+    "stopped/get_masses/fabric": {
+     "touched": [
+      "USD(pxr)"
+     ],
+     "warnings": [
+      "WARN: Physics tensor entity is not valid for use with 'tensor' backend. Falling back to 'usd' backend.",
+      "WARN: Unsupported backend: 'fabric'. Falling back to 'tensor' backend."
+     ],
+     "error": null
+    },
+    "stopped/set_masses/(既定)": {
+     "touched": [
+      "USD(pxr)"
+     ],
+     "warnings": [],
+     "error": null
+    },
+    "stopped/set_masses/tensor": {
+     "touched": [
+      "USD(pxr)"
+     ],
+     "warnings": [
+      "WARN: Physics tensor entity is not valid for use with 'tensor' backend. Falling back to 'usd' backend."
+     ],
+     "error": null
+    },
+    "stopped/set_masses/usd": {
+     "touched": [
+      "USD(pxr)"
+     ],
+     "warnings": [],
+     "error": null
+    },
+    "stopped/set_masses/usdrt": {
+     "touched": [
+      "USD(pxr)"
+     ],
+     "warnings": [
+      "WARN: Physics tensor entity is not valid for use with 'tensor' backend. Falling back to 'usd' backend.",
+      "WARN: Unsupported backend: 'usdrt'. Falling back to 'tensor' backend."
+     ],
+     "error": null
+    },
+    "stopped/set_masses/fabric": {
+     "touched": [
+      "USD(pxr)"
+     ],
+     "warnings": [
+      "WARN: Physics tensor entity is not valid for use with 'tensor' backend. Falling back to 'usd' backend.",
+      "WARN: Unsupported backend: 'fabric'. Falling back to 'tensor' backend."
+     ],
+     "error": null
+    },
+    "stopped/Xform.get_world_poses/(既定)": {
+     "touched": [
+      "USD(pxr)"
+     ],
+     "warnings": [],
+     "error": null
+    },
+    "stopped/Xform.get_world_poses/tensor": {
+     "touched": [
+      "USD(pxr)"
+     ],
+     "warnings": [
+      "WARN: Unsupported backend: 'tensor'. Falling back to 'usd' backend."
+     ],
+     "error": null
+    },
+    "stopped/Xform.get_world_poses/usd": {
+     "touched": [
+      "USD(pxr)"
+     ],
+     "warnings": [],
+     "error": null
+    },
+    "stopped/Xform.get_world_poses/usdrt": {
+     "touched": [
+      "USDRT(usdrt)"
+     ],
+     "warnings": [],
+     "error": null
+    },
+    "stopped/Xform.get_world_poses/fabric": {
+     "touched": [
+      "USDRT(usdrt)",
+      "Fabric直接(warp.fabricarray)"
+     ],
+     "warnings": [],
+     "error": null
+    },
+    "stopped/Xform.set_world_poses/(既定)": {
+     "touched": [
+      "USD(pxr)"
+     ],
+     "warnings": [],
+     "error": null
+    },
+    "stopped/Xform.set_world_poses/tensor": {
+     "touched": [
+      "USD(pxr)"
+     ],
+     "warnings": [
+      "WARN: Unsupported backend: 'tensor'. Falling back to 'usd' backend."
+     ],
+     "error": null
+    },
+    "stopped/Xform.set_world_poses/usd": {
+     "touched": [
+      "USD(pxr)"
+     ],
+     "warnings": [],
+     "error": null
+    },
+    "stopped/Xform.set_world_poses/usdrt": {
+     "touched": [
+      "USDRT(usdrt)"
+     ],
+     "warnings": [],
+     "error": null
+    },
+    "stopped/Xform.set_world_poses/fabric": {
+     "touched": [
+      "USDRT(usdrt)"
+     ],
+     "warnings": [],
+     "error": null
+    },
+    "stopped/Xform.set_local_poses/(既定)": {
+     "touched": [
+      "USD(pxr)"
+     ],
+     "warnings": [],
+     "error": null
+    },
+    "stopped/Xform.set_local_poses/tensor": {
+     "touched": [
+      "USD(pxr)"
+     ],
+     "warnings": [
+      "WARN: Unsupported backend: 'tensor'. Falling back to 'usd' backend."
+     ],
+     "error": null
+    },
+    "stopped/Xform.set_local_poses/usd": {
+     "touched": [
+      "USD(pxr)"
+     ],
+     "warnings": [],
+     "error": null
+    },
+    "stopped/Xform.set_local_poses/usdrt": {
+     "touched": [
+      "USDRT(usdrt)"
+     ],
+     "warnings": [],
+     "error": null
+    },
+    "stopped/Xform.set_local_poses/fabric": {
+     "touched": [
+      "USDRT(usdrt)",
+      "Fabric直接(warp.fabricarray)"
+     ],
+     "warnings": [],
+     "error": null
+    },
+    "playing/get_world_poses/(既定)": {
+     "touched": [
+      "tensor(omni.physics.tensors)"
+     ],
+     "warnings": [],
+     "error": null
+    },
+    "playing/get_world_poses/tensor": {
+     "touched": [
+      "tensor(omni.physics.tensors)"
+     ],
+     "warnings": [],
+     "error": null
+    },
+    "playing/get_world_poses/usd": {
+     "touched": [
+      "USD(pxr)"
+     ],
+     "warnings": [],
+     "error": null
+    },
+    "playing/get_world_poses/usdrt": {
+     "touched": [
+      "USDRT(usdrt)"
+     ],
+     "warnings": [],
+     "error": null
+    },
+    "playing/get_world_poses/fabric": {
+     "touched": [
+      "USDRT(usdrt)",
+      "Fabric直接(warp.fabricarray)"
+     ],
+     "warnings": [],
+     "error": null
+    },
+    "playing/set_world_poses/(既定)": {
+     "touched": [
+      "tensor(omni.physics.tensors)"
+     ],
+     "warnings": [],
+     "error": null
+    },
+    "playing/set_world_poses/tensor": {
+     "touched": [
+      "tensor(omni.physics.tensors)"
+     ],
+     "warnings": [],
+     "error": null
+    },
+    "playing/set_world_poses/usd": {
+     "touched": [
+      "USD(pxr)"
+     ],
+     "warnings": [],
+     "error": null
+    },
+    "playing/set_world_poses/usdrt": {
+     "touched": [
+      "USDRT(usdrt)"
+     ],
+     "warnings": [],
+     "error": null
+    },
+    "playing/set_world_poses/fabric": {
+     "touched": [
+      "USDRT(usdrt)"
+     ],
+     "warnings": [],
+     "error": null
+    },
+    "playing/get_local_poses/(既定)": {
+     "touched": [
+      "tensor(omni.physics.tensors)",
+      "USD(pxr)"
+     ],
+     "warnings": [],
+     "error": null
+    },
+    "playing/get_local_poses/tensor": {
+     "touched": [
+      "tensor(omni.physics.tensors)",
+      "USD(pxr)"
+     ],
+     "warnings": [],
+     "error": null
+    },
+    "playing/get_local_poses/usd": {
+     "touched": [
+      "USD(pxr)"
+     ],
+     "warnings": [],
+     "error": null
+    },
+    "playing/get_local_poses/usdrt": {
+     "touched": [
+      "USDRT(usdrt)"
+     ],
+     "warnings": [],
+     "error": null
+    },
+    "playing/get_local_poses/fabric": {
+     "touched": [
+      "USDRT(usdrt)",
+      "Fabric直接(warp.fabricarray)"
+     ],
+     "warnings": [],
+     "error": null
+    },
+    "playing/get_velocities/(既定)": {
+     "touched": [
+      "tensor(omni.physics.tensors)"
+     ],
+     "warnings": [],
+     "error": null
+    },
+    "playing/get_velocities/tensor": {
+     "touched": [
+      "tensor(omni.physics.tensors)"
+     ],
+     "warnings": [],
+     "error": null
+    },
+    "playing/get_velocities/usd": {
+     "touched": [
+      "USD(pxr)"
+     ],
+     "warnings": [],
+     "error": null
+    },
+    "playing/get_velocities/usdrt": {
+     "touched": [
+      "tensor(omni.physics.tensors)"
+     ],
+     "warnings": [
+      "WARN: Unsupported backend: 'usdrt'. Falling back to 'tensor' backend."
+     ],
+     "error": null
+    },
+    "playing/get_velocities/fabric": {
+     "touched": [
+      "tensor(omni.physics.tensors)"
+     ],
+     "warnings": [
+      "WARN: Unsupported backend: 'fabric'. Falling back to 'tensor' backend."
+     ],
+     "error": null
+    },
+    "playing/set_velocities/(既定)": {
+     "touched": [
+      "tensor(omni.physics.tensors)"
+     ],
+     "warnings": [],
+     "error": null
+    },
+    "playing/set_velocities/tensor": {
+     "touched": [
+      "tensor(omni.physics.tensors)"
+     ],
+     "warnings": [],
+     "error": null
+    },
+    "playing/set_velocities/usd": {
+     "touched": [
+      "USD(pxr)"
+     ],
+     "warnings": [],
+     "error": null
+    },
+    "playing/set_velocities/usdrt": {
+     "touched": [
+      "tensor(omni.physics.tensors)"
+     ],
+     "warnings": [
+      "WARN: Unsupported backend: 'usdrt'. Falling back to 'tensor' backend."
+     ],
+     "error": null
+    },
+    "playing/set_velocities/fabric": {
+     "touched": [
+      "tensor(omni.physics.tensors)"
+     ],
+     "warnings": [
+      "WARN: Unsupported backend: 'fabric'. Falling back to 'tensor' backend."
+     ],
+     "error": null
+    },
+    "playing/get_masses/(既定)": {
+     "touched": [
+      "tensor(omni.physics.tensors)"
+     ],
+     "warnings": [],
+     "error": null
+    },
+    "playing/get_masses/tensor": {
+     "touched": [
+      "tensor(omni.physics.tensors)"
+     ],
+     "warnings": [],
+     "error": null
+    },
+    "playing/get_masses/usd": {
+     "touched": [
+      "USD(pxr)"
+     ],
+     "warnings": [],
+     "error": null
+    },
+    "playing/get_masses/usdrt": {
+     "touched": [
+      "tensor(omni.physics.tensors)"
+     ],
+     "warnings": [
+      "WARN: Unsupported backend: 'usdrt'. Falling back to 'tensor' backend."
+     ],
+     "error": null
+    },
+    "playing/get_masses/fabric": {
+     "touched": [
+      "tensor(omni.physics.tensors)"
+     ],
+     "warnings": [
+      "WARN: Unsupported backend: 'fabric'. Falling back to 'tensor' backend."
+     ],
+     "error": null
+    },
+    "playing/set_masses/(既定)": {
+     "touched": [
+      "tensor(omni.physics.tensors)"
+     ],
+     "warnings": [],
+     "error": null
+    },
+    "playing/set_masses/tensor": {
+     "touched": [
+      "tensor(omni.physics.tensors)"
+     ],
+     "warnings": [],
+     "error": null
+    },
+    "playing/set_masses/usd": {
+     "touched": [
+      "USD(pxr)"
+     ],
+     "warnings": [],
+     "error": null
+    },
+    "playing/set_masses/usdrt": {
+     "touched": [
+      "tensor(omni.physics.tensors)"
+     ],
+     "warnings": [
+      "WARN: Unsupported backend: 'usdrt'. Falling back to 'tensor' backend."
+     ],
+     "error": null
+    },
+    "playing/set_masses/fabric": {
+     "touched": [
+      "tensor(omni.physics.tensors)"
+     ],
+     "warnings": [
+      "WARN: Unsupported backend: 'fabric'. Falling back to 'tensor' backend."
+     ],
+     "error": null
+    },
+    "playing/Xform.get_world_poses/(既定)": {
+     "touched": [
+      "USD(pxr)"
+     ],
+     "warnings": [],
+     "error": null
+    },
+    "playing/Xform.get_world_poses/tensor": {
+     "touched": [
+      "USD(pxr)"
+     ],
+     "warnings": [
+      "WARN: Unsupported backend: 'tensor'. Falling back to 'usd' backend."
+     ],
+     "error": null
+    },
+    "playing/Xform.get_world_poses/usd": {
+     "touched": [
+      "USD(pxr)"
+     ],
+     "warnings": [],
+     "error": null
+    },
+    "playing/Xform.get_world_poses/usdrt": {
+     "touched": [
+      "USDRT(usdrt)"
+     ],
+     "warnings": [],
+     "error": null
+    },
+    "playing/Xform.get_world_poses/fabric": {
+     "touched": [
+      "USDRT(usdrt)",
+      "Fabric直接(warp.fabricarray)"
+     ],
+     "warnings": [],
+     "error": null
+    },
+    "playing/Xform.set_world_poses/(既定)": {
+     "touched": [
+      "USD(pxr)"
+     ],
+     "warnings": [],
+     "error": null
+    },
+    "playing/Xform.set_world_poses/tensor": {
+     "touched": [
+      "USD(pxr)"
+     ],
+     "warnings": [
+      "WARN: Unsupported backend: 'tensor'. Falling back to 'usd' backend."
+     ],
+     "error": null
+    },
+    "playing/Xform.set_world_poses/usd": {
+     "touched": [
+      "USD(pxr)"
+     ],
+     "warnings": [],
+     "error": null
+    },
+    "playing/Xform.set_world_poses/usdrt": {
+     "touched": [
+      "USDRT(usdrt)"
+     ],
+     "warnings": [],
+     "error": null
+    },
+    "playing/Xform.set_world_poses/fabric": {
+     "touched": [
+      "USDRT(usdrt)"
+     ],
+     "warnings": [],
+     "error": null
+    },
+    "playing/Xform.set_local_poses/(既定)": {
+     "touched": [
+      "USD(pxr)"
+     ],
+     "warnings": [],
+     "error": null
+    },
+    "playing/Xform.set_local_poses/tensor": {
+     "touched": [
+      "USD(pxr)"
+     ],
+     "warnings": [
+      "WARN: Unsupported backend: 'tensor'. Falling back to 'usd' backend."
+     ],
+     "error": null
+    },
+    "playing/Xform.set_local_poses/usd": {
+     "touched": [
+      "USD(pxr)"
+     ],
+     "warnings": [],
+     "error": null
+    },
+    "playing/Xform.set_local_poses/usdrt": {
+     "touched": [
+      "USDRT(usdrt)"
+     ],
+     "warnings": [],
+     "error": null
+    },
+    "playing/Xform.set_local_poses/fabric": {
+     "touched": [
+      "USDRT(usdrt)",
+      "Fabric直接(warp.fabricarray)"
+     ],
+     "warnings": [],
+     "error": null
+    }
+   },
+   "touched_symbols": {
+    "stopped/get_world_poses/(既定)": [
+     "pxr.UsdGeom.Xformable",
+     "pxr.Usd.TimeCode"
+    ],
+    "stopped/get_world_poses/tensor": [
+     "pxr.UsdGeom.Xformable",
+     "pxr.Usd.TimeCode"
+    ],
+    "stopped/get_world_poses/usd": [
+     "pxr.UsdGeom.Xformable",
+     "pxr.Usd.TimeCode"
+    ],
+    "stopped/get_world_poses/usdrt": [
+     "usdrt.hierarchy",
+     "usdrt.hierarchy.IFabricHierarchy",
+     "usdrt.Sdf",
+     "usdrt.Sdf.Path"
+    ],
+    "stopped/get_world_poses/fabric": [
+     "usdrt.Sdf",
+     "usdrt.Sdf.ValueTypeNames",
+     "usdrt.Rt",
+     "usdrt.Rt.Xformable",
+     "usdrt.Usd",
+     "usdrt.Usd.Access",
+     "isaacsim.core.experimental.prims.impl._fabric.update_fabric_selection",
+     "warp.fabricarray",
+     "isaacsim.core.experimental.prims.impl._fabric.wk_decompose_fabric_transformation_matrix_to_warp_arrays"
+    ],
+    "stopped/set_world_poses/(既定)": [
+     "pxr.UsdGeom.Xformable",
+     "pxr.Usd.TimeCode",
+     "pxr.Gf.Transform",
+     "pxr.Gf.Matrix4d",
+     "pxr.Gf.Vec3d",
+     "pxr.Gf.Quatd"
+    ],
+    "stopped/set_world_poses/tensor": [
+     "pxr.UsdGeom.Xformable",
+     "pxr.Usd.TimeCode",
+     "pxr.Gf.Transform",
+     "pxr.Gf.Matrix4d",
+     "pxr.Gf.Vec3d",
+     "pxr.Gf.Quatd"
+    ],
+    "stopped/set_world_poses/usd": [
+     "pxr.UsdGeom.Xformable",
+     "pxr.Usd.TimeCode",
+     "pxr.Gf.Transform",
+     "pxr.Gf.Matrix4d",
+     "pxr.Gf.Vec3d",
+     "pxr.Gf.Quatd"
+    ],
+    "stopped/set_world_poses/usdrt": [
+     "usdrt.Sdf",
+     "usdrt.Sdf.Path",
+     "usdrt.Gf",
+     "usdrt.Gf.Vec3d"
+    ],
+    "stopped/set_world_poses/fabric": [
+     "usdrt.Sdf",
+     "usdrt.Sdf.Path",
+     "usdrt.Gf",
+     "usdrt.Gf.Vec3d"
+    ],
+    "stopped/get_local_poses/(既定)": [
+     "pxr.UsdGeom.Xformable",
+     "pxr.Usd.TimeCode"
+    ],
+    "stopped/get_local_poses/tensor": [
+     "pxr.UsdGeom.Xformable",
+     "pxr.Usd.TimeCode"
+    ],
+    "stopped/get_local_poses/usd": [
+     "pxr.UsdGeom.Xformable",
+     "pxr.Usd.TimeCode"
+    ],
+    "stopped/get_local_poses/usdrt": [
+     "usdrt.Sdf",
+     "usdrt.Sdf.Path"
+    ],
+    "stopped/get_local_poses/fabric": [
+     "usdrt.Sdf",
+     "usdrt.Sdf.ValueTypeNames",
+     "usdrt.Usd",
+     "usdrt.Usd.Access",
+     "isaacsim.core.experimental.prims.impl._fabric.update_fabric_selection",
+     "warp.fabricarray",
+     "isaacsim.core.experimental.prims.impl._fabric.wk_decompose_fabric_transformation_matrix_to_warp_arrays"
+    ],
+    "stopped/get_velocities/(既定)": [
+     "pxr.UsdPhysics.RigidBodyAPI",
+     "pxr.Usd.SchemaRegistry"
+    ],
+    "stopped/get_velocities/tensor": [
+     "pxr.UsdPhysics.RigidBodyAPI",
+     "pxr.Usd.SchemaRegistry"
+    ],
+    "stopped/get_velocities/usd": [
+     "pxr.UsdPhysics.RigidBodyAPI",
+     "pxr.Usd.SchemaRegistry"
+    ],
+    "stopped/get_velocities/usdrt": [
+     "pxr.UsdPhysics.RigidBodyAPI",
+     "pxr.Usd.SchemaRegistry"
+    ],
+    "stopped/get_velocities/fabric": [
+     "pxr.UsdPhysics.RigidBodyAPI",
+     "pxr.Usd.SchemaRegistry"
+    ],
+    "stopped/set_velocities/(既定)": [
+     "pxr.UsdPhysics.RigidBodyAPI",
+     "pxr.Usd.SchemaRegistry",
+     "pxr.Gf.Vec3f"
+    ],
+    "stopped/set_velocities/tensor": [
+     "pxr.UsdPhysics.RigidBodyAPI",
+     "pxr.Usd.SchemaRegistry",
+     "pxr.Gf.Vec3f"
+    ],
+    "stopped/set_velocities/usd": [
+     "pxr.UsdPhysics.RigidBodyAPI",
+     "pxr.Usd.SchemaRegistry",
+     "pxr.Gf.Vec3f"
+    ],
+    "stopped/set_velocities/usdrt": [
+     "pxr.UsdPhysics.RigidBodyAPI",
+     "pxr.Usd.SchemaRegistry",
+     "pxr.Gf.Vec3f"
+    ],
+    "stopped/set_velocities/fabric": [
+     "pxr.UsdPhysics.RigidBodyAPI",
+     "pxr.Usd.SchemaRegistry",
+     "pxr.Gf.Vec3f"
+    ],
+    "stopped/get_masses/(既定)": [
+     "pxr.UsdPhysics.MassAPI"
+    ],
+    "stopped/get_masses/tensor": [
+     "pxr.UsdPhysics.MassAPI"
+    ],
+    "stopped/get_masses/usd": [
+     "pxr.UsdPhysics.MassAPI"
+    ],
+    "stopped/get_masses/usdrt": [
+     "pxr.UsdPhysics.MassAPI"
+    ],
+    "stopped/get_masses/fabric": [
+     "pxr.UsdPhysics.MassAPI"
+    ],
+    "stopped/set_masses/(既定)": [
+     "pxr.UsdPhysics.MassAPI",
+     "pxr.Usd.SchemaRegistry"
+    ],
+    "stopped/set_masses/tensor": [
+     "pxr.UsdPhysics.MassAPI",
+     "pxr.Usd.SchemaRegistry"
+    ],
+    "stopped/set_masses/usd": [
+     "pxr.UsdPhysics.MassAPI",
+     "pxr.Usd.SchemaRegistry"
+    ],
+    "stopped/set_masses/usdrt": [
+     "pxr.UsdPhysics.MassAPI",
+     "pxr.Usd.SchemaRegistry"
+    ],
+    "stopped/set_masses/fabric": [
+     "pxr.UsdPhysics.MassAPI",
+     "pxr.Usd.SchemaRegistry"
+    ],
+    "stopped/Xform.get_world_poses/(既定)": [
+     "pxr.UsdGeom.Xformable",
+     "pxr.Usd.TimeCode"
+    ],
+    "stopped/Xform.get_world_poses/tensor": [
+     "pxr.UsdGeom.Xformable",
+     "pxr.Usd.TimeCode"
+    ],
+    "stopped/Xform.get_world_poses/usd": [
+     "pxr.UsdGeom.Xformable",
+     "pxr.Usd.TimeCode"
+    ],
+    "stopped/Xform.get_world_poses/usdrt": [
+     "usdrt.hierarchy",
+     "usdrt.hierarchy.IFabricHierarchy",
+     "usdrt.Sdf",
+     "usdrt.Sdf.Path"
+    ],
+    "stopped/Xform.get_world_poses/fabric": [
+     "usdrt.Sdf",
+     "usdrt.Sdf.ValueTypeNames",
+     "usdrt.Rt",
+     "usdrt.Rt.Xformable",
+     "usdrt.Usd",
+     "usdrt.Usd.Access",
+     "isaacsim.core.experimental.prims.impl._fabric.update_fabric_selection",
+     "warp.fabricarray",
+     "isaacsim.core.experimental.prims.impl._fabric.wk_decompose_fabric_transformation_matrix_to_warp_arrays"
+    ],
+    "stopped/Xform.set_world_poses/(既定)": [
+     "pxr.UsdGeom.Xformable",
+     "pxr.Usd.TimeCode",
+     "pxr.Gf.Transform",
+     "pxr.Gf.Matrix4d",
+     "pxr.Gf.Vec3d",
+     "pxr.Gf.Quatd"
+    ],
+    "stopped/Xform.set_world_poses/tensor": [
+     "pxr.UsdGeom.Xformable",
+     "pxr.Usd.TimeCode",
+     "pxr.Gf.Transform",
+     "pxr.Gf.Matrix4d",
+     "pxr.Gf.Vec3d",
+     "pxr.Gf.Quatd"
+    ],
+    "stopped/Xform.set_world_poses/usd": [
+     "pxr.UsdGeom.Xformable",
+     "pxr.Usd.TimeCode",
+     "pxr.Gf.Transform",
+     "pxr.Gf.Matrix4d",
+     "pxr.Gf.Vec3d",
+     "pxr.Gf.Quatd"
+    ],
+    "stopped/Xform.set_world_poses/usdrt": [
+     "usdrt.Sdf",
+     "usdrt.Sdf.Path",
+     "usdrt.Gf",
+     "usdrt.Gf.Vec3d"
+    ],
+    "stopped/Xform.set_world_poses/fabric": [
+     "usdrt.Sdf",
+     "usdrt.Sdf.Path",
+     "usdrt.Gf",
+     "usdrt.Gf.Vec3d"
+    ],
+    "stopped/Xform.set_local_poses/(既定)": [
+     "pxr.Gf.Vec3d"
+    ],
+    "stopped/Xform.set_local_poses/tensor": [
+     "pxr.Gf.Vec3d"
+    ],
+    "stopped/Xform.set_local_poses/usd": [
+     "pxr.Gf.Vec3d"
+    ],
+    "stopped/Xform.set_local_poses/usdrt": [
+     "usdrt.Sdf",
+     "usdrt.Sdf.Path",
+     "usdrt.Gf",
+     "usdrt.Gf.Vec3d"
+    ],
+    "stopped/Xform.set_local_poses/fabric": [
+     "usdrt.Sdf",
+     "usdrt.Sdf.ValueTypeNames",
+     "usdrt.Usd",
+     "usdrt.Usd.Access",
+     "isaacsim.core.experimental.prims.impl._fabric.update_fabric_selection",
+     "warp.fabricarray",
+     "isaacsim.core.experimental.prims.impl._fabric.wk_compose_fabric_transformation_matrix_from_warp_arrays"
+    ],
+    "playing/get_world_poses/(既定)": [
+     "omni.physics.tensors.api.RigidBodyView.get_transforms"
+    ],
+    "playing/get_world_poses/tensor": [
+     "omni.physics.tensors.api.RigidBodyView.get_transforms"
+    ],
+    "playing/get_world_poses/usd": [
+     "pxr.UsdGeom.Xformable",
+     "pxr.Usd.TimeCode"
+    ],
+    "playing/get_world_poses/usdrt": [
+     "usdrt.hierarchy",
+     "usdrt.hierarchy.IFabricHierarchy",
+     "usdrt.Sdf",
+     "usdrt.Sdf.Path"
+    ],
+    "playing/get_world_poses/fabric": [
+     "usdrt.Sdf",
+     "usdrt.Sdf.ValueTypeNames",
+     "usdrt.Rt",
+     "usdrt.Rt.Xformable",
+     "usdrt.Usd",
+     "usdrt.Usd.Access",
+     "isaacsim.core.experimental.prims.impl._fabric.update_fabric_selection",
+     "warp.fabricarray",
+     "isaacsim.core.experimental.prims.impl._fabric.wk_decompose_fabric_transformation_matrix_to_warp_arrays"
+    ],
+    "playing/set_world_poses/(既定)": [
+     "omni.physics.tensors.api.RigidBodyView.get_transforms",
+     "omni.physics.tensors.api.RigidBodyView.set_transforms"
+    ],
+    "playing/set_world_poses/tensor": [
+     "omni.physics.tensors.api.RigidBodyView.get_transforms",
+     "omni.physics.tensors.api.RigidBodyView.set_transforms"
+    ],
+    "playing/set_world_poses/usd": [
+     "pxr.UsdGeom.Xformable",
+     "pxr.Usd.TimeCode",
+     "pxr.Gf.Transform",
+     "pxr.Gf.Matrix4d",
+     "pxr.Gf.Vec3d",
+     "pxr.Gf.Quatd"
+    ],
+    "playing/set_world_poses/usdrt": [
+     "usdrt.Sdf",
+     "usdrt.Sdf.Path",
+     "usdrt.Gf",
+     "usdrt.Gf.Vec3d"
+    ],
+    "playing/set_world_poses/fabric": [
+     "usdrt.Sdf",
+     "usdrt.Sdf.Path",
+     "usdrt.Gf",
+     "usdrt.Gf.Vec3d"
+    ],
+    "playing/get_local_poses/(既定)": [
+     "omni.physics.tensors.api.RigidBodyView.get_transforms",
+     "pxr.UsdGeom.Xformable",
+     "pxr.Usd.TimeCode",
+     "pxr.Gf.Transform",
+     "pxr.Gf.Matrix4d"
+    ],
+    "playing/get_local_poses/tensor": [
+     "omni.physics.tensors.api.RigidBodyView.get_transforms",
+     "pxr.UsdGeom.Xformable",
+     "pxr.Usd.TimeCode",
+     "pxr.Gf.Transform",
+     "pxr.Gf.Matrix4d"
+    ],
+    "playing/get_local_poses/usd": [
+     "pxr.UsdGeom.Xformable",
+     "pxr.Usd.TimeCode"
+    ],
+    "playing/get_local_poses/usdrt": [
+     "usdrt.Sdf",
+     "usdrt.Sdf.Path"
+    ],
+    "playing/get_local_poses/fabric": [
+     "usdrt.Sdf",
+     "usdrt.Sdf.ValueTypeNames",
+     "usdrt.Usd",
+     "usdrt.Usd.Access",
+     "isaacsim.core.experimental.prims.impl._fabric.update_fabric_selection",
+     "warp.fabricarray",
+     "isaacsim.core.experimental.prims.impl._fabric.wk_decompose_fabric_transformation_matrix_to_warp_arrays"
+    ],
+    "playing/get_velocities/(既定)": [
+     "omni.physics.tensors.api.RigidBodyView.get_velocities"
+    ],
+    "playing/get_velocities/tensor": [
+     "omni.physics.tensors.api.RigidBodyView.get_velocities"
+    ],
+    "playing/get_velocities/usd": [
+     "pxr.UsdPhysics.RigidBodyAPI",
+     "pxr.Usd.SchemaRegistry"
+    ],
+    "playing/get_velocities/usdrt": [
+     "omni.physics.tensors.api.RigidBodyView.get_velocities"
+    ],
+    "playing/get_velocities/fabric": [
+     "omni.physics.tensors.api.RigidBodyView.get_velocities"
+    ],
+    "playing/set_velocities/(既定)": [
+     "omni.physics.tensors.api.RigidBodyView.get_velocities",
+     "omni.physics.tensors.api.RigidBodyView.set_velocities"
+    ],
+    "playing/set_velocities/tensor": [
+     "omni.physics.tensors.api.RigidBodyView.get_velocities",
+     "omni.physics.tensors.api.RigidBodyView.set_velocities"
+    ],
+    "playing/set_velocities/usd": [
+     "pxr.UsdPhysics.RigidBodyAPI",
+     "pxr.Usd.SchemaRegistry",
+     "pxr.Gf.Vec3f"
+    ],
+    "playing/set_velocities/usdrt": [
+     "omni.physics.tensors.api.RigidBodyView.get_velocities",
+     "omni.physics.tensors.api.RigidBodyView.set_velocities"
+    ],
+    "playing/set_velocities/fabric": [
+     "omni.physics.tensors.api.RigidBodyView.get_velocities",
+     "omni.physics.tensors.api.RigidBodyView.set_velocities"
+    ],
+    "playing/get_masses/(既定)": [
+     "omni.physics.tensors.api.RigidBodyView.get_masses"
+    ],
+    "playing/get_masses/tensor": [
+     "omni.physics.tensors.api.RigidBodyView.get_masses"
+    ],
+    "playing/get_masses/usd": [
+     "pxr.UsdPhysics.MassAPI"
+    ],
+    "playing/get_masses/usdrt": [
+     "omni.physics.tensors.api.RigidBodyView.get_masses"
+    ],
+    "playing/get_masses/fabric": [
+     "omni.physics.tensors.api.RigidBodyView.get_masses"
+    ],
+    "playing/set_masses/(既定)": [
+     "omni.physics.tensors.api.RigidBodyView.get_masses",
+     "omni.physics.tensors.api.RigidBodyView.set_masses"
+    ],
+    "playing/set_masses/tensor": [
+     "omni.physics.tensors.api.RigidBodyView.get_masses",
+     "omni.physics.tensors.api.RigidBodyView.set_masses"
+    ],
+    "playing/set_masses/usd": [
+     "pxr.UsdPhysics.MassAPI",
+     "pxr.Usd.SchemaRegistry"
+    ],
+    "playing/set_masses/usdrt": [
+     "omni.physics.tensors.api.RigidBodyView.get_masses",
+     "omni.physics.tensors.api.RigidBodyView.set_masses"
+    ],
+    "playing/set_masses/fabric": [
+     "omni.physics.tensors.api.RigidBodyView.get_masses",
+     "omni.physics.tensors.api.RigidBodyView.set_masses"
+    ],
+    "playing/Xform.get_world_poses/(既定)": [
+     "pxr.UsdGeom.Xformable",
+     "pxr.Usd.TimeCode"
+    ],
+    "playing/Xform.get_world_poses/tensor": [
+     "pxr.UsdGeom.Xformable",
+     "pxr.Usd.TimeCode"
+    ],
+    "playing/Xform.get_world_poses/usd": [
+     "pxr.UsdGeom.Xformable",
+     "pxr.Usd.TimeCode"
+    ],
+    "playing/Xform.get_world_poses/usdrt": [
+     "usdrt.hierarchy",
+     "usdrt.hierarchy.IFabricHierarchy",
+     "usdrt.Sdf",
+     "usdrt.Sdf.Path"
+    ],
+    "playing/Xform.get_world_poses/fabric": [
+     "usdrt.Sdf",
+     "usdrt.Sdf.ValueTypeNames",
+     "usdrt.Rt",
+     "usdrt.Rt.Xformable",
+     "usdrt.Usd",
+     "usdrt.Usd.Access",
+     "isaacsim.core.experimental.prims.impl._fabric.update_fabric_selection",
+     "warp.fabricarray",
+     "isaacsim.core.experimental.prims.impl._fabric.wk_decompose_fabric_transformation_matrix_to_warp_arrays"
+    ],
+    "playing/Xform.set_world_poses/(既定)": [
+     "pxr.UsdGeom.Xformable",
+     "pxr.Usd.TimeCode",
+     "pxr.Gf.Transform",
+     "pxr.Gf.Matrix4d",
+     "pxr.Gf.Vec3d",
+     "pxr.Gf.Quatd"
+    ],
+    "playing/Xform.set_world_poses/tensor": [
+     "pxr.UsdGeom.Xformable",
+     "pxr.Usd.TimeCode",
+     "pxr.Gf.Transform",
+     "pxr.Gf.Matrix4d",
+     "pxr.Gf.Vec3d",
+     "pxr.Gf.Quatd"
+    ],
+    "playing/Xform.set_world_poses/usd": [
+     "pxr.UsdGeom.Xformable",
+     "pxr.Usd.TimeCode",
+     "pxr.Gf.Transform",
+     "pxr.Gf.Matrix4d",
+     "pxr.Gf.Vec3d",
+     "pxr.Gf.Quatd"
+    ],
+    "playing/Xform.set_world_poses/usdrt": [
+     "usdrt.Sdf",
+     "usdrt.Sdf.Path",
+     "usdrt.Gf",
+     "usdrt.Gf.Vec3d"
+    ],
+    "playing/Xform.set_world_poses/fabric": [
+     "usdrt.Sdf",
+     "usdrt.Sdf.Path",
+     "usdrt.Gf",
+     "usdrt.Gf.Vec3d"
+    ],
+    "playing/Xform.set_local_poses/(既定)": [
+     "pxr.Gf.Vec3d"
+    ],
+    "playing/Xform.set_local_poses/tensor": [
+     "pxr.Gf.Vec3d"
+    ],
+    "playing/Xform.set_local_poses/usd": [
+     "pxr.Gf.Vec3d"
+    ],
+    "playing/Xform.set_local_poses/usdrt": [
+     "usdrt.Sdf",
+     "usdrt.Sdf.Path",
+     "usdrt.Gf",
+     "usdrt.Gf.Vec3d"
+    ],
+    "playing/Xform.set_local_poses/fabric": [
+     "usdrt.Sdf",
+     "usdrt.Sdf.ValueTypeNames",
+     "usdrt.Usd",
+     "usdrt.Usd.Access",
+     "isaacsim.core.experimental.prims.impl._fabric.update_fabric_selection",
+     "warp.fabricarray",
+     "isaacsim.core.experimental.prims.impl._fabric.wk_compose_fabric_transformation_matrix_from_warp_arrays"
+    ]
+   }
+  },
+  {
+   "id": "N-04",
+   "description": "「backend」という語の別の意味",
+   "simulation_manager_get_backend": "numpy",
+   "simulation_manager_active_engine": "physx",
+   "create_simulation_view_signature": "(frontend_name, stage_id=-1, backend='physx')",
+   "experimental_use_backend_annotation": "Literal['usd', 'usdrt', 'fabric', 'tensor', 'simstate']",
+   "deprecated_single_rigid_prim_backend_lines": [
+    "L96: self._backend = SimulationManager.get_backend()",
+    "L98: self._backend_utils = SimulationManager._get_backend_utils()"
+   ]
+  },
+  {
+   "id": "N-05",
+   "description": "use_backend の規則",
+   "cases": {
+    "既定(use_backend なし) supported=[tensor,usd]": {
+     "result": "tensor",
+     "warnings": []
+    },
+    "use_backend(usdrt) supported=[tensor,usd]": {
+     "result": "tensor",
+     "warnings": [
+      "WARN: Unsupported backend: 'usdrt'. Falling back to 'tensor' backend."
+     ]
+    },
+    "use_backend(usdrt, raise_on_unsupported) supported=[tensor,usd]": {
+     "error": "RuntimeError: Unsupported backend: 'usdrt'. Supported backends: 'tensor', 'usd'",
+     "warnings": []
+    },
+    "入れ子 usd > tensor > (抜ける) > (抜ける)": {
+     "result": [
+      "usd",
+      "tensor",
+      "usd",
+      "tensor"
+     ],
+     "warnings": []
+    },
+    "スレッドローカル": {
+     "result": {
+      "main": "usd",
+      "worker": "tensor"
+     },
+     "warnings": []
+    },
+    "FSD 無効を模擬して use_backend(fabric)": {
+     "error": "RuntimeError: 'usdrt' and 'fabric' backends require Fabric Scene Delegate (FSD) to be enabled. Enable FSD in .kit experience settings ('app.useFabricSceneDelegate = true') to use them.",
+     "warnings": []
+    },
+    "Stop 中 use_backend(tensor) get_world_poses": {
+     "result": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "warnings": [
+      "WARN: Physics tensor entity is not valid for use with 'tensor' backend. Falling back to 'usd' backend.",
+      "WARN: Unsupported backend: 'tensor'. Falling back to 'usd' backend."
+     ]
+    },
+    "Stop 中 use_backend(tensor, raise_on_fallback) get_world_poses": {
+     "error": "RuntimeError: Physics tensor entity is not valid. Fallback set to 'usd' backend.",
+     "warnings": []
+    },
+    "Stop 中 既定 get_world_poses": {
+     "result": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "warnings": []
+    }
+   }
+  }
+ ]
+}

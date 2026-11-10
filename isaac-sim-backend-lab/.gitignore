@@ -1,0 +1,11 @@
+# Python のキャッシュ
+__pycache__/
+*.pyc
+
+# Obsidian でこのフォルダを開いたときに作られる設定（環境依存なので管理しない）
+.obsidian/
+
+# OS が作るファイル
+Thumbs.db
+desktop.ini
+.DS_Store

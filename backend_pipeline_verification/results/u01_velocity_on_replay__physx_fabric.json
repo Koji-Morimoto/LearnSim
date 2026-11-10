@@ -1,0 +1,6698 @@
+{
+ "group": "u01_velocity_on_replay__physx_fabric",
+ "items": [
+  {
+   "id": "U-00",
+   "description": "バージョンと設定",
+   "omni.physx": "omni.physx-110.4.4",
+   "omni.physx.fabric": "omni.physx.fabric-110.4.4",
+   "omni.physics.tensors": "omni.physics.tensors-110.4.4",
+   "usdrt.scenegraph": "usdrt.scenegraph-7.6.3",
+   "omni.hydra.usdrt_delegate": "omni.hydra.usdrt_delegate-7.5.2",
+   "isaacsim.core.experimental.prims": "isaacsim.core.experimental.prims-1.12.1",
+   "isaacsim.core.experimental.utils": "isaacsim.core.experimental.utils-0.23.3",
+   "isaacsim.core.simulation_manager": "isaacsim.core.simulation_manager-1.17.4",
+   "isaac_sim_VERSION": "6.2.0-rc.14+release.52805.02189a84.gl",
+   "/app/useFabricSceneDelegate": true,
+   "/physics/resetOnStop": true,
+   "/physics/updateToUsd": false,
+   "/physics/updateVelocitiesToUsd": false,
+   "/physics/fabricEnabled": true,
+   "/physics/suppressReadback": false,
+   "/physics/cudaDevice": 0,
+   "config": "physx_fabric",
+   "simulation_device": "cpu"
+  },
+  {
+   "id": "U-A1",
+   "description": "未 Play のステージ、Stop 中に USD 速度 0.6、Fabric を読まずに Play",
+   "play_a_after_play_call": {
+    "local": [
+     0.0,
+     0.0,
+     1.0
+    ],
+    "world": [
+     0.0,
+     0.0,
+     1.0
+    ],
+    "world_cache": [
+     0.0,
+     0.0,
+     1.0
+    ],
+    "velocity": [
+     0.0,
+     0.6,
+     0.0
+    ],
+    "mass": 1.0,
+    "translate_attr": [
+     0.0,
+     0.0,
+     1.0
+    ]
+   },
+   "play_b_update1": {
+    "timeline": "playing",
+    "time": 0.0167,
+    "usd": {
+     "translate": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "mass": 1.0
+    },
+    "fabric": {
+     "local": [
+      0.0,
+      0.03,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.03,
+      1.0
+     ],
+     "world_cache": [
+      0.0,
+      0.03,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "mass": 1.0,
+     "translate_attr": [
+      0.0,
+      0.0,
+      1.0
+     ]
+    },
+    "physx": {
+     "found": true,
+     "position": [
+      0.0,
+      0.03,
+      1.0
+     ]
+    },
+    "tensor": {
+     "valid": true,
+     "position": [
+      0.0,
+      0.03,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "mass": 1.0
+    }
+   },
+   "play_c_update10": {
+    "timeline": "playing",
+    "time": 0.1667,
+    "usd": {
+     "translate": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "mass": 1.0
+    },
+    "fabric": {
+     "local": [
+      0.0,
+      0.12,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.12,
+      1.0
+     ],
+     "world_cache": [
+      0.0,
+      0.12,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "mass": 1.0,
+     "translate_attr": [
+      0.0,
+      0.0,
+      1.0
+     ]
+    },
+    "physx": {
+     "found": true,
+     "position": [
+      0.0,
+      0.12,
+      1.0
+     ]
+    },
+    "tensor": {
+     "valid": true,
+     "position": [
+      0.0,
+      0.12,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "mass": 1.0
+    }
+   },
+   "play_prestep_fabric": [
+    {
+     "fabric_velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "fabric_local": [
+      0.0,
+      0.0,
+      1.0
+     ]
+    },
+    {
+     "fabric_velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "fabric_local": [
+      0.0,
+      0.01,
+      1.0
+     ]
+    }
+   ]
+  },
+  {
+   "id": "U-A2",
+   "description": "未 Play のステージ、Stop 中に USD 速度 0.6、Fabric を読んでから Play",
+   "before_play": {
+    "timeline": "stopped",
+    "time": 0.0,
+    "usd": {
+     "translate": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "mass": 1.0
+    },
+    "fabric": {
+     "local": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world_cache": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "mass": 1.0,
+     "translate_attr": [
+      0.0,
+      0.0,
+      1.0
+     ]
+    },
+    "physx": {
+     "found": false,
+     "position": null
+    },
+    "tensor": {
+     "valid": false
+    }
+   },
+   "play_a_after_play_call": {
+    "local": [
+     0.0,
+     0.0,
+     1.0
+    ],
+    "world": [
+     0.0,
+     0.0,
+     1.0
+    ],
+    "world_cache": [
+     0.0,
+     0.0,
+     1.0
+    ],
+    "velocity": [
+     0.0,
+     0.6,
+     0.0
+    ],
+    "mass": 1.0,
+    "translate_attr": [
+     0.0,
+     0.0,
+     1.0
+    ]
+   },
+   "play_b_update1": {
+    "timeline": "playing",
+    "time": 0.0167,
+    "usd": {
+     "translate": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "mass": 1.0
+    },
+    "fabric": {
+     "local": [
+      0.0,
+      0.03,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.03,
+      1.0
+     ],
+     "world_cache": [
+      0.0,
+      0.03,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "mass": 1.0,
+     "translate_attr": [
+      0.0,
+      0.0,
+      1.0
+     ]
+    },
+    "physx": {
+     "found": true,
+     "position": [
+      0.0,
+      0.03,
+      1.0
+     ]
+    },
+    "tensor": {
+     "valid": true,
+     "position": [
+      0.0,
+      0.03,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "mass": 1.0
+    }
+   },
+   "play_c_update10": {
+    "timeline": "playing",
+    "time": 0.1667,
+    "usd": {
+     "translate": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "mass": 1.0
+    },
+    "fabric": {
+     "local": [
+      0.0,
+      0.12,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.12,
+      1.0
+     ],
+     "world_cache": [
+      0.0,
+      0.12,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "mass": 1.0,
+     "translate_attr": [
+      0.0,
+      0.0,
+      1.0
+     ]
+    },
+    "physx": {
+     "found": true,
+     "position": [
+      0.0,
+      0.12,
+      1.0
+     ]
+    },
+    "tensor": {
+     "valid": true,
+     "position": [
+      0.0,
+      0.12,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "mass": 1.0
+    }
+   },
+   "play_prestep_fabric": [
+    {
+     "fabric_velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "fabric_local": [
+      0.0,
+      0.0,
+      1.0
+     ]
+    },
+    {
+     "fabric_velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "fabric_local": [
+      0.0,
+      0.01,
+      1.0
+     ]
+    }
+   ]
+  },
+  {
+   "id": "U-B",
+   "description": "Play→Stop を 1 回経た後、Stop 中に USD 速度 0.6 → Play",
+   "before_play": {
+    "timeline": "stopped",
+    "time": 0.0,
+    "usd": {
+     "translate": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "mass": 1.0
+    },
+    "fabric": {
+     "local": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world_cache": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "mass": 1.0,
+     "translate_attr": [
+      0.0,
+      0.0,
+      1.0
+     ]
+    },
+    "physx": {
+     "found": false,
+     "position": null
+    },
+    "tensor": {
+     "valid": false
+    }
+   },
+   "play_a_after_play_call": {
+    "local": [
+     0.0,
+     0.0,
+     1.0
+    ],
+    "world": [
+     0.0,
+     0.0,
+     1.0
+    ],
+    "world_cache": [
+     0.0,
+     0.0,
+     1.0
+    ],
+    "velocity": [
+     0.0,
+     0.6,
+     0.0
+    ],
+    "mass": 1.0,
+    "translate_attr": [
+     0.0,
+     0.0,
+     1.0
+    ]
+   },
+   "play_b_update1": {
+    "timeline": "playing",
+    "time": 0.0167,
+    "usd": {
+     "translate": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "mass": 1.0
+    },
+    "fabric": {
+     "local": [
+      0.0,
+      0.03,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.03,
+      1.0
+     ],
+     "world_cache": [
+      0.0,
+      0.03,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "mass": 1.0,
+     "translate_attr": [
+      0.0,
+      0.0,
+      1.0
+     ]
+    },
+    "physx": {
+     "found": true,
+     "position": [
+      0.0,
+      0.03,
+      1.0
+     ]
+    },
+    "tensor": {
+     "valid": true,
+     "position": [
+      0.0,
+      0.03,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "mass": 1.0
+    }
+   },
+   "play_c_update10": {
+    "timeline": "playing",
+    "time": 0.1667,
+    "usd": {
+     "translate": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "mass": 1.0
+    },
+    "fabric": {
+     "local": [
+      0.0,
+      0.12,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.12,
+      1.0
+     ],
+     "world_cache": [
+      0.0,
+      0.12,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "mass": 1.0,
+     "translate_attr": [
+      0.0,
+      0.0,
+      1.0
+     ]
+    },
+    "physx": {
+     "found": true,
+     "position": [
+      0.0,
+      0.12,
+      1.0
+     ]
+    },
+    "tensor": {
+     "valid": true,
+     "position": [
+      0.0,
+      0.12,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "mass": 1.0
+    }
+   },
+   "play_prestep_fabric": [
+    {
+     "fabric_velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "fabric_local": [
+      0.0,
+      0.0,
+      1.0
+     ]
+    },
+    {
+     "fabric_velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "fabric_local": [
+      0.0,
+      0.01,
+      1.0
+     ]
+    }
+   ]
+  },
+  {
+   "id": "U-C",
+   "description": "現象の再現: Play 中に USD 速度 0.6 → Stop → 再 Play",
+   "1_play_after_write": {
+    "timeline": "playing",
+    "time": 0.0667,
+    "usd": {
+     "translate": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "mass": 1.0
+    },
+    "fabric": {
+     "local": [
+      0.0,
+      0.01,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.01,
+      1.0
+     ],
+     "world_cache": [
+      0.0,
+      0.01,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "mass": 1.0,
+     "translate_attr": [
+      0.0,
+      0.0,
+      1.0
+     ]
+    },
+    "physx": {
+     "found": true,
+     "position": [
+      0.0,
+      0.01,
+      1.0
+     ]
+    },
+    "tensor": {
+     "valid": true,
+     "position": [
+      0.0,
+      0.01,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "mass": 1.0
+    }
+   },
+   "2_stopped": {
+    "timeline": "stopped",
+    "time": 0.0,
+    "usd": {
+     "translate": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "mass": 1.0
+    },
+    "fabric": {
+     "local": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world_cache": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "mass": 1.0,
+     "translate_attr": [
+      0.0,
+      0.0,
+      1.0
+     ]
+    },
+    "physx": {
+     "found": false,
+     "position": null
+    },
+    "tensor": {
+     "valid": false
+    }
+   },
+   "replay_a_after_play_call": {
+    "local": [
+     0.0,
+     0.0,
+     1.0
+    ],
+    "world": [
+     0.0,
+     0.0,
+     1.0
+    ],
+    "world_cache": [
+     0.0,
+     0.0,
+     1.0
+    ],
+    "velocity": [
+     0.0,
+     0.6,
+     0.0
+    ],
+    "mass": 1.0,
+    "translate_attr": [
+     0.0,
+     0.0,
+     1.0
+    ]
+   },
+   "replay_b_update1": {
+    "timeline": "playing",
+    "time": 0.0167,
+    "usd": {
+     "translate": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "mass": 1.0
+    },
+    "fabric": {
+     "local": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world_cache": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "mass": 1.0,
+     "translate_attr": [
+      0.0,
+      0.0,
+      1.0
+     ]
+    },
+    "physx": {
+     "found": true,
+     "position": [
+      0.0,
+      0.0,
+      1.0
+     ]
+    },
+    "tensor": {
+     "valid": true,
+     "position": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "mass": 1.0
+    }
+   },
+   "replay_c_update10": {
+    "timeline": "playing",
+    "time": 0.1667,
+    "usd": {
+     "translate": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "mass": 1.0
+    },
+    "fabric": {
+     "local": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world_cache": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "mass": 1.0,
+     "translate_attr": [
+      0.0,
+      0.0,
+      1.0
+     ]
+    },
+    "physx": {
+     "found": true,
+     "position": [
+      0.0,
+      0.0,
+      1.0
+     ]
+    },
+    "tensor": {
+     "valid": true,
+     "position": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "mass": 1.0
+    }
+   },
+   "replay_prestep_fabric": [
+    {
+     "fabric_velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "fabric_local": [
+      0.0,
+      0.0,
+      1.0
+     ]
+    },
+    {
+     "fabric_velocity": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "fabric_local": [
+      0.0,
+      0.0,
+      1.0
+     ]
+    }
+   ]
+  },
+  {
+   "id": "U-C1",
+   "description": "U-C の再 Play 前に Fabric の速度を 0.3 に直接書く",
+   "1_play_after_write": {
+    "timeline": "playing",
+    "time": 0.0667,
+    "usd": {
+     "translate": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "mass": 1.0
+    },
+    "fabric": {
+     "local": [
+      0.0,
+      0.01,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.01,
+      1.0
+     ],
+     "world_cache": [
+      0.0,
+      0.01,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "mass": 1.0,
+     "translate_attr": [
+      0.0,
+      0.0,
+      1.0
+     ]
+    },
+    "physx": {
+     "found": true,
+     "position": [
+      0.0,
+      0.01,
+      1.0
+     ]
+    },
+    "tensor": {
+     "valid": true,
+     "position": [
+      0.0,
+      0.01,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "mass": 1.0
+    }
+   },
+   "2_stopped": {
+    "timeline": "stopped",
+    "time": 0.0,
+    "usd": {
+     "translate": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "mass": 1.0
+    },
+    "fabric": {
+     "local": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world_cache": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "mass": 1.0,
+     "translate_attr": [
+      0.0,
+      0.0,
+      1.0
+     ]
+    },
+    "physx": {
+     "found": false,
+     "position": null
+    },
+    "tensor": {
+     "valid": false
+    }
+   },
+   "3_after_fabric_write": {
+    "local": [
+     0.0,
+     0.0,
+     1.0
+    ],
+    "world": [
+     0.0,
+     0.0,
+     1.0
+    ],
+    "world_cache": [
+     0.0,
+     0.0,
+     1.0
+    ],
+    "velocity": [
+     0.0,
+     0.3,
+     0.0
+    ],
+    "mass": 1.0,
+    "translate_attr": [
+     0.0,
+     0.0,
+     1.0
+    ]
+   },
+   "replay_a_after_play_call": {
+    "local": [
+     0.0,
+     0.0,
+     1.0
+    ],
+    "world": [
+     0.0,
+     0.0,
+     1.0
+    ],
+    "world_cache": [
+     0.0,
+     0.0,
+     1.0
+    ],
+    "velocity": [
+     0.0,
+     0.3,
+     0.0
+    ],
+    "mass": 1.0,
+    "translate_attr": [
+     0.0,
+     0.0,
+     1.0
+    ]
+   },
+   "replay_b_update1": {
+    "timeline": "playing",
+    "time": 0.0167,
+    "usd": {
+     "translate": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "mass": 1.0
+    },
+    "fabric": {
+     "local": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world_cache": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "mass": 1.0,
+     "translate_attr": [
+      0.0,
+      0.0,
+      1.0
+     ]
+    },
+    "physx": {
+     "found": true,
+     "position": [
+      0.0,
+      0.0,
+      1.0
+     ]
+    },
+    "tensor": {
+     "valid": true,
+     "position": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "mass": 1.0
+    }
+   },
+   "replay_c_update10": {
+    "timeline": "playing",
+    "time": 0.1667,
+    "usd": {
+     "translate": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "mass": 1.0
+    },
+    "fabric": {
+     "local": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world_cache": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "mass": 1.0,
+     "translate_attr": [
+      0.0,
+      0.0,
+      1.0
+     ]
+    },
+    "physx": {
+     "found": true,
+     "position": [
+      0.0,
+      0.0,
+      1.0
+     ]
+    },
+    "tensor": {
+     "valid": true,
+     "position": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "mass": 1.0
+    }
+   },
+   "replay_prestep_fabric": [
+    {
+     "fabric_velocity": [
+      0.0,
+      0.3,
+      0.0
+     ],
+     "fabric_local": [
+      0.0,
+      0.0,
+      1.0
+     ]
+    },
+    {
+     "fabric_velocity": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "fabric_local": [
+      0.0,
+      0.0,
+      1.0
+     ]
+    }
+   ]
+  },
+  {
+   "id": "U-C2",
+   "description": "U-C の再 Play 最初の 2 update だけ Fabric change tracking を停止",
+   "1_play_after_write": {
+    "timeline": "playing",
+    "time": 0.0667,
+    "usd": {
+     "translate": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "mass": 1.0
+    },
+    "fabric": {
+     "local": [
+      0.0,
+      0.01,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.01,
+      1.0
+     ],
+     "world_cache": [
+      0.0,
+      0.01,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "mass": 1.0,
+     "translate_attr": [
+      0.0,
+      0.0,
+      1.0
+     ]
+    },
+    "physx": {
+     "found": true,
+     "position": [
+      0.0,
+      0.01,
+      1.0
+     ]
+    },
+    "tensor": {
+     "valid": true,
+     "position": [
+      0.0,
+      0.01,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "mass": 1.0
+    }
+   },
+   "2_stopped": {
+    "timeline": "stopped",
+    "time": 0.0,
+    "usd": {
+     "translate": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "mass": 1.0
+    },
+    "fabric": {
+     "local": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world_cache": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "mass": 1.0,
+     "translate_attr": [
+      0.0,
+      0.0,
+      1.0
+     ]
+    },
+    "physx": {
+     "found": false,
+     "position": null
+    },
+    "tensor": {
+     "valid": false
+    }
+   },
+   "replay_b_update2_paused": {
+    "timeline": "playing",
+    "time": 0.0333,
+    "usd": {
+     "translate": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "mass": 1.0
+    },
+    "fabric": {
+     "local": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world_cache": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "mass": 1.0,
+     "translate_attr": [
+      0.0,
+      0.0,
+      1.0
+     ]
+    },
+    "physx": {
+     "found": true,
+     "position": [
+      0.0,
+      0.0,
+      1.0
+     ]
+    },
+    "tensor": {
+     "valid": true,
+     "position": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "mass": 1.0
+    }
+   },
+   "replay_c_update10": {
+    "timeline": "playing",
+    "time": 0.1667,
+    "usd": {
+     "translate": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "mass": 1.0
+    },
+    "fabric": {
+     "local": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world_cache": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "mass": 1.0,
+     "translate_attr": [
+      0.0,
+      0.0,
+      1.0
+     ]
+    },
+    "physx": {
+     "found": true,
+     "position": [
+      0.0,
+      0.0,
+      1.0
+     ]
+    },
+    "tensor": {
+     "valid": true,
+     "position": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "mass": 1.0
+    }
+   },
+   "replay_prestep_fabric": [
+    {
+     "fabric_velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "fabric_local": [
+      0.0,
+      0.0,
+      1.0
+     ]
+    },
+    {
+     "fabric_velocity": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "fabric_local": [
+      0.0,
+      0.0,
+      1.0
+     ]
+    }
+   ]
+  },
+  {
+   "id": "U-C3",
+   "description": "U-C を /physics/fabricUpdateVelocities=false で",
+   "setting_before": true,
+   "1_play_after_write": {
+    "timeline": "playing",
+    "time": 0.0667,
+    "usd": {
+     "translate": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "mass": 1.0
+    },
+    "fabric": {
+     "local": [
+      0.0,
+      0.01,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.01,
+      1.0
+     ],
+     "world_cache": [
+      0.0,
+      0.01,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "mass": 1.0,
+     "translate_attr": [
+      0.0,
+      0.0,
+      1.0
+     ]
+    },
+    "physx": {
+     "found": true,
+     "position": [
+      0.0,
+      0.01,
+      1.0
+     ]
+    },
+    "tensor": {
+     "valid": true,
+     "position": [
+      0.0,
+      0.01,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "mass": 1.0
+    }
+   },
+   "2_stopped": {
+    "timeline": "stopped",
+    "time": 0.0,
+    "usd": {
+     "translate": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "mass": 1.0
+    },
+    "fabric": {
+     "local": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world_cache": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "mass": 1.0,
+     "translate_attr": [
+      0.0,
+      0.0,
+      1.0
+     ]
+    },
+    "physx": {
+     "found": false,
+     "position": null
+    },
+    "tensor": {
+     "valid": false
+    }
+   },
+   "replay_a_after_play_call": {
+    "local": [
+     0.0,
+     0.0,
+     1.0
+    ],
+    "world": [
+     0.0,
+     0.0,
+     1.0
+    ],
+    "world_cache": [
+     0.0,
+     0.0,
+     1.0
+    ],
+    "velocity": [
+     0.0,
+     0.6,
+     0.0
+    ],
+    "mass": 1.0,
+    "translate_attr": [
+     0.0,
+     0.0,
+     1.0
+    ]
+   },
+   "replay_b_update1": {
+    "timeline": "playing",
+    "time": 0.0167,
+    "usd": {
+     "translate": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "mass": 1.0
+    },
+    "fabric": {
+     "local": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world_cache": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "mass": 1.0,
+     "translate_attr": [
+      0.0,
+      0.0,
+      1.0
+     ]
+    },
+    "physx": {
+     "found": true,
+     "position": [
+      0.0,
+      0.0,
+      1.0
+     ]
+    },
+    "tensor": {
+     "valid": true,
+     "position": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "mass": 1.0
+    }
+   },
+   "replay_c_update10": {
+    "timeline": "playing",
+    "time": 0.1667,
+    "usd": {
+     "translate": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "mass": 1.0
+    },
+    "fabric": {
+     "local": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world_cache": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "mass": 1.0,
+     "translate_attr": [
+      0.0,
+      0.0,
+      1.0
+     ]
+    },
+    "physx": {
+     "found": true,
+     "position": [
+      0.0,
+      0.0,
+      1.0
+     ]
+    },
+    "tensor": {
+     "valid": true,
+     "position": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "mass": 1.0
+    }
+   },
+   "replay_prestep_fabric": [
+    {
+     "fabric_velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "fabric_local": [
+      0.0,
+      0.0,
+      1.0
+     ]
+    },
+    {
+     "fabric_velocity": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "fabric_local": [
+      0.0,
+      0.0,
+      1.0
+     ]
+    }
+   ]
+  },
+  {
+   "id": "U-C4",
+   "description": "U-C の Stop 後に USD 速度を 0.5 に書き直してから再 Play",
+   "1_play_after_write": {
+    "timeline": "playing",
+    "time": 0.0667,
+    "usd": {
+     "translate": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "mass": 1.0
+    },
+    "fabric": {
+     "local": [
+      0.0,
+      0.01,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.01,
+      1.0
+     ],
+     "world_cache": [
+      0.0,
+      0.01,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "mass": 1.0,
+     "translate_attr": [
+      0.0,
+      0.0,
+      1.0
+     ]
+    },
+    "physx": {
+     "found": true,
+     "position": [
+      0.0,
+      0.01,
+      1.0
+     ]
+    },
+    "tensor": {
+     "valid": true,
+     "position": [
+      0.0,
+      0.01,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "mass": 1.0
+    }
+   },
+   "2_stopped": {
+    "timeline": "stopped",
+    "time": 0.0,
+    "usd": {
+     "translate": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "mass": 1.0
+    },
+    "fabric": {
+     "local": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world_cache": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "mass": 1.0,
+     "translate_attr": [
+      0.0,
+      0.0,
+      1.0
+     ]
+    },
+    "physx": {
+     "found": false,
+     "position": null
+    },
+    "tensor": {
+     "valid": false
+    }
+   },
+   "3_after_reauthor": {
+    "timeline": "stopped",
+    "time": 0.0,
+    "usd": {
+     "translate": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.5,
+      0.0
+     ],
+     "mass": 1.0
+    },
+    "fabric": {
+     "local": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world_cache": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.5,
+      0.0
+     ],
+     "mass": 1.0,
+     "translate_attr": [
+      0.0,
+      0.0,
+      1.0
+     ]
+    },
+    "physx": {
+     "found": false,
+     "position": null
+    },
+    "tensor": {
+     "valid": false
+    }
+   },
+   "replay_a_after_play_call": {
+    "local": [
+     0.0,
+     0.0,
+     1.0
+    ],
+    "world": [
+     0.0,
+     0.0,
+     1.0
+    ],
+    "world_cache": [
+     0.0,
+     0.0,
+     1.0
+    ],
+    "velocity": [
+     0.0,
+     0.5,
+     0.0
+    ],
+    "mass": 1.0,
+    "translate_attr": [
+     0.0,
+     0.0,
+     1.0
+    ]
+   },
+   "replay_b_update1": {
+    "timeline": "playing",
+    "time": 0.0167,
+    "usd": {
+     "translate": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.5,
+      0.0
+     ],
+     "mass": 1.0
+    },
+    "fabric": {
+     "local": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world_cache": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "mass": 1.0,
+     "translate_attr": [
+      0.0,
+      0.0,
+      1.0
+     ]
+    },
+    "physx": {
+     "found": true,
+     "position": [
+      0.0,
+      0.0,
+      1.0
+     ]
+    },
+    "tensor": {
+     "valid": true,
+     "position": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "mass": 1.0
+    }
+   },
+   "replay_c_update10": {
+    "timeline": "playing",
+    "time": 0.1667,
+    "usd": {
+     "translate": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.5,
+      0.0
+     ],
+     "mass": 1.0
+    },
+    "fabric": {
+     "local": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world_cache": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "mass": 1.0,
+     "translate_attr": [
+      0.0,
+      0.0,
+      1.0
+     ]
+    },
+    "physx": {
+     "found": true,
+     "position": [
+      0.0,
+      0.0,
+      1.0
+     ]
+    },
+    "tensor": {
+     "valid": true,
+     "position": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "mass": 1.0
+    }
+   },
+   "replay_prestep_fabric": [
+    {
+     "fabric_velocity": [
+      0.0,
+      0.5,
+      0.0
+     ],
+     "fabric_local": [
+      0.0,
+      0.0,
+      1.0
+     ]
+    },
+    {
+     "fabric_velocity": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "fabric_local": [
+      0.0,
+      0.0,
+      1.0
+     ]
+    }
+   ]
+  },
+  {
+   "id": "U-C5",
+   "description": "Play→Stop 後、Fabric と USD の両方に速度 0.6 を書いて Play",
+   "before_play": {
+    "timeline": "stopped",
+    "time": 0.0,
+    "usd": {
+     "translate": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "mass": 1.0
+    },
+    "fabric": {
+     "local": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world_cache": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "mass": 1.0,
+     "translate_attr": [
+      0.0,
+      0.0,
+      1.0
+     ]
+    },
+    "physx": {
+     "found": false,
+     "position": null
+    },
+    "tensor": {
+     "valid": false
+    }
+   },
+   "play_a_after_play_call": {
+    "local": [
+     0.0,
+     0.0,
+     1.0
+    ],
+    "world": [
+     0.0,
+     0.0,
+     1.0
+    ],
+    "world_cache": [
+     0.0,
+     0.0,
+     1.0
+    ],
+    "velocity": [
+     0.0,
+     0.6,
+     0.0
+    ],
+    "mass": 1.0,
+    "translate_attr": [
+     0.0,
+     0.0,
+     1.0
+    ]
+   },
+   "play_b_update1": {
+    "timeline": "playing",
+    "time": 0.0167,
+    "usd": {
+     "translate": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "mass": 1.0
+    },
+    "fabric": {
+     "local": [
+      0.0,
+      0.03,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.03,
+      1.0
+     ],
+     "world_cache": [
+      0.0,
+      0.03,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "mass": 1.0,
+     "translate_attr": [
+      0.0,
+      0.0,
+      1.0
+     ]
+    },
+    "physx": {
+     "found": true,
+     "position": [
+      0.0,
+      0.03,
+      1.0
+     ]
+    },
+    "tensor": {
+     "valid": true,
+     "position": [
+      0.0,
+      0.03,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "mass": 1.0
+    }
+   },
+   "play_c_update10": {
+    "timeline": "playing",
+    "time": 0.1667,
+    "usd": {
+     "translate": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "mass": 1.0
+    },
+    "fabric": {
+     "local": [
+      0.0,
+      0.12,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.12,
+      1.0
+     ],
+     "world_cache": [
+      0.0,
+      0.12,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "mass": 1.0,
+     "translate_attr": [
+      0.0,
+      0.0,
+      1.0
+     ]
+    },
+    "physx": {
+     "found": true,
+     "position": [
+      0.0,
+      0.12,
+      1.0
+     ]
+    },
+    "tensor": {
+     "valid": true,
+     "position": [
+      0.0,
+      0.12,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "mass": 1.0
+    }
+   },
+   "play_prestep_fabric": [
+    {
+     "fabric_velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "fabric_local": [
+      0.0,
+      0.0,
+      1.0
+     ]
+    },
+    {
+     "fabric_velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "fabric_local": [
+      0.0,
+      0.01,
+      1.0
+     ]
+    }
+   ]
+  },
+  {
+   "id": "U-D1",
+   "description": "速度属性を最初の Play 前に 0 で作っておいて U-C",
+   "1_play_after_write": {
+    "timeline": "playing",
+    "time": 0.0667,
+    "usd": {
+     "translate": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "mass": 1.0
+    },
+    "fabric": {
+     "local": [
+      0.0,
+      0.01,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.01,
+      1.0
+     ],
+     "world_cache": [
+      0.0,
+      0.01,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "mass": 1.0,
+     "translate_attr": [
+      0.0,
+      0.0,
+      1.0
+     ]
+    },
+    "physx": {
+     "found": true,
+     "position": [
+      0.0,
+      0.01,
+      1.0
+     ]
+    },
+    "tensor": {
+     "valid": true,
+     "position": [
+      0.0,
+      0.01,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "mass": 1.0
+    }
+   },
+   "2_stopped": {
+    "timeline": "stopped",
+    "time": 0.0,
+    "usd": {
+     "translate": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "mass": 1.0
+    },
+    "fabric": {
+     "local": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world_cache": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "mass": 1.0,
+     "translate_attr": [
+      0.0,
+      0.0,
+      1.0
+     ]
+    },
+    "physx": {
+     "found": false,
+     "position": null
+    },
+    "tensor": {
+     "valid": false
+    }
+   },
+   "replay_a_after_play_call": {
+    "local": [
+     0.0,
+     0.0,
+     1.0
+    ],
+    "world": [
+     0.0,
+     0.0,
+     1.0
+    ],
+    "world_cache": [
+     0.0,
+     0.0,
+     1.0
+    ],
+    "velocity": [
+     0.0,
+     0.6,
+     0.0
+    ],
+    "mass": 1.0,
+    "translate_attr": [
+     0.0,
+     0.0,
+     1.0
+    ]
+   },
+   "replay_b_update1": {
+    "timeline": "playing",
+    "time": 0.0167,
+    "usd": {
+     "translate": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "mass": 1.0
+    },
+    "fabric": {
+     "local": [
+      0.0,
+      0.03,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.03,
+      1.0
+     ],
+     "world_cache": [
+      0.0,
+      0.03,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "mass": 1.0,
+     "translate_attr": [
+      0.0,
+      0.0,
+      1.0
+     ]
+    },
+    "physx": {
+     "found": true,
+     "position": [
+      0.0,
+      0.03,
+      1.0
+     ]
+    },
+    "tensor": {
+     "valid": true,
+     "position": [
+      0.0,
+      0.03,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "mass": 1.0
+    }
+   },
+   "replay_c_update10": {
+    "timeline": "playing",
+    "time": 0.1667,
+    "usd": {
+     "translate": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "mass": 1.0
+    },
+    "fabric": {
+     "local": [
+      0.0,
+      0.12,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.12,
+      1.0
+     ],
+     "world_cache": [
+      0.0,
+      0.12,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "mass": 1.0,
+     "translate_attr": [
+      0.0,
+      0.0,
+      1.0
+     ]
+    },
+    "physx": {
+     "found": true,
+     "position": [
+      0.0,
+      0.12,
+      1.0
+     ]
+    },
+    "tensor": {
+     "valid": true,
+     "position": [
+      0.0,
+      0.12,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "mass": 1.0
+    }
+   },
+   "replay_prestep_fabric": [
+    {
+     "fabric_velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "fabric_local": [
+      0.0,
+      0.0,
+      1.0
+     ]
+    },
+    {
+     "fabric_velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "fabric_local": [
+      0.0,
+      0.01,
+      1.0
+     ]
+    }
+   ]
+  },
+  {
+   "id": "U-D2",
+   "description": "U-C の後さらに Stop → 3 回目の Play",
+   "1_play_after_write": {
+    "timeline": "playing",
+    "time": 0.0667,
+    "usd": {
+     "translate": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "mass": 1.0
+    },
+    "fabric": {
+     "local": [
+      0.0,
+      0.01,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.01,
+      1.0
+     ],
+     "world_cache": [
+      0.0,
+      0.01,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "mass": 1.0,
+     "translate_attr": [
+      0.0,
+      0.0,
+      1.0
+     ]
+    },
+    "physx": {
+     "found": true,
+     "position": [
+      0.0,
+      0.01,
+      1.0
+     ]
+    },
+    "tensor": {
+     "valid": true,
+     "position": [
+      0.0,
+      0.01,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "mass": 1.0
+    }
+   },
+   "2_stopped": {
+    "timeline": "stopped",
+    "time": 0.0,
+    "usd": {
+     "translate": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "mass": 1.0
+    },
+    "fabric": {
+     "local": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world_cache": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "mass": 1.0,
+     "translate_attr": [
+      0.0,
+      0.0,
+      1.0
+     ]
+    },
+    "physx": {
+     "found": false,
+     "position": null
+    },
+    "tensor": {
+     "valid": false
+    }
+   },
+   "replay_a_after_play_call": {
+    "local": [
+     0.0,
+     0.0,
+     1.0
+    ],
+    "world": [
+     0.0,
+     0.0,
+     1.0
+    ],
+    "world_cache": [
+     0.0,
+     0.0,
+     1.0
+    ],
+    "velocity": [
+     0.0,
+     0.6,
+     0.0
+    ],
+    "mass": 1.0,
+    "translate_attr": [
+     0.0,
+     0.0,
+     1.0
+    ]
+   },
+   "replay_b_update1": {
+    "timeline": "playing",
+    "time": 0.0167,
+    "usd": {
+     "translate": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "mass": 1.0
+    },
+    "fabric": {
+     "local": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world_cache": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "mass": 1.0,
+     "translate_attr": [
+      0.0,
+      0.0,
+      1.0
+     ]
+    },
+    "physx": {
+     "found": true,
+     "position": [
+      0.0,
+      0.0,
+      1.0
+     ]
+    },
+    "tensor": {
+     "valid": true,
+     "position": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "mass": 1.0
+    }
+   },
+   "replay_c_update10": {
+    "timeline": "playing",
+    "time": 0.1667,
+    "usd": {
+     "translate": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "mass": 1.0
+    },
+    "fabric": {
+     "local": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world_cache": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "mass": 1.0,
+     "translate_attr": [
+      0.0,
+      0.0,
+      1.0
+     ]
+    },
+    "physx": {
+     "found": true,
+     "position": [
+      0.0,
+      0.0,
+      1.0
+     ]
+    },
+    "tensor": {
+     "valid": true,
+     "position": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "mass": 1.0
+    }
+   },
+   "replay_prestep_fabric": [
+    {
+     "fabric_velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "fabric_local": [
+      0.0,
+      0.0,
+      1.0
+     ]
+    },
+    {
+     "fabric_velocity": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "fabric_local": [
+      0.0,
+      0.0,
+      1.0
+     ]
+    }
+   ],
+   "3_stopped_again": {
+    "timeline": "stopped",
+    "time": 0.0,
+    "usd": {
+     "translate": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "mass": 1.0
+    },
+    "fabric": {
+     "local": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world_cache": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "mass": 1.0,
+     "translate_attr": [
+      0.0,
+      0.0,
+      1.0
+     ]
+    },
+    "physx": {
+     "found": false,
+     "position": null
+    },
+    "tensor": {
+     "valid": false
+    }
+   },
+   "third_a_after_play_call": {
+    "local": [
+     0.0,
+     0.0,
+     1.0
+    ],
+    "world": [
+     0.0,
+     0.0,
+     1.0
+    ],
+    "world_cache": [
+     0.0,
+     0.0,
+     1.0
+    ],
+    "velocity": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "mass": 1.0,
+    "translate_attr": [
+     0.0,
+     0.0,
+     1.0
+    ]
+   },
+   "third_b_update1": {
+    "timeline": "playing",
+    "time": 0.0167,
+    "usd": {
+     "translate": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "mass": 1.0
+    },
+    "fabric": {
+     "local": [
+      0.0,
+      0.03,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.03,
+      1.0
+     ],
+     "world_cache": [
+      0.0,
+      0.03,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "mass": 1.0,
+     "translate_attr": [
+      0.0,
+      0.0,
+      1.0
+     ]
+    },
+    "physx": {
+     "found": true,
+     "position": [
+      0.0,
+      0.03,
+      1.0
+     ]
+    },
+    "tensor": {
+     "valid": true,
+     "position": [
+      0.0,
+      0.03,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "mass": 1.0
+    }
+   },
+   "third_c_update10": {
+    "timeline": "playing",
+    "time": 0.1667,
+    "usd": {
+     "translate": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "mass": 1.0
+    },
+    "fabric": {
+     "local": [
+      0.0,
+      0.12,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.12,
+      1.0
+     ],
+     "world_cache": [
+      0.0,
+      0.12,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "mass": 1.0,
+     "translate_attr": [
+      0.0,
+      0.0,
+      1.0
+     ]
+    },
+    "physx": {
+     "found": true,
+     "position": [
+      0.0,
+      0.12,
+      1.0
+     ]
+    },
+    "tensor": {
+     "valid": true,
+     "position": [
+      0.0,
+      0.12,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "mass": 1.0
+    }
+   },
+   "third_prestep_fabric": [
+    {
+     "fabric_velocity": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "fabric_local": [
+      0.0,
+      0.0,
+      1.0
+     ]
+    },
+    {
+     "fabric_velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "fabric_local": [
+      0.0,
+      0.01,
+      1.0
+     ]
+    }
+   ]
+  },
+  {
+   "id": "U-D3",
+   "description": "U-C の Stop 後、保存して開き直してから Play",
+   "1_play_after_write": {
+    "timeline": "playing",
+    "time": 0.0667,
+    "usd": {
+     "translate": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "mass": 1.0
+    },
+    "fabric": {
+     "local": [
+      0.0,
+      0.01,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.01,
+      1.0
+     ],
+     "world_cache": [
+      0.0,
+      0.01,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "mass": 1.0,
+     "translate_attr": [
+      0.0,
+      0.0,
+      1.0
+     ]
+    },
+    "physx": {
+     "found": true,
+     "position": [
+      0.0,
+      0.01,
+      1.0
+     ]
+    },
+    "tensor": {
+     "valid": true,
+     "position": [
+      0.0,
+      0.01,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "mass": 1.0
+    }
+   },
+   "2_stopped": {
+    "timeline": "stopped",
+    "time": 0.0,
+    "usd": {
+     "translate": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "mass": 1.0
+    },
+    "fabric": {
+     "local": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world_cache": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "mass": 1.0,
+     "translate_attr": [
+      0.0,
+      0.0,
+      1.0
+     ]
+    },
+    "physx": {
+     "found": false,
+     "position": null
+    },
+    "tensor": {
+     "valid": false
+    }
+   },
+   "3_reopened": {
+    "timeline": "stopped",
+    "time": 0.0,
+    "usd": {
+     "translate": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "mass": 1.0
+    },
+    "fabric": {
+     "local": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world_cache": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "mass": 1.0,
+     "translate_attr": [
+      0.0,
+      0.0,
+      1.0
+     ]
+    },
+    "physx": {
+     "found": false,
+     "position": null
+    },
+    "tensor": {
+     "valid": false
+    }
+   },
+   "replay_a_after_play_call": {
+    "local": [
+     0.0,
+     0.0,
+     1.0
+    ],
+    "world": [
+     0.0,
+     0.0,
+     1.0
+    ],
+    "world_cache": [
+     0.0,
+     0.0,
+     1.0
+    ],
+    "velocity": [
+     0.0,
+     0.6,
+     0.0
+    ],
+    "mass": 1.0,
+    "translate_attr": [
+     0.0,
+     0.0,
+     1.0
+    ]
+   },
+   "replay_b_update1": {
+    "timeline": "playing",
+    "time": 0.0167,
+    "usd": {
+     "translate": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "mass": 1.0
+    },
+    "fabric": {
+     "local": [
+      0.0,
+      0.03,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.03,
+      1.0
+     ],
+     "world_cache": [
+      0.0,
+      0.03,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "mass": 1.0,
+     "translate_attr": [
+      0.0,
+      0.0,
+      1.0
+     ]
+    },
+    "physx": {
+     "found": true,
+     "position": [
+      0.0,
+      0.03,
+      1.0
+     ]
+    },
+    "tensor": {
+     "valid": true,
+     "position": [
+      0.0,
+      0.03,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "mass": 1.0
+    }
+   },
+   "replay_c_update10": {
+    "timeline": "playing",
+    "time": 0.1667,
+    "usd": {
+     "translate": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "mass": 1.0
+    },
+    "fabric": {
+     "local": [
+      0.0,
+      0.12,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.12,
+      1.0
+     ],
+     "world_cache": [
+      0.0,
+      0.12,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "mass": 1.0,
+     "translate_attr": [
+      0.0,
+      0.0,
+      1.0
+     ]
+    },
+    "physx": {
+     "found": true,
+     "position": [
+      0.0,
+      0.12,
+      1.0
+     ]
+    },
+    "tensor": {
+     "valid": true,
+     "position": [
+      0.0,
+      0.12,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "mass": 1.0
+    }
+   },
+   "replay_prestep_fabric": [
+    {
+     "fabric_velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "fabric_local": [
+      0.0,
+      0.0,
+      1.0
+     ]
+    },
+    {
+     "fabric_velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "fabric_local": [
+      0.0,
+      0.01,
+      1.0
+     ]
+    }
+   ]
+  },
+  {
+   "id": "U-D4",
+   "description": "U-C をスリープしない剛体(sleepThreshold=0)で",
+   "1_play_after_write": {
+    "timeline": "playing",
+    "time": 0.0667,
+    "usd": {
+     "translate": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "mass": 1.0
+    },
+    "fabric": {
+     "local": [
+      0.0,
+      0.01,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.01,
+      1.0
+     ],
+     "world_cache": [
+      0.0,
+      0.01,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "mass": 1.0,
+     "translate_attr": [
+      0.0,
+      0.0,
+      1.0
+     ]
+    },
+    "physx": {
+     "found": true,
+     "position": [
+      0.0,
+      0.01,
+      1.0
+     ]
+    },
+    "tensor": {
+     "valid": true,
+     "position": [
+      0.0,
+      0.01,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "mass": 1.0
+    }
+   },
+   "2_stopped": {
+    "timeline": "stopped",
+    "time": 0.0,
+    "usd": {
+     "translate": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "mass": 1.0
+    },
+    "fabric": {
+     "local": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world_cache": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "mass": 1.0,
+     "translate_attr": [
+      0.0,
+      0.0,
+      1.0
+     ]
+    },
+    "physx": {
+     "found": false,
+     "position": null
+    },
+    "tensor": {
+     "valid": false
+    }
+   },
+   "replay_a_after_play_call": {
+    "local": [
+     0.0,
+     0.0,
+     1.0
+    ],
+    "world": [
+     0.0,
+     0.0,
+     1.0
+    ],
+    "world_cache": [
+     0.0,
+     0.0,
+     1.0
+    ],
+    "velocity": [
+     0.0,
+     0.6,
+     0.0
+    ],
+    "mass": 1.0,
+    "translate_attr": [
+     0.0,
+     0.0,
+     1.0
+    ]
+   },
+   "replay_b_update1": {
+    "timeline": "playing",
+    "time": 0.0167,
+    "usd": {
+     "translate": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "mass": 1.0
+    },
+    "fabric": {
+     "local": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world_cache": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "mass": 1.0,
+     "translate_attr": [
+      0.0,
+      0.0,
+      1.0
+     ]
+    },
+    "physx": {
+     "found": true,
+     "position": [
+      0.0,
+      0.0,
+      1.0
+     ]
+    },
+    "tensor": {
+     "valid": true,
+     "position": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "mass": 1.0
+    }
+   },
+   "replay_c_update10": {
+    "timeline": "playing",
+    "time": 0.1667,
+    "usd": {
+     "translate": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "mass": 1.0
+    },
+    "fabric": {
+     "local": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world_cache": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "mass": 1.0,
+     "translate_attr": [
+      0.0,
+      0.0,
+      1.0
+     ]
+    },
+    "physx": {
+     "found": true,
+     "position": [
+      0.0,
+      0.0,
+      1.0
+     ]
+    },
+    "tensor": {
+     "valid": true,
+     "position": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "mass": 1.0
+    }
+   },
+   "replay_prestep_fabric": [
+    {
+     "fabric_velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "fabric_local": [
+      0.0,
+      0.0,
+      1.0
+     ]
+    },
+    {
+     "fabric_velocity": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "fabric_local": [
+      0.0,
+      0.0,
+      1.0
+     ]
+    }
+   ]
+  },
+  {
+   "id": "U-D5",
+   "description": "角速度で U-C と同じ手順",
+   "1_tensor_angvel_in_play": [
+    0.0,
+    0.0,
+    1.5695
+   ],
+   "2_usd_angvel_after_stop": [
+    0.0,
+    0.0,
+    90.0
+   ],
+   "3_tensor_angvel_replay": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "3_physx_rotation_replay": [
+    0.0,
+    0.0,
+    0.0,
+    1.0
+   ]
+  },
+  {
+   "id": "U-E1",
+   "description": "U-C の Stop 後、速度属性を削除して Stop 中に 0.5 で作り直してから再 Play",
+   "1_play_after_write": {
+    "timeline": "playing",
+    "time": 0.0667,
+    "usd": {
+     "translate": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "mass": 1.0
+    },
+    "fabric": {
+     "local": [
+      0.0,
+      0.01,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.01,
+      1.0
+     ],
+     "world_cache": [
+      0.0,
+      0.01,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "mass": 1.0,
+     "translate_attr": [
+      0.0,
+      0.0,
+      1.0
+     ]
+    },
+    "physx": {
+     "found": true,
+     "position": [
+      0.0,
+      0.01,
+      1.0
+     ]
+    },
+    "tensor": {
+     "valid": true,
+     "position": [
+      0.0,
+      0.01,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "mass": 1.0
+    }
+   },
+   "2_stopped": {
+    "timeline": "stopped",
+    "time": 0.0,
+    "usd": {
+     "translate": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "mass": 1.0
+    },
+    "fabric": {
+     "local": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world_cache": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "mass": 1.0,
+     "translate_attr": [
+      0.0,
+      0.0,
+      1.0
+     ]
+    },
+    "physx": {
+     "found": false,
+     "position": null
+    },
+    "tensor": {
+     "valid": false
+    }
+   },
+   "3_after_recreate": {
+    "timeline": "stopped",
+    "time": 0.0,
+    "usd": {
+     "translate": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.5,
+      0.0
+     ],
+     "mass": 1.0
+    },
+    "fabric": {
+     "local": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world_cache": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.5,
+      0.0
+     ],
+     "mass": 1.0,
+     "translate_attr": [
+      0.0,
+      0.0,
+      1.0
+     ]
+    },
+    "physx": {
+     "found": false,
+     "position": null
+    },
+    "tensor": {
+     "valid": false
+    }
+   },
+   "replay_a_after_play_call": {
+    "local": [
+     0.0,
+     0.0,
+     1.0
+    ],
+    "world": [
+     0.0,
+     0.0,
+     1.0
+    ],
+    "world_cache": [
+     0.0,
+     0.0,
+     1.0
+    ],
+    "velocity": [
+     0.0,
+     0.5,
+     0.0
+    ],
+    "mass": 1.0,
+    "translate_attr": [
+     0.0,
+     0.0,
+     1.0
+    ]
+   },
+   "replay_b_update1": {
+    "timeline": "playing",
+    "time": 0.0167,
+    "usd": {
+     "translate": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.5,
+      0.0
+     ],
+     "mass": 1.0
+    },
+    "fabric": {
+     "local": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world_cache": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "mass": 1.0,
+     "translate_attr": [
+      0.0,
+      0.0,
+      1.0
+     ]
+    },
+    "physx": {
+     "found": true,
+     "position": [
+      0.0,
+      0.0,
+      1.0
+     ]
+    },
+    "tensor": {
+     "valid": true,
+     "position": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "mass": 1.0
+    }
+   },
+   "replay_c_update10": {
+    "timeline": "playing",
+    "time": 0.1667,
+    "usd": {
+     "translate": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.5,
+      0.0
+     ],
+     "mass": 1.0
+    },
+    "fabric": {
+     "local": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world_cache": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "mass": 1.0,
+     "translate_attr": [
+      0.0,
+      0.0,
+      1.0
+     ]
+    },
+    "physx": {
+     "found": true,
+     "position": [
+      0.0,
+      0.0,
+      1.0
+     ]
+    },
+    "tensor": {
+     "valid": true,
+     "position": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "mass": 1.0
+    }
+   },
+   "replay_prestep_fabric": [
+    {
+     "fabric_velocity": [
+      0.0,
+      0.5,
+      0.0
+     ],
+     "fabric_local": [
+      0.0,
+      0.0,
+      1.0
+     ]
+    },
+    {
+     "fabric_velocity": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "fabric_local": [
+      0.0,
+      0.0,
+      1.0
+     ]
+    }
+   ]
+  },
+  {
+   "id": "U-E2",
+   "description": "resetOnStop=false で U-C",
+   "setting_before": true,
+   "1_play_after_write": {
+    "timeline": "playing",
+    "time": 0.0667,
+    "usd": {
+     "translate": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "mass": 1.0
+    },
+    "fabric": {
+     "local": [
+      0.0,
+      0.01,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.01,
+      1.0
+     ],
+     "world_cache": [
+      0.0,
+      0.01,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "mass": 1.0,
+     "translate_attr": [
+      0.0,
+      0.0,
+      1.0
+     ]
+    },
+    "physx": {
+     "found": true,
+     "position": [
+      0.0,
+      0.01,
+      1.0
+     ]
+    },
+    "tensor": {
+     "valid": true,
+     "position": [
+      0.0,
+      0.01,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "mass": 1.0
+    }
+   },
+   "2_stopped": {
+    "timeline": "stopped",
+    "time": 0.0,
+    "usd": {
+     "translate": [
+      0.0,
+      0.01,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.01,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "mass": 1.0
+    },
+    "fabric": {
+     "local": [
+      0.0,
+      0.01,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.01,
+      1.0
+     ],
+     "world_cache": [
+      0.0,
+      0.01,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "mass": 1.0,
+     "translate_attr": [
+      0.0,
+      0.0,
+      1.0
+     ]
+    },
+    "physx": {
+     "found": false,
+     "position": null
+    },
+    "tensor": {
+     "valid": false
+    }
+   },
+   "replay_a_after_play_call": {
+    "local": [
+     0.0,
+     0.01,
+     1.0
+    ],
+    "world": [
+     0.0,
+     0.01,
+     1.0
+    ],
+    "world_cache": [
+     0.0,
+     0.01,
+     1.0
+    ],
+    "velocity": [
+     0.0,
+     0.6,
+     0.0
+    ],
+    "mass": 1.0,
+    "translate_attr": [
+     0.0,
+     0.0,
+     1.0
+    ]
+   },
+   "replay_b_update1": {
+    "timeline": "playing",
+    "time": 0.0167,
+    "usd": {
+     "translate": [
+      0.0,
+      0.01,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.01,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "mass": 1.0
+    },
+    "fabric": {
+     "local": [
+      0.0,
+      0.01,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.01,
+      1.0
+     ],
+     "world_cache": [
+      0.0,
+      0.01,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "mass": 1.0,
+     "translate_attr": [
+      0.0,
+      0.0,
+      1.0
+     ]
+    },
+    "physx": {
+     "found": true,
+     "position": [
+      0.0,
+      0.01,
+      1.0
+     ]
+    },
+    "tensor": {
+     "valid": true,
+     "position": [
+      0.0,
+      0.01,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "mass": 1.0
+    }
+   },
+   "replay_c_update10": {
+    "timeline": "playing",
+    "time": 0.1667,
+    "usd": {
+     "translate": [
+      0.0,
+      0.01,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.01,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "mass": 1.0
+    },
+    "fabric": {
+     "local": [
+      0.0,
+      0.01,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.01,
+      1.0
+     ],
+     "world_cache": [
+      0.0,
+      0.01,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "mass": 1.0,
+     "translate_attr": [
+      0.0,
+      0.0,
+      1.0
+     ]
+    },
+    "physx": {
+     "found": true,
+     "position": [
+      0.0,
+      0.01,
+      1.0
+     ]
+    },
+    "tensor": {
+     "valid": true,
+     "position": [
+      0.0,
+      0.01,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "mass": 1.0
+    }
+   },
+   "replay_prestep_fabric": [
+    {
+     "fabric_velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "fabric_local": [
+      0.0,
+      0.01,
+      1.0
+     ]
+    },
+    {
+     "fabric_velocity": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "fabric_local": [
+      0.0,
+      0.01,
+      1.0
+     ]
+    }
+   ]
+  },
+  {
+   "id": "U-F1",
+   "description": "U-C の再 Play 前に omni.physx.fabric を無効化",
+   "1_play_after_write": {
+    "timeline": "playing",
+    "time": 0.0667,
+    "usd": {
+     "translate": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "mass": 1.0
+    },
+    "fabric": {
+     "local": [
+      0.0,
+      0.01,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.01,
+      1.0
+     ],
+     "world_cache": [
+      0.0,
+      0.01,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "mass": 1.0,
+     "translate_attr": [
+      0.0,
+      0.0,
+      1.0
+     ]
+    },
+    "physx": {
+     "found": true,
+     "position": [
+      0.0,
+      0.01,
+      1.0
+     ]
+    },
+    "tensor": {
+     "valid": true,
+     "position": [
+      0.0,
+      0.01,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "mass": 1.0
+    }
+   },
+   "2_stopped": {
+    "timeline": "stopped",
+    "time": 0.0,
+    "usd": {
+     "translate": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "mass": 1.0
+    },
+    "fabric": {
+     "local": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world_cache": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "mass": 1.0,
+     "translate_attr": [
+      0.0,
+      0.0,
+      1.0
+     ]
+    },
+    "physx": {
+     "found": false,
+     "position": null
+    },
+    "tensor": {
+     "valid": false
+    }
+   },
+   "replay_a_after_play_call": {
+    "local": [
+     0.0,
+     0.0,
+     1.0
+    ],
+    "world": [
+     0.0,
+     0.0,
+     1.0
+    ],
+    "world_cache": [
+     0.0,
+     0.0,
+     1.0
+    ],
+    "velocity": [
+     0.0,
+     0.6,
+     0.0
+    ],
+    "mass": 1.0,
+    "translate_attr": [
+     0.0,
+     0.0,
+     1.0
+    ]
+   },
+   "replay_b_update1": {
+    "timeline": "playing",
+    "time": 0.0167,
+    "usd": {
+     "translate": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "mass": 1.0
+    },
+    "fabric": {
+     "local": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world_cache": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "mass": 1.0,
+     "translate_attr": [
+      0.0,
+      0.0,
+      1.0
+     ]
+    },
+    "physx": {
+     "found": true,
+     "position": [
+      0.0,
+      0.0,
+      1.0
+     ]
+    },
+    "tensor": {
+     "valid": true,
+     "position": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "mass": 1.0
+    }
+   },
+   "replay_c_update10": {
+    "timeline": "playing",
+    "time": 0.1667,
+    "usd": {
+     "translate": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "mass": 1.0
+    },
+    "fabric": {
+     "local": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world_cache": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "mass": 1.0,
+     "translate_attr": [
+      0.0,
+      0.0,
+      1.0
+     ]
+    },
+    "physx": {
+     "found": true,
+     "position": [
+      0.0,
+      0.0,
+      1.0
+     ]
+    },
+    "tensor": {
+     "valid": true,
+     "position": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "mass": 1.0
+    }
+   },
+   "replay_prestep_fabric": [
+    {
+     "fabric_velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "fabric_local": [
+      0.0,
+      0.0,
+      1.0
+     ]
+    },
+    {
+     "fabric_velocity": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "fabric_local": [
+      0.0,
+      0.0,
+      1.0
+     ]
+    }
+   ]
+  },
+  {
+   "id": "U-F2",
+   "description": "最初の Play は omni.physx.fabric 無効、再 Play だけ有効",
+   "1_play_after_write": {
+    "timeline": "playing",
+    "time": 0.0667,
+    "usd": {
+     "translate": [
+      0.0,
+      0.01,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.01,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "mass": 1.0
+    },
+    "fabric": {
+     "local": [
+      0.0,
+      0.01,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.01,
+      1.0
+     ],
+     "world_cache": [
+      0.0,
+      0.01,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "mass": 1.0,
+     "translate_attr": [
+      0.0,
+      0.01,
+      1.0
+     ]
+    },
+    "physx": {
+     "found": true,
+     "position": [
+      0.0,
+      0.01,
+      1.0
+     ]
+    },
+    "tensor": {
+     "valid": true,
+     "position": [
+      0.0,
+      0.01,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "mass": 1.0
+    }
+   },
+   "2_stopped": {
+    "timeline": "stopped",
+    "time": 0.0,
+    "usd": {
+     "translate": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "velocity": null,
+     "mass": 1.0
+    },
+    "fabric": {
+     "local": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world_cache": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "mass": 1.0,
+     "translate_attr": [
+      0.0,
+      0.01,
+      1.0
+     ]
+    },
+    "physx": {
+     "found": false,
+     "position": null
+    },
+    "tensor": {
+     "valid": false
+    }
+   },
+   "3_before_replay": {
+    "timeline": "stopped",
+    "time": 0.0,
+    "usd": {
+     "translate": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "mass": 1.0
+    },
+    "fabric": {
+     "local": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world_cache": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "mass": 1.0,
+     "translate_attr": [
+      0.0,
+      0.01,
+      1.0
+     ]
+    },
+    "physx": {
+     "found": false,
+     "position": null
+    },
+    "tensor": {
+     "valid": false
+    }
+   },
+   "replay_a_after_play_call": {
+    "local": [
+     0.0,
+     0.0,
+     1.0
+    ],
+    "world": [
+     0.0,
+     0.0,
+     1.0
+    ],
+    "world_cache": [
+     0.0,
+     0.0,
+     1.0
+    ],
+    "velocity": [
+     0.0,
+     0.6,
+     0.0
+    ],
+    "mass": 1.0,
+    "translate_attr": [
+     0.0,
+     0.01,
+     1.0
+    ]
+   },
+   "replay_b_update1": {
+    "timeline": "playing",
+    "time": 0.0167,
+    "usd": {
+     "translate": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "mass": 1.0
+    },
+    "fabric": {
+     "local": [
+      0.0,
+      0.03,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.03,
+      1.0
+     ],
+     "world_cache": [
+      0.0,
+      0.03,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "mass": 1.0,
+     "translate_attr": [
+      0.0,
+      0.01,
+      1.0
+     ]
+    },
+    "physx": {
+     "found": true,
+     "position": [
+      0.0,
+      0.03,
+      1.0
+     ]
+    },
+    "tensor": {
+     "valid": true,
+     "position": [
+      0.0,
+      0.03,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "mass": 1.0
+    }
+   },
+   "replay_c_update10": {
+    "timeline": "playing",
+    "time": 0.1667,
+    "usd": {
+     "translate": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "mass": 1.0
+    },
+    "fabric": {
+     "local": [
+      0.0,
+      0.12,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.12,
+      1.0
+     ],
+     "world_cache": [
+      0.0,
+      0.12,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "mass": 1.0,
+     "translate_attr": [
+      0.0,
+      0.01,
+      1.0
+     ]
+    },
+    "physx": {
+     "found": true,
+     "position": [
+      0.0,
+      0.12,
+      1.0
+     ]
+    },
+    "tensor": {
+     "valid": true,
+     "position": [
+      0.0,
+      0.12,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "mass": 1.0
+    }
+   },
+   "replay_prestep_fabric": [
+    {
+     "fabric_velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "fabric_local": [
+      0.0,
+      0.0,
+      1.0
+     ]
+    },
+    {
+     "fabric_velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "fabric_local": [
+      0.0,
+      0.01,
+      1.0
+     ]
+    }
+   ]
+  },
+  {
+   "id": "U-F3",
+   "description": "U-C の再 Play で、ステップ前に PhysX が読み込んだ速度",
+   "1_play_after_write": {
+    "timeline": "playing",
+    "time": 0.0667,
+    "usd": {
+     "translate": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "mass": 1.0
+    },
+    "fabric": {
+     "local": [
+      0.0,
+      0.01,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.01,
+      1.0
+     ],
+     "world_cache": [
+      0.0,
+      0.01,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "mass": 1.0,
+     "translate_attr": [
+      0.0,
+      0.0,
+      1.0
+     ]
+    },
+    "physx": {
+     "found": true,
+     "position": [
+      0.0,
+      0.01,
+      1.0
+     ]
+    },
+    "tensor": {
+     "valid": true,
+     "position": [
+      0.0,
+      0.01,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "mass": 1.0
+    }
+   },
+   "2_stopped": {
+    "timeline": "stopped",
+    "time": 0.0,
+    "usd": {
+     "translate": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "mass": 1.0
+    },
+    "fabric": {
+     "local": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world_cache": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "mass": 1.0,
+     "translate_attr": [
+      0.0,
+      0.0,
+      1.0
+     ]
+    },
+    "physx": {
+     "found": false,
+     "position": null
+    },
+    "tensor": {
+     "valid": false
+    }
+   },
+   "replay_parsed_velocity_before_any_step": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "replay_velocity_after_update1": "view invalidated",
+   "replay_b_update1": {
+    "timeline": "playing",
+    "time": 0.0167,
+    "usd": {
+     "translate": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "mass": 1.0
+    },
+    "fabric": {
+     "local": [
+      0.0,
+      0.03,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.03,
+      1.0
+     ],
+     "world_cache": [
+      0.0,
+      0.03,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "mass": 1.0,
+     "translate_attr": [
+      0.0,
+      0.0,
+      1.0
+     ]
+    },
+    "physx": {
+     "found": true,
+     "position": [
+      0.0,
+      0.03,
+      1.0
+     ]
+    },
+    "tensor": {
+     "valid": true,
+     "position": [
+      0.0,
+      0.03,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "mass": 1.0
+    }
+   }
+  },
+  {
+   "id": "U-G1",
+   "description": "属性なしから Play 中に USD 速度 0.6 → update ごとの速度",
+   "0_after_write_no_update": {
+    "valid": true,
+    "position": [
+     0.0,
+     0.0,
+     1.0
+    ],
+    "velocity": [
+     0.0,
+     0.6,
+     0.0
+    ],
+    "mass": 1.0
+   },
+   "update1": {
+    "tensor": {
+     "valid": true,
+     "position": [
+      0.0,
+      0.01,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "mass": 1.0
+    },
+    "usd_velocity": [
+     0.0,
+     0.6,
+     0.0
+    ],
+    "fabric_velocity": [
+     0.0,
+     0.6,
+     0.0
+    ]
+   },
+   "update2": {
+    "tensor": {
+     "valid": true,
+     "position": [
+      0.0,
+      0.01,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "mass": 1.0
+    },
+    "usd_velocity": [
+     0.0,
+     0.6,
+     0.0
+    ],
+    "fabric_velocity": [
+     0.0,
+     0.0,
+     0.0
+    ]
+   },
+   "update3": {
+    "tensor": {
+     "valid": true,
+     "position": [
+      0.0,
+      0.01,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "mass": 1.0
+    },
+    "usd_velocity": [
+     0.0,
+     0.6,
+     0.0
+    ],
+    "fabric_velocity": [
+     0.0,
+     0.0,
+     0.0
+    ]
+   },
+   "update4": {
+    "tensor": {
+     "valid": true,
+     "position": [
+      0.0,
+      0.01,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "mass": 1.0
+    },
+    "usd_velocity": [
+     0.0,
+     0.6,
+     0.0
+    ],
+    "fabric_velocity": [
+     0.0,
+     0.0,
+     0.0
+    ]
+   },
+   "update5": {
+    "tensor": {
+     "valid": true,
+     "position": [
+      0.0,
+      0.01,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "mass": 1.0
+    },
+    "usd_velocity": [
+     0.0,
+     0.6,
+     0.0
+    ],
+    "fabric_velocity": [
+     0.0,
+     0.0,
+     0.0
+    ]
+   },
+   "update6": {
+    "tensor": {
+     "valid": true,
+     "position": [
+      0.0,
+      0.01,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "mass": 1.0
+    },
+    "usd_velocity": [
+     0.0,
+     0.6,
+     0.0
+    ],
+    "fabric_velocity": [
+     0.0,
+     0.0,
+     0.0
+    ]
+   },
+   "prestep_fabric": [
+    {
+     "fabric_velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "fabric_local": [
+      0.0,
+      0.0,
+      1.0
+     ]
+    },
+    {
+     "fabric_velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "fabric_local": [
+      0.0,
+      0.01,
+      1.0
+     ]
+    },
+    {
+     "fabric_velocity": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "fabric_local": [
+      0.0,
+      0.01,
+      1.0
+     ]
+    },
+    {
+     "fabric_velocity": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "fabric_local": [
+      0.0,
+      0.01,
+      1.0
+     ]
+    }
+   ]
+  },
+  {
+   "id": "U-G2",
+   "description": "Play 前に属性を 0 で作成 → Play 中に USD 速度 0.6 → update ごとの速度",
+   "0_after_write_no_update": {
+    "valid": true,
+    "position": [
+     0.0,
+     0.0,
+     1.0
+    ],
+    "velocity": [
+     0.0,
+     0.6,
+     0.0
+    ],
+    "mass": 1.0
+   },
+   "update1": {
+    "tensor": {
+     "valid": true,
+     "position": [
+      0.0,
+      0.01,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "mass": 1.0
+    },
+    "usd_velocity": [
+     0.0,
+     0.6,
+     0.0
+    ],
+    "fabric_velocity": [
+     0.0,
+     0.6,
+     0.0
+    ]
+   },
+   "update2": {
+    "tensor": {
+     "valid": true,
+     "position": [
+      0.0,
+      0.02,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "mass": 1.0
+    },
+    "usd_velocity": [
+     0.0,
+     0.6,
+     0.0
+    ],
+    "fabric_velocity": [
+     0.0,
+     0.6,
+     0.0
+    ]
+   },
+   "update3": {
+    "tensor": {
+     "valid": true,
+     "position": [
+      0.0,
+      0.03,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "mass": 1.0
+    },
+    "usd_velocity": [
+     0.0,
+     0.6,
+     0.0
+    ],
+    "fabric_velocity": [
+     0.0,
+     0.6,
+     0.0
+    ]
+   },
+   "update4": {
+    "tensor": {
+     "valid": true,
+     "position": [
+      0.0,
+      0.04,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "mass": 1.0
+    },
+    "usd_velocity": [
+     0.0,
+     0.6,
+     0.0
+    ],
+    "fabric_velocity": [
+     0.0,
+     0.6,
+     0.0
+    ]
+   },
+   "update5": {
+    "tensor": {
+     "valid": true,
+     "position": [
+      0.0,
+      0.05,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "mass": 1.0
+    },
+    "usd_velocity": [
+     0.0,
+     0.6,
+     0.0
+    ],
+    "fabric_velocity": [
+     0.0,
+     0.6,
+     0.0
+    ]
+   },
+   "update6": {
+    "tensor": {
+     "valid": true,
+     "position": [
+      0.0,
+      0.06,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "mass": 1.0
+    },
+    "usd_velocity": [
+     0.0,
+     0.6,
+     0.0
+    ],
+    "fabric_velocity": [
+     0.0,
+     0.6,
+     0.0
+    ]
+   },
+   "prestep_fabric": [
+    {
+     "fabric_velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "fabric_local": [
+      0.0,
+      0.0,
+      1.0
+     ]
+    },
+    {
+     "fabric_velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "fabric_local": [
+      0.0,
+      0.01,
+      1.0
+     ]
+    },
+    {
+     "fabric_velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "fabric_local": [
+      0.0,
+      0.02,
+      1.0
+     ]
+    },
+    {
+     "fabric_velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "fabric_local": [
+      0.0,
+      0.03,
+      1.0
+     ]
+    }
+   ]
+  },
+  {
+   "id": "U-G3",
+   "description": "U-G1 を Fabric change tracking 停止中に",
+   "0_after_write_no_update": {
+    "valid": true,
+    "position": [
+     0.0,
+     0.0,
+     1.0
+    ],
+    "velocity": [
+     0.0,
+     0.6,
+     0.0
+    ],
+    "mass": 1.0
+   },
+   "update1": {
+    "tensor": {
+     "valid": true,
+     "position": [
+      0.0,
+      0.01,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "mass": 1.0
+    },
+    "usd_velocity": [
+     0.0,
+     0.6,
+     0.0
+    ],
+    "fabric_velocity": [
+     0.0,
+     0.6,
+     0.0
+    ]
+   },
+   "update2": {
+    "tensor": {
+     "valid": true,
+     "position": [
+      0.0,
+      0.02,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "mass": 1.0
+    },
+    "usd_velocity": [
+     0.0,
+     0.6,
+     0.0
+    ],
+    "fabric_velocity": [
+     0.0,
+     0.6,
+     0.0
+    ]
+   },
+   "update3": {
+    "tensor": {
+     "valid": true,
+     "position": [
+      0.0,
+      0.03,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "mass": 1.0
+    },
+    "usd_velocity": [
+     0.0,
+     0.6,
+     0.0
+    ],
+    "fabric_velocity": [
+     0.0,
+     0.6,
+     0.0
+    ]
+   },
+   "update4": {
+    "tensor": {
+     "valid": true,
+     "position": [
+      0.0,
+      0.04,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "mass": 1.0
+    },
+    "usd_velocity": [
+     0.0,
+     0.6,
+     0.0
+    ],
+    "fabric_velocity": [
+     0.0,
+     0.6,
+     0.0
+    ]
+   },
+   "update5": {
+    "tensor": {
+     "valid": true,
+     "position": [
+      0.0,
+      0.05,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "mass": 1.0
+    },
+    "usd_velocity": [
+     0.0,
+     0.6,
+     0.0
+    ],
+    "fabric_velocity": [
+     0.0,
+     0.6,
+     0.0
+    ]
+   },
+   "update6": {
+    "tensor": {
+     "valid": true,
+     "position": [
+      0.0,
+      0.06,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "mass": 1.0
+    },
+    "usd_velocity": [
+     0.0,
+     0.6,
+     0.0
+    ],
+    "fabric_velocity": [
+     0.0,
+     0.6,
+     0.0
+    ]
+   },
+   "prestep_fabric": [
+    {
+     "fabric_velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "fabric_local": [
+      0.0,
+      0.0,
+      1.0
+     ]
+    },
+    {
+     "fabric_velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "fabric_local": [
+      0.0,
+      0.01,
+      1.0
+     ]
+    },
+    {
+     "fabric_velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "fabric_local": [
+      0.0,
+      0.02,
+      1.0
+     ]
+    },
+    {
+     "fabric_velocity": [
+      0.0,
+      0.6,
+      0.0
+     ],
+     "fabric_local": [
+      0.0,
+      0.03,
+      1.0
+     ]
+    }
+   ]
+  }
+ ]
+}

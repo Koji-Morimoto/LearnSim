@@ -1,0 +1,209 @@
+{
+ "group": "b04_detector_path",
+ "items": [
+  {
+   "id": "D-01",
+   "description": "未アタッチ(Stop 状態)で呼ぶ",
+   "pairs_returned": [
+    "A-B"
+   ],
+   "buffer_seen_by_function": [
+    "FOUND B-A n=4"
+   ],
+   "before": {
+    "attached_stage_matches": false,
+    "mover_physx_z": null,
+    "mover_usd_z": 0.0
+   },
+   "after": {
+    "attached_stage_matches": false,
+    "mover_physx_z": null,
+    "mover_usd_z": 0.0,
+    "A_has_contact_report_api": false,
+    "session_sublayers": 0
+   }
+  },
+  {
+   "id": "D-02",
+   "description": "IPhysxSimulation にアタッチ済み・3 ステップ済み、ContactReportAPI なし",
+   "buffer_before_call": [],
+   "pairs_returned": [],
+   "buffer_seen_by_function": [],
+   "before": {
+    "attached_stage_matches": true,
+    "mover_physx_z": 0.05,
+    "mover_usd_z": 0.05
+   },
+   "after": {
+    "attached_stage_matches": true,
+    "mover_physx_z": 0.06667,
+    "mover_usd_z": 0.05,
+    "A_has_contact_report_api": false,
+    "session_sublayers": 0
+   }
+  },
+  {
+   "id": "D-03",
+   "description": "IPhysxSimulation にアタッチ済み・3 ステップ済み、ContactReportAPI あり",
+   "buffer_before_call": [
+    "PERSIST B-A n=4"
+   ],
+   "pairs_returned": [],
+   "buffer_seen_by_function": [
+    "PERSIST B-A n=4"
+   ],
+   "before": {
+    "attached_stage_matches": true,
+    "mover_physx_z": 0.05,
+    "mover_usd_z": 0.05
+   },
+   "after": {
+    "attached_stage_matches": true,
+    "mover_physx_z": 0.06667,
+    "mover_usd_z": 0.05,
+    "A_has_contact_report_api": true,
+    "session_sublayers": 0
+   }
+  },
+  {
+   "id": "D-04",
+   "description": "タイムライン Play → Pause の状態で呼ぶ",
+   "no_api": {
+    "physics_steps_before_call": 10,
+    "physics_step_events_during_call": 1,
+    "buffer_before_call": [],
+    "pairs_returned": [
+     "A-B"
+    ],
+    "buffer_seen_by_function": [
+     "FOUND B-A n=4"
+    ],
+    "before": {
+     "attached_stage_matches": false,
+     "mover_physx_z": 0.16667,
+     "mover_usd_z": 0.16667
+    },
+    "after": {
+     "attached_stage_matches": false,
+     "mover_physx_z": null,
+     "mover_usd_z": 0.16667,
+     "A_has_contact_report_api": false,
+     "session_sublayers": 0
+    },
+    "mover_physx_z_10_frames_after_resume": [
+     null,
+     0.33333
+    ]
+   }
+  },
+  {
+   "id": "D-04b",
+   "description": "タイムライン Play → Pause の状態で呼ぶ(API あり)",
+   "pre_api": {
+    "physics_steps_before_call": 10,
+    "physics_step_events_during_call": 1,
+    "buffer_before_call": [
+     "PERSIST B-A n=4"
+    ],
+    "pairs_returned": [
+     "A-B"
+    ],
+    "buffer_seen_by_function": [
+     "FOUND B-A n=4"
+    ],
+    "before": {
+     "attached_stage_matches": false,
+     "mover_physx_z": 0.16667,
+     "mover_usd_z": 0.16667
+    },
+    "after": {
+     "attached_stage_matches": false,
+     "mover_physx_z": null,
+     "mover_usd_z": 0.16667,
+     "A_has_contact_report_api": true,
+     "session_sublayers": 0
+    },
+    "mover_physx_z_10_frames_after_resume": [
+     null,
+     0.33333
+    ]
+   }
+  },
+  {
+   "id": "D-05",
+   "description": "タイムライン Play 中に呼ぶ",
+   "no_api": {
+    "physics_steps_before_call": 10,
+    "physics_step_events_during_call": 1,
+    "buffer_before_call": [],
+    "pairs_returned": [
+     "A-B"
+    ],
+    "buffer_seen_by_function": [
+     "FOUND B-A n=4"
+    ],
+    "before": {
+     "attached_stage_matches": false,
+     "mover_physx_z": 0.16667,
+     "mover_usd_z": 0.16667
+    },
+    "after": {
+     "attached_stage_matches": false,
+     "mover_physx_z": null,
+     "mover_usd_z": 0.16667,
+     "A_has_contact_report_api": false,
+     "session_sublayers": 0
+    },
+    "mover_physx_z_10_frames_after_resume": [
+     null,
+     0.33333
+    ]
+   }
+  },
+  {
+   "id": "D-05b",
+   "description": "タイムライン Play 中に呼ぶ(API あり)",
+   "pre_api": {
+    "physics_steps_before_call": 10,
+    "physics_step_events_during_call": 1,
+    "buffer_before_call": [
+     "PERSIST B-A n=4"
+    ],
+    "pairs_returned": [
+     "A-B"
+    ],
+    "buffer_seen_by_function": [
+     "FOUND B-A n=4"
+    ],
+    "before": {
+     "attached_stage_matches": false,
+     "mover_physx_z": 0.16667,
+     "mover_usd_z": 0.16667
+    },
+    "after": {
+     "attached_stage_matches": false,
+     "mover_physx_z": null,
+     "mover_usd_z": 0.16667,
+     "A_has_contact_report_api": true,
+     "session_sublayers": 0
+    },
+    "mover_physx_z_10_frames_after_resume": [
+     null,
+     0.33333
+    ]
+   }
+  },
+  {
+   "id": "D-06",
+   "description": "アタッチ済み・接触中のペアに、あとから ContactReportAPI を付けた場合",
+   "after_api_step0": [],
+   "after_api_step1": [],
+   "after_api_step2": [],
+   "after_api_step3": [],
+   "after_separate": [],
+   "after_rejoin": [
+    "FOUND B-A n=4"
+   ]
+  }
+ ]
+}

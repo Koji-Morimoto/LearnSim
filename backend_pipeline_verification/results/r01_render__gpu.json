@@ -1,0 +1,1657 @@
+{
+ "group": "r01_render__gpu",
+ "items": [
+  {
+   "id": "R-00",
+   "description": "キャリブレーション(USD で既知の位置に置いて撮影)",
+   "environment": {
+    "omni.physx": "omni.physx-110.4.4",
+    "omni.physx.fabric": "omni.physx.fabric-110.4.4",
+    "omni.physics.tensors": "omni.physics.tensors-110.4.4",
+    "usdrt.scenegraph": "usdrt.scenegraph-7.6.3",
+    "omni.hydra.usdrt_delegate": "omni.hydra.usdrt_delegate-7.5.2",
+    "isaacsim.core.experimental.prims": "isaacsim.core.experimental.prims-1.12.1",
+    "isaacsim.core.experimental.utils": "isaacsim.core.experimental.utils-0.23.3",
+    "isaacsim.core.simulation_manager": "isaacsim.core.simulation_manager-1.17.4",
+    "isaac_sim_VERSION": "6.2.0-rc.14+release.52805.02189a84.gl",
+    "/app/useFabricSceneDelegate": true,
+    "/physics/resetOnStop": true,
+    "/physics/updateToUsd": false,
+    "/physics/updateVelocitiesToUsd": false,
+    "/physics/fabricEnabled": true,
+    "/physics/suppressReadback": true,
+    "/physics/cudaDevice": 0,
+    "config": "gpu",
+    "simulation_device": "cuda:0"
+   },
+   "warmup_captures": 0,
+   "pixels": {
+    "origin": [
+     159.64583333333334,
+     159.59375
+    ],
+    "x1": [
+     183.54545454545453,
+     159.54545454545453
+    ],
+    "y1": [
+     159.65686274509804,
+     135.76470588235293
+    ]
+   },
+   "check": {
+    "usd(-0.5,0.7)": {
+     "pixel": [
+      147.5,
+      142.7
+     ],
+     "world_xy": [
+      -0.509,
+      0.71
+     ]
+    }
+   }
+  },
+  {
+   "id": "R-01",
+   "description": "Stop 中に USD に (1, 0.5) を書く",
+   "result": {
+    "pixel": [
+     183.5,
+     147.5
+    ],
+    "world_xy": [
+     1.0,
+     0.507
+    ],
+    "layers": {
+     "usd": [
+      1.0,
+      0.5
+     ],
+     "fabric_local": [
+      1.0,
+      0.5
+     ],
+     "fabric_world_cache": [
+      1.0,
+      0.5
+     ],
+     "fabric_cuda_world": [
+      1.0,
+      0.5
+     ],
+     "tensor": null
+    }
+   }
+  },
+  {
+   "id": "R-02",
+   "description": "Stop 中に Fabric の local 行列だけ (-1, 0.5) にする",
+   "after_1_update": {
+    "pixel": [
+     135.5,
+     147.5
+    ],
+    "world_xy": [
+     -1.009,
+     0.508
+    ],
+    "layers": {
+     "usd": [
+      0.0,
+      0.0
+     ],
+     "fabric_local": [
+      -1.0,
+      0.5
+     ],
+     "fabric_world_cache": [
+      -1.0,
+      0.5
+     ],
+     "fabric_cuda_world": [
+      -1.0,
+      0.5
+     ],
+     "tensor": null
+    }
+   },
+   "after_3_updates": {
+    "pixel": [
+     135.5,
+     147.5
+    ],
+    "world_xy": [
+     -1.011,
+     0.51
+    ],
+    "layers": {
+     "usd": [
+      0.0,
+      0.0
+     ],
+     "fabric_local": [
+      -1.0,
+      0.5
+     ],
+     "fabric_world_cache": [
+      -1.0,
+      0.5
+     ],
+     "fabric_cuda_world": [
+      -1.0,
+      0.5
+     ],
+     "tensor": null
+    }
+   }
+  },
+  {
+   "id": "R-03",
+   "description": "Stop 中に omni:fabric:worldMatrix 属性だけ (0.5, -1) にする(local 行列はそのまま)",
+   "after_1_update": {
+    "pixel": [
+     171.5,
+     183.5
+    ],
+    "world_xy": [
+     0.496,
+     -1.004
+    ],
+    "layers": {
+     "usd": [
+      0.0,
+      0.0
+     ],
+     "fabric_local": [
+      0.5,
+      -1.0
+     ],
+     "fabric_world_cache": [
+      0.5,
+      -1.0
+     ],
+     "fabric_cuda_world": [
+      0.5,
+      -1.0
+     ],
+     "tensor": null
+    }
+   },
+   "after_3_updates": {
+    "pixel": [
+     171.5,
+     183.5
+    ],
+    "world_xy": [
+     0.496,
+     -1.004
+    ],
+    "layers": {
+     "usd": [
+      0.0,
+      0.0
+     ],
+     "fabric_local": [
+      0.5,
+      -1.0
+     ],
+     "fabric_world_cache": [
+      0.5,
+      -1.0
+     ],
+     "fabric_cuda_world": [
+      0.5,
+      -1.0
+     ],
+     "tensor": null
+    }
+   }
+  },
+  {
+   "id": "R-04",
+   "description": "Play 中、速度 0.6 m/s で x 方向に動かす",
+   "trace": [
+    {
+     "pixel": [
+      161.6,
+      159.6
+     ],
+     "world_xy": [
+      0.084,
+      0.0
+     ],
+     "layers": {
+      "usd": [
+       0.0,
+       0.0
+      ],
+      "fabric_local": [
+       0.1,
+       0.0
+      ],
+      "fabric_world_cache": [
+       0.1,
+       0.0
+      ],
+      "fabric_cuda_world": [
+       0.1,
+       0.0
+      ],
+      "tensor": [
+       0.1,
+       0.0
+      ]
+     }
+    },
+    {
+     "pixel": [
+      164.5,
+      159.6
+     ],
+     "world_xy": [
+      0.201,
+      -0.0
+     ],
+     "layers": {
+      "usd": [
+       0.0,
+       0.0
+      ],
+      "fabric_local": [
+       0.2,
+       0.0
+      ],
+      "fabric_world_cache": [
+       0.2,
+       0.0
+      ],
+      "fabric_cuda_world": [
+       0.2,
+       0.0
+      ],
+      "tensor": [
+       0.2,
+       0.0
+      ]
+     }
+    },
+    {
+     "pixel": [
+      166.5,
+      159.5
+     ],
+     "world_xy": [
+      0.289,
+      0.001
+     ],
+     "layers": {
+      "usd": [
+       0.0,
+       0.0
+      ],
+      "fabric_local": [
+       0.3,
+       0.0
+      ],
+      "fabric_world_cache": [
+       0.3,
+       0.0
+      ],
+      "fabric_cuda_world": [
+       0.3,
+       0.0
+      ],
+      "tensor": [
+       0.3,
+       0.0
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "id": "R-05",
+   "description": "Play 中に tensor で (1, -0.5) に置く",
+   "result": {
+    "pixel": [
+     183.6,
+     171.6
+    ],
+    "world_xy": [
+     1.002,
+     -0.505
+    ],
+    "layers": {
+     "usd": [
+      0.0,
+      0.0
+     ],
+     "fabric_local": [
+      1.0,
+      -0.5
+     ],
+     "fabric_world_cache": [
+      1.0,
+      -0.5
+     ],
+     "fabric_cuda_world": [
+      1.0,
+      -0.5
+     ],
+     "tensor": [
+      1.0,
+      -0.5
+     ]
+    }
+   }
+  },
+  {
+   "id": "R-06",
+   "description": "Play 中に usd で (-1, -0.5) に置き、Stop",
+   "playing": {
+    "pixel": [
+     159.5,
+     159.6
+    ],
+    "world_xy": [
+     -0.007,
+     0.0
+    ],
+    "layers": {
+     "usd": [
+      -1.0,
+      -0.5
+     ],
+     "fabric_local": [
+      0.0,
+      0.0
+     ],
+     "fabric_world_cache": [
+      0.0,
+      0.0
+     ],
+     "fabric_cuda_world": [
+      0.0,
+      0.0
+     ],
+     "tensor": [
+      0.0,
+      0.0
+     ]
+    }
+   },
+   "stopped": {
+    "pixel": [
+     159.5,
+     159.5
+    ],
+    "world_xy": [
+     -0.006,
+     0.004
+    ],
+    "layers": {
+     "usd": [
+      -1.0,
+      -0.5
+     ],
+     "fabric_local": [
+      0.0,
+      0.0
+     ],
+     "fabric_world_cache": [
+      0.0,
+      0.0
+     ],
+     "fabric_cuda_world": [
+      0.0,
+      0.0
+     ],
+     "tensor": null
+    }
+   }
+  },
+  {
+   "id": "R-07",
+   "description": "速度 0.6 で動かし、Pause(update 5 回)→ 再開",
+   "before_pause": {
+    "pixel": [
+     161.7,
+     159.6
+    ],
+    "world_xy": [
+     0.088,
+     -0.002
+    ],
+    "layers": {
+     "usd": [
+      0.0,
+      0.0
+     ],
+     "fabric_local": [
+      0.1,
+      0.0
+     ],
+     "fabric_world_cache": [
+      0.1,
+      0.0
+     ],
+     "fabric_cuda_world": [
+      0.1,
+      0.0
+     ],
+     "tensor": [
+      0.1,
+      0.0
+     ]
+    }
+   },
+   "paused": {
+    "pixel": [
+     161.7,
+     159.6
+    ],
+    "world_xy": [
+     0.087,
+     0.0
+    ],
+    "layers": {
+     "usd": [
+      0.0,
+      0.0
+     ],
+     "fabric_local": [
+      0.1,
+      0.0
+     ],
+     "fabric_world_cache": [
+      0.1,
+      0.0
+     ],
+     "fabric_cuda_world": [
+      0.1,
+      0.0
+     ],
+     "tensor": [
+      0.1,
+      0.0
+     ]
+    }
+   },
+   "after_resume": [
+    {
+     "pixel": [
+      161.5,
+      159.6
+     ],
+     "world_xy": [
+      0.078,
+      -0.0
+     ],
+     "layers": {
+      "usd": [
+       0.0,
+       0.0
+      ],
+      "fabric_local": [
+       0.1,
+       0.0
+      ],
+      "fabric_world_cache": [
+       0.1,
+       0.0
+      ],
+      "fabric_cuda_world": [
+       0.1,
+       0.0
+      ],
+      "tensor": [
+       0.2,
+       0.0
+      ]
+     }
+    },
+    {
+     "pixel": [
+      162.1,
+      159.6
+     ],
+     "world_xy": [
+      0.103,
+      -0.0
+     ],
+     "layers": {
+      "usd": [
+       0.0,
+       0.0
+      ],
+      "fabric_local": [
+       0.1,
+       0.0
+      ],
+      "fabric_world_cache": [
+       0.1,
+       0.0
+      ],
+      "fabric_cuda_world": [
+       0.1,
+       0.0
+      ],
+      "tensor": [
+       0.3,
+       0.0
+      ]
+     }
+    },
+    {
+     "pixel": [
+      162.0,
+      159.5
+     ],
+     "world_xy": [
+      0.099,
+      0.004
+     ],
+     "layers": {
+      "usd": [
+       0.0,
+       0.0
+      ],
+      "fabric_local": [
+       0.1,
+       0.0
+      ],
+      "fabric_world_cache": [
+       0.1,
+       0.0
+      ],
+      "fabric_cuda_world": [
+       0.1,
+       0.0
+      ],
+      "tensor": [
+       0.4,
+       0.0
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "id": "R-08",
+   "description": "Play 中に usd で (-1, -0.5) に置き、Stop 後を 1 update ごとに撮影(3 回繰り返し)",
+   "trial0": [
+    {
+     "layers_before": {
+      "usd": [
+       -1.0,
+       -0.5
+      ],
+      "fabric_local": [
+       0.0,
+       0.0
+      ],
+      "fabric_world_cache": [
+       0.0,
+       0.0
+      ],
+      "fabric_cuda_world": [
+       0.0,
+       0.0
+      ],
+      "tensor": [
+       0.0,
+       0.0
+      ]
+     },
+     "rendered_xy": [
+      -0.006,
+      -0.017
+     ],
+     "layers_after": {
+      "usd": [
+       -1.0,
+       -0.5
+      ],
+      "fabric_local": [
+       0.0,
+       0.0
+      ],
+      "fabric_world_cache": [
+       0.0,
+       0.0
+      ],
+      "fabric_cuda_world": [
+       0.0,
+       0.0
+      ],
+      "tensor": null
+     }
+    },
+    {
+     "layers_before": {
+      "usd": [
+       -1.0,
+       -0.5
+      ],
+      "fabric_local": [
+       0.0,
+       0.0
+      ],
+      "fabric_world_cache": [
+       0.0,
+       0.0
+      ],
+      "fabric_cuda_world": [
+       0.0,
+       0.0
+      ],
+      "tensor": null
+     },
+     "rendered_xy": [
+      -0.006,
+      -0.017
+     ],
+     "layers_after": {
+      "usd": [
+       -1.0,
+       -0.5
+      ],
+      "fabric_local": [
+       0.0,
+       0.0
+      ],
+      "fabric_world_cache": [
+       0.0,
+       0.0
+      ],
+      "fabric_cuda_world": [
+       0.0,
+       0.0
+      ],
+      "tensor": null
+     }
+    },
+    {
+     "layers_before": {
+      "usd": [
+       -1.0,
+       -0.5
+      ],
+      "fabric_local": [
+       0.0,
+       0.0
+      ],
+      "fabric_world_cache": [
+       0.0,
+       0.0
+      ],
+      "fabric_cuda_world": [
+       0.0,
+       0.0
+      ],
+      "tensor": null
+     },
+     "rendered_xy": [
+      -0.085,
+      0.004
+     ],
+     "layers_after": {
+      "usd": [
+       -1.0,
+       -0.5
+      ],
+      "fabric_local": [
+       0.0,
+       0.0
+      ],
+      "fabric_world_cache": [
+       0.0,
+       0.0
+      ],
+      "fabric_cuda_world": [
+       0.0,
+       0.0
+      ],
+      "tensor": null
+     }
+    },
+    {
+     "layers_before": {
+      "usd": [
+       -1.0,
+       -0.5
+      ],
+      "fabric_local": [
+       0.0,
+       0.0
+      ],
+      "fabric_world_cache": [
+       0.0,
+       0.0
+      ],
+      "fabric_cuda_world": [
+       0.0,
+       0.0
+      ],
+      "tensor": null
+     },
+     "rendered_xy": [
+      -0.085,
+      0.004
+     ],
+     "layers_after": {
+      "usd": [
+       -1.0,
+       -0.5
+      ],
+      "fabric_local": [
+       0.0,
+       0.0
+      ],
+      "fabric_world_cache": [
+       0.0,
+       0.0
+      ],
+      "fabric_cuda_world": [
+       0.0,
+       0.0
+      ],
+      "tensor": null
+     }
+    },
+    {
+     "layers_before": {
+      "usd": [
+       -1.0,
+       -0.5
+      ],
+      "fabric_local": [
+       0.0,
+       0.0
+      ],
+      "fabric_world_cache": [
+       0.0,
+       0.0
+      ],
+      "fabric_cuda_world": [
+       0.0,
+       0.0
+      ],
+      "tensor": null
+     },
+     "rendered_xy": [
+      -0.088,
+      0.003
+     ],
+     "layers_after": {
+      "usd": [
+       -1.0,
+       -0.5
+      ],
+      "fabric_local": [
+       0.0,
+       0.0
+      ],
+      "fabric_world_cache": [
+       0.0,
+       0.0
+      ],
+      "fabric_cuda_world": [
+       0.0,
+       0.0
+      ],
+      "tensor": null
+     }
+    },
+    {
+     "layers_before": {
+      "usd": [
+       -1.0,
+       -0.5
+      ],
+      "fabric_local": [
+       0.0,
+       0.0
+      ],
+      "fabric_world_cache": [
+       0.0,
+       0.0
+      ],
+      "fabric_cuda_world": [
+       0.0,
+       0.0
+      ],
+      "tensor": null
+     },
+     "rendered_xy": [
+      -0.088,
+      0.003
+     ],
+     "layers_after": {
+      "usd": [
+       -1.0,
+       -0.5
+      ],
+      "fabric_local": [
+       0.0,
+       0.0
+      ],
+      "fabric_world_cache": [
+       0.0,
+       0.0
+      ],
+      "fabric_cuda_world": [
+       0.0,
+       0.0
+      ],
+      "tensor": null
+     }
+    },
+    {
+     "layers_before": {
+      "usd": [
+       -1.0,
+       -0.5
+      ],
+      "fabric_local": [
+       0.0,
+       0.0
+      ],
+      "fabric_world_cache": [
+       0.0,
+       0.0
+      ],
+      "fabric_cuda_world": [
+       0.0,
+       0.0
+      ],
+      "tensor": null
+     },
+     "rendered_xy": [
+      -0.085,
+      0.004
+     ],
+     "layers_after": {
+      "usd": [
+       -1.0,
+       -0.5
+      ],
+      "fabric_local": [
+       0.0,
+       0.0
+      ],
+      "fabric_world_cache": [
+       0.0,
+       0.0
+      ],
+      "fabric_cuda_world": [
+       0.0,
+       0.0
+      ],
+      "tensor": null
+     }
+    },
+    {
+     "layers_before": {
+      "usd": [
+       -1.0,
+       -0.5
+      ],
+      "fabric_local": [
+       0.0,
+       0.0
+      ],
+      "fabric_world_cache": [
+       0.0,
+       0.0
+      ],
+      "fabric_cuda_world": [
+       0.0,
+       0.0
+      ],
+      "tensor": null
+     },
+     "rendered_xy": [
+      -0.085,
+      0.004
+     ],
+     "layers_after": {
+      "usd": [
+       -1.0,
+       -0.5
+      ],
+      "fabric_local": [
+       0.0,
+       0.0
+      ],
+      "fabric_world_cache": [
+       0.0,
+       0.0
+      ],
+      "fabric_cuda_world": [
+       0.0,
+       0.0
+      ],
+      "tensor": null
+     }
+    }
+   ],
+   "trial1": [
+    {
+     "layers_before": {
+      "usd": [
+       -1.0,
+       -0.5
+      ],
+      "fabric_local": [
+       0.0,
+       0.0
+      ],
+      "fabric_world_cache": [
+       0.0,
+       0.0
+      ],
+      "fabric_cuda_world": [
+       0.0,
+       0.0
+      ],
+      "tensor": [
+       0.0,
+       0.0
+      ]
+     },
+     "rendered_xy": [
+      -0.006,
+      -0.017
+     ],
+     "layers_after": {
+      "usd": [
+       -1.0,
+       -0.5
+      ],
+      "fabric_local": [
+       0.0,
+       0.0
+      ],
+      "fabric_world_cache": [
+       0.0,
+       0.0
+      ],
+      "fabric_cuda_world": [
+       0.0,
+       0.0
+      ],
+      "tensor": null
+     }
+    },
+    {
+     "layers_before": {
+      "usd": [
+       -1.0,
+       -0.5
+      ],
+      "fabric_local": [
+       0.0,
+       0.0
+      ],
+      "fabric_world_cache": [
+       0.0,
+       0.0
+      ],
+      "fabric_cuda_world": [
+       0.0,
+       0.0
+      ],
+      "tensor": null
+     },
+     "rendered_xy": [
+      -0.006,
+      -0.017
+     ],
+     "layers_after": {
+      "usd": [
+       -1.0,
+       -0.5
+      ],
+      "fabric_local": [
+       0.0,
+       0.0
+      ],
+      "fabric_world_cache": [
+       0.0,
+       0.0
+      ],
+      "fabric_cuda_world": [
+       0.0,
+       0.0
+      ],
+      "tensor": null
+     }
+    },
+    {
+     "layers_before": {
+      "usd": [
+       -1.0,
+       -0.5
+      ],
+      "fabric_local": [
+       0.0,
+       0.0
+      ],
+      "fabric_world_cache": [
+       0.0,
+       0.0
+      ],
+      "fabric_cuda_world": [
+       0.0,
+       0.0
+      ],
+      "tensor": null
+     },
+     "rendered_xy": [
+      -0.085,
+      0.004
+     ],
+     "layers_after": {
+      "usd": [
+       -1.0,
+       -0.5
+      ],
+      "fabric_local": [
+       0.0,
+       0.0
+      ],
+      "fabric_world_cache": [
+       0.0,
+       0.0
+      ],
+      "fabric_cuda_world": [
+       0.0,
+       0.0
+      ],
+      "tensor": null
+     }
+    },
+    {
+     "layers_before": {
+      "usd": [
+       -1.0,
+       -0.5
+      ],
+      "fabric_local": [
+       0.0,
+       0.0
+      ],
+      "fabric_world_cache": [
+       0.0,
+       0.0
+      ],
+      "fabric_cuda_world": [
+       0.0,
+       0.0
+      ],
+      "tensor": null
+     },
+     "rendered_xy": [
+      -0.085,
+      0.004
+     ],
+     "layers_after": {
+      "usd": [
+       -1.0,
+       -0.5
+      ],
+      "fabric_local": [
+       0.0,
+       0.0
+      ],
+      "fabric_world_cache": [
+       0.0,
+       0.0
+      ],
+      "fabric_cuda_world": [
+       0.0,
+       0.0
+      ],
+      "tensor": null
+     }
+    },
+    {
+     "layers_before": {
+      "usd": [
+       -1.0,
+       -0.5
+      ],
+      "fabric_local": [
+       0.0,
+       0.0
+      ],
+      "fabric_world_cache": [
+       0.0,
+       0.0
+      ],
+      "fabric_cuda_world": [
+       0.0,
+       0.0
+      ],
+      "tensor": null
+     },
+     "rendered_xy": [
+      -0.088,
+      0.003
+     ],
+     "layers_after": {
+      "usd": [
+       -1.0,
+       -0.5
+      ],
+      "fabric_local": [
+       0.0,
+       0.0
+      ],
+      "fabric_world_cache": [
+       0.0,
+       0.0
+      ],
+      "fabric_cuda_world": [
+       0.0,
+       0.0
+      ],
+      "tensor": null
+     }
+    },
+    {
+     "layers_before": {
+      "usd": [
+       -1.0,
+       -0.5
+      ],
+      "fabric_local": [
+       0.0,
+       0.0
+      ],
+      "fabric_world_cache": [
+       0.0,
+       0.0
+      ],
+      "fabric_cuda_world": [
+       0.0,
+       0.0
+      ],
+      "tensor": null
+     },
+     "rendered_xy": [
+      -0.088,
+      0.003
+     ],
+     "layers_after": {
+      "usd": [
+       -1.0,
+       -0.5
+      ],
+      "fabric_local": [
+       0.0,
+       0.0
+      ],
+      "fabric_world_cache": [
+       0.0,
+       0.0
+      ],
+      "fabric_cuda_world": [
+       0.0,
+       0.0
+      ],
+      "tensor": null
+     }
+    },
+    {
+     "layers_before": {
+      "usd": [
+       -1.0,
+       -0.5
+      ],
+      "fabric_local": [
+       0.0,
+       0.0
+      ],
+      "fabric_world_cache": [
+       0.0,
+       0.0
+      ],
+      "fabric_cuda_world": [
+       0.0,
+       0.0
+      ],
+      "tensor": null
+     },
+     "rendered_xy": [
+      -0.085,
+      0.004
+     ],
+     "layers_after": {
+      "usd": [
+       -1.0,
+       -0.5
+      ],
+      "fabric_local": [
+       0.0,
+       0.0
+      ],
+      "fabric_world_cache": [
+       0.0,
+       0.0
+      ],
+      "fabric_cuda_world": [
+       0.0,
+       0.0
+      ],
+      "tensor": null
+     }
+    },
+    {
+     "layers_before": {
+      "usd": [
+       -1.0,
+       -0.5
+      ],
+      "fabric_local": [
+       0.0,
+       0.0
+      ],
+      "fabric_world_cache": [
+       0.0,
+       0.0
+      ],
+      "fabric_cuda_world": [
+       0.0,
+       0.0
+      ],
+      "tensor": null
+     },
+     "rendered_xy": [
+      -0.085,
+      0.004
+     ],
+     "layers_after": {
+      "usd": [
+       -1.0,
+       -0.5
+      ],
+      "fabric_local": [
+       0.0,
+       0.0
+      ],
+      "fabric_world_cache": [
+       0.0,
+       0.0
+      ],
+      "fabric_cuda_world": [
+       0.0,
+       0.0
+      ],
+      "tensor": null
+     }
+    }
+   ],
+   "trial2": [
+    {
+     "layers_before": {
+      "usd": [
+       -1.0,
+       -0.5
+      ],
+      "fabric_local": [
+       0.0,
+       0.0
+      ],
+      "fabric_world_cache": [
+       0.0,
+       0.0
+      ],
+      "fabric_cuda_world": [
+       0.0,
+       0.0
+      ],
+      "tensor": [
+       0.0,
+       0.0
+      ]
+     },
+     "rendered_xy": [
+      -0.006,
+      -0.017
+     ],
+     "layers_after": {
+      "usd": [
+       -1.0,
+       -0.5
+      ],
+      "fabric_local": [
+       0.0,
+       0.0
+      ],
+      "fabric_world_cache": [
+       0.0,
+       0.0
+      ],
+      "fabric_cuda_world": [
+       0.0,
+       0.0
+      ],
+      "tensor": null
+     }
+    },
+    {
+     "layers_before": {
+      "usd": [
+       -1.0,
+       -0.5
+      ],
+      "fabric_local": [
+       0.0,
+       0.0
+      ],
+      "fabric_world_cache": [
+       0.0,
+       0.0
+      ],
+      "fabric_cuda_world": [
+       0.0,
+       0.0
+      ],
+      "tensor": null
+     },
+     "rendered_xy": [
+      -0.006,
+      -0.017
+     ],
+     "layers_after": {
+      "usd": [
+       -1.0,
+       -0.5
+      ],
+      "fabric_local": [
+       0.0,
+       0.0
+      ],
+      "fabric_world_cache": [
+       0.0,
+       0.0
+      ],
+      "fabric_cuda_world": [
+       0.0,
+       0.0
+      ],
+      "tensor": null
+     }
+    },
+    {
+     "layers_before": {
+      "usd": [
+       -1.0,
+       -0.5
+      ],
+      "fabric_local": [
+       0.0,
+       0.0
+      ],
+      "fabric_world_cache": [
+       0.0,
+       0.0
+      ],
+      "fabric_cuda_world": [
+       0.0,
+       0.0
+      ],
+      "tensor": null
+     },
+     "rendered_xy": [
+      -0.085,
+      0.004
+     ],
+     "layers_after": {
+      "usd": [
+       -1.0,
+       -0.5
+      ],
+      "fabric_local": [
+       0.0,
+       0.0
+      ],
+      "fabric_world_cache": [
+       0.0,
+       0.0
+      ],
+      "fabric_cuda_world": [
+       0.0,
+       0.0
+      ],
+      "tensor": null
+     }
+    },
+    {
+     "layers_before": {
+      "usd": [
+       -1.0,
+       -0.5
+      ],
+      "fabric_local": [
+       0.0,
+       0.0
+      ],
+      "fabric_world_cache": [
+       0.0,
+       0.0
+      ],
+      "fabric_cuda_world": [
+       0.0,
+       0.0
+      ],
+      "tensor": null
+     },
+     "rendered_xy": [
+      -0.085,
+      0.004
+     ],
+     "layers_after": {
+      "usd": [
+       -1.0,
+       -0.5
+      ],
+      "fabric_local": [
+       0.0,
+       0.0
+      ],
+      "fabric_world_cache": [
+       0.0,
+       0.0
+      ],
+      "fabric_cuda_world": [
+       0.0,
+       0.0
+      ],
+      "tensor": null
+     }
+    },
+    {
+     "layers_before": {
+      "usd": [
+       -1.0,
+       -0.5
+      ],
+      "fabric_local": [
+       0.0,
+       0.0
+      ],
+      "fabric_world_cache": [
+       0.0,
+       0.0
+      ],
+      "fabric_cuda_world": [
+       0.0,
+       0.0
+      ],
+      "tensor": null
+     },
+     "rendered_xy": [
+      -0.088,
+      0.003
+     ],
+     "layers_after": {
+      "usd": [
+       -1.0,
+       -0.5
+      ],
+      "fabric_local": [
+       0.0,
+       0.0
+      ],
+      "fabric_world_cache": [
+       0.0,
+       0.0
+      ],
+      "fabric_cuda_world": [
+       0.0,
+       0.0
+      ],
+      "tensor": null
+     }
+    },
+    {
+     "layers_before": {
+      "usd": [
+       -1.0,
+       -0.5
+      ],
+      "fabric_local": [
+       0.0,
+       0.0
+      ],
+      "fabric_world_cache": [
+       0.0,
+       0.0
+      ],
+      "fabric_cuda_world": [
+       0.0,
+       0.0
+      ],
+      "tensor": null
+     },
+     "rendered_xy": [
+      -0.088,
+      0.003
+     ],
+     "layers_after": {
+      "usd": [
+       -1.0,
+       -0.5
+      ],
+      "fabric_local": [
+       0.0,
+       0.0
+      ],
+      "fabric_world_cache": [
+       0.0,
+       0.0
+      ],
+      "fabric_cuda_world": [
+       0.0,
+       0.0
+      ],
+      "tensor": null
+     }
+    },
+    {
+     "layers_before": {
+      "usd": [
+       -1.0,
+       -0.5
+      ],
+      "fabric_local": [
+       0.0,
+       0.0
+      ],
+      "fabric_world_cache": [
+       0.0,
+       0.0
+      ],
+      "fabric_cuda_world": [
+       0.0,
+       0.0
+      ],
+      "tensor": null
+     },
+     "rendered_xy": [
+      -0.085,
+      0.004
+     ],
+     "layers_after": {
+      "usd": [
+       -1.0,
+       -0.5
+      ],
+      "fabric_local": [
+       0.0,
+       0.0
+      ],
+      "fabric_world_cache": [
+       0.0,
+       0.0
+      ],
+      "fabric_cuda_world": [
+       0.0,
+       0.0
+      ],
+      "tensor": null
+     }
+    },
+    {
+     "layers_before": {
+      "usd": [
+       -1.0,
+       -0.5
+      ],
+      "fabric_local": [
+       0.0,
+       0.0
+      ],
+      "fabric_world_cache": [
+       0.0,
+       0.0
+      ],
+      "fabric_cuda_world": [
+       0.0,
+       0.0
+      ],
+      "tensor": null
+     },
+     "rendered_xy": [
+      -0.085,
+      0.004
+     ],
+     "layers_after": {
+      "usd": [
+       -1.0,
+       -0.5
+      ],
+      "fabric_local": [
+       0.0,
+       0.0
+      ],
+      "fabric_world_cache": [
+       0.0,
+       0.0
+      ],
+      "fabric_cuda_world": [
+       0.0,
+       0.0
+      ],
+      "tensor": null
+     }
+    }
+   ]
+  }
+ ]
+}

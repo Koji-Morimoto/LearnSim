@@ -1,0 +1,4104 @@
+{
+ "group": "d01_deformable__gpu",
+ "items": [
+  {
+   "id": "D-00",
+   "description": "バージョンと設定",
+   "omni.physx": "omni.physx-110.4.4",
+   "omni.physx.fabric": "omni.physx.fabric-110.4.4",
+   "omni.physics.tensors": "omni.physics.tensors-110.4.4",
+   "usdrt.scenegraph": "usdrt.scenegraph-7.6.3",
+   "omni.hydra.usdrt_delegate": "omni.hydra.usdrt_delegate-7.5.2",
+   "isaacsim.core.experimental.prims": "isaacsim.core.experimental.prims-1.12.1",
+   "isaacsim.core.experimental.utils": "isaacsim.core.experimental.utils-0.23.3",
+   "isaacsim.core.simulation_manager": "isaacsim.core.simulation_manager-1.17.4",
+   "isaac_sim_VERSION": "6.2.0-rc.14+release.52805.02189a84.gl",
+   "/app/useFabricSceneDelegate": true,
+   "/physics/resetOnStop": true,
+   "/physics/updateToUsd": false,
+   "/physics/updateVelocitiesToUsd": false,
+   "/physics/fabricEnabled": true,
+   "/physics/suppressReadback": true,
+   "/physics/cudaDevice": 0,
+   "config": "gpu",
+   "simulation_device": "cuda:0"
+  },
+  {
+   "id": "D/stopped/set_world_poses/(既定)",
+   "description": "開始=stopped メソッド=set_world_poses use_backend=None",
+   "0_before": {
+    "timeline": "stopped",
+    "usd": {
+     "world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "fabric": {
+     "world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "tensor": {
+     "valid": false
+    }
+   },
+   "call": {
+    "touched": [
+     "USD(pxr)"
+    ],
+    "warnings": [],
+    "error": null
+   },
+   "1_after_call": {
+    "timeline": "stopped",
+    "usd": {
+     "world": [
+      1.0,
+      2.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "fabric": {
+     "world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "tensor": {
+     "valid": false
+    }
+   },
+   "2_after_update1": {
+    "timeline": "stopped",
+    "usd": {
+     "world": [
+      1.0,
+      2.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "fabric": {
+     "world": [
+      1.0,
+      2.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "tensor": {
+     "valid": false
+    }
+   },
+   "3_toggled_play_update1": {
+    "timeline": "playing",
+    "usd": {
+     "world": [
+      1.0,
+      2.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "fabric": {
+     "world": [
+      1.0,
+      2.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "tensor": {
+     "valid": true,
+     "nodes_mean_world": [
+      1.0,
+      2.0,
+      3.0
+     ],
+     "nodes_vel_mean": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    }
+   },
+   "4_play_update10": {
+    "timeline": "playing",
+    "usd": {
+     "world": [
+      1.0,
+      2.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "fabric": {
+     "world": [
+      1.0,
+      2.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "tensor": {
+     "valid": true,
+     "nodes_mean_world": [
+      1.0,
+      2.0,
+      3.0
+     ],
+     "nodes_vel_mean": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    }
+   },
+   "5_stopped_again": {
+    "timeline": "stopped",
+    "usd": {
+     "world": [
+      1.0,
+      2.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "fabric": {
+     "world": [
+      1.0,
+      2.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "tensor": {
+     "valid": false
+    }
+   }
+  },
+  {
+   "id": "D/stopped/set_world_poses/tensor",
+   "description": "開始=stopped メソッド=set_world_poses use_backend=tensor",
+   "0_before": {
+    "timeline": "stopped",
+    "usd": {
+     "world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "fabric": {
+     "world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "tensor": {
+     "valid": false
+    }
+   },
+   "call": {
+    "touched": [
+     "USD(pxr)"
+    ],
+    "warnings": [
+     "WARN: Unsupported backend: 'tensor'. Falling back to 'usd' backend."
+    ],
+    "error": null
+   },
+   "1_after_call": {
+    "timeline": "stopped",
+    "usd": {
+     "world": [
+      1.0,
+      2.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "fabric": {
+     "world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "tensor": {
+     "valid": false
+    }
+   },
+   "2_after_update1": {
+    "timeline": "stopped",
+    "usd": {
+     "world": [
+      1.0,
+      2.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "fabric": {
+     "world": [
+      1.0,
+      2.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "tensor": {
+     "valid": false
+    }
+   },
+   "3_toggled_play_update1": {
+    "timeline": "playing",
+    "usd": {
+     "world": [
+      1.0,
+      2.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "fabric": {
+     "world": [
+      1.0,
+      2.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "tensor": {
+     "valid": true,
+     "nodes_mean_world": [
+      1.0,
+      2.0,
+      3.0
+     ],
+     "nodes_vel_mean": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    }
+   },
+   "4_play_update10": {
+    "timeline": "playing",
+    "usd": {
+     "world": [
+      1.0,
+      2.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "fabric": {
+     "world": [
+      1.0,
+      2.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "tensor": {
+     "valid": true,
+     "nodes_mean_world": [
+      1.0,
+      2.0,
+      3.0
+     ],
+     "nodes_vel_mean": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    }
+   },
+   "5_stopped_again": {
+    "timeline": "stopped",
+    "usd": {
+     "world": [
+      1.0,
+      2.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "fabric": {
+     "world": [
+      1.0,
+      2.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "tensor": {
+     "valid": false
+    }
+   }
+  },
+  {
+   "id": "D/stopped/set_world_poses/usd",
+   "description": "開始=stopped メソッド=set_world_poses use_backend=usd",
+   "0_before": {
+    "timeline": "stopped",
+    "usd": {
+     "world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "fabric": {
+     "world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "tensor": {
+     "valid": false
+    }
+   },
+   "call": {
+    "touched": [
+     "USD(pxr)"
+    ],
+    "warnings": [],
+    "error": null
+   },
+   "1_after_call": {
+    "timeline": "stopped",
+    "usd": {
+     "world": [
+      1.0,
+      2.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "fabric": {
+     "world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "tensor": {
+     "valid": false
+    }
+   },
+   "2_after_update1": {
+    "timeline": "stopped",
+    "usd": {
+     "world": [
+      1.0,
+      2.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "fabric": {
+     "world": [
+      1.0,
+      2.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "tensor": {
+     "valid": false
+    }
+   },
+   "3_toggled_play_update1": {
+    "timeline": "playing",
+    "usd": {
+     "world": [
+      1.0,
+      2.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "fabric": {
+     "world": [
+      1.0,
+      2.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "tensor": {
+     "valid": true,
+     "nodes_mean_world": [
+      1.0,
+      2.0,
+      3.0
+     ],
+     "nodes_vel_mean": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    }
+   },
+   "4_play_update10": {
+    "timeline": "playing",
+    "usd": {
+     "world": [
+      1.0,
+      2.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "fabric": {
+     "world": [
+      1.0,
+      2.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "tensor": {
+     "valid": true,
+     "nodes_mean_world": [
+      1.0,
+      2.0,
+      3.0
+     ],
+     "nodes_vel_mean": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    }
+   },
+   "5_stopped_again": {
+    "timeline": "stopped",
+    "usd": {
+     "world": [
+      1.0,
+      2.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "fabric": {
+     "world": [
+      1.0,
+      2.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "tensor": {
+     "valid": false
+    }
+   }
+  },
+  {
+   "id": "D/stopped/set_world_poses/usdrt",
+   "description": "開始=stopped メソッド=set_world_poses use_backend=usdrt",
+   "0_before": {
+    "timeline": "stopped",
+    "usd": {
+     "world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "fabric": {
+     "world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "tensor": {
+     "valid": false
+    }
+   },
+   "call": {
+    "touched": [
+     "USDRT(usdrt)"
+    ],
+    "warnings": [],
+    "error": null
+   },
+   "1_after_call": {
+    "timeline": "stopped",
+    "usd": {
+     "world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "fabric": {
+     "world": [
+      1.0,
+      2.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "tensor": {
+     "valid": false
+    }
+   },
+   "2_after_update1": {
+    "timeline": "stopped",
+    "usd": {
+     "world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "fabric": {
+     "world": [
+      1.0,
+      2.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "tensor": {
+     "valid": false
+    }
+   },
+   "3_toggled_play_update1": {
+    "timeline": "playing",
+    "usd": {
+     "world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "fabric": {
+     "world": [
+      1.0,
+      2.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "tensor": {
+     "valid": true,
+     "nodes_mean_world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "nodes_vel_mean": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    }
+   },
+   "4_play_update10": {
+    "timeline": "playing",
+    "usd": {
+     "world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "fabric": {
+     "world": [
+      1.0,
+      2.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "tensor": {
+     "valid": true,
+     "nodes_mean_world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "nodes_vel_mean": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    }
+   },
+   "5_stopped_again": {
+    "timeline": "stopped",
+    "usd": {
+     "world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "fabric": {
+     "world": [
+      1.0,
+      2.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "tensor": {
+     "valid": false
+    }
+   }
+  },
+  {
+   "id": "D/stopped/set_world_poses/fabric",
+   "description": "開始=stopped メソッド=set_world_poses use_backend=fabric",
+   "0_before": {
+    "timeline": "stopped",
+    "usd": {
+     "world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "fabric": {
+     "world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "tensor": {
+     "valid": false
+    }
+   },
+   "call": {
+    "touched": [
+     "USDRT(usdrt)"
+    ],
+    "warnings": [],
+    "error": null
+   },
+   "1_after_call": {
+    "timeline": "stopped",
+    "usd": {
+     "world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "fabric": {
+     "world": [
+      1.0,
+      2.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "tensor": {
+     "valid": false
+    }
+   },
+   "2_after_update1": {
+    "timeline": "stopped",
+    "usd": {
+     "world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "fabric": {
+     "world": [
+      1.0,
+      2.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "tensor": {
+     "valid": false
+    }
+   },
+   "3_toggled_play_update1": {
+    "timeline": "playing",
+    "usd": {
+     "world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "fabric": {
+     "world": [
+      1.0,
+      2.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "tensor": {
+     "valid": true,
+     "nodes_mean_world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "nodes_vel_mean": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    }
+   },
+   "4_play_update10": {
+    "timeline": "playing",
+    "usd": {
+     "world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "fabric": {
+     "world": [
+      1.0,
+      2.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "tensor": {
+     "valid": true,
+     "nodes_mean_world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "nodes_vel_mean": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    }
+   },
+   "5_stopped_again": {
+    "timeline": "stopped",
+    "usd": {
+     "world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "fabric": {
+     "world": [
+      1.0,
+      2.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "tensor": {
+     "valid": false
+    }
+   }
+  },
+  {
+   "id": "D/stopped/set_nodal_positions/(既定)",
+   "description": "開始=stopped メソッド=set_nodal_positions use_backend=None",
+   "0_before": {
+    "timeline": "stopped",
+    "usd": {
+     "world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "fabric": {
+     "world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "tensor": {
+     "valid": false
+    }
+   },
+   "call": {
+    "touched": [],
+    "warnings": [],
+    "error": "AssertionError: Instance's physics tensor entity is not valid. Play the simulation/timeline to re-initialize it"
+   },
+   "1_after_call": {
+    "timeline": "stopped",
+    "usd": {
+     "world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "fabric": {
+     "world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "tensor": {
+     "valid": false
+    }
+   },
+   "2_after_update1": {
+    "timeline": "stopped",
+    "usd": {
+     "world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "fabric": {
+     "world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "tensor": {
+     "valid": false
+    }
+   },
+   "3_toggled_play_update1": {
+    "timeline": "playing",
+    "usd": {
+     "world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "fabric": {
+     "world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "tensor": {
+     "valid": true,
+     "nodes_mean_world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "nodes_vel_mean": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    }
+   },
+   "4_play_update10": {
+    "timeline": "playing",
+    "usd": {
+     "world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "fabric": {
+     "world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "tensor": {
+     "valid": true,
+     "nodes_mean_world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "nodes_vel_mean": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    }
+   },
+   "5_stopped_again": {
+    "timeline": "stopped",
+    "usd": {
+     "world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "fabric": {
+     "world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "tensor": {
+     "valid": false
+    }
+   }
+  },
+  {
+   "id": "D/stopped/set_nodal_positions/usd",
+   "description": "開始=stopped メソッド=set_nodal_positions use_backend=usd",
+   "0_before": {
+    "timeline": "stopped",
+    "usd": {
+     "world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "fabric": {
+     "world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "tensor": {
+     "valid": false
+    }
+   },
+   "call": {
+    "touched": [],
+    "warnings": [],
+    "error": "AssertionError: Instance's physics tensor entity is not valid. Play the simulation/timeline to re-initialize it"
+   },
+   "1_after_call": {
+    "timeline": "stopped",
+    "usd": {
+     "world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "fabric": {
+     "world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "tensor": {
+     "valid": false
+    }
+   },
+   "2_after_update1": {
+    "timeline": "stopped",
+    "usd": {
+     "world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "fabric": {
+     "world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "tensor": {
+     "valid": false
+    }
+   },
+   "3_toggled_play_update1": {
+    "timeline": "playing",
+    "usd": {
+     "world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "fabric": {
+     "world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "tensor": {
+     "valid": true,
+     "nodes_mean_world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "nodes_vel_mean": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    }
+   },
+   "4_play_update10": {
+    "timeline": "playing",
+    "usd": {
+     "world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "fabric": {
+     "world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "tensor": {
+     "valid": true,
+     "nodes_mean_world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "nodes_vel_mean": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    }
+   },
+   "5_stopped_again": {
+    "timeline": "stopped",
+    "usd": {
+     "world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "fabric": {
+     "world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "tensor": {
+     "valid": false
+    }
+   }
+  },
+  {
+   "id": "D/stopped/set_nodal_velocities/(既定)",
+   "description": "開始=stopped メソッド=set_nodal_velocities use_backend=None",
+   "0_before": {
+    "timeline": "stopped",
+    "usd": {
+     "world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "fabric": {
+     "world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "tensor": {
+     "valid": false
+    }
+   },
+   "call": {
+    "touched": [
+     "USD(pxr)"
+    ],
+    "warnings": [],
+    "error": "AssertionError: Instance's physics tensor entity is not valid. Play the simulation/timeline to re-initialize it"
+   },
+   "1_after_call": {
+    "timeline": "stopped",
+    "usd": {
+     "world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "fabric": {
+     "world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "tensor": {
+     "valid": false
+    }
+   },
+   "2_after_update1": {
+    "timeline": "stopped",
+    "usd": {
+     "world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "fabric": {
+     "world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "tensor": {
+     "valid": false
+    }
+   },
+   "3_toggled_play_update1": {
+    "timeline": "playing",
+    "usd": {
+     "world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "fabric": {
+     "world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "tensor": {
+     "valid": true,
+     "nodes_mean_world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "nodes_vel_mean": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    }
+   },
+   "4_play_update10": {
+    "timeline": "playing",
+    "usd": {
+     "world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "fabric": {
+     "world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "tensor": {
+     "valid": true,
+     "nodes_mean_world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "nodes_vel_mean": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    }
+   },
+   "5_stopped_again": {
+    "timeline": "stopped",
+    "usd": {
+     "world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "fabric": {
+     "world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "tensor": {
+     "valid": false
+    }
+   }
+  },
+  {
+   "id": "D/stopped/set_nodal_velocities/usd",
+   "description": "開始=stopped メソッド=set_nodal_velocities use_backend=usd",
+   "0_before": {
+    "timeline": "stopped",
+    "usd": {
+     "world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "fabric": {
+     "world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "tensor": {
+     "valid": false
+    }
+   },
+   "call": {
+    "touched": [
+     "USD(pxr)"
+    ],
+    "warnings": [],
+    "error": "AssertionError: Instance's physics tensor entity is not valid. Play the simulation/timeline to re-initialize it"
+   },
+   "1_after_call": {
+    "timeline": "stopped",
+    "usd": {
+     "world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "fabric": {
+     "world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "tensor": {
+     "valid": false
+    }
+   },
+   "2_after_update1": {
+    "timeline": "stopped",
+    "usd": {
+     "world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "fabric": {
+     "world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "tensor": {
+     "valid": false
+    }
+   },
+   "3_toggled_play_update1": {
+    "timeline": "playing",
+    "usd": {
+     "world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "fabric": {
+     "world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "tensor": {
+     "valid": true,
+     "nodes_mean_world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "nodes_vel_mean": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    }
+   },
+   "4_play_update10": {
+    "timeline": "playing",
+    "usd": {
+     "world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "fabric": {
+     "world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "tensor": {
+     "valid": true,
+     "nodes_mean_world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "nodes_vel_mean": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    }
+   },
+   "5_stopped_again": {
+    "timeline": "stopped",
+    "usd": {
+     "world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "fabric": {
+     "world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "tensor": {
+     "valid": false
+    }
+   }
+  },
+  {
+   "id": "D/playing/set_world_poses/(既定)",
+   "description": "開始=playing メソッド=set_world_poses use_backend=None",
+   "0_before": {
+    "timeline": "playing",
+    "usd": {
+     "world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "fabric": {
+     "world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "tensor": {
+     "valid": true,
+     "nodes_mean_world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "nodes_vel_mean": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    }
+   },
+   "call": {
+    "touched": [
+     "USD(pxr)"
+    ],
+    "warnings": [],
+    "error": null
+   },
+   "1_after_call": {
+    "timeline": "playing",
+    "usd": {
+     "world": [
+      1.0,
+      2.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "fabric": {
+     "world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "tensor": {
+     "valid": false
+    }
+   },
+   "2_after_update1": {
+    "timeline": "playing",
+    "usd": {
+     "world": [
+      1.0,
+      2.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "fabric": {
+     "world": [
+      1.0,
+      2.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "tensor": {
+     "valid": false
+    }
+   },
+   "3_toggled_stop": {
+    "timeline": "stopped",
+    "usd": {
+     "world": [
+      1.0,
+      2.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "fabric": {
+     "world": [
+      1.0,
+      2.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "tensor": {
+     "valid": false
+    }
+   },
+   "4_replay_update1": {
+    "timeline": "playing",
+    "usd": {
+     "world": [
+      1.0,
+      2.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "fabric": {
+     "world": [
+      1.0,
+      2.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "tensor": {
+     "valid": true,
+     "nodes_mean_world": [
+      1.0,
+      2.0,
+      3.0
+     ],
+     "nodes_vel_mean": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    }
+   },
+   "5_replay_update10": {
+    "timeline": "playing",
+    "usd": {
+     "world": [
+      1.0,
+      2.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "fabric": {
+     "world": [
+      1.0,
+      2.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "tensor": {
+     "valid": true,
+     "nodes_mean_world": [
+      1.0,
+      2.0,
+      3.0
+     ],
+     "nodes_vel_mean": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    }
+   }
+  },
+  {
+   "id": "D/playing/set_world_poses/tensor",
+   "description": "開始=playing メソッド=set_world_poses use_backend=tensor",
+   "0_before": {
+    "timeline": "playing",
+    "usd": {
+     "world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "fabric": {
+     "world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "tensor": {
+     "valid": true,
+     "nodes_mean_world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "nodes_vel_mean": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    }
+   },
+   "call": {
+    "touched": [
+     "USD(pxr)"
+    ],
+    "warnings": [
+     "WARN: Unsupported backend: 'tensor'. Falling back to 'usd' backend."
+    ],
+    "error": null
+   },
+   "1_after_call": {
+    "timeline": "playing",
+    "usd": {
+     "world": [
+      1.0,
+      2.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "fabric": {
+     "world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "tensor": {
+     "valid": false
+    }
+   },
+   "2_after_update1": {
+    "timeline": "playing",
+    "usd": {
+     "world": [
+      1.0,
+      2.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "fabric": {
+     "world": [
+      1.0,
+      2.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "tensor": {
+     "valid": false
+    }
+   },
+   "3_toggled_stop": {
+    "timeline": "stopped",
+    "usd": {
+     "world": [
+      1.0,
+      2.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "fabric": {
+     "world": [
+      1.0,
+      2.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "tensor": {
+     "valid": false
+    }
+   },
+   "4_replay_update1": {
+    "timeline": "playing",
+    "usd": {
+     "world": [
+      1.0,
+      2.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "fabric": {
+     "world": [
+      1.0,
+      2.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "tensor": {
+     "valid": true,
+     "nodes_mean_world": [
+      1.0,
+      2.0,
+      3.0
+     ],
+     "nodes_vel_mean": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    }
+   },
+   "5_replay_update10": {
+    "timeline": "playing",
+    "usd": {
+     "world": [
+      1.0,
+      2.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "fabric": {
+     "world": [
+      1.0,
+      2.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "tensor": {
+     "valid": true,
+     "nodes_mean_world": [
+      1.0,
+      2.0,
+      3.0
+     ],
+     "nodes_vel_mean": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    }
+   }
+  },
+  {
+   "id": "D/playing/set_world_poses/usd",
+   "description": "開始=playing メソッド=set_world_poses use_backend=usd",
+   "0_before": {
+    "timeline": "playing",
+    "usd": {
+     "world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "fabric": {
+     "world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "tensor": {
+     "valid": true,
+     "nodes_mean_world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "nodes_vel_mean": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    }
+   },
+   "call": {
+    "touched": [
+     "USD(pxr)"
+    ],
+    "warnings": [],
+    "error": null
+   },
+   "1_after_call": {
+    "timeline": "playing",
+    "usd": {
+     "world": [
+      1.0,
+      2.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "fabric": {
+     "world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "tensor": {
+     "valid": false
+    }
+   },
+   "2_after_update1": {
+    "timeline": "playing",
+    "usd": {
+     "world": [
+      1.0,
+      2.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "fabric": {
+     "world": [
+      1.0,
+      2.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "tensor": {
+     "valid": false
+    }
+   },
+   "3_toggled_stop": {
+    "timeline": "stopped",
+    "usd": {
+     "world": [
+      1.0,
+      2.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "fabric": {
+     "world": [
+      1.0,
+      2.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "tensor": {
+     "valid": false
+    }
+   },
+   "4_replay_update1": {
+    "timeline": "playing",
+    "usd": {
+     "world": [
+      1.0,
+      2.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "fabric": {
+     "world": [
+      1.0,
+      2.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "tensor": {
+     "valid": true,
+     "nodes_mean_world": [
+      1.0,
+      2.0,
+      3.0
+     ],
+     "nodes_vel_mean": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    }
+   },
+   "5_replay_update10": {
+    "timeline": "playing",
+    "usd": {
+     "world": [
+      1.0,
+      2.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "fabric": {
+     "world": [
+      1.0,
+      2.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "tensor": {
+     "valid": true,
+     "nodes_mean_world": [
+      1.0,
+      2.0,
+      3.0
+     ],
+     "nodes_vel_mean": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    }
+   }
+  },
+  {
+   "id": "D/playing/set_world_poses/usdrt",
+   "description": "開始=playing メソッド=set_world_poses use_backend=usdrt",
+   "0_before": {
+    "timeline": "playing",
+    "usd": {
+     "world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "fabric": {
+     "world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "tensor": {
+     "valid": true,
+     "nodes_mean_world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "nodes_vel_mean": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    }
+   },
+   "call": {
+    "touched": [
+     "USDRT(usdrt)"
+    ],
+    "warnings": [],
+    "error": null
+   },
+   "1_after_call": {
+    "timeline": "playing",
+    "usd": {
+     "world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "fabric": {
+     "world": [
+      1.0,
+      2.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "tensor": {
+     "valid": true,
+     "nodes_mean_world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "nodes_vel_mean": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    }
+   },
+   "2_after_update1": {
+    "timeline": "playing",
+    "usd": {
+     "world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "fabric": {
+     "world": [
+      1.0,
+      2.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "tensor": {
+     "valid": true,
+     "nodes_mean_world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "nodes_vel_mean": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    }
+   },
+   "3_toggled_stop": {
+    "timeline": "stopped",
+    "usd": {
+     "world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "fabric": {
+     "world": [
+      1.0,
+      2.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "tensor": {
+     "valid": false
+    }
+   },
+   "4_replay_update1": {
+    "timeline": "playing",
+    "usd": {
+     "world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "fabric": {
+     "world": [
+      1.0,
+      2.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "tensor": {
+     "valid": true,
+     "nodes_mean_world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "nodes_vel_mean": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    }
+   },
+   "5_replay_update10": {
+    "timeline": "playing",
+    "usd": {
+     "world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "fabric": {
+     "world": [
+      1.0,
+      2.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "tensor": {
+     "valid": true,
+     "nodes_mean_world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "nodes_vel_mean": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    }
+   }
+  },
+  {
+   "id": "D/playing/set_world_poses/fabric",
+   "description": "開始=playing メソッド=set_world_poses use_backend=fabric",
+   "0_before": {
+    "timeline": "playing",
+    "usd": {
+     "world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "fabric": {
+     "world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "tensor": {
+     "valid": true,
+     "nodes_mean_world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "nodes_vel_mean": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    }
+   },
+   "call": {
+    "touched": [
+     "USDRT(usdrt)"
+    ],
+    "warnings": [],
+    "error": null
+   },
+   "1_after_call": {
+    "timeline": "playing",
+    "usd": {
+     "world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "fabric": {
+     "world": [
+      1.0,
+      2.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "tensor": {
+     "valid": true,
+     "nodes_mean_world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "nodes_vel_mean": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    }
+   },
+   "2_after_update1": {
+    "timeline": "playing",
+    "usd": {
+     "world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "fabric": {
+     "world": [
+      1.0,
+      2.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "tensor": {
+     "valid": true,
+     "nodes_mean_world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "nodes_vel_mean": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    }
+   },
+   "3_toggled_stop": {
+    "timeline": "stopped",
+    "usd": {
+     "world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "fabric": {
+     "world": [
+      1.0,
+      2.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "tensor": {
+     "valid": false
+    }
+   },
+   "4_replay_update1": {
+    "timeline": "playing",
+    "usd": {
+     "world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "fabric": {
+     "world": [
+      1.0,
+      2.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "tensor": {
+     "valid": true,
+     "nodes_mean_world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "nodes_vel_mean": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    }
+   },
+   "5_replay_update10": {
+    "timeline": "playing",
+    "usd": {
+     "world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "fabric": {
+     "world": [
+      1.0,
+      2.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "tensor": {
+     "valid": true,
+     "nodes_mean_world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "nodes_vel_mean": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    }
+   }
+  },
+  {
+   "id": "D/playing/set_nodal_positions/(既定)",
+   "description": "開始=playing メソッド=set_nodal_positions use_backend=None",
+   "0_before": {
+    "timeline": "playing",
+    "usd": {
+     "world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "fabric": {
+     "world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "tensor": {
+     "valid": true,
+     "nodes_mean_world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "nodes_vel_mean": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    }
+   },
+   "call": {
+    "touched": [
+     "tensor(omni.physics.tensors)"
+    ],
+    "warnings": [],
+    "error": null
+   },
+   "1_after_call": {
+    "timeline": "playing",
+    "usd": {
+     "world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "fabric": {
+     "world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "tensor": {
+     "valid": true,
+     "nodes_mean_world": [
+      0.5,
+      0.0,
+      3.0
+     ],
+     "nodes_vel_mean": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    }
+   },
+   "2_after_update1": {
+    "timeline": "playing",
+    "usd": {
+     "world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "fabric": {
+     "world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.5,
+      0.0,
+      0.0
+     ]
+    },
+    "tensor": {
+     "valid": true,
+     "nodes_mean_world": [
+      0.5,
+      0.0,
+      3.0
+     ],
+     "nodes_vel_mean": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    }
+   },
+   "3_toggled_stop": {
+    "timeline": "stopped",
+    "usd": {
+     "world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "fabric": {
+     "world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "tensor": {
+     "valid": false
+    }
+   },
+   "4_replay_update1": {
+    "timeline": "playing",
+    "usd": {
+     "world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "fabric": {
+     "world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "tensor": {
+     "valid": true,
+     "nodes_mean_world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "nodes_vel_mean": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    }
+   },
+   "5_replay_update10": {
+    "timeline": "playing",
+    "usd": {
+     "world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "fabric": {
+     "world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "tensor": {
+     "valid": true,
+     "nodes_mean_world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "nodes_vel_mean": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    }
+   }
+  },
+  {
+   "id": "D/playing/set_nodal_positions/usd",
+   "description": "開始=playing メソッド=set_nodal_positions use_backend=usd",
+   "0_before": {
+    "timeline": "playing",
+    "usd": {
+     "world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "fabric": {
+     "world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "tensor": {
+     "valid": true,
+     "nodes_mean_world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "nodes_vel_mean": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    }
+   },
+   "call": {
+    "touched": [
+     "tensor(omni.physics.tensors)"
+    ],
+    "warnings": [],
+    "error": null
+   },
+   "1_after_call": {
+    "timeline": "playing",
+    "usd": {
+     "world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "fabric": {
+     "world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "tensor": {
+     "valid": true,
+     "nodes_mean_world": [
+      0.5,
+      0.0,
+      3.0
+     ],
+     "nodes_vel_mean": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    }
+   },
+   "2_after_update1": {
+    "timeline": "playing",
+    "usd": {
+     "world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "fabric": {
+     "world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.5,
+      0.0,
+      0.0
+     ]
+    },
+    "tensor": {
+     "valid": true,
+     "nodes_mean_world": [
+      0.5,
+      0.0,
+      3.0
+     ],
+     "nodes_vel_mean": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    }
+   },
+   "3_toggled_stop": {
+    "timeline": "stopped",
+    "usd": {
+     "world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "fabric": {
+     "world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "tensor": {
+     "valid": false
+    }
+   },
+   "4_replay_update1": {
+    "timeline": "playing",
+    "usd": {
+     "world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "fabric": {
+     "world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "tensor": {
+     "valid": true,
+     "nodes_mean_world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "nodes_vel_mean": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    }
+   },
+   "5_replay_update10": {
+    "timeline": "playing",
+    "usd": {
+     "world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "fabric": {
+     "world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "tensor": {
+     "valid": true,
+     "nodes_mean_world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "nodes_vel_mean": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    }
+   }
+  },
+  {
+   "id": "D/playing/set_nodal_velocities/(既定)",
+   "description": "開始=playing メソッド=set_nodal_velocities use_backend=None",
+   "0_before": {
+    "timeline": "playing",
+    "usd": {
+     "world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "fabric": {
+     "world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "tensor": {
+     "valid": true,
+     "nodes_mean_world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "nodes_vel_mean": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    }
+   },
+   "call": {
+    "touched": [
+     "tensor(omni.physics.tensors)"
+    ],
+    "warnings": [],
+    "error": null
+   },
+   "1_after_call": {
+    "timeline": "playing",
+    "usd": {
+     "world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "fabric": {
+     "world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "tensor": {
+     "valid": true,
+     "nodes_mean_world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "nodes_vel_mean": [
+      0.0,
+      0.6,
+      0.0
+     ]
+    }
+   },
+   "2_after_update1": {
+    "timeline": "playing",
+    "usd": {
+     "world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "fabric": {
+     "world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.01,
+      0.0
+     ]
+    },
+    "tensor": {
+     "valid": true,
+     "nodes_mean_world": [
+      0.0,
+      0.01,
+      3.0
+     ],
+     "nodes_vel_mean": [
+      0.0,
+      0.6,
+      0.0
+     ]
+    }
+   },
+   "3_toggled_stop": {
+    "timeline": "stopped",
+    "usd": {
+     "world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "fabric": {
+     "world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "tensor": {
+     "valid": false
+    }
+   },
+   "4_replay_update1": {
+    "timeline": "playing",
+    "usd": {
+     "world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "fabric": {
+     "world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "tensor": {
+     "valid": true,
+     "nodes_mean_world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "nodes_vel_mean": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    }
+   },
+   "5_replay_update10": {
+    "timeline": "playing",
+    "usd": {
+     "world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "fabric": {
+     "world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "tensor": {
+     "valid": true,
+     "nodes_mean_world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "nodes_vel_mean": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    }
+   }
+  },
+  {
+   "id": "D/playing/set_nodal_velocities/usd",
+   "description": "開始=playing メソッド=set_nodal_velocities use_backend=usd",
+   "0_before": {
+    "timeline": "playing",
+    "usd": {
+     "world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "fabric": {
+     "world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "tensor": {
+     "valid": true,
+     "nodes_mean_world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "nodes_vel_mean": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    }
+   },
+   "call": {
+    "touched": [
+     "tensor(omni.physics.tensors)"
+    ],
+    "warnings": [],
+    "error": null
+   },
+   "1_after_call": {
+    "timeline": "playing",
+    "usd": {
+     "world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "fabric": {
+     "world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "tensor": {
+     "valid": true,
+     "nodes_mean_world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "nodes_vel_mean": [
+      0.0,
+      0.6,
+      0.0
+     ]
+    }
+   },
+   "2_after_update1": {
+    "timeline": "playing",
+    "usd": {
+     "world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "fabric": {
+     "world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.01,
+      0.0
+     ]
+    },
+    "tensor": {
+     "valid": true,
+     "nodes_mean_world": [
+      0.0,
+      0.01,
+      3.0
+     ],
+     "nodes_vel_mean": [
+      0.0,
+      0.6,
+      0.0
+     ]
+    }
+   },
+   "3_toggled_stop": {
+    "timeline": "stopped",
+    "usd": {
+     "world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "fabric": {
+     "world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "tensor": {
+     "valid": false
+    }
+   },
+   "4_replay_update1": {
+    "timeline": "playing",
+    "usd": {
+     "world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "fabric": {
+     "world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "tensor": {
+     "valid": true,
+     "nodes_mean_world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "nodes_vel_mean": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    }
+   },
+   "5_replay_update10": {
+    "timeline": "playing",
+    "usd": {
+     "world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "fabric": {
+     "world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "points_mean_local": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "tensor": {
+     "valid": true,
+     "nodes_mean_world": [
+      0.0,
+      0.0,
+      3.0
+     ],
+     "nodes_vel_mean": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    }
+   }
+  },
+  {
+   "id": "D-90",
+   "description": "Play 中に usd で変形体の姿勢を書く → simulation view と剛体の tensor ビューはどうなるか",
+   "0_before": {
+    "sim_view_valid": true,
+    "deformable_wrapper_tensor_valid": true,
+    "rigid_wrapper_tensor_valid": true,
+    "rigid_fabric": [
+     0.0,
+     0.03,
+     1.0
+    ],
+    "time": 0.1,
+    "rigid_readback_position": [
+     0.0,
+     0.03,
+     1.0
+    ]
+   },
+   "1_after_call": {
+    "sim_view_valid": false,
+    "deformable_wrapper_tensor_valid": true,
+    "rigid_wrapper_tensor_valid": false,
+    "rigid_fabric": [
+     0.0,
+     0.03,
+     1.0
+    ],
+    "time": 0.1,
+    "rigid_readback_position": [
+     0.0,
+     0.0,
+     1.0
+    ]
+   },
+   "2_after_update1": {
+    "sim_view_valid": false,
+    "deformable_wrapper_tensor_valid": true,
+    "rigid_wrapper_tensor_valid": false,
+    "rigid_fabric": [
+     0.0,
+     0.04,
+     1.0
+    ],
+    "time": 0.1167,
+    "rigid_readback_position": [
+     0.0,
+     0.0,
+     1.0
+    ]
+   },
+   "3_after_update6": {
+    "sim_view_valid": false,
+    "deformable_wrapper_tensor_valid": true,
+    "rigid_wrapper_tensor_valid": false,
+    "rigid_fabric": [
+     0.0,
+     0.09,
+     1.0
+    ],
+    "time": 0.2,
+    "rigid_readback_position": [
+     0.0,
+     0.0,
+     1.0
+    ]
+   },
+   "warnings": []
+  }
+ ]
+}

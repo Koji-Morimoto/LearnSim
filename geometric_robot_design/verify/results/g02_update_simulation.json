@@ -1,0 +1,135 @@
+{
+ "group": "g02_update_simulation",
+ "items": [
+  {
+   "id": "U-01",
+   "description": "kinematic、Stop、USD に書いてから update_simulation",
+   "timeline": "stopped",
+   "before": {
+    "old_x0": true,
+    "usd_x2": false,
+    "fabric_x4": false
+   },
+   "after_usd_write": {
+    "old_x0": true,
+    "usd_x2": false,
+    "fabric_x4": false
+   },
+   "after_2_app_updates": {
+    "old_x0": true,
+    "usd_x2": false,
+    "fabric_x4": false
+   },
+   "after_update_simulation_x1": {
+    "old_x0": false,
+    "usd_x2": true,
+    "fabric_x4": false
+   },
+   "timeline_after": "stopped"
+  },
+  {
+   "id": "U-02",
+   "description": "kinematic、Stop、Fabric だけに書いてから update_simulation",
+   "before": {
+    "old_x0": true,
+    "usd_x2": false,
+    "fabric_x4": false
+   },
+   "after_fabric_write_and_update_simulation_x1": {
+    "old_x0": true,
+    "usd_x2": false,
+    "fabric_x4": false
+   },
+   "after_update_simulation_x4": {
+    "old_x0": true,
+    "usd_x2": false,
+    "fabric_x4": false
+   },
+   "after_2_app_updates_and_1_more_step": {
+    "old_x0": true,
+    "usd_x2": false,
+    "fabric_x4": false
+   },
+   "fabric_state": {
+    "local": [
+     4.0,
+     0.0,
+     1.0
+    ],
+    "world": [
+     4.0,
+     0.0,
+     1.0
+    ],
+    "world_cache": [
+     4.0,
+     0.0,
+     1.0
+    ],
+    "velocity": null,
+    "mass": null,
+    "translate_attr": [
+     0.0,
+     0.0,
+     1.0
+    ]
+   }
+  },
+  {
+   "id": "U-03",
+   "description": "動的剛体(重力 9.81)、Stop、update_simulation を 30 回(各 1/60 s)",
+   "timeline": "stopped",
+   "physx_z_before": 5.0,
+   "usd_z_before": 5.0,
+   "physx_z_after_30_steps": 3.7329,
+   "usd_z_after_30_steps": 5.0,
+   "expected_free_fall_z": 3.7737,
+   "usd_z_after_2_app_updates": 5.0,
+   "usd_z_after_update_transformations": 3.7329,
+   "root_layer_has_moved_value": 3.732874870300293,
+   "timeline_after": "stopped"
+  },
+  {
+   "id": "U-04",
+   "description": "kinematic 剛体 2 個だけのシーン、Stop のまま update_simulation で干渉を取る",
+   "a_initially_overlapping": {
+    "overlap_L0_before_any_step": [
+     "/World/Robot/L1/collider"
+    ],
+    "contacts_after_3_steps_no_motion": [],
+    "overlap_L0_after_steps": [
+     "/World/Robot/L1/collider"
+    ],
+    "contacts_after_moving_1cm_and_1_step": [
+     "CONTACT_FOUND L0-L1"
+    ]
+   },
+   "b_moved_into_overlap": {
+    "overlap_L0_apart": [],
+    "overlap_L0_after_usd_write_no_step": [
+     "/World/Robot/L1/collider"
+    ],
+    "probe_L1_side_sees_L0_no_step": false,
+    "contacts_right_after_1_step": [],
+    "overlap_L0_after_1_step": [
+     "/World/Robot/L1/collider"
+    ],
+    "probe_L1_side_sees_L0_after_1_step": true,
+    "contacts_after_app_update": [],
+    "contacts_after_2_more_steps_no_motion": [
+     "CONTACT_FOUND L0-L1",
+     "CONTACT_PERSIST L0-L1"
+    ],
+    "contacts_after_moving_away_1_step": [
+     "CONTACT_PERSIST L0-L1"
+    ]
+   },
+   "c_no_flags": {
+    "contacts": [],
+    "overlap_L0": [
+     "/World/Robot/L1/collider"
+    ]
+   }
+  }
+ ]
+}

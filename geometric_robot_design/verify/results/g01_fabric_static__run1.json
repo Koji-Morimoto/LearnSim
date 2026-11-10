@@ -1,0 +1,404 @@
+{
+ "group": "g01_fabric_static",
+ "items": [
+  {
+   "id": "F-00",
+   "description": "環境",
+   "omni.physx": "omni.physx-110.4.4",
+   "omni.physx.fabric": "(disabled)",
+   "omni.physics.tensors": "omni.physics.tensors-110.4.4",
+   "usdrt.scenegraph": "usdrt.scenegraph-7.6.3",
+   "omni.hydra.usdrt_delegate": "omni.hydra.usdrt_delegate-7.5.2",
+   "isaacsim.core.experimental.prims": "isaacsim.core.experimental.prims-1.12.1",
+   "isaacsim.core.experimental.utils": "isaacsim.core.experimental.utils-0.23.3",
+   "isaacsim.core.simulation_manager": "isaacsim.core.simulation_manager-1.17.4",
+   "isaac_sim_VERSION": "6.2.0-rc.14+release.52805.02189a84.gl",
+   "/app/useFabricSceneDelegate": true,
+   "/physics/resetOnStop": true,
+   "/physics/updateToUsd": true,
+   "/physics/updateVelocitiesToUsd": true,
+   "/physics/fabricEnabled": null,
+   "/physics/suppressReadback": false,
+   "/physics/cudaDevice": 0,
+   "config": "default",
+   "simulation_device": "cpu"
+  },
+  {
+   "id": "F-01",
+   "description": "対照: 静的コライダー、Stop、USD に書く",
+   "before": {
+    "old_x0": true,
+    "usd_x2": false,
+    "fabric_x4": false
+   },
+   "shape_before": [],
+   "after_usd_write_immediately": {
+    "old_x0": false,
+    "usd_x2": true,
+    "fabric_x4": false
+   },
+   "shape_after": [
+    "/World/Obstacle"
+   ]
+  },
+  {
+   "id": "F-02",
+   "description": "静的コライダー、Stop、Fabric(IFabricHierarchy)だけに書く",
+   "before": {
+    "old_x0": true,
+    "usd_x2": false,
+    "fabric_x4": false
+   },
+   "0_immediately": {
+    "old_x0": true,
+    "usd_x2": false,
+    "fabric_x4": false
+   },
+   "1_after_1_update": {
+    "old_x0": true,
+    "usd_x2": false,
+    "fabric_x4": false
+   },
+   "2_after_4_updates": {
+    "old_x0": true,
+    "usd_x2": false,
+    "fabric_x4": false
+   },
+   "shape_hits_L0": [
+    "/World/Obstacle"
+   ],
+   "fabric_state": {
+    "local": [
+     4.0,
+     0.0,
+     1.0
+    ],
+    "world": [
+     4.0,
+     0.0,
+     1.0
+    ],
+    "world_cache": [
+     4.0,
+     0.0,
+     1.0
+    ],
+    "velocity": null,
+    "mass": null,
+    "translate_attr": [
+     0.0,
+     0.0,
+     1.0
+    ]
+   },
+   "usd_x": 0.0,
+   "3_after_update_simulation": {
+    "old_x0": true,
+    "usd_x2": false,
+    "fabric_x4": false
+   },
+   "4_after_force_load": {
+    "old_x0": true,
+    "usd_x2": false,
+    "fabric_x4": false
+   }
+  },
+  {
+   "id": "F-03",
+   "description": "静的コライダー、Stop、XformPrim の fabric バックエンドで書く",
+   "before": {
+    "old_x0": true,
+    "usd_x2": false,
+    "fabric_x4": false
+   },
+   "0_immediately": {
+    "old_x0": true,
+    "usd_x2": false,
+    "fabric_x4": false
+   },
+   "1_after_1_update": {
+    "old_x0": true,
+    "usd_x2": false,
+    "fabric_x4": false
+   },
+   "2_after_4_updates": {
+    "old_x0": true,
+    "usd_x2": false,
+    "fabric_x4": false
+   },
+   "fabric_state": {
+    "local": [
+     4.0,
+     0.0,
+     1.0
+    ],
+    "world": [
+     4.0,
+     0.0,
+     1.0
+    ],
+    "world_cache": [
+     4.0,
+     0.0,
+     1.0
+    ],
+    "velocity": null,
+    "mass": null,
+    "translate_attr": [
+     0.0,
+     0.0,
+     1.0
+    ]
+   }
+  },
+  {
+   "id": "F-04",
+   "description": "静的コライダー、Play 中、Fabric だけに書く",
+   "before": {
+    "old_x0": true,
+    "usd_x2": false,
+    "fabric_x4": false
+   },
+   "0_immediately": {
+    "old_x0": true,
+    "usd_x2": false,
+    "fabric_x4": false
+   },
+   "1_after_1_update": {
+    "old_x0": false,
+    "usd_x2": false,
+    "fabric_x4": true
+   },
+   "2_after_4_updates": {
+    "old_x0": false,
+    "usd_x2": false,
+    "fabric_x4": true
+   }
+  },
+  {
+   "id": "F-05",
+   "description": "kinematic 剛体、Play 中、Fabric だけに書く",
+   "before": {
+    "old_x0": true,
+    "usd_x2": false,
+    "fabric_x4": false
+   },
+   "0_immediately": {
+    "old_x0": true,
+    "usd_x2": false,
+    "fabric_x4": false
+   },
+   "1_after_1_update": {
+    "old_x0": false,
+    "usd_x2": false,
+    "fabric_x4": true
+   },
+   "2_after_4_updates": {
+    "old_x0": false,
+    "usd_x2": false,
+    "fabric_x4": true
+   }
+  },
+  {
+   "id": "F-06",
+   "description": "対照: kinematic 剛体、Play 中、USD に書く",
+   "before": {
+    "old_x0": true,
+    "usd_x2": false,
+    "fabric_x4": false
+   },
+   "0_immediately": {
+    "old_x0": true,
+    "usd_x2": false,
+    "fabric_x4": false
+   },
+   "1_after_1_update": {
+    "old_x0": false,
+    "usd_x2": true,
+    "fabric_x4": false
+   },
+   "2_after_4_updates": {
+    "old_x0": false,
+    "usd_x2": true,
+    "fabric_x4": false
+   }
+  },
+  {
+   "id": "F-07",
+   "description": "対照: 静的コライダー、Play 中、USD に書く",
+   "before": {
+    "old_x0": true,
+    "usd_x2": false,
+    "fabric_x4": false
+   },
+   "0_immediately": {
+    "old_x0": false,
+    "usd_x2": true,
+    "fabric_x4": false
+   },
+   "1_after_1_update": {
+    "old_x0": false,
+    "usd_x2": true,
+    "fabric_x4": false
+   },
+   "2_after_4_updates": {
+    "old_x0": false,
+    "usd_x2": true,
+    "fabric_x4": false
+   }
+  },
+  {
+   "id": "D-01",
+   "description": "Stop 中に Sublayer へ姿勢を書いた直後、PhysX の位置が追従するか",
+   "rb+rigidBodyEnabled=false": {
+    "before": {
+     "old_x0": true,
+     "usd_x2": false,
+     "fabric_x4": false
+    },
+    "after_usd_write_immediately": {
+     "old_x0": false,
+     "usd_x2": true,
+     "fabric_x4": false
+    },
+    "after_1_update": {
+     "old_x0": false,
+     "usd_x2": true,
+     "fabric_x4": false
+    }
+   },
+   "kinematic": {
+    "before": {
+     "old_x0": true,
+     "usd_x2": false,
+     "fabric_x4": false
+    },
+    "after_usd_write_immediately": {
+     "old_x0": true,
+     "usd_x2": false,
+     "fabric_x4": false
+    },
+    "after_1_update": {
+     "old_x0": true,
+     "usd_x2": false,
+     "fabric_x4": false
+    }
+   },
+   "rb": {
+    "before": {
+     "old_x0": true,
+     "usd_x2": false,
+     "fabric_x4": false
+    },
+    "after_usd_write_immediately": {
+     "old_x0": false,
+     "usd_x2": true,
+     "fabric_x4": false
+    },
+    "after_1_update": {
+     "old_x0": false,
+     "usd_x2": true,
+     "fabric_x4": false
+    }
+   }
+  },
+  {
+   "id": "D-02",
+   "description": "アーティキュレーションに Sublayer(articulation 無効 + joint 無効 + rigidBodyEnabled=false)を付け外し",
+   "z0": 1.0,
+   "1_original_play_40_updates_z": 0.9071,
+   "1_after_stop_z": 1.0,
+   "2_geo_stop_before": {
+    "home": true,
+    "moved": false
+   },
+   "2_geo_stop_after_write": {
+    "home": false,
+    "moved": true
+   },
+   "3_geo_play_40_updates_z": 1.5,
+   "3_geo_play_probe": {
+    "home": false,
+    "moved": true
+   },
+   "4_removed_z": 1.0,
+   "4_removed_rigidBodyEnabled": true,
+   "4_removed_play_40_updates_z": 0.9071
+  },
+  {
+   "id": "T-01 N=10",
+   "description": "N 個のリンク(静的コライダー、Stop、PhysX 読み込み済み)へ姿勢を書く時間の中央値 [µs]",
+   "usd_loop_us": 243.0,
+   "update_after_usd_us": 9860.5,
+   "usd_changeblock_us": 120.6,
+   "query_only_us": 258.0,
+   "usd_changeblock_plus_query_us": 568.3,
+   "xformprim_usd_us": 1266.1,
+   "xformprim_fabric_us": 275.1,
+   "fabric_hierarchy_loop_us": 46.4,
+   "update_after_fabric_us": 9540.2,
+   "idle_update_us": 9790.4,
+   "check_usd_follow": true
+  },
+  {
+   "id": "T-01 N=30",
+   "description": "N 個のリンク(静的コライダー、Stop、PhysX 読み込み済み)へ姿勢を書く時間の中央値 [µs]",
+   "usd_loop_us": 730.2,
+   "update_after_usd_us": 9508.1,
+   "usd_changeblock_us": 374.1,
+   "query_only_us": 1002.5,
+   "usd_changeblock_plus_query_us": 1602.2,
+   "xformprim_usd_us": 2845.3,
+   "xformprim_fabric_us": 632.4,
+   "fabric_hierarchy_loop_us": 137.4,
+   "update_after_fabric_us": 9318.8,
+   "idle_update_us": 9570.7,
+   "check_usd_follow": true
+  },
+  {
+   "id": "T-01 N=100",
+   "description": "N 個のリンク(静的コライダー、Stop、PhysX 読み込み済み)へ姿勢を書く時間の中央値 [µs]",
+   "usd_loop_us": 2569.7,
+   "update_after_usd_us": 10577.9,
+   "usd_changeblock_us": 1157.5,
+   "query_only_us": 3334.6,
+   "usd_changeblock_plus_query_us": 5478.8,
+   "xformprim_usd_us": 8207.0,
+   "xformprim_fabric_us": 1840.0,
+   "fabric_hierarchy_loop_us": 449.4,
+   "update_after_fabric_us": 9526.5,
+   "idle_update_us": 9757.4,
+   "check_usd_follow": true
+  },
+  {
+   "id": "T-01 N=300",
+   "description": "N 個のリンク(静的コライダー、Stop、PhysX 読み込み済み)へ姿勢を書く時間の中央値 [µs]",
+   "usd_loop_us": 7992.6,
+   "update_after_usd_us": 13136.1,
+   "usd_changeblock_us": 3496.3,
+   "query_only_us": 9789.3,
+   "usd_changeblock_plus_query_us": 15895.4,
+   "xformprim_usd_us": 24209.4,
+   "xformprim_fabric_us": 5378.1,
+   "fabric_hierarchy_loop_us": 1380.7,
+   "update_after_fabric_us": 10571.5,
+   "idle_update_us": 9660.5,
+   "check_usd_follow": true
+  },
+  {
+   "id": "T-01 N=1000",
+   "description": "N 個のリンク(静的コライダー、Stop、PhysX 読み込み済み)へ姿勢を書く時間の中央値 [µs]",
+   "usd_loop_us": 27734.3,
+   "update_after_usd_us": 22085.8,
+   "usd_changeblock_us": 12263.5,
+   "query_only_us": 34784.5,
+   "usd_changeblock_plus_query_us": 52181.5,
+   "xformprim_usd_us": 79494.3,
+   "xformprim_fabric_us": 18053.0,
+   "fabric_hierarchy_loop_us": 4643.6,
+   "update_after_fabric_us": 13563.7,
+   "idle_update_us": 9549.4,
+   "check_usd_follow": true
+  }
+ ]
+}

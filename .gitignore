@@ -1,0 +1,16 @@
+﻿# ホワイトリスト方式: 下記以外は全て無視
+/*
+!/.gitignore
+!/robot_representation_verification/
+!/2026-11-10_kinematic剛体の干渉検出_overlapとContactReport/
+!/backend_pipeline_verification/
+!/contact_report_buffer_verification/
+!/geometric_mode_verification/
+!/geometric_robot_design/
+!/isaac-sim-backend-lab/
+!/physx_overlap_contact_verification/
+
+# 各フォルダ共通で除外
+__pycache__/
+*.pyc
+.git_empty_bak/

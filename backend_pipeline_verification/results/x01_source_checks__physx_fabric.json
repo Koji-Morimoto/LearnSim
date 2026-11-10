@@ -1,0 +1,239 @@
+{
+ "group": "x01_source_checks__physx_fabric",
+ "items": [
+  {
+   "id": "X-00",
+   "description": "バージョンと設定",
+   "omni.physx": "omni.physx-110.4.4",
+   "omni.physx.fabric": "omni.physx.fabric-110.4.4",
+   "omni.physics.tensors": "omni.physics.tensors-110.4.4",
+   "usdrt.scenegraph": "usdrt.scenegraph-7.6.3",
+   "omni.hydra.usdrt_delegate": "omni.hydra.usdrt_delegate-7.5.2",
+   "isaacsim.core.experimental.prims": "isaacsim.core.experimental.prims-1.12.1",
+   "isaacsim.core.experimental.utils": "isaacsim.core.experimental.utils-0.23.3",
+   "isaacsim.core.simulation_manager": "isaacsim.core.simulation_manager-1.17.4",
+   "isaac_sim_VERSION": "6.2.0-rc.14+release.52805.02189a84.gl",
+   "/app/useFabricSceneDelegate": true,
+   "/physics/resetOnStop": true,
+   "/physics/updateToUsd": false,
+   "/physics/updateVelocitiesToUsd": false,
+   "/physics/fabricEnabled": true,
+   "/physics/suppressReadback": false,
+   "/physics/cudaDevice": 0,
+   "config": "physx_fabric",
+   "simulation_device": "cpu"
+  },
+  {
+   "id": "X-A",
+   "description": "Pause → 再開で PhysX の PAUSED / RESUMED イベントが届くか",
+   "Pause 中に update 1 回": {
+    "play": [
+     "RESUMED",
+     "RESUMED"
+    ],
+    "pause": [
+     "PAUSED"
+    ],
+    "resume_and_3_updates": [
+     "RESUMED"
+    ],
+    "after_resume": {
+     "tensor_y": [
+      0.0,
+      0.05,
+      1.0
+     ],
+     "fabric_y": [
+      0.0,
+      0.05,
+      1.0
+     ]
+    },
+    "stop": [
+     "13",
+     "STOPPED"
+    ]
+   },
+   "Pause 中に update なし": {
+    "play": [
+     "RESUMED",
+     "RESUMED"
+    ],
+    "pause": [],
+    "resume_and_3_updates": [],
+    "after_resume": {
+     "tensor_y": [
+      0.0,
+      0.05,
+      1.0
+     ],
+     "fabric_y": [
+      0.0,
+      0.05,
+      1.0
+     ]
+    },
+    "stop": [
+     "13",
+     "STOPPED"
+    ]
+   }
+  },
+  {
+   "id": "X-B",
+   "description": "Fabric の physics:velocity の型名と値の変化",
+   "属性なしから Play 中に作る": {
+    "0_stopped": {
+     "type": null,
+     "value": null
+    },
+    "1_playing": {
+     "type": "Sdf.ValueTypeName('float3')",
+     "value": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "2_after_usd_write": {
+     "type": "Sdf.ValueTypeName('float3')",
+     "value": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "3_update1": {
+     "fabric": {
+      "type": "Sdf.ValueTypeName('float3 (vector)')",
+      "value": [
+       0.0,
+       0.6,
+       0.0
+      ]
+     },
+     "tensor_vy": 0.6
+    },
+    "3_update2": {
+     "fabric": {
+      "type": "Sdf.ValueTypeName('float3 (vector)')",
+      "value": [
+       0.0,
+       0.0,
+       0.0
+      ]
+     },
+     "tensor_vy": 0.0
+    },
+    "3_update3": {
+     "fabric": {
+      "type": "Sdf.ValueTypeName('float3 (vector)')",
+      "value": [
+       0.0,
+       0.0,
+       0.0
+      ]
+     },
+     "tensor_vy": 0.0
+    },
+    "4_stopped": {
+     "type": "Sdf.ValueTypeName('float3 (vector)')",
+     "value": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "5_replay_update1": {
+     "fabric": {
+      "type": "Sdf.ValueTypeName('float3')",
+      "value": [
+       0.0,
+       0.6,
+       0.0
+      ]
+     },
+     "tensor_vy": 0.6
+    }
+   },
+   "Play 前に属性を作っておく": {
+    "0_stopped": {
+     "type": "Sdf.ValueTypeName('float3 (vector)')",
+     "value": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "1_playing": {
+     "type": "Sdf.ValueTypeName('float3')",
+     "value": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "2_after_usd_write": {
+     "type": "Sdf.ValueTypeName('float3')",
+     "value": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "3_update1": {
+     "fabric": {
+      "type": "Sdf.ValueTypeName('float3')",
+      "value": [
+       0.0,
+       0.6,
+       0.0
+      ]
+     },
+     "tensor_vy": 0.6
+    },
+    "3_update2": {
+     "fabric": {
+      "type": "Sdf.ValueTypeName('float3')",
+      "value": [
+       0.0,
+       0.6,
+       0.0
+      ]
+     },
+     "tensor_vy": 0.6
+    },
+    "3_update3": {
+     "fabric": {
+      "type": "Sdf.ValueTypeName('float3')",
+      "value": [
+       0.0,
+       0.6,
+       0.0
+      ]
+     },
+     "tensor_vy": 0.6
+    },
+    "4_stopped": {
+     "type": "Sdf.ValueTypeName('float3')",
+     "value": [
+      0.0,
+      0.6,
+      0.0
+     ]
+    },
+    "5_replay_update1": {
+     "fabric": {
+      "type": "Sdf.ValueTypeName('float3')",
+      "value": [
+       0.0,
+       0.6,
+       0.0
+      ]
+     },
+     "tensor_vy": 0.6
+    }
+   }
+  }
+ ]
+}

@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1160" height="580" viewBox="0 0 1160 580">
+<defs><marker id="arrow-cdd6f4" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#cdd6f4"/></marker><marker id="arrow-89b4fa" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#89b4fa"/></marker><marker id="arrow-a6e3a1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#a6e3a1"/></marker><marker id="arrow-f38ba8" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#f38ba8"/></marker><marker id="arrow-f9e2af" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#f9e2af"/></marker></defs>
+<rect class="background" x="0" y="0" width="1160" height="580" fill="#1e1e2e"/>
+<text x="40" y="42" font-family="Noto Sans JP, sans-serif" font-size="22" fill="#cdd6f4" text-anchor="start" font-weight="bold">図1　メインループの1回の更新で起きること（Play 中）</text>
+<rect x="40" y="110" width="250" height="190" rx="6" fill="#313244" stroke="#89b4fa" stroke-width="2"/>
+<text x="56" y="145" font-family="Noto Sans JP, sans-serif" font-size="16" fill="#cdd6f4" text-anchor="start" font-weight="bold">① timeline を進める</text>
+<text x="56" y="178" font-family="Noto Sans JP, sans-serif" font-size="16" fill="#cdd6f4" text-anchor="start">この更新で進める時間を</text>
+<text x="56" y="202" font-family="Noto Sans JP, sans-serif" font-size="16" fill="#cdd6f4" text-anchor="start">timeline 時刻に足す</text>
+<text x="56" y="232" font-family="Noto Sans JP, sans-serif" font-size="14" fill="#cdd6f4" text-anchor="start">既定では timeline 時刻で</text>
+<text x="56" y="254" font-family="Noto Sans JP, sans-serif" font-size="14" fill="#cdd6f4" text-anchor="start">1/60 秒進む</text>
+<text x="56" y="276" font-family="Noto Sans JP, sans-serif" font-size="14" fill="#cdd6f4" text-anchor="start">間引かれた更新では進まない</text>
+<rect class="container" x="330" y="90" width="560" height="330" rx="6" fill="#262637" stroke="#a6e3a1" stroke-width="2" stroke-dasharray="6 4"/>
+<text x="350" y="120" font-family="Noto Sans JP, sans-serif" font-size="16" fill="#cdd6f4" text-anchor="start" font-weight="bold">② 物理ステップを 0 回以上くり返す</text>
+<text x="350" y="145" font-family="Noto Sans JP, sans-serif" font-size="14" fill="#cdd6f4" text-anchor="start">回数 ＝（timeline の進み ＋ 余り）÷ h の切り捨て。minFrameRate で上限あり</text>
+<rect x="360" y="165" width="400" height="46" rx="6" fill="#313244" stroke="#a6e3a1" stroke-width="1.5"/>
+<text x="376" y="194" font-family="Noto Sans JP, sans-serif" font-size="16" fill="#cdd6f4" text-anchor="start">PHYSICS_PRE_STEP コールバック</text>
+<rect x="360" y="231" width="400" height="46" rx="6" fill="#313244" stroke="#a6e3a1" stroke-width="1.5"/>
+<text x="376" y="260" font-family="Noto Sans JP, sans-serif" font-size="16" fill="#cdd6f4" text-anchor="start">物理ステップ1回（シミュレーション時刻を h 秒）</text>
+<rect x="360" y="297" width="400" height="46" rx="6" fill="#313244" stroke="#a6e3a1" stroke-width="1.5"/>
+<text x="376" y="326" font-family="Noto Sans JP, sans-serif" font-size="16" fill="#cdd6f4" text-anchor="start">PHYSICS_POST_STEP コールバック</text>
+<rect x="360" y="363" width="400" height="46" rx="6" fill="#313244" stroke="#a6e3a1" stroke-width="1.5"/>
+<text x="376" y="392" font-family="Noto Sans JP, sans-serif" font-size="16" fill="#cdd6f4" text-anchor="start">描画側の時刻 ← シミュレーション時刻</text>
+<line x1="560" y1="211" x2="560" y2="229" stroke="#a6e3a1" stroke-width="2" marker-end="url(#arrow-a6e3a1)"/>
+<line x1="560" y1="277" x2="560" y2="295" stroke="#a6e3a1" stroke-width="2" marker-end="url(#arrow-a6e3a1)"/>
+<line x1="560" y1="343" x2="560" y2="361" stroke="#a6e3a1" stroke-width="2" marker-end="url(#arrow-a6e3a1)"/>
+<line x1="762" y1="386" x2="810" y2="386" stroke="#a6e3a1" stroke-width="2"/>
+<line x1="810" y1="386" x2="810" y2="188" stroke="#a6e3a1" stroke-width="2"/>
+<line x1="810" y1="188" x2="764" y2="188" stroke="#a6e3a1" stroke-width="2" marker-end="url(#arrow-a6e3a1)"/>
+<text x="818" y="292" font-family="Noto Sans JP, sans-serif" font-size="14" fill="#a6e3a1" text-anchor="start">くり返す</text>
+<rect x="930" y="110" width="210" height="190" rx="6" fill="#313244" stroke="#f9e2af" stroke-width="2"/>
+<text x="946" y="145" font-family="Noto Sans JP, sans-serif" font-size="16" fill="#cdd6f4" text-anchor="start" font-weight="bold">③ 描画</text>
+<text x="946" y="182" font-family="Noto Sans JP, sans-serif" font-size="16" fill="#cdd6f4" text-anchor="start">描画側の時刻を1回</text>
+<text x="946" y="207" font-family="Noto Sans JP, sans-serif" font-size="16" fill="#cdd6f4" text-anchor="start">だけ読み、画面を作る</text>
+<text x="946" y="232" font-family="Noto Sans JP, sans-serif" font-size="16" fill="#cdd6f4" text-anchor="start">センサー画像は物理が</text>
+<text x="946" y="257" font-family="Noto Sans JP, sans-serif" font-size="16" fill="#cdd6f4" text-anchor="start">進んだ更新でだけ作る</text>
+<line x1="292" y1="188" x2="357" y2="188" stroke="#cdd6f4" stroke-width="2" marker-end="url(#arrow-cdd6f4)"/>
+<line x1="892" y1="190" x2="927" y2="190" stroke="#cdd6f4" stroke-width="2" marker-end="url(#arrow-cdd6f4)"/>
+<line x1="1035" y1="302" x2="1035" y2="460" stroke="#cdd6f4" stroke-width="2"/>
+<line x1="1035" y1="460" x2="165" y2="460" stroke="#cdd6f4" stroke-width="2"/>
+<line x1="165" y1="460" x2="165" y2="304" stroke="#cdd6f4" stroke-width="2" marker-end="url(#arrow-cdd6f4)"/>
+<text x="590" y="450" font-family="Noto Sans JP, sans-serif" font-size="14" fill="#cdd6f4" text-anchor="middle">次の更新へ進み、①から同じ順序をくり返す</text>
+<rect x="40" y="486" width="18" height="18" rx="6" fill="#313244" stroke="#89b4fa" stroke-width="2"/>
+<text x="66" y="501" font-family="Noto Sans JP, sans-serif" font-size="14" fill="#cdd6f4" text-anchor="start">timeline に関わる処理</text>
+<rect x="260" y="486" width="18" height="18" rx="6" fill="#313244" stroke="#a6e3a1" stroke-width="2"/>
+<text x="286" y="501" font-family="Noto Sans JP, sans-serif" font-size="14" fill="#cdd6f4" text-anchor="start">物理に関わる処理</text>
+<rect x="450" y="486" width="18" height="18" rx="6" fill="#313244" stroke="#f9e2af" stroke-width="2"/>
+<text x="476" y="501" font-family="Noto Sans JP, sans-serif" font-size="14" fill="#cdd6f4" text-anchor="start">描画に関わる処理</text>
+<line x1="640" y1="495" x2="690" y2="495" stroke="#cdd6f4" stroke-width="2" marker-end="url(#arrow-cdd6f4)"/>
+<text x="700" y="501" font-family="Noto Sans JP, sans-serif" font-size="14" fill="#cdd6f4" text-anchor="start">処理の順序</text>
+<text x="40" y="552" font-family="Noto Sans JP, sans-serif" font-size="16" fill="#f9e2af" text-anchor="start" font-weight="bold">→ 物理ステップの回数は更新ごとに変わりうるが、画面の描画は1回の更新につき1回行われる</text>
+</svg>

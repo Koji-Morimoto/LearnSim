@@ -1,0 +1,158 @@
+{
+ "group": "b05_sleep",
+ "items": [
+  {
+   "id": "Z-01",
+   "description": "静止シーンで push と pull が止まるステップとスリープの関係",
+   "gravity=0.0/can_sleep=True": {
+    "push": [
+     "FOUND x1 (step0-0)",
+     "PERSIST x23 (step1-23)",
+     "- x56 (step24-79)"
+    ],
+    "pull": [
+     "FOUND x1 (step0-0)",
+     "PERSIST x23 (step1-23)",
+     "- x56 (step24-79)"
+    ],
+    "sleeping": [
+     "False x24 (step0-23)",
+     "True x56 (step24-79)"
+    ],
+    "first_step_sleeping": 24,
+    "last_step_with_push": 23,
+    "last_step_with_pull": 23,
+    "push_equals_pull_every_step": true
+   },
+   "gravity=0.0/can_sleep=False": {
+    "push": [
+     "FOUND x1 (step0-0)",
+     "PERSIST x79 (step1-79)"
+    ],
+    "pull": [
+     "FOUND x1 (step0-0)",
+     "PERSIST x79 (step1-79)"
+    ],
+    "sleeping": [
+     "False x80 (step0-79)"
+    ],
+    "first_step_sleeping": null,
+    "last_step_with_push": 79,
+    "last_step_with_pull": 79,
+    "push_equals_pull_every_step": true
+   },
+   "gravity=9.81/can_sleep=True": {
+    "push": [
+     "FOUND x1 (step0-0)",
+     "PERSIST x23 (step1-23)",
+     "- x56 (step24-79)"
+    ],
+    "pull": [
+     "FOUND x1 (step0-0)",
+     "PERSIST x23 (step1-23)",
+     "- x56 (step24-79)"
+    ],
+    "sleeping": [
+     "False x24 (step0-23)",
+     "True x56 (step24-79)"
+    ],
+    "first_step_sleeping": 24,
+    "last_step_with_push": 23,
+    "last_step_with_pull": 23,
+    "push_equals_pull_every_step": true
+   },
+   "gravity=9.81/can_sleep=False": {
+    "push": [
+     "FOUND x1 (step0-0)",
+     "PERSIST x79 (step1-79)"
+    ],
+    "pull": [
+     "FOUND x1 (step0-0)",
+     "PERSIST x79 (step1-79)"
+    ],
+    "sleeping": [
+     "False x80 (step0-79)"
+    ],
+    "first_step_sleeping": null,
+    "last_step_with_push": 79,
+    "last_step_with_pull": 79,
+    "push_equals_pull_every_step": true
+   }
+  },
+  {
+   "id": "Z-02",
+   "description": "重力あり・スリープ許可。step50 の直前に wake_up",
+   "wake_at": 50,
+   "push": [
+    "FOUND x1 (step0-0)",
+    "PERSIST x23 (step1-23)",
+    "- x26 (step24-49)",
+    "PERSIST x24 (step50-73)",
+    "- x6 (step74-79)"
+   ],
+   "pull": [
+    "FOUND x1 (step0-0)",
+    "PERSIST x23 (step1-23)",
+    "- x26 (step24-49)",
+    "PERSIST x24 (step50-73)",
+    "- x6 (step74-79)"
+   ],
+   "sleeping": [
+    "False x24 (step0-23)",
+    "True x26 (step24-49)",
+    "False x24 (step50-73)",
+    "True x6 (step74-79)"
+   ],
+   "first_step_sleeping": 24,
+   "last_step_with_push": 73,
+   "last_step_with_pull": 73,
+   "push_equals_pull_every_step": true
+  },
+  {
+   "id": "Z-03",
+   "description": "重力 0・スリープ許可。step5 の直前に put_to_sleep",
+   "sleep_at": 5,
+   "push": [
+    "FOUND x1 (step0-0)",
+    "PERSIST x4 (step1-4)",
+    "- x75 (step5-79)"
+   ],
+   "pull": [
+    "FOUND x1 (step0-0)",
+    "PERSIST x4 (step1-4)",
+    "- x75 (step5-79)"
+   ],
+   "sleeping": [
+    "False x5 (step0-4)",
+    "True x75 (step5-79)"
+   ],
+   "first_step_sleeping": 5,
+   "last_step_with_push": 4,
+   "last_step_with_pull": 4,
+   "push_equals_pull_every_step": true
+  },
+  {
+   "id": "Z-04",
+   "description": "タイムライン Play 中。app.update 1 回ごとに push と pull を記録(1 フレーム = 1 行)",
+   "physics_steps_per_frame": [
+    "1 x80 (step0-79)"
+   ],
+   "push": [
+    "PERSIST x23 (step0-22)",
+    "- x57 (step23-79)"
+   ],
+   "pull": [
+    "PERSIST x23 (step0-22)",
+    "- x57 (step23-79)"
+   ],
+   "sleeping": [
+    "False x23 (step0-22)",
+    "True x57 (step23-79)"
+   ],
+   "first_step_sleeping": 23,
+   "last_step_with_push": 22,
+   "last_step_with_pull": 22,
+   "push_equals_pull_every_step": true
+  }
+ ]
+}

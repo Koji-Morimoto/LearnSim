@@ -1,0 +1,140 @@
+{
+ "shots": [
+  {
+   "t": 2.117,
+   "mover_x": -0.383,
+   "state": {
+    "Mover": "found",
+    "Target": "found"
+   },
+   "shown": {
+    "Mover": "found",
+    "Target": "found",
+    "Wall": "original"
+   },
+   "png": "C:\\isaacsim-6.2.0\\CodeByClaude\\geometric_mode_verification\\results\\event_t2.1.png"
+  },
+  {
+   "t": 2.617,
+   "mover_x": 0.117,
+   "state": {
+    "Mover": "persist",
+    "Target": "persist"
+   },
+   "shown": {
+    "Mover": "persist",
+    "Target": "persist",
+    "Wall": "original"
+   },
+   "png": "C:\\isaacsim-6.2.0\\CodeByClaude\\geometric_mode_verification\\results\\event_t2.6.png"
+  },
+  {
+   "t": 3.217,
+   "mover_x": 0.717,
+   "state": {
+    "Mover": "lost",
+    "Target": "lost"
+   },
+   "shown": {
+    "Mover": "lost",
+    "Target": "lost",
+    "Wall": "original"
+   },
+   "png": "C:\\isaacsim-6.2.0\\CodeByClaude\\geometric_mode_verification\\results\\event_t3.2.png"
+  },
+  {
+   "t": 4.317,
+   "mover_x": 1.817,
+   "state": {
+    "Mover": "found",
+    "Wall": "found"
+   },
+   "shown": {
+    "Mover": "found",
+    "Target": "original",
+    "Wall": "found"
+   },
+   "png": "C:\\isaacsim-6.2.0\\CodeByClaude\\geometric_mode_verification\\results\\event_t4.3.png"
+  },
+  {
+   "t": 4.617,
+   "mover_x": 2.117,
+   "state": {
+    "Mover": "persist",
+    "Wall": "persist"
+   },
+   "shown": {
+    "Mover": "persist",
+    "Target": "original",
+    "Wall": "persist"
+   },
+   "png": "C:\\isaacsim-6.2.0\\CodeByClaude\\geometric_mode_verification\\results\\event_t4.6.png"
+  },
+  {
+   "t": 5.017,
+   "mover_x": 2.517,
+   "state": {
+    "Mover": "lost",
+    "Wall": "lost"
+   },
+   "shown": {
+    "Mover": "lost",
+    "Target": "original",
+    "Wall": "lost"
+   },
+   "png": "C:\\isaacsim-6.2.0\\CodeByClaude\\geometric_mode_verification\\results\\event_t5.0.png"
+  }
+ ],
+ "pairs": {
+  "Mover - Target": {
+   "counts": {
+    "found": 2,
+    "persist": 124,
+    "lost": 2
+   },
+   "found_lost_log": [
+    [
+     2.0,
+     "found"
+    ],
+    [
+     3.05,
+     "lost"
+    ],
+    [
+     8.0,
+     "found"
+    ],
+    [
+     9.05,
+     "lost"
+    ]
+   ]
+  },
+  "Mover - Wall": {
+   "counts": {
+    "found": 2,
+    "persist": 72,
+    "lost": 2
+   },
+   "found_lost_log": [
+    [
+     4.217,
+     "found"
+    ],
+    [
+     4.833,
+     "lost"
+    ],
+    [
+     6.217,
+     "found"
+    ],
+    [
+     6.833,
+     "lost"
+    ]
+   ]
+  }
+ }
+}

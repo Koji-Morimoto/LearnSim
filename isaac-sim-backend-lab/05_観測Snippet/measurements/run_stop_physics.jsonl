@@ -1,0 +1,21 @@
+{"name": "S1_stop_initialize", "kind": "phase"}
+{"step": "initialize の前", "overlap_A": [], "view": false, "kind": "stop_init"}
+{"step": "initialize の直後", "stopped": true, "view": true, "steps": 2, "overlap_A": ["/World/A", "/World/B"], "kind": "stop_init"}
+{"step": "tensor で読めた", "z": [0.9916787147521973, 0.9919713139533997, 0.9918251037597656], "kind": "stop_init"}
+{"step": "Stop のまま10回更新した後", "stopped": true, "steps": 2, "z": [0.9916787147521973, 0.9919713139533997, 0.9918251037597656], "kind": "stop_init"}
+{"step": "step(10) の後", "stopped": true, "steps": 12, "z": [0.841804027557373, 0.8420966267585754, 0.8419504165649414], "usd_A": 0.841804027557373, "kind": "stop_init"}
+{"step": "tensor で set した直後", "z": [3.0, 3.0, 3.0], "overlap_at_new_A": ["/World/A"], "kind": "stop_init"}
+{"step": "set の後に step(1)", "z": [2.970025062561035, 2.970025062561035, 2.970025062561035], "overlap_at_new_A": ["/World/A"], "kind": "stop_init"}
+{"step": "その後 Play", "playing": true, "steps": 18, "view": true, "kind": "stop_init"}
+{"step": "その後 Stop", "stopped": true, "view": false, "steps": 0, "kind": "stop_init"}
+{"step": "もう一度 Play", "playing": true, "steps": 7, "view": true, "kind": "stop_init"}
+{"name": "S2_interference_only", "kind": "phase"}
+{"step": "1000個を tensor で置き直して step(1)", "median_ms": 0.8824500000628177, "device": "cpu", "kind": "interference"}
+{"step": "overlap_box 1回", "median_us": 12.849999620812014, "hits": ["/World/Cubes/c_0"], "kind": "interference"}
+{"name": "S3_gpu_stop", "kind": "phase"}
+{"step": "initialize の前", "device": "cuda:0", "kind": "gpu_stop"}
+{"step": "initialize と step(10) の後", "stopped": true, "device": "cuda:0", "array_device": "cuda:0", "z": 0.7874499559402466, "kind": "gpu_stop"}
+{"name": "S4_live_setting", "kind": "phase"}
+{"key": "/physics/updateToUsd", "before": 4.787450313568115, "after_10": 4.787450313568115, "after_20": 4.787450313568115, "physx": 3.561199903488159, "kind": "live_setting"}
+{"key": "/physics/updateToUsd を true に戻した後", "usd": 3.084324836730957, "kind": "live_setting"}
+{"name": "done", "kind": "phase"}

@@ -1,0 +1,241 @@
+{
+ "group": "b03_per_step_cost",
+ "items": [
+  {
+   "id": "C-01",
+   "description": "ContactReportAPI の有無・読み方ごとの 1 ステップ時間と pull のコスト",
+   "N=100": {
+    "contact_pairs": 100,
+    "steps_run_before_final_pull": 210,
+    "no_api": {
+     "step_ms_median_per_repeat": [
+      0.7944,
+      0.6408
+     ],
+     "pull_ms_median_per_repeat": [
+      null,
+      null
+     ],
+     "final_pull_ms_per_repeat": [
+      0.0378,
+      0.0167
+     ],
+     "final_pull_headers": 0,
+     "final_pull_contact_points": 0,
+     "step_ms_over_no_api": 0.0
+    },
+    "api_no_read": {
+     "step_ms_median_per_repeat": [
+      0.7823,
+      0.7422
+     ],
+     "pull_ms_median_per_repeat": [
+      null,
+      null
+     ],
+     "final_pull_ms_per_repeat": [
+      0.0298,
+      0.0257
+     ],
+     "final_pull_headers": 100,
+     "final_pull_contact_points": 400,
+     "step_ms_over_no_api": 0.0446
+    },
+    "api_pull": {
+     "step_ms_median_per_repeat": [
+      0.692,
+      0.7084
+     ],
+     "pull_ms_median_per_repeat": [
+      0.0163,
+      0.0171
+     ],
+     "final_pull_ms_per_repeat": [
+      0.0048,
+      0.0053
+     ],
+     "final_pull_headers": 100,
+     "final_pull_contact_points": 400,
+     "step_ms_over_no_api": -0.0174
+    },
+    "api_subscribe": {
+     "step_ms_median_per_repeat": [
+      0.6993,
+      0.7002
+     ],
+     "pull_ms_median_per_repeat": [
+      null,
+      null
+     ],
+     "final_pull_ms_per_repeat": [
+      0.0136,
+      0.0153
+     ],
+     "final_pull_headers": 100,
+     "final_pull_contact_points": 400,
+     "step_ms_over_no_api": -0.0178
+    }
+   },
+   "N=900": {
+    "contact_pairs": 900,
+    "steps_run_before_final_pull": 210,
+    "no_api": {
+     "step_ms_median_per_repeat": [
+      3.3367,
+      3.2005
+     ],
+     "pull_ms_median_per_repeat": [
+      null,
+      null
+     ],
+     "final_pull_ms_per_repeat": [
+      0.0224,
+      0.0164
+     ],
+     "final_pull_headers": 0,
+     "final_pull_contact_points": 0,
+     "step_ms_over_no_api": 0.0
+    },
+    "api_no_read": {
+     "step_ms_median_per_repeat": [
+      4.112,
+      3.8938
+     ],
+     "pull_ms_median_per_repeat": [
+      null,
+      null
+     ],
+     "final_pull_ms_per_repeat": [
+      0.0723,
+      0.1174
+     ],
+     "final_pull_headers": 900,
+     "final_pull_contact_points": 3600,
+     "step_ms_over_no_api": 0.7343
+    },
+    "api_pull": {
+     "step_ms_median_per_repeat": [
+      3.9327,
+      3.7444
+     ],
+     "pull_ms_median_per_repeat": [
+      0.0638,
+      0.0543
+     ],
+     "final_pull_ms_per_repeat": [
+      0.0086,
+      0.0098
+     ],
+     "final_pull_headers": 900,
+     "final_pull_contact_points": 3600,
+     "step_ms_over_no_api": 0.5699
+    },
+    "api_subscribe": {
+     "step_ms_median_per_repeat": [
+      4.2138,
+      3.8215
+     ],
+     "pull_ms_median_per_repeat": [
+      null,
+      null
+     ],
+     "final_pull_ms_per_repeat": [
+      0.0562,
+      0.0379
+     ],
+     "final_pull_headers": 900,
+     "final_pull_contact_points": 3600,
+     "step_ms_over_no_api": 0.749
+    }
+   },
+   "N=2500": {
+    "contact_pairs": 2500,
+    "steps_run_before_final_pull": 210,
+    "no_api": {
+     "step_ms_median_per_repeat": [
+      8.8915,
+      9.0401
+     ],
+     "pull_ms_median_per_repeat": [
+      null,
+      null
+     ],
+     "final_pull_ms_per_repeat": [
+      0.0262,
+      0.026
+     ],
+     "final_pull_headers": 0,
+     "final_pull_contact_points": 0,
+     "step_ms_over_no_api": 0.0
+    },
+    "api_no_read": {
+     "step_ms_median_per_repeat": [
+      10.7664,
+      10.8205
+     ],
+     "pull_ms_median_per_repeat": [
+      null,
+      null
+     ],
+     "final_pull_ms_per_repeat": [
+      0.182,
+      0.1715
+     ],
+     "final_pull_headers": 2500,
+     "final_pull_contact_points": 10000,
+     "step_ms_over_no_api": 1.8276
+    },
+    "api_pull": {
+     "step_ms_median_per_repeat": [
+      10.6842,
+      10.8329
+     ],
+     "pull_ms_median_per_repeat": [
+      0.1612,
+      0.1643
+     ],
+     "final_pull_ms_per_repeat": [
+      0.027,
+      0.025
+     ],
+     "final_pull_headers": 2500,
+     "final_pull_contact_points": 10000,
+     "step_ms_over_no_api": 1.7927
+    },
+    "api_subscribe": {
+     "step_ms_median_per_repeat": [
+      10.9195,
+      10.9436
+     ],
+     "pull_ms_median_per_repeat": [
+      null,
+      null
+     ],
+     "final_pull_ms_per_repeat": [
+      0.17,
+      0.1585
+     ],
+     "final_pull_headers": 2500,
+     "final_pull_contact_points": 10000,
+     "step_ms_over_no_api": 1.9657
+    }
+   }
+  },
+  {
+   "id": "C-02",
+   "description": "スリープを許した静止剛体(9 個)で、ステップごとのヘッダ数",
+   "headers_per_step_compressed": [
+    "9 x24 (step0-23)",
+    "0 x96 (step24-119)"
+   ],
+   "first_step_with_zero_headers": 24,
+   "event_types_when_count_changed": {
+    "0": [
+     "FOUND"
+    ],
+    "24": []
+   },
+   "B_0_0_is_sleeping_at_end": true
+  }
+ ]
+}

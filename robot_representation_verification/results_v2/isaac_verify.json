@@ -1,0 +1,9386 @@
+{
+ "results": {
+  "V0_home_touching_pairs": {
+   "dh/nested": [
+    [
+     "base",
+     "link1"
+    ],
+    [
+     "link1",
+     "link2"
+    ],
+    [
+     "link2",
+     "link3"
+    ],
+    [
+     "link3",
+     "link4"
+    ],
+    [
+     "link4",
+     "link5"
+    ],
+    [
+     "link5",
+     "link6"
+    ]
+   ],
+   "screw/flat": [
+    [
+     "base",
+     "link1"
+    ],
+    [
+     "link1",
+     "link2"
+    ],
+    [
+     "link2",
+     "link3"
+    ],
+    [
+     "link3",
+     "link4"
+    ],
+    [
+     "link4",
+     "link5"
+    ],
+    [
+     "link5",
+     "link6"
+    ]
+   ],
+   "swing/nested": [
+    [
+     "base",
+     "link1"
+    ],
+    [
+     "link1",
+     "link2"
+    ],
+    [
+     "link2",
+     "link3"
+    ],
+    [
+     "link3",
+     "link4"
+    ],
+    [
+     "link4",
+     "link5"
+    ],
+    [
+     "link5",
+     "link6"
+    ]
+   ],
+   "dh/flat": [
+    [
+     "base",
+     "link1"
+    ],
+    [
+     "link1",
+     "link2"
+    ],
+    [
+     "link2",
+     "link3"
+    ],
+    [
+     "link3",
+     "link4"
+    ],
+    [
+     "link4",
+     "link5"
+    ],
+    [
+     "link5",
+     "link6"
+    ]
+   ],
+   "screw/nested": [
+    [
+     "base",
+     "link1"
+    ],
+    [
+     "link1",
+     "link2"
+    ],
+    [
+     "link2",
+     "link3"
+    ],
+    [
+     "link3",
+     "link4"
+    ],
+    [
+     "link4",
+     "link5"
+    ],
+    [
+     "link5",
+     "link6"
+    ]
+   ],
+   "swing/flat": [
+    [
+     "base",
+     "link1"
+    ],
+    [
+     "link1",
+     "link2"
+    ],
+    [
+     "link2",
+     "link3"
+    ],
+    [
+     "link3",
+     "link4"
+    ],
+    [
+     "link4",
+     "link5"
+    ],
+    [
+     "link5",
+     "link6"
+    ]
+   ]
+  },
+  "V1_usd_endpoints": {
+   "samples": 300,
+   "max_err_vs_numpy_m": 1.3877787807814457e-15,
+   "max_err_between_reps_m": 1.3322676295501878e-15
+  },
+  "V2_static_overlap": {
+   "samples": 300,
+   "agree": 300,
+   "disagree": 0,
+   "samples_with_hit": 25,
+   "samples_with_self_hit": 19,
+   "samples_with_obstacle_hit": 6,
+   "skipped_boundary_pairs": 0,
+   "disagree_examples": []
+  },
+  "V5_timing": {
+   "set_joint_positions_ms_median": 0.5317499999364372,
+   "check_ms_median": 0.4007499992439989,
+   "colliders_per_robot": 8
+  },
+  "V2_immediate_reflection": {
+   "trials": 20,
+   "correct": 20,
+   "timeline_stopped": true
+  },
+  "V3_kinematic_stop_overlap": {
+   "set": {
+    "max_position_err_physx_vs_usd_m": 1.278821052815635
+   },
+   "after_app_update": {
+    "max_position_err_physx_vs_usd_m": 1.278821052815635
+   },
+   "after_update_simulation": {
+    "max_position_err_physx_vs_usd_m": 1.1920928955078125e-07
+   }
+  },
+  "V3_kinematic_pose": {
+   "frames": 293,
+   "max_err_physx_vs_usd": 5.606413254755083e-07
+  },
+  "V3_kinematic_overlap": {
+   "frames": 293,
+   "agree_with_current_q": 293,
+   "agree_with_previous_q": 286
+  },
+  "V4_contact_monitor_obstacle_events": {
+   "dh/flat": [
+    [
+     56,
+     "found"
+    ],
+    [
+     61,
+     "found"
+    ],
+    [
+     137,
+     "lost"
+    ],
+    [
+     142,
+     "lost"
+    ]
+   ],
+   "screw/flat": [
+    [
+     56,
+     "found"
+    ],
+    [
+     61,
+     "found"
+    ],
+    [
+     137,
+     "lost"
+    ],
+    [
+     142,
+     "lost"
+    ]
+   ],
+   "swing/flat": [
+    [
+     56,
+     "found"
+    ],
+    [
+     61,
+     "found"
+    ],
+    [
+     137,
+     "lost"
+    ],
+    [
+     142,
+     "lost"
+    ]
+   ]
+  },
+  "V4_contact_monitor_by_phase": {
+   "approach": {
+    "frames": 61,
+    "truth": 12,
+    "truth_self": 0,
+    "dh/flat": 12,
+    "screw/flat": 12,
+    "swing/flat": 12,
+    "dh/flat:self": 0,
+    "screw/flat:self": 0,
+    "swing/flat:self": 0
+   },
+   "hold_hit": {
+    "frames": 60,
+    "truth": 60,
+    "truth_self": 0,
+    "dh/flat": 60,
+    "screw/flat": 60,
+    "swing/flat": 60,
+    "dh/flat:self": 0,
+    "screw/flat:self": 0,
+    "swing/flat:self": 0
+   },
+   "leave": {
+    "frames": 61,
+    "truth": 12,
+    "truth_self": 0,
+    "dh/flat": 14,
+    "screw/flat": 14,
+    "swing/flat": 14,
+    "dh/flat:self": 0,
+    "screw/flat:self": 0,
+    "swing/flat:self": 0
+   },
+   "hold_free": {
+    "frames": 30,
+    "truth": 0,
+    "truth_self": 0,
+    "dh/flat": 0,
+    "screw/flat": 0,
+    "swing/flat": 0,
+    "dh/flat:self": 0,
+    "screw/flat:self": 0,
+    "swing/flat:self": 0
+   },
+   "self_approach": {
+    "frames": 61,
+    "truth": 0,
+    "truth_self": 35,
+    "dh/flat": 0,
+    "screw/flat": 0,
+    "swing/flat": 0,
+    "dh/flat:self": 39,
+    "screw/flat:self": 39,
+    "swing/flat:self": 39
+   },
+   "self_hold": {
+    "frames": 20,
+    "truth": 0,
+    "truth_self": 20,
+    "dh/flat": 0,
+    "screw/flat": 0,
+    "swing/flat": 0,
+    "dh/flat:self": 20,
+    "screw/flat:self": 20,
+    "swing/flat:self": 20
+   }
+  },
+  "V4_contact_monitor_other_pairs": {
+   "dh/flat": [
+    [
+     "base",
+     "link4"
+    ],
+    [
+     "base",
+     "link5"
+    ],
+    [
+     "link1",
+     "link4"
+    ],
+    [
+     "link1",
+     "link5"
+    ]
+   ],
+   "screw/flat": [
+    [
+     "base",
+     "link4"
+    ],
+    [
+     "base",
+     "link5"
+    ],
+    [
+     "link1",
+     "link4"
+    ],
+    [
+     "link1",
+     "link5"
+    ]
+   ],
+   "swing/flat": [
+    [
+     "base",
+     "link4"
+    ],
+    [
+     "base",
+     "link5"
+    ],
+    [
+     "link1",
+     "link4"
+    ],
+    [
+     "link1",
+     "link5"
+    ]
+   ]
+  },
+  "V3_stop_reset": {
+   "q_at_play_end": [
+    -0.5551436127377865,
+    1.69103830467387,
+    -0.0362569295756277,
+    -0.3640163181139524,
+    0.12261522952881965,
+    1.803752782327399
+   ],
+   "q_after_stop": [
+    -0.5551436127377865,
+    1.69103830467387,
+    -0.0362569295756277,
+    -0.3640163181139524,
+    0.12261522952881965,
+    1.803752782327399
+   ],
+   "ops_unchanged_by_stop": {
+    "dh/flat": true,
+    "screw/flat": true,
+    "swing/flat": true
+   },
+   "ops_consistent_with_joint_attr": {
+    "dh/flat": true,
+    "screw/flat": true,
+    "swing/flat": true
+   }
+  },
+  "V6_nested_kinematic": {
+   "contact_report_headers": {
+    "dh/nested": 46,
+    "swing/nested": 46,
+    "screw/nested": 46,
+    "dh/flat": 15,
+    "swing/flat": 15,
+    "screw/flat": 15
+   },
+   "ball_displacement_m": {
+    "dh/nested": 0.1256971441363132,
+    "swing/nested": 0.12569710650727667,
+    "screw/nested": 0.12568642224364854,
+    "dh/flat": 0.269072826645563,
+    "swing/flat": 0.2690733976159859,
+    "screw/flat": 0.26907350767862176
+   }
+  }
+ },
+ "examples": {
+  "self": [
+   -0.5551436127377865,
+   1.69103830467387,
+   -0.0362569295756277,
+   -0.3640163181139524,
+   0.12261522952881965,
+   1.803752782327399
+  ],
+  "env": [
+   0.47094317256449614,
+   -0.21490785484146135,
+   0.1000784382655666,
+   -1.6091023095778105,
+   2.603926422320611,
+   -1.1312206147691102
+  ],
+  "free": [
+   0.7859979977652181,
+   1.588855203878302,
+   0.10513713804903872,
+   -1.4289226120489225,
+   -1.2555922625248999,
+   1.4942137815850476
+  ]
+ },
+ "kinematic_frames": [
+  {
+   "frame": 0,
+   "phase": "approach",
+   "truth_obstacle": false,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": 0.30917410376081506
+  },
+  {
+   "frame": 1,
+   "phase": "approach",
+   "truth_obstacle": false,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": 0.309152281617701
+  },
+  {
+   "frame": 2,
+   "phase": "approach",
+   "truth_obstacle": false,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": 0.30913198888277726
+  },
+  {
+   "frame": 3,
+   "phase": "approach",
+   "truth_obstacle": false,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": 0.30911322634043104
+  },
+  {
+   "frame": 4,
+   "phase": "approach",
+   "truth_obstacle": false,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": 0.3090959947160144
+  },
+  {
+   "frame": 5,
+   "phase": "approach",
+   "truth_obstacle": false,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": 0.3090802946757901
+  },
+  {
+   "frame": 6,
+   "phase": "approach",
+   "truth_obstacle": false,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": 0.3090661268268811
+  },
+  {
+   "frame": 7,
+   "phase": "approach",
+   "truth_obstacle": false,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": 0.30905349171722535
+  },
+  {
+   "frame": 8,
+   "phase": "approach",
+   "truth_obstacle": false,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": 0.3090423898355346
+  },
+  {
+   "frame": 9,
+   "phase": "approach",
+   "truth_obstacle": false,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": 0.3090328216112574
+  },
+  {
+   "frame": 10,
+   "phase": "approach",
+   "truth_obstacle": false,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": 0.3090247874145469
+  },
+  {
+   "frame": 11,
+   "phase": "approach",
+   "truth_obstacle": false,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": 0.30901828755623345
+  },
+  {
+   "frame": 12,
+   "phase": "approach",
+   "truth_obstacle": false,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": 0.30901332228780043
+  },
+  {
+   "frame": 13,
+   "phase": "approach",
+   "truth_obstacle": false,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": 0.30900989180136573
+  },
+  {
+   "frame": 14,
+   "phase": "approach",
+   "truth_obstacle": false,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": 0.3090079962296676
+  },
+  {
+   "frame": 15,
+   "phase": "approach",
+   "truth_obstacle": false,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": 0.3067235260121156
+  },
+  {
+   "frame": 16,
+   "phase": "approach",
+   "truth_obstacle": false,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": 0.30219092003861536
+  },
+  {
+   "frame": 17,
+   "phase": "approach",
+   "truth_obstacle": false,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": 0.29731329969758097
+  },
+  {
+   "frame": 18,
+   "phase": "approach",
+   "truth_obstacle": false,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": 0.2920942882583343
+  },
+  {
+   "frame": 19,
+   "phase": "approach",
+   "truth_obstacle": false,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": 0.28653793806597033
+  },
+  {
+   "frame": 20,
+   "phase": "approach",
+   "truth_obstacle": false,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": 0.2806487216844235
+  },
+  {
+   "frame": 21,
+   "phase": "approach",
+   "truth_obstacle": false,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": 0.2744315229655684
+  },
+  {
+   "frame": 22,
+   "phase": "approach",
+   "truth_obstacle": false,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": 0.26789162804142275
+  },
+  {
+   "frame": 23,
+   "phase": "approach",
+   "truth_obstacle": false,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": 0.2610347162422861
+  },
+  {
+   "frame": 24,
+   "phase": "approach",
+   "truth_obstacle": false,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": 0.253866850950029
+  },
+  {
+   "frame": 25,
+   "phase": "approach",
+   "truth_obstacle": false,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": 0.2463944704030211
+  },
+  {
+   "frame": 26,
+   "phase": "approach",
+   "truth_obstacle": false,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": 0.23862437847770418
+  },
+  {
+   "frame": 27,
+   "phase": "approach",
+   "truth_obstacle": false,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": 0.23056373548209225
+  },
+  {
+   "frame": 28,
+   "phase": "approach",
+   "truth_obstacle": false,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": 0.22222004900915232
+  },
+  {
+   "frame": 29,
+   "phase": "approach",
+   "truth_obstacle": false,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": 0.21360116491401449
+  },
+  {
+   "frame": 30,
+   "phase": "approach",
+   "truth_obstacle": false,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": 0.20471525849954758
+  },
+  {
+   "frame": 31,
+   "phase": "approach",
+   "truth_obstacle": false,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": 0.19557082602180376
+  },
+  {
+   "frame": 32,
+   "phase": "approach",
+   "truth_obstacle": false,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": 0.18617667666274712
+  },
+  {
+   "frame": 33,
+   "phase": "approach",
+   "truth_obstacle": false,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": 0.1765419251662414
+  },
+  {
+   "frame": 34,
+   "phase": "approach",
+   "truth_obstacle": false,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": 0.1666759853999072
+  },
+  {
+   "frame": 35,
+   "phase": "approach",
+   "truth_obstacle": false,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": 0.15658856519825282
+  },
+  {
+   "frame": 36,
+   "phase": "approach",
+   "truth_obstacle": false,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": 0.1462896629736386
+  },
+  {
+   "frame": 37,
+   "phase": "approach",
+   "truth_obstacle": false,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": 0.13578956676987092
+  },
+  {
+   "frame": 38,
+   "phase": "approach",
+   "truth_obstacle": false,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": 0.125098856707824
+  },
+  {
+   "frame": 39,
+   "phase": "approach",
+   "truth_obstacle": false,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": 0.11422841218001879
+  },
+  {
+   "frame": 40,
+   "phase": "approach",
+   "truth_obstacle": false,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": 0.10318942576731728
+  },
+  {
+   "frame": 41,
+   "phase": "approach",
+   "truth_obstacle": false,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": 0.09199342680172402
+  },
+  {
+   "frame": 42,
+   "phase": "approach",
+   "truth_obstacle": false,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": 0.0806523189993764
+  },
+  {
+   "frame": 43,
+   "phase": "approach",
+   "truth_obstacle": false,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": 0.06917843901310959
+  },
+  {
+   "frame": 44,
+   "phase": "approach",
+   "truth_obstacle": false,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": 0.05758464678333362
+  },
+  {
+   "frame": 45,
+   "phase": "approach",
+   "truth_obstacle": false,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": 0.04588446546704657
+  },
+  {
+   "frame": 46,
+   "phase": "approach",
+   "truth_obstacle": false,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": 0.034092300956387364
+  },
+  {
+   "frame": 47,
+   "phase": "approach",
+   "truth_obstacle": false,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": 0.022223793537093486
+  },
+  {
+   "frame": 48,
+   "phase": "approach",
+   "truth_obstacle": false,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": 0.01029639765880229
+  },
+  {
+   "frame": 49,
+   "phase": "approach",
+   "truth_obstacle": true,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": true,
+    "screw/flat": true,
+    "swing/flat": true
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": -0.0016696261501678161
+  },
+  {
+   "frame": 50,
+   "phase": "approach",
+   "truth_obstacle": true,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": true,
+    "screw/flat": true,
+    "swing/flat": true
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": -0.013649433581140666
+  },
+  {
+   "frame": 51,
+   "phase": "approach",
+   "truth_obstacle": true,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": true,
+    "screw/flat": true,
+    "swing/flat": true
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": -0.025610221331191195
+  },
+  {
+   "frame": 52,
+   "phase": "approach",
+   "truth_obstacle": true,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": true,
+    "screw/flat": true,
+    "swing/flat": true
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": -0.037504342062907085
+  },
+  {
+   "frame": 53,
+   "phase": "approach",
+   "truth_obstacle": true,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": true,
+    "screw/flat": true,
+    "swing/flat": true
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": -0.04925394191544669
+  },
+  {
+   "frame": 54,
+   "phase": "approach",
+   "truth_obstacle": true,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": true,
+    "screw/flat": true,
+    "swing/flat": true
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": -0.0607126184027287
+  },
+  {
+   "frame": 55,
+   "phase": "approach",
+   "truth_obstacle": true,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": true,
+    "screw/flat": true,
+    "swing/flat": true
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": -0.07155593976183852
+  },
+  {
+   "frame": 56,
+   "phase": "approach",
+   "truth_obstacle": true,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": true,
+    "screw/flat": true,
+    "swing/flat": true
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": -0.08092820566468259
+  },
+  {
+   "frame": 57,
+   "phase": "approach",
+   "truth_obstacle": true,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": true,
+    "screw/flat": true,
+    "swing/flat": true
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": -0.08646679716017568
+  },
+  {
+   "frame": 58,
+   "phase": "approach",
+   "truth_obstacle": true,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": true,
+    "screw/flat": true,
+    "swing/flat": true
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": -0.0847834706175371
+  },
+  {
+   "frame": 59,
+   "phase": "approach",
+   "truth_obstacle": true,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": true,
+    "screw/flat": true,
+    "swing/flat": true
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": -0.07721300397298031
+  },
+  {
+   "frame": 60,
+   "phase": "approach",
+   "truth_obstacle": true,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": true,
+    "screw/flat": true,
+    "swing/flat": true
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": -0.06719036704682929
+  },
+  {
+   "frame": 61,
+   "phase": "hold_hit",
+   "truth_obstacle": true,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": true,
+    "screw/flat": true,
+    "swing/flat": true
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": -0.06719036704682929
+  },
+  {
+   "frame": 62,
+   "phase": "hold_hit",
+   "truth_obstacle": true,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": true,
+    "screw/flat": true,
+    "swing/flat": true
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": -0.06719036704682929
+  },
+  {
+   "frame": 63,
+   "phase": "hold_hit",
+   "truth_obstacle": true,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": true,
+    "screw/flat": true,
+    "swing/flat": true
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": -0.06719036704682929
+  },
+  {
+   "frame": 64,
+   "phase": "hold_hit",
+   "truth_obstacle": true,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": true,
+    "screw/flat": true,
+    "swing/flat": true
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": -0.06719036704682929
+  },
+  {
+   "frame": 65,
+   "phase": "hold_hit",
+   "truth_obstacle": true,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": true,
+    "screw/flat": true,
+    "swing/flat": true
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": -0.06719036704682929
+  },
+  {
+   "frame": 66,
+   "phase": "hold_hit",
+   "truth_obstacle": true,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": true,
+    "screw/flat": true,
+    "swing/flat": true
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": -0.06719036704682929
+  },
+  {
+   "frame": 67,
+   "phase": "hold_hit",
+   "truth_obstacle": true,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": true,
+    "screw/flat": true,
+    "swing/flat": true
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": -0.06719036704682929
+  },
+  {
+   "frame": 68,
+   "phase": "hold_hit",
+   "truth_obstacle": true,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": true,
+    "screw/flat": true,
+    "swing/flat": true
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": -0.06719036704682929
+  },
+  {
+   "frame": 69,
+   "phase": "hold_hit",
+   "truth_obstacle": true,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": true,
+    "screw/flat": true,
+    "swing/flat": true
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": -0.06719036704682929
+  },
+  {
+   "frame": 70,
+   "phase": "hold_hit",
+   "truth_obstacle": true,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": true,
+    "screw/flat": true,
+    "swing/flat": true
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": -0.06719036704682929
+  },
+  {
+   "frame": 71,
+   "phase": "hold_hit",
+   "truth_obstacle": true,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": true,
+    "screw/flat": true,
+    "swing/flat": true
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": -0.06719036704682929
+  },
+  {
+   "frame": 72,
+   "phase": "hold_hit",
+   "truth_obstacle": true,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": true,
+    "screw/flat": true,
+    "swing/flat": true
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": -0.06719036704682929
+  },
+  {
+   "frame": 73,
+   "phase": "hold_hit",
+   "truth_obstacle": true,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": true,
+    "screw/flat": true,
+    "swing/flat": true
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": -0.06719036704682929
+  },
+  {
+   "frame": 74,
+   "phase": "hold_hit",
+   "truth_obstacle": true,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": true,
+    "screw/flat": true,
+    "swing/flat": true
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": -0.06719036704682929
+  },
+  {
+   "frame": 75,
+   "phase": "hold_hit",
+   "truth_obstacle": true,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": true,
+    "screw/flat": true,
+    "swing/flat": true
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": -0.06719036704682929
+  },
+  {
+   "frame": 76,
+   "phase": "hold_hit",
+   "truth_obstacle": true,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": true,
+    "screw/flat": true,
+    "swing/flat": true
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": -0.06719036704682929
+  },
+  {
+   "frame": 77,
+   "phase": "hold_hit",
+   "truth_obstacle": true,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": true,
+    "screw/flat": true,
+    "swing/flat": true
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": -0.06719036704682929
+  },
+  {
+   "frame": 78,
+   "phase": "hold_hit",
+   "truth_obstacle": true,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": true,
+    "screw/flat": true,
+    "swing/flat": true
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": -0.06719036704682929
+  },
+  {
+   "frame": 79,
+   "phase": "hold_hit",
+   "truth_obstacle": true,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": true,
+    "screw/flat": true,
+    "swing/flat": true
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": -0.06719036704682929
+  },
+  {
+   "frame": 80,
+   "phase": "hold_hit",
+   "truth_obstacle": true,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": true,
+    "screw/flat": true,
+    "swing/flat": true
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": -0.06719036704682929
+  },
+  {
+   "frame": 81,
+   "phase": "hold_hit",
+   "truth_obstacle": true,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": true,
+    "screw/flat": true,
+    "swing/flat": true
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": -0.06719036704682929
+  },
+  {
+   "frame": 82,
+   "phase": "hold_hit",
+   "truth_obstacle": true,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": true,
+    "screw/flat": true,
+    "swing/flat": true
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": -0.06719036704682929
+  },
+  {
+   "frame": 83,
+   "phase": "hold_hit",
+   "truth_obstacle": true,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": true,
+    "screw/flat": true,
+    "swing/flat": true
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": -0.06719036704682929
+  },
+  {
+   "frame": 84,
+   "phase": "hold_hit",
+   "truth_obstacle": true,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": true,
+    "screw/flat": true,
+    "swing/flat": true
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": -0.06719036704682929
+  },
+  {
+   "frame": 85,
+   "phase": "hold_hit",
+   "truth_obstacle": true,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": true,
+    "screw/flat": true,
+    "swing/flat": true
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": -0.06719036704682929
+  },
+  {
+   "frame": 86,
+   "phase": "hold_hit",
+   "truth_obstacle": true,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": true,
+    "screw/flat": true,
+    "swing/flat": true
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": -0.06719036704682929
+  },
+  {
+   "frame": 87,
+   "phase": "hold_hit",
+   "truth_obstacle": true,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": true,
+    "screw/flat": true,
+    "swing/flat": true
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": -0.06719036704682929
+  },
+  {
+   "frame": 88,
+   "phase": "hold_hit",
+   "truth_obstacle": true,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": true,
+    "screw/flat": true,
+    "swing/flat": true
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": -0.06719036704682929
+  },
+  {
+   "frame": 89,
+   "phase": "hold_hit",
+   "truth_obstacle": true,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": true,
+    "screw/flat": true,
+    "swing/flat": true
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": -0.06719036704682929
+  },
+  {
+   "frame": 90,
+   "phase": "hold_hit",
+   "truth_obstacle": true,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": true,
+    "screw/flat": true,
+    "swing/flat": true
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": -0.06719036704682929
+  },
+  {
+   "frame": 91,
+   "phase": "hold_hit",
+   "truth_obstacle": true,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": true,
+    "screw/flat": true,
+    "swing/flat": true
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": -0.06719036704682929
+  },
+  {
+   "frame": 92,
+   "phase": "hold_hit",
+   "truth_obstacle": true,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": true,
+    "screw/flat": true,
+    "swing/flat": true
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": -0.06719036704682929
+  },
+  {
+   "frame": 93,
+   "phase": "hold_hit",
+   "truth_obstacle": true,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": true,
+    "screw/flat": true,
+    "swing/flat": true
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": -0.06719036704682929
+  },
+  {
+   "frame": 94,
+   "phase": "hold_hit",
+   "truth_obstacle": true,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": true,
+    "screw/flat": true,
+    "swing/flat": true
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": -0.06719036704682929
+  },
+  {
+   "frame": 95,
+   "phase": "hold_hit",
+   "truth_obstacle": true,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": true,
+    "screw/flat": true,
+    "swing/flat": true
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": -0.06719036704682929
+  },
+  {
+   "frame": 96,
+   "phase": "hold_hit",
+   "truth_obstacle": true,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": true,
+    "screw/flat": true,
+    "swing/flat": true
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": -0.06719036704682929
+  },
+  {
+   "frame": 97,
+   "phase": "hold_hit",
+   "truth_obstacle": true,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": true,
+    "screw/flat": true,
+    "swing/flat": true
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": -0.06719036704682929
+  },
+  {
+   "frame": 98,
+   "phase": "hold_hit",
+   "truth_obstacle": true,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": true,
+    "screw/flat": true,
+    "swing/flat": true
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": -0.06719036704682929
+  },
+  {
+   "frame": 99,
+   "phase": "hold_hit",
+   "truth_obstacle": true,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": true,
+    "screw/flat": true,
+    "swing/flat": true
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": -0.06719036704682929
+  },
+  {
+   "frame": 100,
+   "phase": "hold_hit",
+   "truth_obstacle": true,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": true,
+    "screw/flat": true,
+    "swing/flat": true
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": -0.06719036704682929
+  },
+  {
+   "frame": 101,
+   "phase": "hold_hit",
+   "truth_obstacle": true,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": true,
+    "screw/flat": true,
+    "swing/flat": true
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": -0.06719036704682929
+  },
+  {
+   "frame": 102,
+   "phase": "hold_hit",
+   "truth_obstacle": true,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": true,
+    "screw/flat": true,
+    "swing/flat": true
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": -0.06719036704682929
+  },
+  {
+   "frame": 103,
+   "phase": "hold_hit",
+   "truth_obstacle": true,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": true,
+    "screw/flat": true,
+    "swing/flat": true
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": -0.06719036704682929
+  },
+  {
+   "frame": 104,
+   "phase": "hold_hit",
+   "truth_obstacle": true,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": true,
+    "screw/flat": true,
+    "swing/flat": true
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": -0.06719036704682929
+  },
+  {
+   "frame": 105,
+   "phase": "hold_hit",
+   "truth_obstacle": true,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": true,
+    "screw/flat": true,
+    "swing/flat": true
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": -0.06719036704682929
+  },
+  {
+   "frame": 106,
+   "phase": "hold_hit",
+   "truth_obstacle": true,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": true,
+    "screw/flat": true,
+    "swing/flat": true
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": -0.06719036704682929
+  },
+  {
+   "frame": 107,
+   "phase": "hold_hit",
+   "truth_obstacle": true,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": true,
+    "screw/flat": true,
+    "swing/flat": true
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": -0.06719036704682929
+  },
+  {
+   "frame": 108,
+   "phase": "hold_hit",
+   "truth_obstacle": true,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": true,
+    "screw/flat": true,
+    "swing/flat": true
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": -0.06719036704682929
+  },
+  {
+   "frame": 109,
+   "phase": "hold_hit",
+   "truth_obstacle": true,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": true,
+    "screw/flat": true,
+    "swing/flat": true
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": -0.06719036704682929
+  },
+  {
+   "frame": 110,
+   "phase": "hold_hit",
+   "truth_obstacle": true,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": true,
+    "screw/flat": true,
+    "swing/flat": true
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": -0.06719036704682929
+  },
+  {
+   "frame": 111,
+   "phase": "hold_hit",
+   "truth_obstacle": true,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": true,
+    "screw/flat": true,
+    "swing/flat": true
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": -0.06719036704682929
+  },
+  {
+   "frame": 112,
+   "phase": "hold_hit",
+   "truth_obstacle": true,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": true,
+    "screw/flat": true,
+    "swing/flat": true
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": -0.06719036704682929
+  },
+  {
+   "frame": 113,
+   "phase": "hold_hit",
+   "truth_obstacle": true,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": true,
+    "screw/flat": true,
+    "swing/flat": true
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": -0.06719036704682929
+  },
+  {
+   "frame": 114,
+   "phase": "hold_hit",
+   "truth_obstacle": true,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": true,
+    "screw/flat": true,
+    "swing/flat": true
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": -0.06719036704682929
+  },
+  {
+   "frame": 115,
+   "phase": "hold_hit",
+   "truth_obstacle": true,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": true,
+    "screw/flat": true,
+    "swing/flat": true
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": -0.06719036704682929
+  },
+  {
+   "frame": 116,
+   "phase": "hold_hit",
+   "truth_obstacle": true,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": true,
+    "screw/flat": true,
+    "swing/flat": true
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": -0.06719036704682929
+  },
+  {
+   "frame": 117,
+   "phase": "hold_hit",
+   "truth_obstacle": true,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": true,
+    "screw/flat": true,
+    "swing/flat": true
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": -0.06719036704682929
+  },
+  {
+   "frame": 118,
+   "phase": "hold_hit",
+   "truth_obstacle": true,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": true,
+    "screw/flat": true,
+    "swing/flat": true
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": -0.06719036704682929
+  },
+  {
+   "frame": 119,
+   "phase": "hold_hit",
+   "truth_obstacle": true,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": true,
+    "screw/flat": true,
+    "swing/flat": true
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": -0.06719036704682929
+  },
+  {
+   "frame": 120,
+   "phase": "hold_hit",
+   "truth_obstacle": true,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": true,
+    "screw/flat": true,
+    "swing/flat": true
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": -0.06719036704682929
+  },
+  {
+   "frame": 121,
+   "phase": "leave",
+   "truth_obstacle": true,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": true,
+    "screw/flat": true,
+    "swing/flat": true
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": -0.06719036704682929
+  },
+  {
+   "frame": 122,
+   "phase": "leave",
+   "truth_obstacle": true,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": true,
+    "screw/flat": true,
+    "swing/flat": true
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": -0.07721300397298024
+  },
+  {
+   "frame": 123,
+   "phase": "leave",
+   "truth_obstacle": true,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": true,
+    "screw/flat": true,
+    "swing/flat": true
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": -0.08478347061753705
+  },
+  {
+   "frame": 124,
+   "phase": "leave",
+   "truth_obstacle": true,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": true,
+    "screw/flat": true,
+    "swing/flat": true
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": -0.08646679716017563
+  },
+  {
+   "frame": 125,
+   "phase": "leave",
+   "truth_obstacle": true,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": true,
+    "screw/flat": true,
+    "swing/flat": true
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": -0.08092820566468248
+  },
+  {
+   "frame": 126,
+   "phase": "leave",
+   "truth_obstacle": true,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": true,
+    "screw/flat": true,
+    "swing/flat": true
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": -0.07155593976183858
+  },
+  {
+   "frame": 127,
+   "phase": "leave",
+   "truth_obstacle": true,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": true,
+    "screw/flat": true,
+    "swing/flat": true
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": -0.0607126184027287
+  },
+  {
+   "frame": 128,
+   "phase": "leave",
+   "truth_obstacle": true,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": true,
+    "screw/flat": true,
+    "swing/flat": true
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": -0.04925394191544674
+  },
+  {
+   "frame": 129,
+   "phase": "leave",
+   "truth_obstacle": true,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": true,
+    "screw/flat": true,
+    "swing/flat": true
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": -0.037504342062907016
+  },
+  {
+   "frame": 130,
+   "phase": "leave",
+   "truth_obstacle": true,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": true,
+    "screw/flat": true,
+    "swing/flat": true
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": -0.025610221331191237
+  },
+  {
+   "frame": 131,
+   "phase": "leave",
+   "truth_obstacle": true,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": true,
+    "screw/flat": true,
+    "swing/flat": true
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": -0.013649433581140583
+  },
+  {
+   "frame": 132,
+   "phase": "leave",
+   "truth_obstacle": true,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": true,
+    "screw/flat": true,
+    "swing/flat": true
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": -0.0016696261501678439
+  },
+  {
+   "frame": 133,
+   "phase": "leave",
+   "truth_obstacle": false,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": true,
+    "screw/flat": true,
+    "swing/flat": true
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": 0.010296397658802345
+  },
+  {
+   "frame": 134,
+   "phase": "leave",
+   "truth_obstacle": false,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": true,
+    "screw/flat": true,
+    "swing/flat": true
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": 0.022223793537093514
+  },
+  {
+   "frame": 135,
+   "phase": "leave",
+   "truth_obstacle": false,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": 0.03409230095638742
+  },
+  {
+   "frame": 136,
+   "phase": "leave",
+   "truth_obstacle": false,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": 0.04588446546704657
+  },
+  {
+   "frame": 137,
+   "phase": "leave",
+   "truth_obstacle": false,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": 0.05758464678333357
+  },
+  {
+   "frame": 138,
+   "phase": "leave",
+   "truth_obstacle": false,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": 0.06917843901310956
+  },
+  {
+   "frame": 139,
+   "phase": "leave",
+   "truth_obstacle": false,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": 0.0806523189993764
+  },
+  {
+   "frame": 140,
+   "phase": "leave",
+   "truth_obstacle": false,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": 0.09199342680172402
+  },
+  {
+   "frame": 141,
+   "phase": "leave",
+   "truth_obstacle": false,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": 0.10318942576731725
+  },
+  {
+   "frame": 142,
+   "phase": "leave",
+   "truth_obstacle": false,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": 0.11422841218001879
+  },
+  {
+   "frame": 143,
+   "phase": "leave",
+   "truth_obstacle": false,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": 0.125098856707824
+  },
+  {
+   "frame": 144,
+   "phase": "leave",
+   "truth_obstacle": false,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": 0.13578956676987092
+  },
+  {
+   "frame": 145,
+   "phase": "leave",
+   "truth_obstacle": false,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": 0.1462896629736386
+  },
+  {
+   "frame": 146,
+   "phase": "leave",
+   "truth_obstacle": false,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": 0.15658856519825282
+  },
+  {
+   "frame": 147,
+   "phase": "leave",
+   "truth_obstacle": false,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": 0.16667598539990713
+  },
+  {
+   "frame": 148,
+   "phase": "leave",
+   "truth_obstacle": false,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": 0.1765419251662414
+  },
+  {
+   "frame": 149,
+   "phase": "leave",
+   "truth_obstacle": false,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": 0.18617667666274712
+  },
+  {
+   "frame": 150,
+   "phase": "leave",
+   "truth_obstacle": false,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": 0.1955708260218038
+  },
+  {
+   "frame": 151,
+   "phase": "leave",
+   "truth_obstacle": false,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": 0.20471525849954758
+  },
+  {
+   "frame": 152,
+   "phase": "leave",
+   "truth_obstacle": false,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": 0.21360116491401449
+  },
+  {
+   "frame": 153,
+   "phase": "leave",
+   "truth_obstacle": false,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": 0.22222004900915232
+  },
+  {
+   "frame": 154,
+   "phase": "leave",
+   "truth_obstacle": false,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": 0.23056373548209225
+  },
+  {
+   "frame": 155,
+   "phase": "leave",
+   "truth_obstacle": false,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": 0.23862437847770412
+  },
+  {
+   "frame": 156,
+   "phase": "leave",
+   "truth_obstacle": false,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": 0.2463944704030211
+  },
+  {
+   "frame": 157,
+   "phase": "leave",
+   "truth_obstacle": false,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": 0.253866850950029
+  },
+  {
+   "frame": 158,
+   "phase": "leave",
+   "truth_obstacle": false,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": 0.2610347162422861
+  },
+  {
+   "frame": 159,
+   "phase": "leave",
+   "truth_obstacle": false,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": 0.26789162804142275
+  },
+  {
+   "frame": 160,
+   "phase": "leave",
+   "truth_obstacle": false,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": 0.2744315229655684
+  },
+  {
+   "frame": 161,
+   "phase": "leave",
+   "truth_obstacle": false,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": 0.2806487216844234
+  },
+  {
+   "frame": 162,
+   "phase": "leave",
+   "truth_obstacle": false,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": 0.28653793806597044
+  },
+  {
+   "frame": 163,
+   "phase": "leave",
+   "truth_obstacle": false,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": 0.2920942882583343
+  },
+  {
+   "frame": 164,
+   "phase": "leave",
+   "truth_obstacle": false,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": 0.29731329969758097
+  },
+  {
+   "frame": 165,
+   "phase": "leave",
+   "truth_obstacle": false,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": 0.30219092003861536
+  },
+  {
+   "frame": 166,
+   "phase": "leave",
+   "truth_obstacle": false,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": 0.3067235260121156
+  },
+  {
+   "frame": 167,
+   "phase": "leave",
+   "truth_obstacle": false,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": 0.3090079962296676
+  },
+  {
+   "frame": 168,
+   "phase": "leave",
+   "truth_obstacle": false,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": 0.30900989180136573
+  },
+  {
+   "frame": 169,
+   "phase": "leave",
+   "truth_obstacle": false,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": 0.30901332228780043
+  },
+  {
+   "frame": 170,
+   "phase": "leave",
+   "truth_obstacle": false,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": 0.3090182875562335
+  },
+  {
+   "frame": 171,
+   "phase": "leave",
+   "truth_obstacle": false,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": 0.3090247874145469
+  },
+  {
+   "frame": 172,
+   "phase": "leave",
+   "truth_obstacle": false,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": 0.3090328216112574
+  },
+  {
+   "frame": 173,
+   "phase": "leave",
+   "truth_obstacle": false,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": 0.3090423898355346
+  },
+  {
+   "frame": 174,
+   "phase": "leave",
+   "truth_obstacle": false,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": 0.30905349171722535
+  },
+  {
+   "frame": 175,
+   "phase": "leave",
+   "truth_obstacle": false,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": 0.3090661268268811
+  },
+  {
+   "frame": 176,
+   "phase": "leave",
+   "truth_obstacle": false,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": 0.3090802946757901
+  },
+  {
+   "frame": 177,
+   "phase": "leave",
+   "truth_obstacle": false,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": 0.3090959947160144
+  },
+  {
+   "frame": 178,
+   "phase": "leave",
+   "truth_obstacle": false,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": 0.30911322634043104
+  },
+  {
+   "frame": 179,
+   "phase": "leave",
+   "truth_obstacle": false,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": 0.30913198888277726
+  },
+  {
+   "frame": 180,
+   "phase": "leave",
+   "truth_obstacle": false,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": 0.309152281617701
+  },
+  {
+   "frame": 181,
+   "phase": "leave",
+   "truth_obstacle": false,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": 0.30917410376081506
+  },
+  {
+   "frame": 182,
+   "phase": "hold_free",
+   "truth_obstacle": false,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": 0.30917410376081506
+  },
+  {
+   "frame": 183,
+   "phase": "hold_free",
+   "truth_obstacle": false,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": 0.30917410376081506
+  },
+  {
+   "frame": 184,
+   "phase": "hold_free",
+   "truth_obstacle": false,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": 0.30917410376081506
+  },
+  {
+   "frame": 185,
+   "phase": "hold_free",
+   "truth_obstacle": false,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": 0.30917410376081506
+  },
+  {
+   "frame": 186,
+   "phase": "hold_free",
+   "truth_obstacle": false,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": 0.30917410376081506
+  },
+  {
+   "frame": 187,
+   "phase": "hold_free",
+   "truth_obstacle": false,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": 0.30917410376081506
+  },
+  {
+   "frame": 188,
+   "phase": "hold_free",
+   "truth_obstacle": false,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": 0.30917410376081506
+  },
+  {
+   "frame": 189,
+   "phase": "hold_free",
+   "truth_obstacle": false,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": 0.30917410376081506
+  },
+  {
+   "frame": 190,
+   "phase": "hold_free",
+   "truth_obstacle": false,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": 0.30917410376081506
+  },
+  {
+   "frame": 191,
+   "phase": "hold_free",
+   "truth_obstacle": false,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": 0.30917410376081506
+  },
+  {
+   "frame": 192,
+   "phase": "hold_free",
+   "truth_obstacle": false,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": 0.30917410376081506
+  },
+  {
+   "frame": 193,
+   "phase": "hold_free",
+   "truth_obstacle": false,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": 0.30917410376081506
+  },
+  {
+   "frame": 194,
+   "phase": "hold_free",
+   "truth_obstacle": false,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": 0.30917410376081506
+  },
+  {
+   "frame": 195,
+   "phase": "hold_free",
+   "truth_obstacle": false,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": 0.30917410376081506
+  },
+  {
+   "frame": 196,
+   "phase": "hold_free",
+   "truth_obstacle": false,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": 0.30917410376081506
+  },
+  {
+   "frame": 197,
+   "phase": "hold_free",
+   "truth_obstacle": false,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": 0.30917410376081506
+  },
+  {
+   "frame": 198,
+   "phase": "hold_free",
+   "truth_obstacle": false,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": 0.30917410376081506
+  },
+  {
+   "frame": 199,
+   "phase": "hold_free",
+   "truth_obstacle": false,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": 0.30917410376081506
+  },
+  {
+   "frame": 200,
+   "phase": "hold_free",
+   "truth_obstacle": false,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": 0.30917410376081506
+  },
+  {
+   "frame": 201,
+   "phase": "hold_free",
+   "truth_obstacle": false,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": 0.30917410376081506
+  },
+  {
+   "frame": 202,
+   "phase": "hold_free",
+   "truth_obstacle": false,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": 0.30917410376081506
+  },
+  {
+   "frame": 203,
+   "phase": "hold_free",
+   "truth_obstacle": false,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": 0.30917410376081506
+  },
+  {
+   "frame": 204,
+   "phase": "hold_free",
+   "truth_obstacle": false,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": 0.30917410376081506
+  },
+  {
+   "frame": 205,
+   "phase": "hold_free",
+   "truth_obstacle": false,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": 0.30917410376081506
+  },
+  {
+   "frame": 206,
+   "phase": "hold_free",
+   "truth_obstacle": false,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": 0.30917410376081506
+  },
+  {
+   "frame": 207,
+   "phase": "hold_free",
+   "truth_obstacle": false,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": 0.30917410376081506
+  },
+  {
+   "frame": 208,
+   "phase": "hold_free",
+   "truth_obstacle": false,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": 0.30917410376081506
+  },
+  {
+   "frame": 209,
+   "phase": "hold_free",
+   "truth_obstacle": false,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": 0.30917410376081506
+  },
+  {
+   "frame": 210,
+   "phase": "hold_free",
+   "truth_obstacle": false,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": 0.30917410376081506
+  },
+  {
+   "frame": 211,
+   "phase": "hold_free",
+   "truth_obstacle": false,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": 0.30917410376081506
+  },
+  {
+   "frame": 212,
+   "phase": "self_approach",
+   "truth_obstacle": false,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": 0.30917410376081506
+  },
+  {
+   "frame": 213,
+   "phase": "self_approach",
+   "truth_obstacle": false,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": 0.30909181593807616
+  },
+  {
+   "frame": 214,
+   "phase": "self_approach",
+   "truth_obstacle": false,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": 0.30903728302179473
+  },
+  {
+   "frame": 215,
+   "phase": "self_approach",
+   "truth_obstacle": false,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": 0.3090105432280821
+  },
+  {
+   "frame": 216,
+   "phase": "self_approach",
+   "truth_obstacle": false,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": 0.30897442728165553
+  },
+  {
+   "frame": 217,
+   "phase": "self_approach",
+   "truth_obstacle": false,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": 0.3087370113141975
+  },
+  {
+   "frame": 218,
+   "phase": "self_approach",
+   "truth_obstacle": false,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": 0.30827111585175526
+  },
+  {
+   "frame": 219,
+   "phase": "self_approach",
+   "truth_obstacle": false,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": 0.3075769851465378
+  },
+  {
+   "frame": 220,
+   "phase": "self_approach",
+   "truth_obstacle": false,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": 0.306654983205359
+  },
+  {
+   "frame": 221,
+   "phase": "self_approach",
+   "truth_obstacle": false,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": 0.3055055937171871
+  },
+  {
+   "frame": 222,
+   "phase": "self_approach",
+   "truth_obstacle": false,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": 0.3041294199590465
+  },
+  {
+   "frame": 223,
+   "phase": "self_approach",
+   "truth_obstacle": false,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": 0.30252718468219186
+  },
+  {
+   "frame": 224,
+   "phase": "self_approach",
+   "truth_obstacle": false,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": 0.3006997299810199
+  },
+  {
+   "frame": 225,
+   "phase": "self_approach",
+   "truth_obstacle": false,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": 0.2986480171477731
+  },
+  {
+   "frame": 226,
+   "phase": "self_approach",
+   "truth_obstacle": false,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": 0.2963731265167538
+  },
+  {
+   "frame": 227,
+   "phase": "self_approach",
+   "truth_obstacle": false,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": 0.293876257302497
+  },
+  {
+   "frame": 228,
+   "phase": "self_approach",
+   "truth_obstacle": false,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": 0.2912299334931343
+  },
+  {
+   "frame": 229,
+   "phase": "self_approach",
+   "truth_obstacle": false,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": 0.28860590705195194
+  },
+  {
+   "frame": 230,
+   "phase": "self_approach",
+   "truth_obstacle": false,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": 0.2860134484849519
+  },
+  {
+   "frame": 231,
+   "phase": "self_approach",
+   "truth_obstacle": false,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": 0.28345449789297916
+  },
+  {
+   "frame": 232,
+   "phase": "self_approach",
+   "truth_obstacle": false,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": 0.280931012882184
+  },
+  {
+   "frame": 233,
+   "phase": "self_approach",
+   "truth_obstacle": false,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [],
+    "screw/flat": [],
+    "swing/flat": []
+   },
+   "min_margin_obstacle": 0.27844496673782393
+  },
+  {
+   "frame": 234,
+   "phase": "self_approach",
+   "truth_obstacle": false,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ],
+    "screw/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ],
+    "swing/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ]
+   },
+   "min_margin_obstacle": 0.2759983464150259
+  },
+  {
+   "frame": 235,
+   "phase": "self_approach",
+   "truth_obstacle": false,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ],
+    "screw/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ],
+    "swing/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ]
+   },
+   "min_margin_obstacle": 0.27359315033969134
+  },
+  {
+   "frame": 236,
+   "phase": "self_approach",
+   "truth_obstacle": false,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ],
+    "screw/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ],
+    "swing/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ]
+   },
+   "min_margin_obstacle": 0.27123138601349095
+  },
+  {
+   "frame": 237,
+   "phase": "self_approach",
+   "truth_obstacle": false,
+   "truth_self": [],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ],
+    "screw/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ],
+    "swing/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ]
+   },
+   "min_margin_obstacle": 0.26891506741781696
+  },
+  {
+   "frame": 238,
+   "phase": "self_approach",
+   "truth_obstacle": false,
+   "truth_self": [
+    [
+     "base",
+     "link4"
+    ],
+    [
+     "base",
+     "link5"
+    ],
+    [
+     "link1",
+     "link4"
+    ],
+    [
+     "link1",
+     "link5"
+    ]
+   ],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ],
+    "screw/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ],
+    "swing/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ]
+   },
+   "min_margin_obstacle": 0.2666462122126657
+  },
+  {
+   "frame": 239,
+   "phase": "self_approach",
+   "truth_obstacle": false,
+   "truth_self": [
+    [
+     "base",
+     "link4"
+    ],
+    [
+     "base",
+     "link5"
+    ],
+    [
+     "link1",
+     "link4"
+    ],
+    [
+     "link1",
+     "link5"
+    ]
+   ],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ],
+    "screw/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ],
+    "swing/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ]
+   },
+   "min_margin_obstacle": 0.2644268387276942
+  },
+  {
+   "frame": 240,
+   "phase": "self_approach",
+   "truth_obstacle": false,
+   "truth_self": [
+    [
+     "base",
+     "link4"
+    ],
+    [
+     "base",
+     "link5"
+    ],
+    [
+     "link1",
+     "link4"
+    ],
+    [
+     "link1",
+     "link5"
+    ]
+   ],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ],
+    "screw/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ],
+    "swing/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ]
+   },
+   "min_margin_obstacle": 0.26225896274416327
+  },
+  {
+   "frame": 241,
+   "phase": "self_approach",
+   "truth_obstacle": false,
+   "truth_self": [
+    [
+     "base",
+     "link4"
+    ],
+    [
+     "base",
+     "link5"
+    ],
+    [
+     "link1",
+     "link4"
+    ],
+    [
+     "link1",
+     "link5"
+    ]
+   ],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ],
+    "screw/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ],
+    "swing/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ]
+   },
+   "min_margin_obstacle": 0.2601445940681303
+  },
+  {
+   "frame": 242,
+   "phase": "self_approach",
+   "truth_obstacle": false,
+   "truth_self": [
+    [
+     "base",
+     "link4"
+    ],
+    [
+     "base",
+     "link5"
+    ],
+    [
+     "link1",
+     "link4"
+    ],
+    [
+     "link1",
+     "link5"
+    ]
+   ],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ],
+    "screw/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ],
+    "swing/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ]
+   },
+   "min_margin_obstacle": 0.25808573289708936
+  },
+  {
+   "frame": 243,
+   "phase": "self_approach",
+   "truth_obstacle": false,
+   "truth_self": [
+    [
+     "base",
+     "link4"
+    ],
+    [
+     "base",
+     "link5"
+    ],
+    [
+     "link1",
+     "link4"
+    ],
+    [
+     "link1",
+     "link5"
+    ]
+   ],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ],
+    "screw/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ],
+    "swing/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ]
+   },
+   "min_margin_obstacle": 0.2560843659842825
+  },
+  {
+   "frame": 244,
+   "phase": "self_approach",
+   "truth_obstacle": false,
+   "truth_self": [
+    [
+     "base",
+     "link4"
+    ],
+    [
+     "base",
+     "link5"
+    ],
+    [
+     "link1",
+     "link4"
+    ],
+    [
+     "link1",
+     "link5"
+    ]
+   ],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ],
+    "screw/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ],
+    "swing/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ]
+   },
+   "min_margin_obstacle": 0.2541424626070964
+  },
+  {
+   "frame": 245,
+   "phase": "self_approach",
+   "truth_obstacle": false,
+   "truth_self": [
+    [
+     "base",
+     "link4"
+    ],
+    [
+     "base",
+     "link5"
+    ],
+    [
+     "link1",
+     "link4"
+    ],
+    [
+     "link1",
+     "link5"
+    ]
+   ],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ],
+    "screw/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ],
+    "swing/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ]
+   },
+   "min_margin_obstacle": 0.2522619703483108
+  },
+  {
+   "frame": 246,
+   "phase": "self_approach",
+   "truth_obstacle": false,
+   "truth_self": [
+    [
+     "base",
+     "link4"
+    ],
+    [
+     "base",
+     "link5"
+    ],
+    [
+     "link1",
+     "link4"
+    ],
+    [
+     "link1",
+     "link5"
+    ]
+   ],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ],
+    "screw/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ],
+    "swing/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ]
+   },
+   "min_margin_obstacle": 0.25044481070145996
+  },
+  {
+   "frame": 247,
+   "phase": "self_approach",
+   "truth_obstacle": false,
+   "truth_self": [
+    [
+     "base",
+     "link4"
+    ],
+    [
+     "base",
+     "link5"
+    ],
+    [
+     "link1",
+     "link4"
+    ],
+    [
+     "link1",
+     "link5"
+    ]
+   ],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ],
+    "screw/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ],
+    "swing/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ]
+   },
+   "min_margin_obstacle": 0.24869287451417138
+  },
+  {
+   "frame": 248,
+   "phase": "self_approach",
+   "truth_obstacle": false,
+   "truth_self": [
+    [
+     "base",
+     "link4"
+    ],
+    [
+     "base",
+     "link5"
+    ],
+    [
+     "link1",
+     "link4"
+    ],
+    [
+     "link1",
+     "link5"
+    ]
+   ],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ],
+    "screw/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ],
+    "swing/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ]
+   },
+   "min_margin_obstacle": 0.24700801728604027
+  },
+  {
+   "frame": 249,
+   "phase": "self_approach",
+   "truth_obstacle": false,
+   "truth_self": [
+    [
+     "base",
+     "link4"
+    ],
+    [
+     "base",
+     "link5"
+    ],
+    [
+     "link1",
+     "link4"
+    ],
+    [
+     "link1",
+     "link5"
+    ]
+   ],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ],
+    "screw/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ],
+    "swing/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ]
+   },
+   "min_margin_obstacle": 0.24539205434033362
+  },
+  {
+   "frame": 250,
+   "phase": "self_approach",
+   "truth_obstacle": false,
+   "truth_self": [
+    [
+     "base",
+     "link4"
+    ],
+    [
+     "base",
+     "link5"
+    ],
+    [
+     "link1",
+     "link4"
+    ],
+    [
+     "link1",
+     "link5"
+    ]
+   ],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ],
+    "screw/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ],
+    "swing/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ]
+   },
+   "min_margin_obstacle": 0.24384675589156218
+  },
+  {
+   "frame": 251,
+   "phase": "self_approach",
+   "truth_obstacle": false,
+   "truth_self": [
+    [
+     "base",
+     "link4"
+    ],
+    [
+     "base",
+     "link5"
+    ],
+    [
+     "link1",
+     "link4"
+    ],
+    [
+     "link1",
+     "link5"
+    ]
+   ],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ],
+    "screw/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ],
+    "swing/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ]
+   },
+   "min_margin_obstacle": 0.24237384203366225
+  },
+  {
+   "frame": 252,
+   "phase": "self_approach",
+   "truth_obstacle": false,
+   "truth_self": [
+    [
+     "base",
+     "link4"
+    ],
+    [
+     "base",
+     "link5"
+    ],
+    [
+     "link1",
+     "link4"
+    ],
+    [
+     "link1",
+     "link5"
+    ]
+   ],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ],
+    "screw/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ],
+    "swing/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ]
+   },
+   "min_margin_obstacle": 0.24097497767613502
+  },
+  {
+   "frame": 253,
+   "phase": "self_approach",
+   "truth_obstacle": false,
+   "truth_self": [
+    [
+     "base",
+     "link4"
+    ],
+    [
+     "base",
+     "link5"
+    ],
+    [
+     "link1",
+     "link4"
+    ],
+    [
+     "link1",
+     "link5"
+    ]
+   ],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ],
+    "screw/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ],
+    "swing/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ]
+   },
+   "min_margin_obstacle": 0.2396517674579547
+  },
+  {
+   "frame": 254,
+   "phase": "self_approach",
+   "truth_obstacle": false,
+   "truth_self": [
+    [
+     "base",
+     "link4"
+    ],
+    [
+     "base",
+     "link5"
+    ],
+    [
+     "link1",
+     "link4"
+    ],
+    [
+     "link1",
+     "link5"
+    ]
+   ],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ],
+    "screw/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ],
+    "swing/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ]
+   },
+   "min_margin_obstacle": 0.2384057506713097
+  },
+  {
+   "frame": 255,
+   "phase": "self_approach",
+   "truth_obstacle": false,
+   "truth_self": [
+    [
+     "base",
+     "link4"
+    ],
+    [
+     "base",
+     "link5"
+    ],
+    [
+     "link1",
+     "link4"
+    ],
+    [
+     "link1",
+     "link5"
+    ]
+   ],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ],
+    "screw/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ],
+    "swing/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ]
+   },
+   "min_margin_obstacle": 0.23723839622922965
+  },
+  {
+   "frame": 256,
+   "phase": "self_approach",
+   "truth_obstacle": false,
+   "truth_self": [
+    [
+     "base",
+     "link4"
+    ],
+    [
+     "base",
+     "link5"
+    ],
+    [
+     "link1",
+     "link4"
+    ],
+    [
+     "link1",
+     "link5"
+    ]
+   ],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ],
+    "screw/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ],
+    "swing/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ]
+   },
+   "min_margin_obstacle": 0.2361510977128175
+  },
+  {
+   "frame": 257,
+   "phase": "self_approach",
+   "truth_obstacle": false,
+   "truth_self": [
+    [
+     "base",
+     "link4"
+    ],
+    [
+     "base",
+     "link5"
+    ],
+    [
+     "link1",
+     "link4"
+    ],
+    [
+     "link1",
+     "link5"
+    ]
+   ],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ],
+    "screw/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ],
+    "swing/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ]
+   },
+   "min_margin_obstacle": 0.234956286691142
+  },
+  {
+   "frame": 258,
+   "phase": "self_approach",
+   "truth_obstacle": false,
+   "truth_self": [
+    [
+     "base",
+     "link4"
+    ],
+    [
+     "base",
+     "link5"
+    ],
+    [
+     "link1",
+     "link4"
+    ],
+    [
+     "link1",
+     "link5"
+    ]
+   ],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ],
+    "screw/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ],
+    "swing/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ]
+   },
+   "min_margin_obstacle": 0.2335560891145615
+  },
+  {
+   "frame": 259,
+   "phase": "self_approach",
+   "truth_obstacle": false,
+   "truth_self": [
+    [
+     "base",
+     "link4"
+    ],
+    [
+     "base",
+     "link5"
+    ],
+    [
+     "link1",
+     "link4"
+    ],
+    [
+     "link1",
+     "link5"
+    ]
+   ],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ],
+    "screw/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ],
+    "swing/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ]
+   },
+   "min_margin_obstacle": 0.23225973106357412
+  },
+  {
+   "frame": 260,
+   "phase": "self_approach",
+   "truth_obstacle": false,
+   "truth_self": [
+    [
+     "base",
+     "link4"
+    ],
+    [
+     "base",
+     "link5"
+    ],
+    [
+     "link1",
+     "link4"
+    ],
+    [
+     "link1",
+     "link5"
+    ]
+   ],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ],
+    "screw/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ],
+    "swing/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ]
+   },
+   "min_margin_obstacle": 0.23106971640770008
+  },
+  {
+   "frame": 261,
+   "phase": "self_approach",
+   "truth_obstacle": false,
+   "truth_self": [
+    [
+     "base",
+     "link4"
+    ],
+    [
+     "base",
+     "link5"
+    ],
+    [
+     "link1",
+     "link4"
+    ],
+    [
+     "link1",
+     "link5"
+    ]
+   ],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ],
+    "screw/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ],
+    "swing/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ]
+   },
+   "min_margin_obstacle": 0.22998844718785083
+  },
+  {
+   "frame": 262,
+   "phase": "self_approach",
+   "truth_obstacle": false,
+   "truth_self": [
+    [
+     "base",
+     "link4"
+    ],
+    [
+     "base",
+     "link5"
+    ],
+    [
+     "link1",
+     "link4"
+    ],
+    [
+     "link1",
+     "link5"
+    ]
+   ],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ],
+    "screw/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ],
+    "swing/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ]
+   },
+   "min_margin_obstacle": 0.22901821261419325
+  },
+  {
+   "frame": 263,
+   "phase": "self_approach",
+   "truth_obstacle": false,
+   "truth_self": [
+    [
+     "base",
+     "link4"
+    ],
+    [
+     "base",
+     "link5"
+    ],
+    [
+     "link1",
+     "link4"
+    ],
+    [
+     "link1",
+     "link5"
+    ]
+   ],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ],
+    "screw/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ],
+    "swing/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ]
+   },
+   "min_margin_obstacle": 0.22816117823618592
+  },
+  {
+   "frame": 264,
+   "phase": "self_approach",
+   "truth_obstacle": false,
+   "truth_self": [
+    [
+     "base",
+     "link4"
+    ],
+    [
+     "base",
+     "link5"
+    ],
+    [
+     "link1",
+     "link4"
+    ],
+    [
+     "link1",
+     "link5"
+    ]
+   ],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ],
+    "screw/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ],
+    "swing/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ]
+   },
+   "min_margin_obstacle": 0.22741937539363943
+  },
+  {
+   "frame": 265,
+   "phase": "self_approach",
+   "truth_obstacle": false,
+   "truth_self": [
+    [
+     "base",
+     "link4"
+    ],
+    [
+     "base",
+     "link5"
+    ],
+    [
+     "link1",
+     "link4"
+    ],
+    [
+     "link1",
+     "link5"
+    ]
+   ],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ],
+    "screw/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ],
+    "swing/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ]
+   },
+   "min_margin_obstacle": 0.22679469106010725
+  },
+  {
+   "frame": 266,
+   "phase": "self_approach",
+   "truth_obstacle": false,
+   "truth_self": [
+    [
+     "base",
+     "link4"
+    ],
+    [
+     "base",
+     "link5"
+    ],
+    [
+     "link1",
+     "link4"
+    ],
+    [
+     "link1",
+     "link5"
+    ]
+   ],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ],
+    "screw/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ],
+    "swing/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ]
+   },
+   "min_margin_obstacle": 0.2262888581903652
+  },
+  {
+   "frame": 267,
+   "phase": "self_approach",
+   "truth_obstacle": false,
+   "truth_self": [
+    [
+     "base",
+     "link4"
+    ],
+    [
+     "base",
+     "link5"
+    ],
+    [
+     "link1",
+     "link4"
+    ],
+    [
+     "link1",
+     "link5"
+    ]
+   ],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ],
+    "screw/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ],
+    "swing/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ]
+   },
+   "min_margin_obstacle": 0.2259034466820588
+  },
+  {
+   "frame": 268,
+   "phase": "self_approach",
+   "truth_obstacle": false,
+   "truth_self": [
+    [
+     "base",
+     "link4"
+    ],
+    [
+     "base",
+     "link5"
+    ],
+    [
+     "link1",
+     "link4"
+    ],
+    [
+     "link1",
+     "link5"
+    ]
+   ],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ],
+    "screw/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ],
+    "swing/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ]
+   },
+   "min_margin_obstacle": 0.22563985505767004
+  },
+  {
+   "frame": 269,
+   "phase": "self_approach",
+   "truth_obstacle": false,
+   "truth_self": [
+    [
+     "base",
+     "link4"
+    ],
+    [
+     "base",
+     "link5"
+    ],
+    [
+     "link1",
+     "link4"
+    ],
+    [
+     "link1",
+     "link5"
+    ]
+   ],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ],
+    "screw/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ],
+    "swing/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ]
+   },
+   "min_margin_obstacle": 0.22549930296677229
+  },
+  {
+   "frame": 270,
+   "phase": "self_approach",
+   "truth_obstacle": false,
+   "truth_self": [
+    [
+     "base",
+     "link4"
+    ],
+    [
+     "base",
+     "link5"
+    ],
+    [
+     "link1",
+     "link4"
+    ],
+    [
+     "link1",
+     "link5"
+    ]
+   ],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ],
+    "screw/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ],
+    "swing/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ]
+   },
+   "min_margin_obstacle": 0.2254828246001317
+  },
+  {
+   "frame": 271,
+   "phase": "self_approach",
+   "truth_obstacle": false,
+   "truth_self": [
+    [
+     "base",
+     "link4"
+    ],
+    [
+     "base",
+     "link5"
+    ],
+    [
+     "link1",
+     "link4"
+    ],
+    [
+     "link1",
+     "link5"
+    ]
+   ],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ],
+    "screw/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ],
+    "swing/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ]
+   },
+   "min_margin_obstacle": 0.2255912630967129
+  },
+  {
+   "frame": 272,
+   "phase": "self_approach",
+   "truth_obstacle": false,
+   "truth_self": [
+    [
+     "base",
+     "link4"
+    ],
+    [
+     "base",
+     "link5"
+    ],
+    [
+     "link1",
+     "link4"
+    ],
+    [
+     "link1",
+     "link5"
+    ]
+   ],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ],
+    "screw/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ],
+    "swing/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ]
+   },
+   "min_margin_obstacle": 0.22582526601224068
+  },
+  {
+   "frame": 273,
+   "phase": "self_hold",
+   "truth_obstacle": false,
+   "truth_self": [
+    [
+     "base",
+     "link4"
+    ],
+    [
+     "base",
+     "link5"
+    ],
+    [
+     "link1",
+     "link4"
+    ],
+    [
+     "link1",
+     "link5"
+    ]
+   ],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ],
+    "screw/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ],
+    "swing/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ]
+   },
+   "min_margin_obstacle": 0.22582526601224068
+  },
+  {
+   "frame": 274,
+   "phase": "self_hold",
+   "truth_obstacle": false,
+   "truth_self": [
+    [
+     "base",
+     "link4"
+    ],
+    [
+     "base",
+     "link5"
+    ],
+    [
+     "link1",
+     "link4"
+    ],
+    [
+     "link1",
+     "link5"
+    ]
+   ],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ],
+    "screw/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ],
+    "swing/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ]
+   },
+   "min_margin_obstacle": 0.22582526601224068
+  },
+  {
+   "frame": 275,
+   "phase": "self_hold",
+   "truth_obstacle": false,
+   "truth_self": [
+    [
+     "base",
+     "link4"
+    ],
+    [
+     "base",
+     "link5"
+    ],
+    [
+     "link1",
+     "link4"
+    ],
+    [
+     "link1",
+     "link5"
+    ]
+   ],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ],
+    "screw/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ],
+    "swing/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ]
+   },
+   "min_margin_obstacle": 0.22582526601224068
+  },
+  {
+   "frame": 276,
+   "phase": "self_hold",
+   "truth_obstacle": false,
+   "truth_self": [
+    [
+     "base",
+     "link4"
+    ],
+    [
+     "base",
+     "link5"
+    ],
+    [
+     "link1",
+     "link4"
+    ],
+    [
+     "link1",
+     "link5"
+    ]
+   ],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ],
+    "screw/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ],
+    "swing/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ]
+   },
+   "min_margin_obstacle": 0.22582526601224068
+  },
+  {
+   "frame": 277,
+   "phase": "self_hold",
+   "truth_obstacle": false,
+   "truth_self": [
+    [
+     "base",
+     "link4"
+    ],
+    [
+     "base",
+     "link5"
+    ],
+    [
+     "link1",
+     "link4"
+    ],
+    [
+     "link1",
+     "link5"
+    ]
+   ],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ],
+    "screw/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ],
+    "swing/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ]
+   },
+   "min_margin_obstacle": 0.22582526601224068
+  },
+  {
+   "frame": 278,
+   "phase": "self_hold",
+   "truth_obstacle": false,
+   "truth_self": [
+    [
+     "base",
+     "link4"
+    ],
+    [
+     "base",
+     "link5"
+    ],
+    [
+     "link1",
+     "link4"
+    ],
+    [
+     "link1",
+     "link5"
+    ]
+   ],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ],
+    "screw/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ],
+    "swing/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ]
+   },
+   "min_margin_obstacle": 0.22582526601224068
+  },
+  {
+   "frame": 279,
+   "phase": "self_hold",
+   "truth_obstacle": false,
+   "truth_self": [
+    [
+     "base",
+     "link4"
+    ],
+    [
+     "base",
+     "link5"
+    ],
+    [
+     "link1",
+     "link4"
+    ],
+    [
+     "link1",
+     "link5"
+    ]
+   ],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ],
+    "screw/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ],
+    "swing/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ]
+   },
+   "min_margin_obstacle": 0.22582526601224068
+  },
+  {
+   "frame": 280,
+   "phase": "self_hold",
+   "truth_obstacle": false,
+   "truth_self": [
+    [
+     "base",
+     "link4"
+    ],
+    [
+     "base",
+     "link5"
+    ],
+    [
+     "link1",
+     "link4"
+    ],
+    [
+     "link1",
+     "link5"
+    ]
+   ],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ],
+    "screw/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ],
+    "swing/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ]
+   },
+   "min_margin_obstacle": 0.22582526601224068
+  },
+  {
+   "frame": 281,
+   "phase": "self_hold",
+   "truth_obstacle": false,
+   "truth_self": [
+    [
+     "base",
+     "link4"
+    ],
+    [
+     "base",
+     "link5"
+    ],
+    [
+     "link1",
+     "link4"
+    ],
+    [
+     "link1",
+     "link5"
+    ]
+   ],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ],
+    "screw/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ],
+    "swing/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ]
+   },
+   "min_margin_obstacle": 0.22582526601224068
+  },
+  {
+   "frame": 282,
+   "phase": "self_hold",
+   "truth_obstacle": false,
+   "truth_self": [
+    [
+     "base",
+     "link4"
+    ],
+    [
+     "base",
+     "link5"
+    ],
+    [
+     "link1",
+     "link4"
+    ],
+    [
+     "link1",
+     "link5"
+    ]
+   ],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ],
+    "screw/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ],
+    "swing/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ]
+   },
+   "min_margin_obstacle": 0.22582526601224068
+  },
+  {
+   "frame": 283,
+   "phase": "self_hold",
+   "truth_obstacle": false,
+   "truth_self": [
+    [
+     "base",
+     "link4"
+    ],
+    [
+     "base",
+     "link5"
+    ],
+    [
+     "link1",
+     "link4"
+    ],
+    [
+     "link1",
+     "link5"
+    ]
+   ],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ],
+    "screw/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ],
+    "swing/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ]
+   },
+   "min_margin_obstacle": 0.22582526601224068
+  },
+  {
+   "frame": 284,
+   "phase": "self_hold",
+   "truth_obstacle": false,
+   "truth_self": [
+    [
+     "base",
+     "link4"
+    ],
+    [
+     "base",
+     "link5"
+    ],
+    [
+     "link1",
+     "link4"
+    ],
+    [
+     "link1",
+     "link5"
+    ]
+   ],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ],
+    "screw/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ],
+    "swing/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ]
+   },
+   "min_margin_obstacle": 0.22582526601224068
+  },
+  {
+   "frame": 285,
+   "phase": "self_hold",
+   "truth_obstacle": false,
+   "truth_self": [
+    [
+     "base",
+     "link4"
+    ],
+    [
+     "base",
+     "link5"
+    ],
+    [
+     "link1",
+     "link4"
+    ],
+    [
+     "link1",
+     "link5"
+    ]
+   ],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ],
+    "screw/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ],
+    "swing/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ]
+   },
+   "min_margin_obstacle": 0.22582526601224068
+  },
+  {
+   "frame": 286,
+   "phase": "self_hold",
+   "truth_obstacle": false,
+   "truth_self": [
+    [
+     "base",
+     "link4"
+    ],
+    [
+     "base",
+     "link5"
+    ],
+    [
+     "link1",
+     "link4"
+    ],
+    [
+     "link1",
+     "link5"
+    ]
+   ],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ],
+    "screw/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ],
+    "swing/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ]
+   },
+   "min_margin_obstacle": 0.22582526601224068
+  },
+  {
+   "frame": 287,
+   "phase": "self_hold",
+   "truth_obstacle": false,
+   "truth_self": [
+    [
+     "base",
+     "link4"
+    ],
+    [
+     "base",
+     "link5"
+    ],
+    [
+     "link1",
+     "link4"
+    ],
+    [
+     "link1",
+     "link5"
+    ]
+   ],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ],
+    "screw/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ],
+    "swing/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ]
+   },
+   "min_margin_obstacle": 0.22582526601224068
+  },
+  {
+   "frame": 288,
+   "phase": "self_hold",
+   "truth_obstacle": false,
+   "truth_self": [
+    [
+     "base",
+     "link4"
+    ],
+    [
+     "base",
+     "link5"
+    ],
+    [
+     "link1",
+     "link4"
+    ],
+    [
+     "link1",
+     "link5"
+    ]
+   ],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ],
+    "screw/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ],
+    "swing/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ]
+   },
+   "min_margin_obstacle": 0.22582526601224068
+  },
+  {
+   "frame": 289,
+   "phase": "self_hold",
+   "truth_obstacle": false,
+   "truth_self": [
+    [
+     "base",
+     "link4"
+    ],
+    [
+     "base",
+     "link5"
+    ],
+    [
+     "link1",
+     "link4"
+    ],
+    [
+     "link1",
+     "link5"
+    ]
+   ],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ],
+    "screw/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ],
+    "swing/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ]
+   },
+   "min_margin_obstacle": 0.22582526601224068
+  },
+  {
+   "frame": 290,
+   "phase": "self_hold",
+   "truth_obstacle": false,
+   "truth_self": [
+    [
+     "base",
+     "link4"
+    ],
+    [
+     "base",
+     "link5"
+    ],
+    [
+     "link1",
+     "link4"
+    ],
+    [
+     "link1",
+     "link5"
+    ]
+   ],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ],
+    "screw/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ],
+    "swing/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ]
+   },
+   "min_margin_obstacle": 0.22582526601224068
+  },
+  {
+   "frame": 291,
+   "phase": "self_hold",
+   "truth_obstacle": false,
+   "truth_self": [
+    [
+     "base",
+     "link4"
+    ],
+    [
+     "base",
+     "link5"
+    ],
+    [
+     "link1",
+     "link4"
+    ],
+    [
+     "link1",
+     "link5"
+    ]
+   ],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ],
+    "screw/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ],
+    "swing/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ]
+   },
+   "min_margin_obstacle": 0.22582526601224068
+  },
+  {
+   "frame": 292,
+   "phase": "self_hold",
+   "truth_obstacle": false,
+   "truth_self": [
+    [
+     "base",
+     "link4"
+    ],
+    [
+     "base",
+     "link5"
+    ],
+    [
+     "link1",
+     "link4"
+    ],
+    [
+     "link1",
+     "link5"
+    ]
+   ],
+   "monitor_obstacle": {
+    "dh/flat": false,
+    "screw/flat": false,
+    "swing/flat": false
+   },
+   "monitor_self": {
+    "dh/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ],
+    "screw/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ],
+    "swing/flat": [
+     [
+      "base",
+      "link4"
+     ],
+     [
+      "base",
+      "link5"
+     ],
+     [
+      "link1",
+      "link4"
+     ],
+     [
+      "link1",
+      "link5"
+     ]
+    ]
+   },
+   "min_margin_obstacle": 0.22582526601224068
+  }
+ ]
+}

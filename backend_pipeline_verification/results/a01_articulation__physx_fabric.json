@@ -1,0 +1,6807 @@
+{
+ "group": "a01_articulation__physx_fabric",
+ "items": [
+  {
+   "id": "A-00",
+   "description": "バージョンと設定",
+   "omni.physx": "omni.physx-110.4.4",
+   "omni.physx.fabric": "omni.physx.fabric-110.4.4",
+   "omni.physics.tensors": "omni.physics.tensors-110.4.4",
+   "usdrt.scenegraph": "usdrt.scenegraph-7.6.3",
+   "omni.hydra.usdrt_delegate": "omni.hydra.usdrt_delegate-7.5.2",
+   "isaacsim.core.experimental.prims": "isaacsim.core.experimental.prims-1.12.1",
+   "isaacsim.core.experimental.utils": "isaacsim.core.experimental.utils-0.23.3",
+   "isaacsim.core.simulation_manager": "isaacsim.core.simulation_manager-1.17.4",
+   "isaac_sim_VERSION": "6.2.0-rc.14+release.52805.02189a84.gl",
+   "/app/useFabricSceneDelegate": true,
+   "/physics/resetOnStop": true,
+   "/physics/updateToUsd": false,
+   "/physics/updateVelocitiesToUsd": false,
+   "/physics/fabricEnabled": true,
+   "/physics/suppressReadback": false,
+   "/physics/cudaDevice": 0,
+   "config": "physx_fabric",
+   "simulation_device": "cpu"
+  },
+  {
+   "id": "A-90",
+   "description": "Robot に xformOp が無いときの set_world_poses(Stop 中)",
+   "reset_xform_op_properties=False": {
+    "call": {
+     "touched": [
+      "USD(pxr)"
+     ],
+     "warnings": [],
+     "error": "AssertionError: Undefined 'xformOp:translate' property for the /World/Robot prim. Set the 'reset_xform_op_properties' parameter to True when initializing the class, or call '.reset_xform_op_properties()' manually before doing transform operations"
+    },
+    "robot_xform_ops_after": [],
+    "after_update1": {
+     "timeline": "stopped",
+     "usd": {
+      "robot_xform": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "root": [
+       0.0,
+       0.0,
+       1.0
+      ],
+      "joint_deg": 0.0,
+      "target_deg": 0.0,
+      "child_mass": 1.0
+     },
+     "fabric": {
+      "robot_xform": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "root": [
+       0.0,
+       0.0,
+       1.0
+      ],
+      "joint_deg": 0.0,
+      "target_deg": 0.0,
+      "child_mass": 1.0
+     },
+     "tensor": {
+      "valid": false
+     }
+    }
+   },
+   "reset_xform_op_properties=True": {
+    "call": {
+     "touched": [
+      "USD(pxr)"
+     ],
+     "warnings": [],
+     "error": null
+    },
+    "robot_xform_ops_after": [
+     "xformOp:translate",
+     "xformOp:orient",
+     "xformOp:scale"
+    ],
+    "after_update1": {
+     "timeline": "stopped",
+     "usd": {
+      "robot_xform": [
+       1.0,
+       2.0,
+       3.0
+      ],
+      "root": [
+       1.0,
+       2.0,
+       4.0
+      ],
+      "joint_deg": 0.0,
+      "target_deg": 0.0,
+      "child_mass": 1.0
+     },
+     "fabric": {
+      "robot_xform": [
+       1.0,
+       2.0,
+       3.0
+      ],
+      "root": [
+       1.0,
+       2.0,
+       4.0
+      ],
+      "joint_deg": 0.0,
+      "target_deg": 0.0,
+      "child_mass": 1.0
+     },
+     "tensor": {
+      "valid": false
+     }
+    }
+   }
+  },
+  {
+   "id": "A-91",
+   "description": "simstate バックエンド(Play 中に目標角 0.3 rad を書く)",
+   "use_backend('simstate')": {
+    "call": {
+     "touched": [],
+     "warnings": [
+      "ERROR: Failed to create SimStateStorage: No module named 'isaacsim.mega'"
+     ],
+     "error": null
+    },
+    "simstate_mode_during_call": "SimStateMode.EXCLUSIVE",
+    "after_update1": {
+     "timeline": "playing",
+     "usd": {
+      "robot_xform": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "root": [
+       0.0,
+       0.0,
+       1.0
+      ],
+      "joint_deg": 0.0,
+      "target_deg": 0.0,
+      "child_mass": 1.0
+     },
+     "fabric": {
+      "robot_xform": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "root": [
+       0.0,
+       0.0,
+       1.0
+      ],
+      "joint_deg": 0.0,
+      "target_deg": 0.0,
+      "child_mass": 1.0
+     },
+     "tensor": {
+      "valid": true,
+      "root": [
+       0.0,
+       0.0,
+       1.0
+      ],
+      "joint_rad": 0.0,
+      "joint_deg": 0.0,
+      "target_rad": 0.0,
+      "target_deg": 0.0,
+      "link_masses": [
+       1.0,
+       1.0
+      ]
+     }
+    }
+   },
+   "simStateMode=mirror": {
+    "call": {
+     "touched": [
+      "tensor(omni.physics.tensors)"
+     ],
+     "warnings": [
+      "ERROR: Failed to create SimStateStorage: No module named 'isaacsim.mega'"
+     ],
+     "error": null
+    },
+    "simstate_mode_during_call": "SimStateMode.MIRROR",
+    "after_update1": {
+     "timeline": "playing",
+     "usd": {
+      "robot_xform": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "root": [
+       0.0,
+       0.0,
+       1.0
+      ],
+      "joint_deg": 0.0,
+      "target_deg": 0.0,
+      "child_mass": 1.0
+     },
+     "fabric": {
+      "robot_xform": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "root": [
+       0.0,
+       0.0,
+       1.0
+      ],
+      "joint_deg": 0.0,
+      "target_deg": 0.0,
+      "child_mass": 1.0
+     },
+     "tensor": {
+      "valid": true,
+      "root": [
+       0.0,
+       0.0,
+       1.0
+      ],
+      "joint_rad": 0.0,
+      "joint_deg": 0.0,
+      "target_rad": 0.3,
+      "target_deg": 17.19,
+      "link_masses": [
+       1.0,
+       1.0
+      ]
+     }
+    }
+   },
+   "RigidPrim.set_masses under use_backend('simstate')": {
+    "touched": [
+     "tensor(omni.physics.tensors)"
+    ],
+    "warnings": [
+     "WARN: Unsupported backend: 'simstate'. Falling back to 'tensor' backend."
+    ],
+    "error": null
+   }
+  },
+  {
+   "id": "A/stopped/set_world_poses/(既定)",
+   "description": "開始=stopped メソッド=set_world_poses use_backend=None",
+   "0_before": {
+    "timeline": "stopped",
+    "usd": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "fabric": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "tensor": {
+     "valid": false
+    }
+   },
+   "call": {
+    "touched": [
+     "USD(pxr)"
+    ],
+    "warnings": [],
+    "error": null
+   },
+   "1_after_call": {
+    "timeline": "stopped",
+    "usd": {
+     "robot_xform": [
+      1.0,
+      2.0,
+      3.0
+     ],
+     "root": [
+      1.0,
+      2.0,
+      4.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "fabric": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "tensor": {
+     "valid": false
+    }
+   },
+   "2_after_update1": {
+    "timeline": "stopped",
+    "usd": {
+     "robot_xform": [
+      1.0,
+      2.0,
+      3.0
+     ],
+     "root": [
+      1.0,
+      2.0,
+      4.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "fabric": {
+     "robot_xform": [
+      1.0,
+      2.0,
+      3.0
+     ],
+     "root": [
+      1.0,
+      2.0,
+      4.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "tensor": {
+     "valid": false
+    }
+   },
+   "3_toggled_play_update1": {
+    "timeline": "playing",
+    "usd": {
+     "robot_xform": [
+      1.0,
+      2.0,
+      3.0
+     ],
+     "root": [
+      1.0,
+      2.0,
+      4.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "fabric": {
+     "robot_xform": [
+      1.0,
+      2.0,
+      3.0
+     ],
+     "root": [
+      1.0,
+      2.0,
+      4.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "tensor": {
+     "valid": true,
+     "root": [
+      1.0,
+      2.0,
+      4.0
+     ],
+     "joint_rad": 0.0,
+     "joint_deg": 0.0,
+     "target_rad": 0.0,
+     "target_deg": 0.0,
+     "link_masses": [
+      1.0,
+      1.0
+     ]
+    }
+   },
+   "4_play_update10": {
+    "timeline": "playing",
+    "usd": {
+     "robot_xform": [
+      1.0,
+      2.0,
+      3.0
+     ],
+     "root": [
+      1.0,
+      2.0,
+      4.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "fabric": {
+     "robot_xform": [
+      1.0,
+      2.0,
+      3.0
+     ],
+     "root": [
+      1.0,
+      2.0,
+      4.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "tensor": {
+     "valid": true,
+     "root": [
+      1.0,
+      2.0,
+      4.0
+     ],
+     "joint_rad": 0.0,
+     "joint_deg": 0.0,
+     "target_rad": 0.0,
+     "target_deg": 0.0,
+     "link_masses": [
+      1.0,
+      1.0
+     ]
+    }
+   },
+   "5_stopped_again": {
+    "timeline": "stopped",
+    "usd": {
+     "robot_xform": [
+      1.0,
+      2.0,
+      3.0
+     ],
+     "root": [
+      1.0,
+      2.0,
+      4.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "fabric": {
+     "robot_xform": [
+      1.0,
+      2.0,
+      3.0
+     ],
+     "root": [
+      1.0,
+      2.0,
+      4.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "tensor": {
+     "valid": false
+    }
+   }
+  },
+  {
+   "id": "A/stopped/set_world_poses/tensor",
+   "description": "開始=stopped メソッド=set_world_poses use_backend=tensor",
+   "0_before": {
+    "timeline": "stopped",
+    "usd": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "fabric": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "tensor": {
+     "valid": false
+    }
+   },
+   "call": {
+    "touched": [
+     "USD(pxr)"
+    ],
+    "warnings": [
+     "WARN: Physics tensor entity is not valid for use with 'tensor' backend. Falling back to 'usd' backend.",
+     "WARN: Unsupported backend: 'tensor'. Falling back to 'usd' backend."
+    ],
+    "error": null
+   },
+   "1_after_call": {
+    "timeline": "stopped",
+    "usd": {
+     "robot_xform": [
+      1.0,
+      2.0,
+      3.0
+     ],
+     "root": [
+      1.0,
+      2.0,
+      4.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "fabric": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "tensor": {
+     "valid": false
+    }
+   },
+   "2_after_update1": {
+    "timeline": "stopped",
+    "usd": {
+     "robot_xform": [
+      1.0,
+      2.0,
+      3.0
+     ],
+     "root": [
+      1.0,
+      2.0,
+      4.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "fabric": {
+     "robot_xform": [
+      1.0,
+      2.0,
+      3.0
+     ],
+     "root": [
+      1.0,
+      2.0,
+      4.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "tensor": {
+     "valid": false
+    }
+   },
+   "3_toggled_play_update1": {
+    "timeline": "playing",
+    "usd": {
+     "robot_xform": [
+      1.0,
+      2.0,
+      3.0
+     ],
+     "root": [
+      1.0,
+      2.0,
+      4.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "fabric": {
+     "robot_xform": [
+      1.0,
+      2.0,
+      3.0
+     ],
+     "root": [
+      1.0,
+      2.0,
+      4.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "tensor": {
+     "valid": true,
+     "root": [
+      1.0,
+      2.0,
+      4.0
+     ],
+     "joint_rad": 0.0,
+     "joint_deg": 0.0,
+     "target_rad": 0.0,
+     "target_deg": 0.0,
+     "link_masses": [
+      1.0,
+      1.0
+     ]
+    }
+   },
+   "4_play_update10": {
+    "timeline": "playing",
+    "usd": {
+     "robot_xform": [
+      1.0,
+      2.0,
+      3.0
+     ],
+     "root": [
+      1.0,
+      2.0,
+      4.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "fabric": {
+     "robot_xform": [
+      1.0,
+      2.0,
+      3.0
+     ],
+     "root": [
+      1.0,
+      2.0,
+      4.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "tensor": {
+     "valid": true,
+     "root": [
+      1.0,
+      2.0,
+      4.0
+     ],
+     "joint_rad": 0.0,
+     "joint_deg": 0.0,
+     "target_rad": 0.0,
+     "target_deg": 0.0,
+     "link_masses": [
+      1.0,
+      1.0
+     ]
+    }
+   },
+   "5_stopped_again": {
+    "timeline": "stopped",
+    "usd": {
+     "robot_xform": [
+      1.0,
+      2.0,
+      3.0
+     ],
+     "root": [
+      1.0,
+      2.0,
+      4.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "fabric": {
+     "robot_xform": [
+      1.0,
+      2.0,
+      3.0
+     ],
+     "root": [
+      1.0,
+      2.0,
+      4.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "tensor": {
+     "valid": false
+    }
+   }
+  },
+  {
+   "id": "A/stopped/set_world_poses/usd",
+   "description": "開始=stopped メソッド=set_world_poses use_backend=usd",
+   "0_before": {
+    "timeline": "stopped",
+    "usd": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "fabric": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "tensor": {
+     "valid": false
+    }
+   },
+   "call": {
+    "touched": [
+     "USD(pxr)"
+    ],
+    "warnings": [],
+    "error": null
+   },
+   "1_after_call": {
+    "timeline": "stopped",
+    "usd": {
+     "robot_xform": [
+      1.0,
+      2.0,
+      3.0
+     ],
+     "root": [
+      1.0,
+      2.0,
+      4.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "fabric": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "tensor": {
+     "valid": false
+    }
+   },
+   "2_after_update1": {
+    "timeline": "stopped",
+    "usd": {
+     "robot_xform": [
+      1.0,
+      2.0,
+      3.0
+     ],
+     "root": [
+      1.0,
+      2.0,
+      4.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "fabric": {
+     "robot_xform": [
+      1.0,
+      2.0,
+      3.0
+     ],
+     "root": [
+      1.0,
+      2.0,
+      4.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "tensor": {
+     "valid": false
+    }
+   },
+   "3_toggled_play_update1": {
+    "timeline": "playing",
+    "usd": {
+     "robot_xform": [
+      1.0,
+      2.0,
+      3.0
+     ],
+     "root": [
+      1.0,
+      2.0,
+      4.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "fabric": {
+     "robot_xform": [
+      1.0,
+      2.0,
+      3.0
+     ],
+     "root": [
+      1.0,
+      2.0,
+      4.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "tensor": {
+     "valid": true,
+     "root": [
+      1.0,
+      2.0,
+      4.0
+     ],
+     "joint_rad": 0.0,
+     "joint_deg": 0.0,
+     "target_rad": 0.0,
+     "target_deg": 0.0,
+     "link_masses": [
+      1.0,
+      1.0
+     ]
+    }
+   },
+   "4_play_update10": {
+    "timeline": "playing",
+    "usd": {
+     "robot_xform": [
+      1.0,
+      2.0,
+      3.0
+     ],
+     "root": [
+      1.0,
+      2.0,
+      4.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "fabric": {
+     "robot_xform": [
+      1.0,
+      2.0,
+      3.0
+     ],
+     "root": [
+      1.0,
+      2.0,
+      4.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "tensor": {
+     "valid": true,
+     "root": [
+      1.0,
+      2.0,
+      4.0
+     ],
+     "joint_rad": 0.0,
+     "joint_deg": 0.0,
+     "target_rad": 0.0,
+     "target_deg": 0.0,
+     "link_masses": [
+      1.0,
+      1.0
+     ]
+    }
+   },
+   "5_stopped_again": {
+    "timeline": "stopped",
+    "usd": {
+     "robot_xform": [
+      1.0,
+      2.0,
+      3.0
+     ],
+     "root": [
+      1.0,
+      2.0,
+      4.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "fabric": {
+     "robot_xform": [
+      1.0,
+      2.0,
+      3.0
+     ],
+     "root": [
+      1.0,
+      2.0,
+      4.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "tensor": {
+     "valid": false
+    }
+   }
+  },
+  {
+   "id": "A/stopped/set_world_poses/usdrt",
+   "description": "開始=stopped メソッド=set_world_poses use_backend=usdrt",
+   "0_before": {
+    "timeline": "stopped",
+    "usd": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "fabric": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "tensor": {
+     "valid": false
+    }
+   },
+   "call": {
+    "touched": [
+     "USDRT(usdrt)"
+    ],
+    "warnings": [],
+    "error": null
+   },
+   "1_after_call": {
+    "timeline": "stopped",
+    "usd": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "fabric": {
+     "robot_xform": [
+      1.0,
+      2.0,
+      3.0
+     ],
+     "root": [
+      1.0,
+      2.0,
+      4.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "tensor": {
+     "valid": false
+    }
+   },
+   "2_after_update1": {
+    "timeline": "stopped",
+    "usd": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "fabric": {
+     "robot_xform": [
+      1.0,
+      2.0,
+      3.0
+     ],
+     "root": [
+      1.0,
+      2.0,
+      4.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "tensor": {
+     "valid": false
+    }
+   },
+   "3_toggled_play_update1": {
+    "timeline": "playing",
+    "usd": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "fabric": {
+     "robot_xform": [
+      1.0,
+      2.0,
+      3.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "tensor": {
+     "valid": true,
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_rad": 0.0,
+     "joint_deg": 0.0,
+     "target_rad": 0.0,
+     "target_deg": 0.0,
+     "link_masses": [
+      1.0,
+      1.0
+     ]
+    }
+   },
+   "4_play_update10": {
+    "timeline": "playing",
+    "usd": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "fabric": {
+     "robot_xform": [
+      1.0,
+      2.0,
+      3.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "tensor": {
+     "valid": true,
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_rad": 0.0,
+     "joint_deg": 0.0,
+     "target_rad": 0.0,
+     "target_deg": 0.0,
+     "link_masses": [
+      1.0,
+      1.0
+     ]
+    }
+   },
+   "5_stopped_again": {
+    "timeline": "stopped",
+    "usd": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "fabric": {
+     "robot_xform": [
+      1.0,
+      2.0,
+      3.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "tensor": {
+     "valid": false
+    }
+   }
+  },
+  {
+   "id": "A/stopped/set_world_poses/fabric",
+   "description": "開始=stopped メソッド=set_world_poses use_backend=fabric",
+   "0_before": {
+    "timeline": "stopped",
+    "usd": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "fabric": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "tensor": {
+     "valid": false
+    }
+   },
+   "call": {
+    "touched": [
+     "USDRT(usdrt)"
+    ],
+    "warnings": [],
+    "error": null
+   },
+   "1_after_call": {
+    "timeline": "stopped",
+    "usd": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "fabric": {
+     "robot_xform": [
+      1.0,
+      2.0,
+      3.0
+     ],
+     "root": [
+      1.0,
+      2.0,
+      4.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "tensor": {
+     "valid": false
+    }
+   },
+   "2_after_update1": {
+    "timeline": "stopped",
+    "usd": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "fabric": {
+     "robot_xform": [
+      1.0,
+      2.0,
+      3.0
+     ],
+     "root": [
+      1.0,
+      2.0,
+      4.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "tensor": {
+     "valid": false
+    }
+   },
+   "3_toggled_play_update1": {
+    "timeline": "playing",
+    "usd": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "fabric": {
+     "robot_xform": [
+      1.0,
+      2.0,
+      3.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "tensor": {
+     "valid": true,
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_rad": 0.0,
+     "joint_deg": 0.0,
+     "target_rad": 0.0,
+     "target_deg": 0.0,
+     "link_masses": [
+      1.0,
+      1.0
+     ]
+    }
+   },
+   "4_play_update10": {
+    "timeline": "playing",
+    "usd": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "fabric": {
+     "robot_xform": [
+      1.0,
+      2.0,
+      3.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "tensor": {
+     "valid": true,
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_rad": 0.0,
+     "joint_deg": 0.0,
+     "target_rad": 0.0,
+     "target_deg": 0.0,
+     "link_masses": [
+      1.0,
+      1.0
+     ]
+    }
+   },
+   "5_stopped_again": {
+    "timeline": "stopped",
+    "usd": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "fabric": {
+     "robot_xform": [
+      1.0,
+      2.0,
+      3.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "tensor": {
+     "valid": false
+    }
+   }
+  },
+  {
+   "id": "A/stopped/set_dof_positions/(既定)",
+   "description": "開始=stopped メソッド=set_dof_positions use_backend=None",
+   "0_before": {
+    "timeline": "stopped",
+    "usd": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "fabric": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "tensor": {
+     "valid": false
+    }
+   },
+   "call": {
+    "touched": [],
+    "warnings": [],
+    "error": "AssertionError: Instance's physics tensor entity is not valid. Play the simulation/timeline to re-initialize it"
+   },
+   "1_after_call": {
+    "timeline": "stopped",
+    "usd": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "fabric": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "tensor": {
+     "valid": false
+    }
+   },
+   "2_after_update1": {
+    "timeline": "stopped",
+    "usd": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "fabric": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "tensor": {
+     "valid": false
+    }
+   },
+   "3_toggled_play_update1": {
+    "timeline": "playing",
+    "usd": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "fabric": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "tensor": {
+     "valid": true,
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_rad": 0.0,
+     "joint_deg": 0.0,
+     "target_rad": 0.0,
+     "target_deg": 0.0,
+     "link_masses": [
+      1.0,
+      1.0
+     ]
+    }
+   },
+   "4_play_update10": {
+    "timeline": "playing",
+    "usd": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "fabric": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "tensor": {
+     "valid": true,
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_rad": 0.0,
+     "joint_deg": 0.0,
+     "target_rad": 0.0,
+     "target_deg": 0.0,
+     "link_masses": [
+      1.0,
+      1.0
+     ]
+    }
+   },
+   "5_stopped_again": {
+    "timeline": "stopped",
+    "usd": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "fabric": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "tensor": {
+     "valid": false
+    }
+   }
+  },
+  {
+   "id": "A/stopped/set_dof_positions/usd",
+   "description": "開始=stopped メソッド=set_dof_positions use_backend=usd",
+   "0_before": {
+    "timeline": "stopped",
+    "usd": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "fabric": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "tensor": {
+     "valid": false
+    }
+   },
+   "call": {
+    "touched": [],
+    "warnings": [],
+    "error": "AssertionError: Instance's physics tensor entity is not valid. Play the simulation/timeline to re-initialize it"
+   },
+   "1_after_call": {
+    "timeline": "stopped",
+    "usd": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "fabric": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "tensor": {
+     "valid": false
+    }
+   },
+   "2_after_update1": {
+    "timeline": "stopped",
+    "usd": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "fabric": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "tensor": {
+     "valid": false
+    }
+   },
+   "3_toggled_play_update1": {
+    "timeline": "playing",
+    "usd": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "fabric": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "tensor": {
+     "valid": true,
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_rad": 0.0,
+     "joint_deg": 0.0,
+     "target_rad": 0.0,
+     "target_deg": 0.0,
+     "link_masses": [
+      1.0,
+      1.0
+     ]
+    }
+   },
+   "4_play_update10": {
+    "timeline": "playing",
+    "usd": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "fabric": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "tensor": {
+     "valid": true,
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_rad": 0.0,
+     "joint_deg": 0.0,
+     "target_rad": 0.0,
+     "target_deg": 0.0,
+     "link_masses": [
+      1.0,
+      1.0
+     ]
+    }
+   },
+   "5_stopped_again": {
+    "timeline": "stopped",
+    "usd": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "fabric": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "tensor": {
+     "valid": false
+    }
+   }
+  },
+  {
+   "id": "A/stopped/set_dof_position_targets/(既定)",
+   "description": "開始=stopped メソッド=set_dof_position_targets use_backend=None",
+   "0_before": {
+    "timeline": "stopped",
+    "usd": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "fabric": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "tensor": {
+     "valid": false
+    }
+   },
+   "call": {
+    "touched": [
+     "USD(pxr)",
+     "tensor(omni.physics.tensors)"
+    ],
+    "warnings": [],
+    "error": null
+   },
+   "1_after_call": {
+    "timeline": "stopped",
+    "usd": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 17.1887,
+     "child_mass": 1.0
+    },
+    "fabric": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "tensor": {
+     "valid": false
+    }
+   },
+   "2_after_update1": {
+    "timeline": "stopped",
+    "usd": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 17.1887,
+     "child_mass": 1.0
+    },
+    "fabric": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 17.1887,
+     "child_mass": 1.0
+    },
+    "tensor": {
+     "valid": false
+    }
+   },
+   "3_toggled_play_update1": {
+    "timeline": "playing",
+    "usd": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 17.1887,
+     "child_mass": 1.0
+    },
+    "fabric": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 17.1887,
+     "child_mass": 1.0
+    },
+    "tensor": {
+     "valid": true,
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_rad": 0.0,
+     "joint_deg": 0.0,
+     "target_rad": 0.3,
+     "target_deg": 17.19,
+     "link_masses": [
+      1.0,
+      1.0
+     ]
+    }
+   },
+   "4_play_update10": {
+    "timeline": "playing",
+    "usd": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 17.1887,
+     "child_mass": 1.0
+    },
+    "fabric": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 17.1887,
+     "child_mass": 1.0
+    },
+    "tensor": {
+     "valid": true,
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_rad": 0.0,
+     "joint_deg": 0.0,
+     "target_rad": 0.3,
+     "target_deg": 17.19,
+     "link_masses": [
+      1.0,
+      1.0
+     ]
+    }
+   },
+   "5_stopped_again": {
+    "timeline": "stopped",
+    "usd": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 17.1887,
+     "child_mass": 1.0
+    },
+    "fabric": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 17.1887,
+     "child_mass": 1.0
+    },
+    "tensor": {
+     "valid": false
+    }
+   }
+  },
+  {
+   "id": "A/stopped/set_dof_position_targets/tensor",
+   "description": "開始=stopped メソッド=set_dof_position_targets use_backend=tensor",
+   "0_before": {
+    "timeline": "stopped",
+    "usd": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "fabric": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "tensor": {
+     "valid": false
+    }
+   },
+   "call": {
+    "touched": [
+     "USD(pxr)",
+     "tensor(omni.physics.tensors)"
+    ],
+    "warnings": [
+     "WARN: Physics tensor entity is not valid for use with 'tensor' backend. Falling back to 'usd' backend."
+    ],
+    "error": null
+   },
+   "1_after_call": {
+    "timeline": "stopped",
+    "usd": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 17.1887,
+     "child_mass": 1.0
+    },
+    "fabric": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "tensor": {
+     "valid": false
+    }
+   },
+   "2_after_update1": {
+    "timeline": "stopped",
+    "usd": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 17.1887,
+     "child_mass": 1.0
+    },
+    "fabric": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 17.1887,
+     "child_mass": 1.0
+    },
+    "tensor": {
+     "valid": false
+    }
+   },
+   "3_toggled_play_update1": {
+    "timeline": "playing",
+    "usd": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 17.1887,
+     "child_mass": 1.0
+    },
+    "fabric": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 17.1887,
+     "child_mass": 1.0
+    },
+    "tensor": {
+     "valid": true,
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_rad": 0.0,
+     "joint_deg": 0.0,
+     "target_rad": 0.3,
+     "target_deg": 17.19,
+     "link_masses": [
+      1.0,
+      1.0
+     ]
+    }
+   },
+   "4_play_update10": {
+    "timeline": "playing",
+    "usd": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 17.1887,
+     "child_mass": 1.0
+    },
+    "fabric": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 17.1887,
+     "child_mass": 1.0
+    },
+    "tensor": {
+     "valid": true,
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_rad": 0.0,
+     "joint_deg": 0.0,
+     "target_rad": 0.3,
+     "target_deg": 17.19,
+     "link_masses": [
+      1.0,
+      1.0
+     ]
+    }
+   },
+   "5_stopped_again": {
+    "timeline": "stopped",
+    "usd": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 17.1887,
+     "child_mass": 1.0
+    },
+    "fabric": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 17.1887,
+     "child_mass": 1.0
+    },
+    "tensor": {
+     "valid": false
+    }
+   }
+  },
+  {
+   "id": "A/stopped/set_dof_position_targets/usd",
+   "description": "開始=stopped メソッド=set_dof_position_targets use_backend=usd",
+   "0_before": {
+    "timeline": "stopped",
+    "usd": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "fabric": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "tensor": {
+     "valid": false
+    }
+   },
+   "call": {
+    "touched": [
+     "USD(pxr)",
+     "tensor(omni.physics.tensors)"
+    ],
+    "warnings": [],
+    "error": null
+   },
+   "1_after_call": {
+    "timeline": "stopped",
+    "usd": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 17.1887,
+     "child_mass": 1.0
+    },
+    "fabric": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "tensor": {
+     "valid": false
+    }
+   },
+   "2_after_update1": {
+    "timeline": "stopped",
+    "usd": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 17.1887,
+     "child_mass": 1.0
+    },
+    "fabric": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 17.1887,
+     "child_mass": 1.0
+    },
+    "tensor": {
+     "valid": false
+    }
+   },
+   "3_toggled_play_update1": {
+    "timeline": "playing",
+    "usd": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 17.1887,
+     "child_mass": 1.0
+    },
+    "fabric": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 17.1887,
+     "child_mass": 1.0
+    },
+    "tensor": {
+     "valid": true,
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_rad": 0.0,
+     "joint_deg": 0.0,
+     "target_rad": 0.3,
+     "target_deg": 17.19,
+     "link_masses": [
+      1.0,
+      1.0
+     ]
+    }
+   },
+   "4_play_update10": {
+    "timeline": "playing",
+    "usd": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 17.1887,
+     "child_mass": 1.0
+    },
+    "fabric": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 17.1887,
+     "child_mass": 1.0
+    },
+    "tensor": {
+     "valid": true,
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_rad": 0.0,
+     "joint_deg": 0.0,
+     "target_rad": 0.3,
+     "target_deg": 17.19,
+     "link_masses": [
+      1.0,
+      1.0
+     ]
+    }
+   },
+   "5_stopped_again": {
+    "timeline": "stopped",
+    "usd": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 17.1887,
+     "child_mass": 1.0
+    },
+    "fabric": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 17.1887,
+     "child_mass": 1.0
+    },
+    "tensor": {
+     "valid": false
+    }
+   }
+  },
+  {
+   "id": "A/stopped/set_link_masses/(既定)",
+   "description": "開始=stopped メソッド=set_link_masses use_backend=None",
+   "0_before": {
+    "timeline": "stopped",
+    "usd": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "fabric": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "tensor": {
+     "valid": false
+    }
+   },
+   "call": {
+    "touched": [
+     "USD(pxr)",
+     "tensor(omni.physics.tensors)"
+    ],
+    "warnings": [],
+    "error": null
+   },
+   "1_after_call": {
+    "timeline": "stopped",
+    "usd": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 5.0
+    },
+    "fabric": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "tensor": {
+     "valid": false
+    }
+   },
+   "2_after_update1": {
+    "timeline": "stopped",
+    "usd": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 5.0
+    },
+    "fabric": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 5.0
+    },
+    "tensor": {
+     "valid": false
+    }
+   },
+   "3_toggled_play_update1": {
+    "timeline": "playing",
+    "usd": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 5.0
+    },
+    "fabric": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 5.0
+    },
+    "tensor": {
+     "valid": true,
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_rad": 0.0,
+     "joint_deg": 0.0,
+     "target_rad": 0.0,
+     "target_deg": 0.0,
+     "link_masses": [
+      1.0,
+      5.0
+     ]
+    }
+   },
+   "4_play_update10": {
+    "timeline": "playing",
+    "usd": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 5.0
+    },
+    "fabric": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 5.0
+    },
+    "tensor": {
+     "valid": true,
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_rad": 0.0,
+     "joint_deg": 0.0,
+     "target_rad": 0.0,
+     "target_deg": 0.0,
+     "link_masses": [
+      1.0,
+      5.0
+     ]
+    }
+   },
+   "5_stopped_again": {
+    "timeline": "stopped",
+    "usd": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 5.0
+    },
+    "fabric": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 5.0
+    },
+    "tensor": {
+     "valid": false
+    }
+   }
+  },
+  {
+   "id": "A/stopped/set_link_masses/usd",
+   "description": "開始=stopped メソッド=set_link_masses use_backend=usd",
+   "0_before": {
+    "timeline": "stopped",
+    "usd": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "fabric": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "tensor": {
+     "valid": false
+    }
+   },
+   "call": {
+    "touched": [
+     "USD(pxr)",
+     "tensor(omni.physics.tensors)"
+    ],
+    "warnings": [],
+    "error": null
+   },
+   "1_after_call": {
+    "timeline": "stopped",
+    "usd": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 5.0
+    },
+    "fabric": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "tensor": {
+     "valid": false
+    }
+   },
+   "2_after_update1": {
+    "timeline": "stopped",
+    "usd": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 5.0
+    },
+    "fabric": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 5.0
+    },
+    "tensor": {
+     "valid": false
+    }
+   },
+   "3_toggled_play_update1": {
+    "timeline": "playing",
+    "usd": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 5.0
+    },
+    "fabric": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 5.0
+    },
+    "tensor": {
+     "valid": true,
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_rad": 0.0,
+     "joint_deg": 0.0,
+     "target_rad": 0.0,
+     "target_deg": 0.0,
+     "link_masses": [
+      1.0,
+      5.0
+     ]
+    }
+   },
+   "4_play_update10": {
+    "timeline": "playing",
+    "usd": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 5.0
+    },
+    "fabric": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 5.0
+    },
+    "tensor": {
+     "valid": true,
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_rad": 0.0,
+     "joint_deg": 0.0,
+     "target_rad": 0.0,
+     "target_deg": 0.0,
+     "link_masses": [
+      1.0,
+      5.0
+     ]
+    }
+   },
+   "5_stopped_again": {
+    "timeline": "stopped",
+    "usd": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 5.0
+    },
+    "fabric": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 5.0
+    },
+    "tensor": {
+     "valid": false
+    }
+   }
+  },
+  {
+   "id": "A/playing/set_world_poses/(既定)",
+   "description": "開始=playing メソッド=set_world_poses use_backend=None",
+   "0_before": {
+    "timeline": "playing",
+    "usd": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "fabric": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "tensor": {
+     "valid": true,
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_rad": 0.0,
+     "joint_deg": 0.0,
+     "target_rad": 0.0,
+     "target_deg": 0.0,
+     "link_masses": [
+      1.0,
+      1.0
+     ]
+    }
+   },
+   "call": {
+    "touched": [
+     "tensor(omni.physics.tensors)"
+    ],
+    "warnings": [],
+    "error": null
+   },
+   "1_after_call": {
+    "timeline": "playing",
+    "usd": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "fabric": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "tensor": {
+     "valid": true,
+     "root": [
+      1.0,
+      2.0,
+      3.0
+     ],
+     "joint_rad": 0.0,
+     "joint_deg": 0.0,
+     "target_rad": 0.0,
+     "target_deg": 0.0,
+     "link_masses": [
+      1.0,
+      1.0
+     ]
+    }
+   },
+   "2_after_update1": {
+    "timeline": "playing",
+    "usd": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "fabric": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      1.0,
+      2.0,
+      3.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "tensor": {
+     "valid": true,
+     "root": [
+      1.0,
+      2.0,
+      3.0
+     ],
+     "joint_rad": 0.0,
+     "joint_deg": 0.0,
+     "target_rad": 0.0,
+     "target_deg": 0.0,
+     "link_masses": [
+      1.0,
+      1.0
+     ]
+    }
+   },
+   "3_toggled_stop": {
+    "timeline": "stopped",
+    "usd": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "fabric": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "tensor": {
+     "valid": false
+    }
+   },
+   "4_replay_update1": {
+    "timeline": "playing",
+    "usd": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "fabric": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "tensor": {
+     "valid": true,
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_rad": 0.0,
+     "joint_deg": 0.0,
+     "target_rad": 0.0,
+     "target_deg": 0.0,
+     "link_masses": [
+      1.0,
+      1.0
+     ]
+    }
+   },
+   "5_replay_update10": {
+    "timeline": "playing",
+    "usd": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "fabric": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "tensor": {
+     "valid": true,
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_rad": 0.0,
+     "joint_deg": 0.0,
+     "target_rad": 0.0,
+     "target_deg": 0.0,
+     "link_masses": [
+      1.0,
+      1.0
+     ]
+    }
+   }
+  },
+  {
+   "id": "A/playing/set_world_poses/tensor",
+   "description": "開始=playing メソッド=set_world_poses use_backend=tensor",
+   "0_before": {
+    "timeline": "playing",
+    "usd": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "fabric": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "tensor": {
+     "valid": true,
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_rad": 0.0,
+     "joint_deg": 0.0,
+     "target_rad": 0.0,
+     "target_deg": 0.0,
+     "link_masses": [
+      1.0,
+      1.0
+     ]
+    }
+   },
+   "call": {
+    "touched": [
+     "tensor(omni.physics.tensors)"
+    ],
+    "warnings": [],
+    "error": null
+   },
+   "1_after_call": {
+    "timeline": "playing",
+    "usd": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "fabric": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "tensor": {
+     "valid": true,
+     "root": [
+      1.0,
+      2.0,
+      3.0
+     ],
+     "joint_rad": 0.0,
+     "joint_deg": 0.0,
+     "target_rad": 0.0,
+     "target_deg": 0.0,
+     "link_masses": [
+      1.0,
+      1.0
+     ]
+    }
+   },
+   "2_after_update1": {
+    "timeline": "playing",
+    "usd": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "fabric": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      1.0,
+      2.0,
+      3.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "tensor": {
+     "valid": true,
+     "root": [
+      1.0,
+      2.0,
+      3.0
+     ],
+     "joint_rad": 0.0,
+     "joint_deg": 0.0,
+     "target_rad": 0.0,
+     "target_deg": 0.0,
+     "link_masses": [
+      1.0,
+      1.0
+     ]
+    }
+   },
+   "3_toggled_stop": {
+    "timeline": "stopped",
+    "usd": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "fabric": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "tensor": {
+     "valid": false
+    }
+   },
+   "4_replay_update1": {
+    "timeline": "playing",
+    "usd": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "fabric": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "tensor": {
+     "valid": true,
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_rad": 0.0,
+     "joint_deg": 0.0,
+     "target_rad": 0.0,
+     "target_deg": 0.0,
+     "link_masses": [
+      1.0,
+      1.0
+     ]
+    }
+   },
+   "5_replay_update10": {
+    "timeline": "playing",
+    "usd": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "fabric": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "tensor": {
+     "valid": true,
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_rad": 0.0,
+     "joint_deg": 0.0,
+     "target_rad": 0.0,
+     "target_deg": 0.0,
+     "link_masses": [
+      1.0,
+      1.0
+     ]
+    }
+   }
+  },
+  {
+   "id": "A/playing/set_world_poses/usd",
+   "description": "開始=playing メソッド=set_world_poses use_backend=usd",
+   "0_before": {
+    "timeline": "playing",
+    "usd": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "fabric": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "tensor": {
+     "valid": true,
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_rad": 0.0,
+     "joint_deg": 0.0,
+     "target_rad": 0.0,
+     "target_deg": 0.0,
+     "link_masses": [
+      1.0,
+      1.0
+     ]
+    }
+   },
+   "call": {
+    "touched": [
+     "USD(pxr)"
+    ],
+    "warnings": [],
+    "error": null
+   },
+   "1_after_call": {
+    "timeline": "playing",
+    "usd": {
+     "robot_xform": [
+      1.0,
+      2.0,
+      3.0
+     ],
+     "root": [
+      1.0,
+      2.0,
+      4.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "fabric": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "tensor": {
+     "valid": true,
+     "root": [
+      1.0,
+      2.0,
+      4.0
+     ],
+     "joint_rad": 0.0,
+     "joint_deg": 0.0,
+     "target_rad": 0.0,
+     "target_deg": 0.0,
+     "link_masses": [
+      1.0,
+      1.0
+     ]
+    }
+   },
+   "2_after_update1": {
+    "timeline": "playing",
+    "usd": {
+     "robot_xform": [
+      1.0,
+      2.0,
+      3.0
+     ],
+     "root": [
+      1.0,
+      2.0,
+      4.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "fabric": {
+     "robot_xform": [
+      1.0,
+      2.0,
+      3.0
+     ],
+     "root": [
+      1.0,
+      2.0,
+      4.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "tensor": {
+     "valid": true,
+     "root": [
+      1.0,
+      2.0,
+      4.0
+     ],
+     "joint_rad": 0.0,
+     "joint_deg": 0.0,
+     "target_rad": 0.0,
+     "target_deg": 0.0,
+     "link_masses": [
+      1.0,
+      1.0
+     ]
+    }
+   },
+   "3_toggled_stop": {
+    "timeline": "stopped",
+    "usd": {
+     "robot_xform": [
+      1.0,
+      2.0,
+      3.0
+     ],
+     "root": [
+      1.0,
+      2.0,
+      4.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "fabric": {
+     "robot_xform": [
+      1.0,
+      2.0,
+      3.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "tensor": {
+     "valid": false
+    }
+   },
+   "4_replay_update1": {
+    "timeline": "playing",
+    "usd": {
+     "robot_xform": [
+      1.0,
+      2.0,
+      3.0
+     ],
+     "root": [
+      1.0,
+      2.0,
+      4.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "fabric": {
+     "robot_xform": [
+      1.0,
+      2.0,
+      3.0
+     ],
+     "root": [
+      1.0,
+      2.0,
+      4.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "tensor": {
+     "valid": true,
+     "root": [
+      1.0,
+      2.0,
+      4.0
+     ],
+     "joint_rad": 0.0,
+     "joint_deg": 0.0,
+     "target_rad": 0.0,
+     "target_deg": 0.0,
+     "link_masses": [
+      1.0,
+      1.0
+     ]
+    }
+   },
+   "5_replay_update10": {
+    "timeline": "playing",
+    "usd": {
+     "robot_xform": [
+      1.0,
+      2.0,
+      3.0
+     ],
+     "root": [
+      1.0,
+      2.0,
+      4.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "fabric": {
+     "robot_xform": [
+      1.0,
+      2.0,
+      3.0
+     ],
+     "root": [
+      1.0,
+      2.0,
+      4.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "tensor": {
+     "valid": true,
+     "root": [
+      1.0,
+      2.0,
+      4.0
+     ],
+     "joint_rad": 0.0,
+     "joint_deg": 0.0,
+     "target_rad": 0.0,
+     "target_deg": 0.0,
+     "link_masses": [
+      1.0,
+      1.0
+     ]
+    }
+   }
+  },
+  {
+   "id": "A/playing/set_world_poses/usdrt",
+   "description": "開始=playing メソッド=set_world_poses use_backend=usdrt",
+   "0_before": {
+    "timeline": "playing",
+    "usd": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "fabric": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "tensor": {
+     "valid": true,
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_rad": 0.0,
+     "joint_deg": 0.0,
+     "target_rad": 0.0,
+     "target_deg": 0.0,
+     "link_masses": [
+      1.0,
+      1.0
+     ]
+    }
+   },
+   "call": {
+    "touched": [
+     "USDRT(usdrt)"
+    ],
+    "warnings": [],
+    "error": null
+   },
+   "1_after_call": {
+    "timeline": "playing",
+    "usd": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "fabric": {
+     "robot_xform": [
+      1.0,
+      2.0,
+      3.0
+     ],
+     "root": [
+      1.0,
+      2.0,
+      4.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "tensor": {
+     "valid": true,
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_rad": 0.0,
+     "joint_deg": 0.0,
+     "target_rad": 0.0,
+     "target_deg": 0.0,
+     "link_masses": [
+      1.0,
+      1.0
+     ]
+    }
+   },
+   "2_after_update1": {
+    "timeline": "playing",
+    "usd": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "fabric": {
+     "robot_xform": [
+      1.0,
+      2.0,
+      3.0
+     ],
+     "root": [
+      1.0,
+      2.0,
+      4.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "tensor": {
+     "valid": true,
+     "root": [
+      1.0,
+      2.0,
+      4.0
+     ],
+     "joint_rad": 0.0,
+     "joint_deg": 0.0,
+     "target_rad": 0.0,
+     "target_deg": 0.0,
+     "link_masses": [
+      1.0,
+      1.0
+     ]
+    }
+   },
+   "3_toggled_stop": {
+    "timeline": "stopped",
+    "usd": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "fabric": {
+     "robot_xform": [
+      1.0,
+      2.0,
+      3.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "tensor": {
+     "valid": false
+    }
+   },
+   "4_replay_update1": {
+    "timeline": "playing",
+    "usd": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "fabric": {
+     "robot_xform": [
+      1.0,
+      2.0,
+      3.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "tensor": {
+     "valid": true,
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_rad": 0.0,
+     "joint_deg": 0.0,
+     "target_rad": 0.0,
+     "target_deg": 0.0,
+     "link_masses": [
+      1.0,
+      1.0
+     ]
+    }
+   },
+   "5_replay_update10": {
+    "timeline": "playing",
+    "usd": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "fabric": {
+     "robot_xform": [
+      1.0,
+      2.0,
+      3.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "tensor": {
+     "valid": true,
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_rad": 0.0,
+     "joint_deg": 0.0,
+     "target_rad": 0.0,
+     "target_deg": 0.0,
+     "link_masses": [
+      1.0,
+      1.0
+     ]
+    }
+   }
+  },
+  {
+   "id": "A/playing/set_world_poses/fabric",
+   "description": "開始=playing メソッド=set_world_poses use_backend=fabric",
+   "0_before": {
+    "timeline": "playing",
+    "usd": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "fabric": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "tensor": {
+     "valid": true,
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_rad": 0.0,
+     "joint_deg": 0.0,
+     "target_rad": 0.0,
+     "target_deg": 0.0,
+     "link_masses": [
+      1.0,
+      1.0
+     ]
+    }
+   },
+   "call": {
+    "touched": [
+     "USDRT(usdrt)"
+    ],
+    "warnings": [],
+    "error": null
+   },
+   "1_after_call": {
+    "timeline": "playing",
+    "usd": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "fabric": {
+     "robot_xform": [
+      1.0,
+      2.0,
+      3.0
+     ],
+     "root": [
+      1.0,
+      2.0,
+      4.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "tensor": {
+     "valid": true,
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_rad": 0.0,
+     "joint_deg": 0.0,
+     "target_rad": 0.0,
+     "target_deg": 0.0,
+     "link_masses": [
+      1.0,
+      1.0
+     ]
+    }
+   },
+   "2_after_update1": {
+    "timeline": "playing",
+    "usd": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "fabric": {
+     "robot_xform": [
+      1.0,
+      2.0,
+      3.0
+     ],
+     "root": [
+      1.0,
+      2.0,
+      4.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "tensor": {
+     "valid": true,
+     "root": [
+      1.0,
+      2.0,
+      4.0
+     ],
+     "joint_rad": 0.0,
+     "joint_deg": 0.0,
+     "target_rad": 0.0,
+     "target_deg": 0.0,
+     "link_masses": [
+      1.0,
+      1.0
+     ]
+    }
+   },
+   "3_toggled_stop": {
+    "timeline": "stopped",
+    "usd": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "fabric": {
+     "robot_xform": [
+      1.0,
+      2.0,
+      3.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "tensor": {
+     "valid": false
+    }
+   },
+   "4_replay_update1": {
+    "timeline": "playing",
+    "usd": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "fabric": {
+     "robot_xform": [
+      1.0,
+      2.0,
+      3.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "tensor": {
+     "valid": true,
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_rad": 0.0,
+     "joint_deg": 0.0,
+     "target_rad": 0.0,
+     "target_deg": 0.0,
+     "link_masses": [
+      1.0,
+      1.0
+     ]
+    }
+   },
+   "5_replay_update10": {
+    "timeline": "playing",
+    "usd": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "fabric": {
+     "robot_xform": [
+      1.0,
+      2.0,
+      3.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "tensor": {
+     "valid": true,
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_rad": 0.0,
+     "joint_deg": 0.0,
+     "target_rad": 0.0,
+     "target_deg": 0.0,
+     "link_masses": [
+      1.0,
+      1.0
+     ]
+    }
+   }
+  },
+  {
+   "id": "A/playing/set_dof_positions/(既定)",
+   "description": "開始=playing メソッド=set_dof_positions use_backend=None",
+   "0_before": {
+    "timeline": "playing",
+    "usd": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "fabric": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "tensor": {
+     "valid": true,
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_rad": 0.0,
+     "joint_deg": 0.0,
+     "target_rad": 0.0,
+     "target_deg": 0.0,
+     "link_masses": [
+      1.0,
+      1.0
+     ]
+    }
+   },
+   "call": {
+    "touched": [
+     "tensor(omni.physics.tensors)"
+    ],
+    "warnings": [],
+    "error": null
+   },
+   "1_after_call": {
+    "timeline": "playing",
+    "usd": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "fabric": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "tensor": {
+     "valid": true,
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_rad": 0.5,
+     "joint_deg": 28.65,
+     "target_rad": 0.5,
+     "target_deg": 28.65,
+     "link_masses": [
+      1.0,
+      1.0
+     ]
+    }
+   },
+   "2_after_update1": {
+    "timeline": "playing",
+    "usd": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "fabric": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 28.6479,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "tensor": {
+     "valid": true,
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_rad": 0.5,
+     "joint_deg": 28.65,
+     "target_rad": 0.5,
+     "target_deg": 28.65,
+     "link_masses": [
+      1.0,
+      1.0
+     ]
+    }
+   },
+   "3_toggled_stop": {
+    "timeline": "stopped",
+    "usd": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "fabric": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "tensor": {
+     "valid": false
+    }
+   },
+   "4_replay_update1": {
+    "timeline": "playing",
+    "usd": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "fabric": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "tensor": {
+     "valid": true,
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_rad": 0.0,
+     "joint_deg": 0.0,
+     "target_rad": 0.0,
+     "target_deg": 0.0,
+     "link_masses": [
+      1.0,
+      1.0
+     ]
+    }
+   },
+   "5_replay_update10": {
+    "timeline": "playing",
+    "usd": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "fabric": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "tensor": {
+     "valid": true,
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_rad": 0.0,
+     "joint_deg": 0.0,
+     "target_rad": 0.0,
+     "target_deg": 0.0,
+     "link_masses": [
+      1.0,
+      1.0
+     ]
+    }
+   }
+  },
+  {
+   "id": "A/playing/set_dof_positions/usd",
+   "description": "開始=playing メソッド=set_dof_positions use_backend=usd",
+   "0_before": {
+    "timeline": "playing",
+    "usd": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "fabric": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "tensor": {
+     "valid": true,
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_rad": 0.0,
+     "joint_deg": 0.0,
+     "target_rad": 0.0,
+     "target_deg": 0.0,
+     "link_masses": [
+      1.0,
+      1.0
+     ]
+    }
+   },
+   "call": {
+    "touched": [
+     "tensor(omni.physics.tensors)"
+    ],
+    "warnings": [],
+    "error": null
+   },
+   "1_after_call": {
+    "timeline": "playing",
+    "usd": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "fabric": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "tensor": {
+     "valid": true,
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_rad": 0.5,
+     "joint_deg": 28.65,
+     "target_rad": 0.5,
+     "target_deg": 28.65,
+     "link_masses": [
+      1.0,
+      1.0
+     ]
+    }
+   },
+   "2_after_update1": {
+    "timeline": "playing",
+    "usd": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "fabric": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 28.6479,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "tensor": {
+     "valid": true,
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_rad": 0.5,
+     "joint_deg": 28.65,
+     "target_rad": 0.5,
+     "target_deg": 28.65,
+     "link_masses": [
+      1.0,
+      1.0
+     ]
+    }
+   },
+   "3_toggled_stop": {
+    "timeline": "stopped",
+    "usd": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "fabric": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "tensor": {
+     "valid": false
+    }
+   },
+   "4_replay_update1": {
+    "timeline": "playing",
+    "usd": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "fabric": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "tensor": {
+     "valid": true,
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_rad": 0.0,
+     "joint_deg": 0.0,
+     "target_rad": 0.0,
+     "target_deg": 0.0,
+     "link_masses": [
+      1.0,
+      1.0
+     ]
+    }
+   },
+   "5_replay_update10": {
+    "timeline": "playing",
+    "usd": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "fabric": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "tensor": {
+     "valid": true,
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_rad": 0.0,
+     "joint_deg": 0.0,
+     "target_rad": 0.0,
+     "target_deg": 0.0,
+     "link_masses": [
+      1.0,
+      1.0
+     ]
+    }
+   }
+  },
+  {
+   "id": "A/playing/set_dof_position_targets/(既定)",
+   "description": "開始=playing メソッド=set_dof_position_targets use_backend=None",
+   "0_before": {
+    "timeline": "playing",
+    "usd": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "fabric": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "tensor": {
+     "valid": true,
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_rad": 0.0,
+     "joint_deg": 0.0,
+     "target_rad": 0.0,
+     "target_deg": 0.0,
+     "link_masses": [
+      1.0,
+      1.0
+     ]
+    }
+   },
+   "call": {
+    "touched": [
+     "tensor(omni.physics.tensors)"
+    ],
+    "warnings": [],
+    "error": null
+   },
+   "1_after_call": {
+    "timeline": "playing",
+    "usd": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "fabric": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "tensor": {
+     "valid": true,
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_rad": 0.0,
+     "joint_deg": 0.0,
+     "target_rad": 0.3,
+     "target_deg": 17.19,
+     "link_masses": [
+      1.0,
+      1.0
+     ]
+    }
+   },
+   "2_after_update1": {
+    "timeline": "playing",
+    "usd": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "fabric": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "tensor": {
+     "valid": true,
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_rad": 0.0,
+     "joint_deg": 0.0,
+     "target_rad": 0.3,
+     "target_deg": 17.19,
+     "link_masses": [
+      1.0,
+      1.0
+     ]
+    }
+   },
+   "3_toggled_stop": {
+    "timeline": "stopped",
+    "usd": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "fabric": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "tensor": {
+     "valid": false
+    }
+   },
+   "4_replay_update1": {
+    "timeline": "playing",
+    "usd": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "fabric": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "tensor": {
+     "valid": true,
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_rad": 0.0,
+     "joint_deg": 0.0,
+     "target_rad": 0.0,
+     "target_deg": 0.0,
+     "link_masses": [
+      1.0,
+      1.0
+     ]
+    }
+   },
+   "5_replay_update10": {
+    "timeline": "playing",
+    "usd": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "fabric": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "tensor": {
+     "valid": true,
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_rad": 0.0,
+     "joint_deg": 0.0,
+     "target_rad": 0.0,
+     "target_deg": 0.0,
+     "link_masses": [
+      1.0,
+      1.0
+     ]
+    }
+   }
+  },
+  {
+   "id": "A/playing/set_dof_position_targets/tensor",
+   "description": "開始=playing メソッド=set_dof_position_targets use_backend=tensor",
+   "0_before": {
+    "timeline": "playing",
+    "usd": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "fabric": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "tensor": {
+     "valid": true,
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_rad": 0.0,
+     "joint_deg": 0.0,
+     "target_rad": 0.0,
+     "target_deg": 0.0,
+     "link_masses": [
+      1.0,
+      1.0
+     ]
+    }
+   },
+   "call": {
+    "touched": [
+     "tensor(omni.physics.tensors)"
+    ],
+    "warnings": [],
+    "error": null
+   },
+   "1_after_call": {
+    "timeline": "playing",
+    "usd": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "fabric": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "tensor": {
+     "valid": true,
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_rad": 0.0,
+     "joint_deg": 0.0,
+     "target_rad": 0.3,
+     "target_deg": 17.19,
+     "link_masses": [
+      1.0,
+      1.0
+     ]
+    }
+   },
+   "2_after_update1": {
+    "timeline": "playing",
+    "usd": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "fabric": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "tensor": {
+     "valid": true,
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_rad": 0.0,
+     "joint_deg": 0.0,
+     "target_rad": 0.3,
+     "target_deg": 17.19,
+     "link_masses": [
+      1.0,
+      1.0
+     ]
+    }
+   },
+   "3_toggled_stop": {
+    "timeline": "stopped",
+    "usd": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "fabric": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "tensor": {
+     "valid": false
+    }
+   },
+   "4_replay_update1": {
+    "timeline": "playing",
+    "usd": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "fabric": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "tensor": {
+     "valid": true,
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_rad": 0.0,
+     "joint_deg": 0.0,
+     "target_rad": 0.0,
+     "target_deg": 0.0,
+     "link_masses": [
+      1.0,
+      1.0
+     ]
+    }
+   },
+   "5_replay_update10": {
+    "timeline": "playing",
+    "usd": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "fabric": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "tensor": {
+     "valid": true,
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_rad": 0.0,
+     "joint_deg": 0.0,
+     "target_rad": 0.0,
+     "target_deg": 0.0,
+     "link_masses": [
+      1.0,
+      1.0
+     ]
+    }
+   }
+  },
+  {
+   "id": "A/playing/set_dof_position_targets/usd",
+   "description": "開始=playing メソッド=set_dof_position_targets use_backend=usd",
+   "0_before": {
+    "timeline": "playing",
+    "usd": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "fabric": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "tensor": {
+     "valid": true,
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_rad": 0.0,
+     "joint_deg": 0.0,
+     "target_rad": 0.0,
+     "target_deg": 0.0,
+     "link_masses": [
+      1.0,
+      1.0
+     ]
+    }
+   },
+   "call": {
+    "touched": [
+     "tensor(omni.physics.tensors)",
+     "USD(pxr)"
+    ],
+    "warnings": [],
+    "error": null
+   },
+   "1_after_call": {
+    "timeline": "playing",
+    "usd": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 17.1887,
+     "child_mass": 1.0
+    },
+    "fabric": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "tensor": {
+     "valid": true,
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_rad": 0.0,
+     "joint_deg": 0.0,
+     "target_rad": 0.3,
+     "target_deg": 17.19,
+     "link_masses": [
+      1.0,
+      1.0
+     ]
+    }
+   },
+   "2_after_update1": {
+    "timeline": "playing",
+    "usd": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 17.1887,
+     "child_mass": 1.0
+    },
+    "fabric": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 17.1887,
+     "child_mass": 1.0
+    },
+    "tensor": {
+     "valid": true,
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_rad": 0.0,
+     "joint_deg": 0.0,
+     "target_rad": 0.3,
+     "target_deg": 17.19,
+     "link_masses": [
+      1.0,
+      1.0
+     ]
+    }
+   },
+   "3_toggled_stop": {
+    "timeline": "stopped",
+    "usd": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 17.1887,
+     "child_mass": 1.0
+    },
+    "fabric": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 17.1887,
+     "child_mass": 1.0
+    },
+    "tensor": {
+     "valid": false
+    }
+   },
+   "4_replay_update1": {
+    "timeline": "playing",
+    "usd": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 17.1887,
+     "child_mass": 1.0
+    },
+    "fabric": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 17.1887,
+     "child_mass": 1.0
+    },
+    "tensor": {
+     "valid": true,
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_rad": 0.0,
+     "joint_deg": 0.0,
+     "target_rad": 0.3,
+     "target_deg": 17.19,
+     "link_masses": [
+      1.0,
+      1.0
+     ]
+    }
+   },
+   "5_replay_update10": {
+    "timeline": "playing",
+    "usd": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 17.1887,
+     "child_mass": 1.0
+    },
+    "fabric": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 17.1887,
+     "child_mass": 1.0
+    },
+    "tensor": {
+     "valid": true,
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_rad": 0.0,
+     "joint_deg": 0.0,
+     "target_rad": 0.3,
+     "target_deg": 17.19,
+     "link_masses": [
+      1.0,
+      1.0
+     ]
+    }
+   }
+  },
+  {
+   "id": "A/playing/set_link_masses/(既定)",
+   "description": "開始=playing メソッド=set_link_masses use_backend=None",
+   "0_before": {
+    "timeline": "playing",
+    "usd": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "fabric": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "tensor": {
+     "valid": true,
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_rad": 0.0,
+     "joint_deg": 0.0,
+     "target_rad": 0.0,
+     "target_deg": 0.0,
+     "link_masses": [
+      1.0,
+      1.0
+     ]
+    }
+   },
+   "call": {
+    "touched": [
+     "tensor(omni.physics.tensors)"
+    ],
+    "warnings": [],
+    "error": null
+   },
+   "1_after_call": {
+    "timeline": "playing",
+    "usd": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "fabric": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "tensor": {
+     "valid": true,
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_rad": 0.0,
+     "joint_deg": 0.0,
+     "target_rad": 0.0,
+     "target_deg": 0.0,
+     "link_masses": [
+      1.0,
+      5.0
+     ]
+    }
+   },
+   "2_after_update1": {
+    "timeline": "playing",
+    "usd": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "fabric": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "tensor": {
+     "valid": true,
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_rad": 0.0,
+     "joint_deg": 0.0,
+     "target_rad": 0.0,
+     "target_deg": 0.0,
+     "link_masses": [
+      1.0,
+      5.0
+     ]
+    }
+   },
+   "3_toggled_stop": {
+    "timeline": "stopped",
+    "usd": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "fabric": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "tensor": {
+     "valid": false
+    }
+   },
+   "4_replay_update1": {
+    "timeline": "playing",
+    "usd": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "fabric": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "tensor": {
+     "valid": true,
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_rad": 0.0,
+     "joint_deg": 0.0,
+     "target_rad": 0.0,
+     "target_deg": 0.0,
+     "link_masses": [
+      1.0,
+      1.0
+     ]
+    }
+   },
+   "5_replay_update10": {
+    "timeline": "playing",
+    "usd": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "fabric": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "tensor": {
+     "valid": true,
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_rad": 0.0,
+     "joint_deg": 0.0,
+     "target_rad": 0.0,
+     "target_deg": 0.0,
+     "link_masses": [
+      1.0,
+      1.0
+     ]
+    }
+   }
+  },
+  {
+   "id": "A/playing/set_link_masses/usd",
+   "description": "開始=playing メソッド=set_link_masses use_backend=usd",
+   "0_before": {
+    "timeline": "playing",
+    "usd": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "fabric": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "tensor": {
+     "valid": true,
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_rad": 0.0,
+     "joint_deg": 0.0,
+     "target_rad": 0.0,
+     "target_deg": 0.0,
+     "link_masses": [
+      1.0,
+      1.0
+     ]
+    }
+   },
+   "call": {
+    "touched": [
+     "USD(pxr)"
+    ],
+    "warnings": [],
+    "error": null
+   },
+   "1_after_call": {
+    "timeline": "playing",
+    "usd": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 5.0
+    },
+    "fabric": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 1.0
+    },
+    "tensor": {
+     "valid": true,
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_rad": 0.0,
+     "joint_deg": 0.0,
+     "target_rad": 0.0,
+     "target_deg": 0.0,
+     "link_masses": [
+      1.0,
+      1.0
+     ]
+    }
+   },
+   "2_after_update1": {
+    "timeline": "playing",
+    "usd": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 5.0
+    },
+    "fabric": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 5.0
+    },
+    "tensor": {
+     "valid": true,
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_rad": 0.0,
+     "joint_deg": 0.0,
+     "target_rad": 0.0,
+     "target_deg": 0.0,
+     "link_masses": [
+      1.0,
+      5.0
+     ]
+    }
+   },
+   "3_toggled_stop": {
+    "timeline": "stopped",
+    "usd": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 5.0
+    },
+    "fabric": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 5.0
+    },
+    "tensor": {
+     "valid": false
+    }
+   },
+   "4_replay_update1": {
+    "timeline": "playing",
+    "usd": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 5.0
+    },
+    "fabric": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 5.0
+    },
+    "tensor": {
+     "valid": true,
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_rad": 0.0,
+     "joint_deg": 0.0,
+     "target_rad": 0.0,
+     "target_deg": 0.0,
+     "link_masses": [
+      1.0,
+      5.0
+     ]
+    }
+   },
+   "5_replay_update10": {
+    "timeline": "playing",
+    "usd": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 5.0
+    },
+    "fabric": {
+     "robot_xform": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_deg": 0.0,
+     "target_deg": 0.0,
+     "child_mass": 5.0
+    },
+    "tensor": {
+     "valid": true,
+     "root": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "joint_rad": 0.0,
+     "joint_deg": 0.0,
+     "target_rad": 0.0,
+     "target_deg": 0.0,
+     "link_masses": [
+      1.0,
+      5.0
+     ]
+    }
+   }
+  }
+ ]
+}

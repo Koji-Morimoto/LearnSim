@@ -1,0 +1,215 @@
+status: ok
+{
+ "A": {
+  "errors": "frame 0: AssertionError: Instance's physics tensor entity is not valid. Play the simulation/timeline to re-initialize it",
+  "max_abs_angle_error_deg": null,
+  "actual_angle_at_cmd_90": null,
+  "actual_angle_samples": [],
+  "obstacle_moved_m": 0.0,
+  "contacts": {},
+  "logs": [
+   "[omni.physx.plugin] PhysicsUSD: CreateJoint - cannot create a joint between static bodies, joint prim: /World/Arm/FixToWorld",
+   "[omni.physx.plugin] PhysicsUSD: CreateJoint - cannot create a joint between static bodies, joint prim: /World/Arm/Hinge",
+   "[omni.physx.tensors.plugin] Pattern '/World/Arm' did not match any articulations\n",
+   "[omni.physx.tensors.plugin] Provided pattern list did not match any articulations\n"
+  ]
+ },
+ "B": {
+  "errors": null,
+  "dof_names": [
+   "Hinge"
+  ],
+  "max_abs_angle_error_deg": 6.06,
+  "actual_angle_at_cmd_90": 90.0,
+  "actual_angle_samples": [
+   [
+    0.0,
+    -0.0
+   ],
+   [
+    15.0,
+    15.0
+   ],
+   [
+    30.0,
+    27.1
+   ],
+   [
+    45.0,
+    42.0
+   ],
+   [
+    60.0,
+    62.9
+   ],
+   [
+    75.0,
+    75.0
+   ],
+   [
+    90.0,
+    90.0
+   ],
+   [
+    75.0,
+    75.0
+   ],
+   [
+    60.0,
+    62.9
+   ],
+   [
+    45.0,
+    48.0
+   ],
+   [
+    30.0,
+    27.1
+   ],
+   [
+    15.0,
+    15.0
+   ],
+   [
+    0.0,
+    -0.0
+   ]
+  ],
+  "obstacle_moved_m": 0.0,
+  "contacts": {
+   "Geom - Obstacle": 76
+  },
+  "logs": []
+ },
+ "B2": {
+  "errors": null,
+  "dof_names": [
+   "Hinge"
+  ],
+  "max_abs_angle_error_deg": 62.92,
+  "actual_angle_at_cmd_90": 27.08,
+  "actual_angle_samples": [
+   [
+    0.0,
+    -0.0
+   ],
+   [
+    15.0,
+    14.8
+   ],
+   [
+    30.0,
+    27.1
+   ],
+   [
+    45.0,
+    27.1
+   ],
+   [
+    60.0,
+    27.1
+   ],
+   [
+    75.0,
+    27.1
+   ],
+   [
+    90.0,
+    27.1
+   ],
+   [
+    75.0,
+    27.1
+   ],
+   [
+    60.0,
+    27.1
+   ],
+   [
+    45.0,
+    27.1
+   ],
+   [
+    30.0,
+    27.1
+   ],
+   [
+    15.0,
+    15.2
+   ],
+   [
+    0.0,
+    0.2
+   ]
+  ],
+  "obstacle_moved_m": 0.0,
+  "contacts": {
+   "Geom - Obstacle": 128
+  },
+  "logs": []
+ },
+ "C": {
+  "errors": null,
+  "max_abs_angle_error_deg": 0.0,
+  "actual_angle_at_cmd_90": 90.0,
+  "actual_angle_samples": [
+   [
+    0.0,
+    -0.0
+   ],
+   [
+    15.0,
+    15.0
+   ],
+   [
+    30.0,
+    30.0
+   ],
+   [
+    45.0,
+    45.0
+   ],
+   [
+    60.0,
+    60.0
+   ],
+   [
+    75.0,
+    75.0
+   ],
+   [
+    90.0,
+    90.0
+   ],
+   [
+    75.0,
+    75.0
+   ],
+   [
+    60.0,
+    60.0
+   ],
+   [
+    45.0,
+    45.0
+   ],
+   [
+    30.0,
+    30.0
+   ],
+   [
+    15.0,
+    15.0
+   ],
+   [
+    0.0,
+    -0.0
+   ]
+  ],
+  "obstacle_moved_m": 0.0,
+  "contacts": {
+   "Geom - Obstacle": 76
+  },
+  "logs": []
+ }
+}

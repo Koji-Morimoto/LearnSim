@@ -1,0 +1,11 @@
+{"name": "A: set 直後にクエリ（step しない）", "kind": "phase"}
+{"step": "set 直後", "at_c0": ["/World/K/c_0", "/World/K/c_1"], "at_old_c1": [], "kind": "probe"}
+{"step": "step 1 回目の後", "tensor_c1": [0.30000001192092896, 0.0, 1.0], "at_c0": ["/World/K/c_0"], "at_old_c1": ["/World/K/c_1"], "kind": "probe"}
+{"step": "step 2 回目の後", "tensor_c1": [0.30000001192092896, 0.0, 1.0], "at_c0": ["/World/K/c_0"], "at_old_c1": ["/World/K/c_1"], "kind": "probe"}
+{"method": "A: set 直後にクエリ（step しない）", "median_us": 188.05000036081765, "kind": "timing"}
+{"name": "B: set_kinematic_targets してから step", "kind": "phase"}
+{"step": "set_kinematic_targets 直後（step 前）", "tensor_c1": [0.30000001192092896, 0.0, 1.0], "at_c0": ["/World/K/c_0"], "kind": "probe"}
+{"step": "step 1 回目の後", "tensor_c1": [0.05000000074505806, 0.0, 1.0], "at_c0": ["/World/K/c_0", "/World/K/c_1"], "at_old_c1": [], "kind": "probe"}
+{"step": "step 2 回目の後", "tensor_c1": [0.05000000074505806, 0.0, 1.0], "at_c0": ["/World/K/c_0", "/World/K/c_1"], "at_old_c1": [], "kind": "probe"}
+{"method": "B: set_kinematic_targets してから step", "median_us": 2384.850000453298, "kind": "timing"}
+{"name": "done", "kind": "phase"}

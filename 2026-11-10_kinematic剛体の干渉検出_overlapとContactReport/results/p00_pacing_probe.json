@@ -1,0 +1,22 @@
+{
+ "group": "p00_pacing_probe",
+ "items": [
+  {
+   "id": "P-00",
+   "description": "Play 中、空のシーンの update 時間の中央値 [ms]",
+   "initial_settings": {
+    "/app/runLoops/main/rateLimitEnabled": true,
+    "/app/runLoops/main/rateLimitFrequency": 120,
+    "/app/runLoops/main/manualModeEnabled": null,
+    "/app/player/useFixedTimeStepping": true,
+    "/app/player/playSimulations": true,
+    "/persistent/simulation/minFrameRate": 30
+   },
+   "0_default": 16.703,
+   "1_rateLimit_off": 16.703,
+   "2_plus_manualMode_on": 16.704,
+   "3_rateLimit_off_plus_play_every_frame": 16.703,
+   "4_rateLimit_off_plus_fixedTimeStepping_off": 0.181
+  }
+ ]
+}

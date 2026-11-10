@@ -1,0 +1,496 @@
+{
+ "group": "b02_substep",
+ "items": [
+  {
+   "id": "S-00",
+   "description": "サブステップ数に関係する設定",
+   "minFrameRate": 30,
+   "omni.physx": "omni.physx-110.4.4",
+   "omni.physics.physx": "omni.physics.physx-110.4.4",
+   "omni.physics.stageupdate": "omni.physics.stageupdate-110.4.4",
+   "isaac_sim_VERSION": "6.2.0-rc.14+release.52805.02189a84.gl"
+  },
+  {
+   "id": "S-01",
+   "description": "simulate(k/60) 1 回で走るサブステップ数",
+   "simfetch/k=1": {
+    "step_events": 1,
+    "step_event_dts": [
+     0.016667
+    ],
+    "drop_over_g_dt2": 1.0,
+    "if_split_into_k_substeps": 1.0,
+    "if_single_step_of_k_dt": 1
+   },
+   "simfetch/k=2": {
+    "step_events": 1,
+    "step_event_dts": [
+     0.033333
+    ],
+    "drop_over_g_dt2": 4.001,
+    "if_split_into_k_substeps": 3.0,
+    "if_single_step_of_k_dt": 4
+   },
+   "simfetch/k=3": {
+    "step_events": 1,
+    "step_event_dts": [
+     0.05
+    ],
+    "drop_over_g_dt2": 9.001,
+    "if_split_into_k_substeps": 6.0,
+    "if_single_step_of_k_dt": 9
+   },
+   "simfetch/k=4": {
+    "step_events": 1,
+    "step_event_dts": [
+     0.066667
+    ],
+    "drop_over_g_dt2": 16.001,
+    "if_split_into_k_substeps": 10.0,
+    "if_single_step_of_k_dt": 16
+   },
+   "simfetch/k=8": {
+    "step_events": 1,
+    "step_event_dts": [
+     0.133333
+    ],
+    "drop_over_g_dt2": 64.0,
+    "if_split_into_k_substeps": 36.0,
+    "if_single_step_of_k_dt": 64
+   },
+   "update/k=1": {
+    "step_events": 1,
+    "step_event_dts": [
+     0.016667
+    ],
+    "drop_over_g_dt2": 1.0,
+    "if_split_into_k_substeps": 1.0,
+    "if_single_step_of_k_dt": 1
+   },
+   "update/k=2": {
+    "step_events": 2,
+    "step_event_dts": [
+     0.016667,
+     0.016667
+    ],
+    "drop_over_g_dt2": 2.999,
+    "if_split_into_k_substeps": 3.0,
+    "if_single_step_of_k_dt": 4
+   },
+   "update/k=3": {
+    "step_events": 2,
+    "step_event_dts": [
+     0.016667,
+     0.016667
+    ],
+    "drop_over_g_dt2": 2.999,
+    "if_split_into_k_substeps": 6.0,
+    "if_single_step_of_k_dt": 9
+   },
+   "update/k=4": {
+    "step_events": 2,
+    "step_event_dts": [
+     0.016667,
+     0.016667
+    ],
+    "drop_over_g_dt2": 2.999,
+    "if_split_into_k_substeps": 10.0,
+    "if_single_step_of_k_dt": 16
+   },
+   "update/k=8": {
+    "step_events": 2,
+    "step_event_dts": [
+     0.016667,
+     0.016667
+    ],
+    "drop_over_g_dt2": 2.999,
+    "if_split_into_k_substeps": 36.0,
+    "if_single_step_of_k_dt": 64
+   }
+  },
+  {
+   "id": "S-02",
+   "description": "接触継続中に k サブステップを 1 回で進めたときのヘッダ数",
+   "simfetch/k=1": {
+    "substeps": 1,
+    "pulled": [
+     "PERSIST Box-Ground n=4"
+    ],
+    "contact_points": 4
+   },
+   "simfetch/k=2": {
+    "substeps": 1,
+    "pulled": [
+     "PERSIST Box-Ground n=4"
+    ],
+    "contact_points": 4
+   },
+   "simfetch/k=3": {
+    "substeps": 1,
+    "pulled": [
+     "PERSIST Box-Ground n=4"
+    ],
+    "contact_points": 4
+   },
+   "simfetch/k=4": {
+    "substeps": 1,
+    "pulled": [
+     "PERSIST Box-Ground n=4"
+    ],
+    "contact_points": 4
+   },
+   "simfetch/k=8": {
+    "substeps": 1,
+    "pulled": [
+     "PERSIST Box-Ground n=4"
+    ],
+    "contact_points": 4
+   },
+   "update/k=1": {
+    "substeps": 1,
+    "pulled": [
+     "PERSIST Box-Ground n=4"
+    ],
+    "contact_points": 4
+   },
+   "update/k=2": {
+    "substeps": 2,
+    "pulled": [
+     "PERSIST Box-Ground n=4"
+    ],
+    "contact_points": 4
+   },
+   "update/k=3": {
+    "substeps": 2,
+    "pulled": [
+     "PERSIST Box-Ground n=4"
+    ],
+    "contact_points": 4
+   },
+   "update/k=4": {
+    "substeps": 2,
+    "pulled": [
+     "PERSIST Box-Ground n=4"
+    ],
+    "contact_points": 4
+   },
+   "update/k=8": {
+    "substeps": 2,
+    "pulled": [
+     "PERSIST Box-Ground n=4"
+    ],
+    "contact_points": 4
+   }
+  },
+  {
+   "id": "S-03",
+   "description": "1 回の呼び出しで複数サブステップ走るとき、各サブステップのイベントが全部残るか",
+   "speed": 30.0,
+   "start_x=-3.0/simfetch/k=1": {
+    "calls_with_events": [
+     {
+      "call": 5,
+      "substeps": [
+       5
+      ],
+      "pulled": [
+       "FOUND Box-Wall n=4"
+      ]
+     },
+     {
+      "call": 6,
+      "substeps": [
+       6
+      ],
+      "pulled": [
+       "PERSIST Box-Wall n=4"
+      ]
+     },
+     {
+      "call": 7,
+      "substeps": [
+       7
+      ],
+      "pulled": [
+       "PERSIST Box-Wall n=4"
+      ]
+     },
+     {
+      "call": 8,
+      "substeps": [
+       8
+      ],
+      "pulled": [
+       "LOST Box-Wall n=0"
+      ]
+     }
+    ],
+    "final_x": 5.0,
+    "total_substeps": 16
+   },
+   "start_x=-3.0/update/k=1": {
+    "calls_with_events": [
+     {
+      "call": 5,
+      "substeps": [
+       5
+      ],
+      "pulled": [
+       "FOUND Box-Wall n=4"
+      ]
+     },
+     {
+      "call": 6,
+      "substeps": [
+       6
+      ],
+      "pulled": [
+       "PERSIST Box-Wall n=4"
+      ]
+     },
+     {
+      "call": 7,
+      "substeps": [
+       7
+      ],
+      "pulled": [
+       "PERSIST Box-Wall n=4"
+      ]
+     },
+     {
+      "call": 8,
+      "substeps": [
+       8
+      ],
+      "pulled": [
+       "LOST Box-Wall n=0"
+      ]
+     }
+    ],
+    "final_x": 5.0,
+    "total_substeps": 16
+   },
+   "start_x=-3.0/update/k=2": {
+    "calls_with_events": [
+     {
+      "call": 2,
+      "substeps": [
+       4,
+       5
+      ],
+      "pulled": [
+       "FOUND Box-Wall n=4"
+      ]
+     },
+     {
+      "call": 3,
+      "substeps": [
+       6,
+       7
+      ],
+      "pulled": [
+       "PERSIST Box-Wall n=4"
+      ]
+     }
+    ],
+    "final_x": 5.0,
+    "total_substeps": 16
+   },
+   "start_x=-2.5/simfetch/k=1": {
+    "calls_with_events": [
+     {
+      "call": 4,
+      "substeps": [
+       4
+      ],
+      "pulled": [
+       "FOUND Box-Wall n=4"
+      ]
+     },
+     {
+      "call": 5,
+      "substeps": [
+       5
+      ],
+      "pulled": [
+       "PERSIST Box-Wall n=4"
+      ]
+     },
+     {
+      "call": 6,
+      "substeps": [
+       6
+      ],
+      "pulled": [
+       "PERSIST Box-Wall n=4"
+      ]
+     },
+     {
+      "call": 7,
+      "substeps": [
+       7
+      ],
+      "pulled": [
+       "LOST Box-Wall n=0"
+      ]
+     }
+    ],
+    "final_x": 5.5,
+    "total_substeps": 16
+   },
+   "start_x=-2.5/update/k=1": {
+    "calls_with_events": [
+     {
+      "call": 4,
+      "substeps": [
+       4
+      ],
+      "pulled": [
+       "FOUND Box-Wall n=4"
+      ]
+     },
+     {
+      "call": 5,
+      "substeps": [
+       5
+      ],
+      "pulled": [
+       "PERSIST Box-Wall n=4"
+      ]
+     },
+     {
+      "call": 6,
+      "substeps": [
+       6
+      ],
+      "pulled": [
+       "PERSIST Box-Wall n=4"
+      ]
+     },
+     {
+      "call": 7,
+      "substeps": [
+       7
+      ],
+      "pulled": [
+       "LOST Box-Wall n=0"
+      ]
+     }
+    ],
+    "final_x": 5.5,
+    "total_substeps": 16
+   },
+   "start_x=-2.5/update/k=2": {
+    "calls_with_events": [
+     {
+      "call": 2,
+      "substeps": [
+       4,
+       5
+      ],
+      "pulled": [
+       "PERSIST Box-Wall n=4"
+      ]
+     },
+     {
+      "call": 3,
+      "substeps": [
+       6,
+       7
+      ],
+      "pulled": [
+       "LOST Box-Wall n=0"
+      ]
+     }
+    ],
+    "final_x": 5.5,
+    "total_substeps": 16
+   }
+  },
+  {
+   "id": "S-04",
+   "description": "2 サブステップ/呼び出しのとき、push 購読と pull が受け取るものの違い",
+   "start_x=-3.0/update/k=2": [
+    {
+     "substeps": [
+      4,
+      5
+     ],
+     "push": [
+      [
+       "FOUND Box-Wall n=4"
+      ]
+     ],
+     "pull": [
+      "FOUND Box-Wall n=4"
+     ]
+    },
+    {
+     "substeps": [
+      6,
+      7
+     ],
+     "push": [
+      [
+       "PERSIST Box-Wall n=4"
+      ],
+      [
+       "PERSIST Box-Wall n=4"
+      ]
+     ],
+     "pull": [
+      "PERSIST Box-Wall n=4"
+     ]
+    },
+    {
+     "substeps": [
+      8,
+      9
+     ],
+     "push": [
+      [
+       "LOST Box-Wall n=0"
+      ]
+     ],
+     "pull": []
+    }
+   ],
+   "start_x=-2.5/update/k=2": [
+    {
+     "substeps": [
+      4,
+      5
+     ],
+     "push": [
+      [
+       "FOUND Box-Wall n=4"
+      ],
+      [
+       "PERSIST Box-Wall n=4"
+      ]
+     ],
+     "pull": [
+      "PERSIST Box-Wall n=4"
+     ]
+    },
+    {
+     "substeps": [
+      6,
+      7
+     ],
+     "push": [
+      [
+       "PERSIST Box-Wall n=4"
+      ],
+      [
+       "LOST Box-Wall n=0"
+      ]
+     ],
+     "pull": [
+      "LOST Box-Wall n=0"
+     ]
+    }
+   ]
+  }
+ ]
+}

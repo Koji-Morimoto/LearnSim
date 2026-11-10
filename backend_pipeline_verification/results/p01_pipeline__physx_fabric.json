@@ -1,0 +1,2605 @@
+{
+ "group": "p01_pipeline__physx_fabric",
+ "items": [
+  {
+   "id": "P-00",
+   "description": "バージョンと設定",
+   "omni.physx": "omni.physx-110.4.4",
+   "omni.physx.fabric": "omni.physx.fabric-110.4.4",
+   "omni.physics.tensors": "omni.physics.tensors-110.4.4",
+   "usdrt.scenegraph": "usdrt.scenegraph-7.6.3",
+   "omni.hydra.usdrt_delegate": "omni.hydra.usdrt_delegate-7.5.2",
+   "isaacsim.core.experimental.prims": "isaacsim.core.experimental.prims-1.12.1",
+   "isaacsim.core.experimental.utils": "isaacsim.core.experimental.utils-0.23.3",
+   "isaacsim.core.simulation_manager": "isaacsim.core.simulation_manager-1.17.4",
+   "isaac_sim_VERSION": "6.2.0-rc.14+release.52805.02189a84.gl",
+   "/app/useFabricSceneDelegate": true,
+   "/physics/resetOnStop": true,
+   "/physics/updateToUsd": false,
+   "/physics/updateVelocitiesToUsd": false,
+   "/physics/fabricEnabled": true,
+   "/physics/suppressReadback": false,
+   "/physics/cudaDevice": 0,
+   "config": "physx_fabric",
+   "simulation_device": "cpu"
+  },
+  {
+   "id": "P-01",
+   "description": "Stop 中に pxr で xformOp:translate = (2,0,0) を書いたあとの Fabric",
+   "/World/Marker": {
+    "fabric_immediately": {
+     "local": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "world": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "world_cache": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "velocity": null,
+     "mass": null,
+     "translate_attr": [
+      2.0,
+      0.0,
+      0.0
+     ]
+    },
+    "usd_immediately": {
+     "translate": [
+      2.0,
+      0.0,
+      0.0
+     ],
+     "world": [
+      2.0,
+      0.0,
+      0.0
+     ],
+     "velocity": null,
+     "mass": null
+    },
+    "fabric_after_update": {
+     "local": [
+      2.0,
+      0.0,
+      0.0
+     ],
+     "world": [
+      2.0,
+      0.0,
+      0.0
+     ],
+     "world_cache": [
+      2.0,
+      0.0,
+      0.0
+     ],
+     "velocity": null,
+     "mass": null,
+     "translate_attr": [
+      2.0,
+      0.0,
+      0.0
+     ]
+    }
+   },
+   "/World/Body": {
+    "fabric_immediately": {
+     "local": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world_cache": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "velocity": null,
+     "mass": 1.0,
+     "translate_attr": [
+      2.0,
+      0.0,
+      0.0
+     ]
+    },
+    "usd_immediately": {
+     "translate": [
+      2.0,
+      0.0,
+      0.0
+     ],
+     "world": [
+      2.0,
+      0.0,
+      0.0
+     ],
+     "velocity": null,
+     "mass": 1.0
+    },
+    "fabric_after_update": {
+     "local": [
+      2.0,
+      0.0,
+      0.0
+     ],
+     "world": [
+      2.0,
+      0.0,
+      0.0
+     ],
+     "world_cache": [
+      2.0,
+      0.0,
+      0.0
+     ],
+     "velocity": null,
+     "mass": 1.0,
+     "translate_attr": [
+      2.0,
+      0.0,
+      0.0
+     ]
+    }
+   }
+  },
+  {
+   "id": "P-02",
+   "description": "Stop 中に Fabric の local 行列を (0,7,0) にしたあと",
+   "1_fabric_write/fabric": {
+    "local": [
+     0.0,
+     7.0,
+     0.0
+    ],
+    "world": [
+     0.0,
+     7.0,
+     0.0
+    ],
+    "world_cache": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "velocity": null,
+    "mass": null,
+    "translate_attr": [
+     0.0,
+     0.0,
+     0.0
+    ]
+   },
+   "1_fabric_write/usd": {
+    "translate": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "world": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "velocity": null,
+    "mass": null
+   },
+   "2_after_3_updates/fabric": {
+    "local": [
+     0.0,
+     7.0,
+     0.0
+    ],
+    "world": [
+     0.0,
+     7.0,
+     0.0
+    ],
+    "world_cache": [
+     0.0,
+     7.0,
+     0.0
+    ],
+    "velocity": null,
+    "mass": null,
+    "translate_attr": [
+     0.0,
+     0.0,
+     0.0
+    ]
+   },
+   "2_after_3_updates/usd": {
+    "translate": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "world": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "velocity": null,
+    "mass": null
+   },
+   "3_after_unrelated_usd_write/fabric": {
+    "local": [
+     0.0,
+     7.0,
+     0.0
+    ],
+    "world": [
+     0.0,
+     7.0,
+     0.0
+    ],
+    "world_cache": [
+     0.0,
+     7.0,
+     0.0
+    ],
+    "velocity": null,
+    "mass": null,
+    "translate_attr": [
+     0.0,
+     0.0,
+     0.0
+    ]
+   },
+   "4_after_usd_translate_write/fabric": {
+    "local": [
+     0.0,
+     0.0,
+     5.0
+    ],
+    "world": [
+     0.0,
+     0.0,
+     5.0
+    ],
+    "world_cache": [
+     0.0,
+     0.0,
+     5.0
+    ],
+    "velocity": null,
+    "mass": null,
+    "translate_attr": [
+     0.0,
+     0.0,
+     0.0
+    ]
+   },
+   "4_after_usd_translate_write/usd": {
+    "translate": [
+     0.0,
+     0.0,
+     5.0
+    ],
+    "world": [
+     0.0,
+     0.0,
+     5.0
+    ],
+    "velocity": null,
+    "mass": null
+   }
+  },
+  {
+   "id": "P-03",
+   "description": "USD=(0,0,1), Fabric=(3,0,1) に食い違わせて Play → Stop",
+   "before_play": {
+    "timeline": "stopped",
+    "time": 0.0,
+    "usd": {
+     "translate": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "velocity": null,
+     "mass": 1.0
+    },
+    "fabric": {
+     "local": [
+      3.0,
+      0.0,
+      1.0
+     ],
+     "world": [
+      3.0,
+      0.0,
+      1.0
+     ],
+     "world_cache": [
+      3.0,
+      0.0,
+      1.0
+     ],
+     "velocity": null,
+     "mass": 1.0,
+     "translate_attr": [
+      0.0,
+      0.0,
+      1.0
+     ]
+    },
+    "physx": {
+     "found": false,
+     "position": null
+    },
+    "tensor": {
+     "valid": false
+    }
+   },
+   "after_play_1_update": {
+    "timeline": "playing",
+    "time": 0.0167,
+    "usd": {
+     "translate": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "velocity": null,
+     "mass": 1.0
+    },
+    "fabric": {
+     "local": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world_cache": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "mass": 1.0,
+     "translate_attr": [
+      0.0,
+      0.0,
+      1.0
+     ]
+    },
+    "physx": {
+     "found": true,
+     "position": [
+      0.0,
+      0.0,
+      1.0
+     ]
+    },
+    "tensor": {
+     "valid": true,
+     "position": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "mass": 1.0
+    }
+   },
+   "after_stop": {
+    "timeline": "stopped",
+    "time": 0.0,
+    "usd": {
+     "translate": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "velocity": null,
+     "mass": 1.0
+    },
+    "fabric": {
+     "local": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world_cache": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "mass": 1.0,
+     "translate_attr": [
+      0.0,
+      0.0,
+      1.0
+     ]
+    },
+    "physx": {
+     "found": false,
+     "position": null
+    },
+    "tensor": {
+     "valid": false
+    }
+   }
+  },
+  {
+   "id": "P-04",
+   "description": "重力 9.81 で落下させ、毎 update の各層の z を追う",
+   "0_before_play": {
+    "timeline": "stopped",
+    "time": 0.0,
+    "usd": {
+     "translate": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "velocity": null,
+     "mass": 1.0
+    },
+    "fabric": {
+     "local": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world_cache": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "velocity": null,
+     "mass": 1.0,
+     "translate_attr": [
+      0.0,
+      0.0,
+      1.0
+     ]
+    },
+    "physx": {
+     "found": false,
+     "position": null
+    },
+    "tensor": {
+     "valid": false
+    }
+   },
+   "1_after_play_update1": {
+    "timeline": "playing",
+    "time": 0.0167,
+    "usd": {
+     "translate": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "velocity": null,
+     "mass": 1.0
+    },
+    "fabric": {
+     "local": [
+      0.0,
+      0.0,
+      0.9836
+     ],
+     "world": [
+      0.0,
+      0.0,
+      0.9836
+     ],
+     "world_cache": [
+      0.0,
+      0.0,
+      0.9836
+     ],
+     "velocity": [
+      0.0,
+      0.0,
+      -0.4905
+     ],
+     "mass": 1.0,
+     "translate_attr": [
+      0.0,
+      0.0,
+      1.0
+     ]
+    },
+    "physx": {
+     "found": true,
+     "position": [
+      0.0,
+      0.0,
+      0.9836
+     ]
+    },
+    "tensor": {
+     "valid": true,
+     "position": [
+      0.0,
+      0.0,
+      0.9836
+     ],
+     "velocity": [
+      0.0,
+      0.0,
+      -0.4905
+     ],
+     "mass": 1.0
+    }
+   },
+   "2_after_update2": {
+    "timeline": "playing",
+    "time": 0.0333,
+    "usd": {
+     "translate": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "velocity": null,
+     "mass": 1.0
+    },
+    "fabric": {
+     "local": [
+      0.0,
+      0.0,
+      0.9727
+     ],
+     "world": [
+      0.0,
+      0.0,
+      0.9727
+     ],
+     "world_cache": [
+      0.0,
+      0.0,
+      0.9727
+     ],
+     "velocity": [
+      0.0,
+      0.0,
+      -0.654
+     ],
+     "mass": 1.0,
+     "translate_attr": [
+      0.0,
+      0.0,
+      1.0
+     ]
+    },
+    "physx": {
+     "found": true,
+     "position": [
+      0.0,
+      0.0,
+      0.9727
+     ]
+    },
+    "tensor": {
+     "valid": true,
+     "position": [
+      0.0,
+      0.0,
+      0.9727
+     ],
+     "velocity": [
+      0.0,
+      0.0,
+      -0.654
+     ],
+     "mass": 1.0
+    }
+   },
+   "3_after_update3": {
+    "timeline": "playing",
+    "time": 0.05,
+    "usd": {
+     "translate": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "velocity": null,
+     "mass": 1.0
+    },
+    "fabric": {
+     "local": [
+      0.0,
+      0.0,
+      0.9591
+     ],
+     "world": [
+      0.0,
+      0.0,
+      0.9591
+     ],
+     "world_cache": [
+      0.0,
+      0.0,
+      0.9591
+     ],
+     "velocity": [
+      0.0,
+      0.0,
+      -0.8175
+     ],
+     "mass": 1.0,
+     "translate_attr": [
+      0.0,
+      0.0,
+      1.0
+     ]
+    },
+    "physx": {
+     "found": true,
+     "position": [
+      0.0,
+      0.0,
+      0.9591
+     ]
+    },
+    "tensor": {
+     "valid": true,
+     "position": [
+      0.0,
+      0.0,
+      0.9591
+     ],
+     "velocity": [
+      0.0,
+      0.0,
+      -0.8175
+     ],
+     "mass": 1.0
+    }
+   }
+  },
+  {
+   "id": "P-05",
+   "description": "P-04 の続きで Stop(resetOnStop = true)",
+   "stop_called_no_update": {
+    "timeline": "playing",
+    "time": 0.05,
+    "usd": {
+     "translate": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "velocity": null,
+     "mass": 1.0
+    },
+    "fabric": {
+     "local": [
+      0.0,
+      0.0,
+      0.9591
+     ],
+     "world": [
+      0.0,
+      0.0,
+      0.9591
+     ],
+     "world_cache": [
+      0.0,
+      0.0,
+      0.9591
+     ],
+     "velocity": [
+      0.0,
+      0.0,
+      -0.8175
+     ],
+     "mass": 1.0,
+     "translate_attr": [
+      0.0,
+      0.0,
+      1.0
+     ]
+    },
+    "physx": {
+     "found": true,
+     "position": [
+      0.0,
+      0.0,
+      0.9591
+     ]
+    },
+    "tensor": {
+     "valid": true,
+     "position": [
+      0.0,
+      0.0,
+      0.9591
+     ],
+     "velocity": [
+      0.0,
+      0.0,
+      -0.8175
+     ],
+     "mass": 1.0
+    }
+   },
+   "after_stop_update1": {
+    "timeline": "stopped",
+    "time": 0.0,
+    "usd": {
+     "translate": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "velocity": null,
+     "mass": 1.0
+    },
+    "fabric": {
+     "local": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world_cache": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.0,
+      -0.8175
+     ],
+     "mass": 1.0,
+     "translate_attr": [
+      0.0,
+      0.0,
+      1.0
+     ]
+    },
+    "physx": {
+     "found": false,
+     "position": null
+    },
+    "tensor": {
+     "valid": false
+    }
+   },
+   "after_stop_update2": {
+    "timeline": "stopped",
+    "time": 0.0,
+    "usd": {
+     "translate": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "velocity": null,
+     "mass": 1.0
+    },
+    "fabric": {
+     "local": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world_cache": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.0,
+      -0.8175
+     ],
+     "mass": 1.0,
+     "translate_attr": [
+      0.0,
+      0.0,
+      1.0
+     ]
+    },
+    "physx": {
+     "found": false,
+     "position": null
+    },
+    "tensor": {
+     "valid": false
+    }
+   }
+  },
+  {
+   "id": "P-06",
+   "description": "Play 中(重力 0、静止)に各層を直接書く → update → Stop",
+   "usd(pxr)": {
+    "before": {
+     "timeline": "playing",
+     "time": 0.05,
+     "usd": {
+      "translate": [
+       0.0,
+       0.0,
+       1.0
+      ],
+      "world": [
+       0.0,
+       0.0,
+       1.0
+      ],
+      "velocity": null,
+      "mass": 1.0
+     },
+     "fabric": {
+      "local": [
+       0.0,
+       0.0,
+       1.0
+      ],
+      "world": [
+       0.0,
+       0.0,
+       1.0
+      ],
+      "world_cache": [
+       0.0,
+       0.0,
+       1.0
+      ],
+      "velocity": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "mass": 1.0,
+      "translate_attr": [
+       0.0,
+       0.0,
+       1.0
+      ]
+     },
+     "physx": {
+      "found": true,
+      "position": [
+       0.0,
+       0.0,
+       1.0
+      ]
+     },
+     "tensor": {
+      "valid": true,
+      "position": [
+       0.0,
+       0.0,
+       1.0
+      ],
+      "velocity": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "mass": 1.0
+     }
+    },
+    "immediately": {
+     "timeline": "playing",
+     "time": 0.05,
+     "usd": {
+      "translate": [
+       0.0,
+       0.0,
+       2.0
+      ],
+      "world": [
+       0.0,
+       0.0,
+       2.0
+      ],
+      "velocity": null,
+      "mass": 1.0
+     },
+     "fabric": {
+      "local": [
+       0.0,
+       0.0,
+       1.0
+      ],
+      "world": [
+       0.0,
+       0.0,
+       1.0
+      ],
+      "world_cache": [
+       0.0,
+       0.0,
+       1.0
+      ],
+      "velocity": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "mass": 1.0,
+      "translate_attr": [
+       0.0,
+       0.0,
+       1.0
+      ]
+     },
+     "physx": {
+      "found": true,
+      "position": [
+       0.0,
+       0.0,
+       2.0
+      ]
+     },
+     "tensor": {
+      "valid": true,
+      "position": [
+       0.0,
+       0.0,
+       2.0
+      ],
+      "velocity": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "mass": 1.0
+     }
+    },
+    "after_update1": {
+     "timeline": "playing",
+     "time": 0.0667,
+     "usd": {
+      "translate": [
+       0.0,
+       0.0,
+       2.0
+      ],
+      "world": [
+       0.0,
+       0.0,
+       2.0
+      ],
+      "velocity": null,
+      "mass": 1.0
+     },
+     "fabric": {
+      "local": [
+       0.0,
+       0.0,
+       2.0
+      ],
+      "world": [
+       0.0,
+       0.0,
+       2.0
+      ],
+      "world_cache": [
+       0.0,
+       0.0,
+       2.0
+      ],
+      "velocity": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "mass": 1.0,
+      "translate_attr": [
+       0.0,
+       0.0,
+       1.0
+      ]
+     },
+     "physx": {
+      "found": true,
+      "position": [
+       0.0,
+       0.0,
+       2.0
+      ]
+     },
+     "tensor": {
+      "valid": true,
+      "position": [
+       0.0,
+       0.0,
+       2.0
+      ],
+      "velocity": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "mass": 1.0
+     }
+    },
+    "after_update6": {
+     "timeline": "playing",
+     "time": 0.15,
+     "usd": {
+      "translate": [
+       0.0,
+       0.0,
+       2.0
+      ],
+      "world": [
+       0.0,
+       0.0,
+       2.0
+      ],
+      "velocity": null,
+      "mass": 1.0
+     },
+     "fabric": {
+      "local": [
+       0.0,
+       0.0,
+       2.0
+      ],
+      "world": [
+       0.0,
+       0.0,
+       2.0
+      ],
+      "world_cache": [
+       0.0,
+       0.0,
+       2.0
+      ],
+      "velocity": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "mass": 1.0,
+      "translate_attr": [
+       0.0,
+       0.0,
+       1.0
+      ]
+     },
+     "physx": {
+      "found": true,
+      "position": [
+       0.0,
+       0.0,
+       2.0
+      ]
+     },
+     "tensor": {
+      "valid": true,
+      "position": [
+       0.0,
+       0.0,
+       2.0
+      ],
+      "velocity": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "mass": 1.0
+     }
+    },
+    "after_stop": {
+     "timeline": "stopped",
+     "time": 0.0,
+     "usd": {
+      "translate": [
+       0.0,
+       0.0,
+       2.0
+      ],
+      "world": [
+       0.0,
+       0.0,
+       2.0
+      ],
+      "velocity": null,
+      "mass": 1.0
+     },
+     "fabric": {
+      "local": [
+       0.0,
+       0.0,
+       1.0
+      ],
+      "world": [
+       0.0,
+       0.0,
+       1.0
+      ],
+      "world_cache": [
+       0.0,
+       0.0,
+       1.0
+      ],
+      "velocity": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "mass": 1.0,
+      "translate_attr": [
+       0.0,
+       0.0,
+       1.0
+      ]
+     },
+     "physx": {
+      "found": false,
+      "position": null
+     },
+     "tensor": {
+      "valid": false
+     }
+    }
+   },
+   "fabric(IFabricHierarchy)": {
+    "before": {
+     "timeline": "playing",
+     "time": 0.05,
+     "usd": {
+      "translate": [
+       0.0,
+       0.0,
+       1.0
+      ],
+      "world": [
+       0.0,
+       0.0,
+       1.0
+      ],
+      "velocity": null,
+      "mass": 1.0
+     },
+     "fabric": {
+      "local": [
+       0.0,
+       0.0,
+       1.0
+      ],
+      "world": [
+       0.0,
+       0.0,
+       1.0
+      ],
+      "world_cache": [
+       0.0,
+       0.0,
+       1.0
+      ],
+      "velocity": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "mass": 1.0,
+      "translate_attr": [
+       0.0,
+       0.0,
+       1.0
+      ]
+     },
+     "physx": {
+      "found": true,
+      "position": [
+       0.0,
+       0.0,
+       1.0
+      ]
+     },
+     "tensor": {
+      "valid": true,
+      "position": [
+       0.0,
+       0.0,
+       1.0
+      ],
+      "velocity": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "mass": 1.0
+     }
+    },
+    "immediately": {
+     "timeline": "playing",
+     "time": 0.05,
+     "usd": {
+      "translate": [
+       0.0,
+       0.0,
+       1.0
+      ],
+      "world": [
+       0.0,
+       0.0,
+       1.0
+      ],
+      "velocity": null,
+      "mass": 1.0
+     },
+     "fabric": {
+      "local": [
+       0.0,
+       0.0,
+       3.0
+      ],
+      "world": [
+       0.0,
+       0.0,
+       3.0
+      ],
+      "world_cache": [
+       0.0,
+       0.0,
+       1.0
+      ],
+      "velocity": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "mass": 1.0,
+      "translate_attr": [
+       0.0,
+       0.0,
+       1.0
+      ]
+     },
+     "physx": {
+      "found": true,
+      "position": [
+       0.0,
+       0.0,
+       1.0
+      ]
+     },
+     "tensor": {
+      "valid": true,
+      "position": [
+       0.0,
+       0.0,
+       1.0
+      ],
+      "velocity": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "mass": 1.0
+     }
+    },
+    "after_update1": {
+     "timeline": "playing",
+     "time": 0.0667,
+     "usd": {
+      "translate": [
+       0.0,
+       0.0,
+       1.0
+      ],
+      "world": [
+       0.0,
+       0.0,
+       1.0
+      ],
+      "velocity": null,
+      "mass": 1.0
+     },
+     "fabric": {
+      "local": [
+       0.0,
+       0.0,
+       3.0
+      ],
+      "world": [
+       0.0,
+       0.0,
+       3.0
+      ],
+      "world_cache": [
+       0.0,
+       0.0,
+       3.0
+      ],
+      "velocity": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "mass": 1.0,
+      "translate_attr": [
+       0.0,
+       0.0,
+       1.0
+      ]
+     },
+     "physx": {
+      "found": true,
+      "position": [
+       0.0,
+       0.0,
+       3.0
+      ]
+     },
+     "tensor": {
+      "valid": true,
+      "position": [
+       0.0,
+       0.0,
+       3.0
+      ],
+      "velocity": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "mass": 1.0
+     }
+    },
+    "after_update6": {
+     "timeline": "playing",
+     "time": 0.15,
+     "usd": {
+      "translate": [
+       0.0,
+       0.0,
+       1.0
+      ],
+      "world": [
+       0.0,
+       0.0,
+       1.0
+      ],
+      "velocity": null,
+      "mass": 1.0
+     },
+     "fabric": {
+      "local": [
+       0.0,
+       0.0,
+       3.0
+      ],
+      "world": [
+       0.0,
+       0.0,
+       3.0
+      ],
+      "world_cache": [
+       0.0,
+       0.0,
+       3.0
+      ],
+      "velocity": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "mass": 1.0,
+      "translate_attr": [
+       0.0,
+       0.0,
+       1.0
+      ]
+     },
+     "physx": {
+      "found": true,
+      "position": [
+       0.0,
+       0.0,
+       3.0
+      ]
+     },
+     "tensor": {
+      "valid": true,
+      "position": [
+       0.0,
+       0.0,
+       3.0
+      ],
+      "velocity": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "mass": 1.0
+     }
+    },
+    "after_stop": {
+     "timeline": "stopped",
+     "time": 0.0,
+     "usd": {
+      "translate": [
+       0.0,
+       0.0,
+       1.0
+      ],
+      "world": [
+       0.0,
+       0.0,
+       1.0
+      ],
+      "velocity": null,
+      "mass": 1.0
+     },
+     "fabric": {
+      "local": [
+       0.0,
+       0.0,
+       1.0
+      ],
+      "world": [
+       0.0,
+       0.0,
+       1.0
+      ],
+      "world_cache": [
+       0.0,
+       0.0,
+       1.0
+      ],
+      "velocity": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "mass": 1.0,
+      "translate_attr": [
+       0.0,
+       0.0,
+       1.0
+      ]
+     },
+     "physx": {
+      "found": false,
+      "position": null
+     },
+     "tensor": {
+      "valid": false
+     }
+    }
+   },
+   "tensor(RigidBodyView.set_transforms)": {
+    "before": {
+     "timeline": "playing",
+     "time": 0.05,
+     "usd": {
+      "translate": [
+       0.0,
+       0.0,
+       1.0
+      ],
+      "world": [
+       0.0,
+       0.0,
+       1.0
+      ],
+      "velocity": null,
+      "mass": 1.0
+     },
+     "fabric": {
+      "local": [
+       0.0,
+       0.0,
+       1.0
+      ],
+      "world": [
+       0.0,
+       0.0,
+       1.0
+      ],
+      "world_cache": [
+       0.0,
+       0.0,
+       1.0
+      ],
+      "velocity": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "mass": 1.0,
+      "translate_attr": [
+       0.0,
+       0.0,
+       1.0
+      ]
+     },
+     "physx": {
+      "found": true,
+      "position": [
+       0.0,
+       0.0,
+       1.0
+      ]
+     },
+     "tensor": {
+      "valid": true,
+      "position": [
+       0.0,
+       0.0,
+       1.0
+      ],
+      "velocity": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "mass": 1.0
+     }
+    },
+    "immediately": {
+     "timeline": "playing",
+     "time": 0.05,
+     "usd": {
+      "translate": [
+       0.0,
+       0.0,
+       1.0
+      ],
+      "world": [
+       0.0,
+       0.0,
+       1.0
+      ],
+      "velocity": null,
+      "mass": 1.0
+     },
+     "fabric": {
+      "local": [
+       0.0,
+       0.0,
+       1.0
+      ],
+      "world": [
+       0.0,
+       0.0,
+       1.0
+      ],
+      "world_cache": [
+       0.0,
+       0.0,
+       1.0
+      ],
+      "velocity": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "mass": 1.0,
+      "translate_attr": [
+       0.0,
+       0.0,
+       1.0
+      ]
+     },
+     "physx": {
+      "found": true,
+      "position": [
+       0.0,
+       0.0,
+       4.0
+      ]
+     },
+     "tensor": {
+      "valid": true,
+      "position": [
+       0.0,
+       0.0,
+       4.0
+      ],
+      "velocity": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "mass": 1.0
+     }
+    },
+    "after_update1": {
+     "timeline": "playing",
+     "time": 0.0667,
+     "usd": {
+      "translate": [
+       0.0,
+       0.0,
+       1.0
+      ],
+      "world": [
+       0.0,
+       0.0,
+       1.0
+      ],
+      "velocity": null,
+      "mass": 1.0
+     },
+     "fabric": {
+      "local": [
+       0.0,
+       0.0,
+       4.0
+      ],
+      "world": [
+       0.0,
+       0.0,
+       4.0
+      ],
+      "world_cache": [
+       0.0,
+       0.0,
+       4.0
+      ],
+      "velocity": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "mass": 1.0,
+      "translate_attr": [
+       0.0,
+       0.0,
+       1.0
+      ]
+     },
+     "physx": {
+      "found": true,
+      "position": [
+       0.0,
+       0.0,
+       4.0
+      ]
+     },
+     "tensor": {
+      "valid": true,
+      "position": [
+       0.0,
+       0.0,
+       4.0
+      ],
+      "velocity": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "mass": 1.0
+     }
+    },
+    "after_update6": {
+     "timeline": "playing",
+     "time": 0.15,
+     "usd": {
+      "translate": [
+       0.0,
+       0.0,
+       1.0
+      ],
+      "world": [
+       0.0,
+       0.0,
+       1.0
+      ],
+      "velocity": null,
+      "mass": 1.0
+     },
+     "fabric": {
+      "local": [
+       0.0,
+       0.0,
+       4.0
+      ],
+      "world": [
+       0.0,
+       0.0,
+       4.0
+      ],
+      "world_cache": [
+       0.0,
+       0.0,
+       4.0
+      ],
+      "velocity": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "mass": 1.0,
+      "translate_attr": [
+       0.0,
+       0.0,
+       1.0
+      ]
+     },
+     "physx": {
+      "found": true,
+      "position": [
+       0.0,
+       0.0,
+       4.0
+      ]
+     },
+     "tensor": {
+      "valid": true,
+      "position": [
+       0.0,
+       0.0,
+       4.0
+      ],
+      "velocity": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "mass": 1.0
+     }
+    },
+    "after_stop": {
+     "timeline": "stopped",
+     "time": 0.0,
+     "usd": {
+      "translate": [
+       0.0,
+       0.0,
+       1.0
+      ],
+      "world": [
+       0.0,
+       0.0,
+       1.0
+      ],
+      "velocity": null,
+      "mass": 1.0
+     },
+     "fabric": {
+      "local": [
+       0.0,
+       0.0,
+       1.0
+      ],
+      "world": [
+       0.0,
+       0.0,
+       1.0
+      ],
+      "world_cache": [
+       0.0,
+       0.0,
+       1.0
+      ],
+      "velocity": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "mass": 1.0,
+      "translate_attr": [
+       0.0,
+       0.0,
+       1.0
+      ]
+     },
+     "physx": {
+      "found": false,
+      "position": null
+     },
+     "tensor": {
+      "valid": false
+     }
+    }
+   }
+  },
+  {
+   "id": "P-07",
+   "description": "Play 中に Marker(物理なし)と Body の Fabric を y=6 に書く",
+   "immediately/marker_usd": {
+    "translate": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "world": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "velocity": null,
+    "mass": null
+   },
+   "immediately/marker_fabric": {
+    "local": [
+     0.0,
+     6.0,
+     0.0
+    ],
+    "world": [
+     0.0,
+     6.0,
+     0.0
+    ],
+    "world_cache": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "velocity": null,
+    "mass": null,
+    "translate_attr": [
+     0.0,
+     0.0,
+     0.0
+    ]
+   },
+   "immediately/body": {
+    "timeline": "playing",
+    "time": 0.05,
+    "usd": {
+     "translate": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "velocity": null,
+     "mass": 1.0
+    },
+    "fabric": {
+     "local": [
+      0.0,
+      6.0,
+      1.0
+     ],
+     "world": [
+      0.0,
+      6.0,
+      1.0
+     ],
+     "world_cache": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "mass": 1.0,
+     "translate_attr": [
+      0.0,
+      0.0,
+      1.0
+     ]
+    },
+    "physx": {
+     "found": true,
+     "position": [
+      0.0,
+      0.0,
+      1.0
+     ]
+    },
+    "tensor": {
+     "valid": true,
+     "position": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "mass": 1.0
+    }
+   },
+   "after_update1/marker_usd": {
+    "translate": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "world": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "velocity": null,
+    "mass": null
+   },
+   "after_update1/marker_fabric": {
+    "local": [
+     0.0,
+     6.0,
+     0.0
+    ],
+    "world": [
+     0.0,
+     6.0,
+     0.0
+    ],
+    "world_cache": [
+     0.0,
+     6.0,
+     0.0
+    ],
+    "velocity": null,
+    "mass": null,
+    "translate_attr": [
+     0.0,
+     0.0,
+     0.0
+    ]
+   },
+   "after_update1/body": {
+    "timeline": "playing",
+    "time": 0.0667,
+    "usd": {
+     "translate": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "world": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "velocity": null,
+     "mass": 1.0
+    },
+    "fabric": {
+     "local": [
+      0.0,
+      6.0,
+      1.0
+     ],
+     "world": [
+      0.0,
+      6.0,
+      1.0
+     ],
+     "world_cache": [
+      0.0,
+      6.0,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "mass": 1.0,
+     "translate_attr": [
+      0.0,
+      0.0,
+      1.0
+     ]
+    },
+    "physx": {
+     "found": true,
+     "position": [
+      0.0,
+      6.0,
+      1.0
+     ]
+    },
+    "tensor": {
+     "valid": true,
+     "position": [
+      0.0,
+      6.0,
+      1.0
+     ],
+     "velocity": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "mass": 1.0
+    }
+   },
+   "after_update6/marker_usd": {
+    "translate": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "world": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "velocity": null,
+    "mass": null
+   },
+   "after_update6/marker_fabric": {
+    "local": [
+     0.0,
+     6.0,
+     0.0
+    ],
+    "world": [
+     0.0,
+     6.0,
+     0.0
+    ],
+    "world_cache": [
+     0.0,
+     6.0,
+     0.0
+    ],
+    "velocity": null,
+    "mass": null,
+    "translate_attr": [
+     0.0,
+     0.0,
+     0.0
+    ]
+   },
+   "after_stop/marker_usd": {
+    "translate": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "world": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "velocity": null,
+    "mass": null
+   },
+   "after_stop/marker_fabric": {
+    "local": [
+     0.0,
+     6.0,
+     0.0
+    ],
+    "world": [
+     0.0,
+     6.0,
+     0.0
+    ],
+    "world_cache": [
+     0.0,
+     6.0,
+     0.0
+    ],
+    "velocity": null,
+    "mass": null,
+    "translate_attr": [
+     0.0,
+     0.0,
+     0.0
+    ]
+   }
+  },
+  {
+   "id": "P-08",
+   "description": "Stop 中、Body の Fabric を y=8 に書く前に USD 変更を仕込む",
+   "a_何もしない": {
+    "immediately": [
+     0.0,
+     8.0,
+     1.0
+    ],
+    "after_update1": [
+     0.0,
+     8.0,
+     1.0
+    ],
+    "after_update3": [
+     0.0,
+     8.0,
+     1.0
+    ],
+    "usd": [
+     0.0,
+     0.0,
+     1.0
+    ]
+   },
+   "b_APIスキーマ適用(PhysxRigidBodyAPI)→即Fabric書き込み": {
+    "immediately": [
+     0.0,
+     8.0,
+     1.0
+    ],
+    "after_update1": [
+     0.0,
+     0.0,
+     1.0
+    ],
+    "after_update3": [
+     0.0,
+     0.0,
+     1.0
+    ],
+    "usd": [
+     0.0,
+     0.0,
+     1.0
+    ]
+   },
+   "c_APIスキーマ適用→update→Fabric書き込み": {
+    "immediately": [
+     0.0,
+     8.0,
+     1.0
+    ],
+    "after_update1": [
+     0.0,
+     8.0,
+     1.0
+    ],
+    "after_update3": [
+     0.0,
+     8.0,
+     1.0
+    ],
+    "usd": [
+     0.0,
+     0.0,
+     1.0
+    ]
+   },
+   "d_無関係な属性を作成→即Fabric書き込み": {
+    "immediately": [
+     0.0,
+     8.0,
+     1.0
+    ],
+    "after_update1": [
+     0.0,
+     8.0,
+     1.0
+    ],
+    "after_update3": [
+     0.0,
+     8.0,
+     1.0
+    ],
+    "usd": [
+     0.0,
+     0.0,
+     1.0
+    ]
+   },
+   "e_RigidPrim作成→即Fabric書き込み": {
+    "immediately": [
+     0.0,
+     8.0,
+     1.0
+    ],
+    "after_update1": [
+     0.0,
+     0.0,
+     1.0
+    ],
+    "after_update3": [
+     0.0,
+     0.0,
+     1.0
+    ],
+    "usd": [
+     0.0,
+     0.0,
+     1.0
+    ]
+   },
+   "f_RigidPrim作成→update→Fabric書き込み": {
+    "immediately": [
+     0.0,
+     8.0,
+     1.0
+    ],
+    "after_update1": [
+     0.0,
+     8.0,
+     1.0
+    ],
+    "after_update3": [
+     0.0,
+     8.0,
+     1.0
+    ],
+    "usd": [
+     0.0,
+     0.0,
+     1.0
+    ]
+   }
+  },
+  {
+   "id": "P-09",
+   "description": "Play 中に pause_change_tracking を切り替えて Body の Fabric を y=9 に書く",
+   "not_paused": {
+    "is_change_tracking_paused": false,
+    "after_update1": {
+     "timeline": "playing",
+     "time": 0.0667,
+     "usd": {
+      "translate": [
+       0.0,
+       0.0,
+       1.0
+      ],
+      "world": [
+       0.0,
+       0.0,
+       1.0
+      ],
+      "velocity": null,
+      "mass": 1.0
+     },
+     "fabric": {
+      "local": [
+       0.0,
+       9.0,
+       1.0
+      ],
+      "world": [
+       0.0,
+       9.0,
+       1.0
+      ],
+      "world_cache": [
+       0.0,
+       9.0,
+       1.0
+      ],
+      "velocity": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "mass": 1.0,
+      "translate_attr": [
+       0.0,
+       0.0,
+       1.0
+      ]
+     },
+     "physx": {
+      "found": true,
+      "position": [
+       0.0,
+       9.0,
+       1.0
+      ]
+     },
+     "tensor": {
+      "valid": true,
+      "position": [
+       0.0,
+       9.0,
+       1.0
+      ],
+      "velocity": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "mass": 1.0
+     }
+    },
+    "after_resume_update1": {
+     "timeline": "playing",
+     "time": 0.0833,
+     "usd": {
+      "translate": [
+       0.0,
+       0.0,
+       1.0
+      ],
+      "world": [
+       0.0,
+       0.0,
+       1.0
+      ],
+      "velocity": null,
+      "mass": 1.0
+     },
+     "fabric": {
+      "local": [
+       0.0,
+       9.0,
+       1.0
+      ],
+      "world": [
+       0.0,
+       9.0,
+       1.0
+      ],
+      "world_cache": [
+       0.0,
+       9.0,
+       1.0
+      ],
+      "velocity": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "mass": 1.0,
+      "translate_attr": [
+       0.0,
+       0.0,
+       1.0
+      ]
+     },
+     "physx": {
+      "found": true,
+      "position": [
+       0.0,
+       9.0,
+       1.0
+      ]
+     },
+     "tensor": {
+      "valid": true,
+      "position": [
+       0.0,
+       9.0,
+       1.0
+      ],
+      "velocity": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "mass": 1.0
+     }
+    }
+   },
+   "paused": {
+    "is_change_tracking_paused": true,
+    "after_update1": {
+     "timeline": "playing",
+     "time": 0.0667,
+     "usd": {
+      "translate": [
+       0.0,
+       0.0,
+       1.0
+      ],
+      "world": [
+       0.0,
+       0.0,
+       1.0
+      ],
+      "velocity": null,
+      "mass": 1.0
+     },
+     "fabric": {
+      "local": [
+       0.0,
+       0.0,
+       1.0
+      ],
+      "world": [
+       0.0,
+       0.0,
+       1.0
+      ],
+      "world_cache": [
+       0.0,
+       0.0,
+       1.0
+      ],
+      "velocity": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "mass": 1.0,
+      "translate_attr": [
+       0.0,
+       0.0,
+       1.0
+      ]
+     },
+     "physx": {
+      "found": true,
+      "position": [
+       0.0,
+       0.0,
+       1.0
+      ]
+     },
+     "tensor": {
+      "valid": true,
+      "position": [
+       0.0,
+       0.0,
+       1.0
+      ],
+      "velocity": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "mass": 1.0
+     }
+    },
+    "after_resume_update1": {
+     "timeline": "playing",
+     "time": 0.0833,
+     "usd": {
+      "translate": [
+       0.0,
+       0.0,
+       1.0
+      ],
+      "world": [
+       0.0,
+       0.0,
+       1.0
+      ],
+      "velocity": null,
+      "mass": 1.0
+     },
+     "fabric": {
+      "local": [
+       0.0,
+       0.0,
+       1.0
+      ],
+      "world": [
+       0.0,
+       0.0,
+       1.0
+      ],
+      "world_cache": [
+       0.0,
+       0.0,
+       1.0
+      ],
+      "velocity": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "mass": 1.0,
+      "translate_attr": [
+       0.0,
+       0.0,
+       1.0
+      ]
+     },
+     "physx": {
+      "found": true,
+      "position": [
+       0.0,
+       0.0,
+       1.0
+      ]
+     },
+     "tensor": {
+      "valid": true,
+      "position": [
+       0.0,
+       0.0,
+       1.0
+      ],
+      "velocity": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "mass": 1.0
+     }
+    }
+   }
+  }
+ ]
+}
