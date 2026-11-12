@@ -1,0 +1,14 @@
+defaults: {'/rtx/post/aa/op': 3, '/rtx/post/dlss/execMode': 0, '/rtx/shadows/enabled': True, '/rtx/ambientOcclusion/enabled': True}
+A	既定: DLSS Performance	sharpness=84.3	mean=147.0
+B	DLSS Quality	sharpness=98.5	mean=146.6
+C	DLAA	sharpness=109.1	mean=146.6
+D	DLAA + 影/AO なし	sharpness=71.1	mean=151.5
+E	DLAA + 黒い縁取り	sharpness=193.0	mean=131.7
+F	DLAA + べた塗り + 縁取り	sharpness=228.4	mean=140.4
+G	PointInstancer + DLAA	sharpness=114.3	mean=145.5
+selection_outline	mean_abs_diff_vs_C=0.94	orange_pixels=0
+S1	影あり(既定)	ground_mean=212.0
+S2	点群だけ影なし	ground_mean=223.3
+S3	描画全体で影なし	ground_mean=223.8
+S3x	(確認)光源の ShadowAPI だけ切る	ground_mean=211.8
+S4	PointInstancer で点群だけ影なし	ground_mean=223.1
