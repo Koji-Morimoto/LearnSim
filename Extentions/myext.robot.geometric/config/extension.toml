@@ -1,0 +1,30 @@
+[package]
+version = "0.1.0"
+title = "MyExt Geometric Robot"
+description = "物理ソルバーも Drive も使わず、関節値からリンクの Transform を計算して動かすロボットの Python API。Sublayer を付けると幾何モード、外すと元の Articulation 構成に戻る(元の USD は書き換えない)。既存の Articulation・DH・修正 DH・スクリュー軸・URDF から作れ、mimic・IK・干渉チェック・ロボットの結合に対応"
+category = "MyExt"
+keywords = ["myext", "robot", "kinematics", "articulation", "sublayer", "ik", "collision", "dh"]
+authors = ["myext"]
+readme = "docs/README.md"
+
+[dependencies]
+"omni.usd" = {}
+"omni.timeline" = {}
+"omni.physx" = {}
+"omni.usd.schema.physx" = {}
+"usdrt.scenegraph" = {}
+"isaacsim.core.experimental.prims" = {}  # Fabric への一括書き込み
+"isaacsim.core.experimental.utils" = {}
+
+[[python.module]]
+name = "myext.robot.geometric"
+
+[settings]
+# Sublayer を差し込む場所。"session" = Session Layer の下(保存しても元ファイルに混ざらない)、"root" = Root Layer の下
+exts."myext.robot.geometric".layer_target = "session"
+# layer_target = "root" のときの Sublayer のファイルパス(.usda)
+exts."myext.robot.geometric".root_layer_file = ""
+# リンクのコリジョンの残し方。"static" = 静的コライダー(Play しなくても干渉を調べられる)、"kinematic" = kinematic 剛体(Play 中に Contact Report が使える)
+exts."myext.robot.geometric".collision_mode = "static"
+# リンクの姿勢の書き込み先。"fabric" = Fabric(干渉チェックの直前だけ USD にも書く)、"usd" = 毎回 USD、"both" = 毎回両方
+exts."myext.robot.geometric".write_target = "fabric"

@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+tests_pure/last_run.log
+tests_kit/last_run.log
+tests_kit/last_run.json
+demo/out/
+docs/LOCAL_NOTES.md
