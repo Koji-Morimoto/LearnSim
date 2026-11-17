@@ -575,3 +575,72 @@ KINEMATIC プロファイルは作らない。kinematic 剛体にしか無いも
 4. `CollisionChecker` と範囲指定、結合ロボットでの確認
 5. `KinematicChain`、`IKSolver`、`JacobianIKSolver`、`IKPySolver`
 6. DH・修正 DH・スクリュー・URDF からの prim 生成、`GeometricRobotView` と `FabricWriter`
+
+## 16. 2026-11-18 追加：VariantSet・角度の単位・コマンド変換
+
+### 16.1 決まったこと
+
+| 項目 | 決定 |
+|---|---|
+| Variant の選択を書く場所 | Session Layer（幾何モードの Sublayer の外）。元ファイルに混ざらず、Sublayer を外しても選んだ器具のまま |
+| Stage タブなど外から Variant が変えられたとき | `GeometricRobot` を作り直す |
+| Sublayer を外して Play しているときに Articulation へ流すか | 流さない（名前に反するため） |
+| 閉ループ（`excludeFromArticulation` の Joint） | 今回は扱わない |
+| 角度の単位 | 内部はラジアン。`AngleUnit = Literal["rad", "deg"]` で、ロボットの既定と呼び出しごとの指定 |
+| 性能 | 毎フレームの処理に、リンクや軸の数だけ回る Python のループを置かない |
+
+### 16.2 変更前の実測（4 本アーム、54 軸・59 リンク、2026-11-18）
+
+| 処理 | 時間 |
+|---|---|
+| 器具を切り替えて作り直す（変更前は閉じて作り直すしかない） | 47〜53 ms（うち USD の読み取り約 22 ms） |
+| その後の初回の干渉チェック（PhysX の読み直しを含む） | 7〜11 ms |
+| 順運動学 1 回 | 0.56 ms（リンクを 1 個ずつ Python で回していた） |
+| `set_dof_positions`（Fabric） | 0.94 ms |
+
+### 16.3 VariantSet
+
+- **VariantSet は prim ごとに付く。** 複数アームのロボットでは、同じ名前の VariantSet（例：各アームの `Instrument`）が複数の prim にある。そこで API は「どの prim の、どの VariantSet を、どれにするか」を指定する。
+
+```python
+robot.get_variants()                       # {prim パス: {VariantSet 名: 今の選択}}
+robot.get_variant_choices()                # {prim パス: {VariantSet 名: [選べる名前, ...]}}
+robot.set_variant("Instrument", "camera", prim="arm0_tool")      # prim はロボットの prim からの相対パスか絶対パス
+robot.set_variants({("arm0_tool", "Instrument"): "camera", ("arm1_tool", "Instrument"): "stapler"})   # まとめて 1 回で作り直す
+robot.get_component("arm0").set_variant("Instrument", "camera")  # 構成要素の中に、その名前の VariantSet が 1 つだけなら prim を省略できる
+```
+
+- **確かめること**：prim がロボットの範囲にあること、その prim にその VariantSet があること、その名前の Variant があること。どれかが違えば、選べるものを並べて ValueError。prim を省略して候補が複数あるときも ValueError（候補を並べる）。
+- **作り直し**：ロボットの prim 以下で構造が変わった通知（USD の resync）を受けたら印を付け、次の update か次の API 呼び出しの時に、Variant の選択と Joint・剛体の並びの「構造の指紋」を比べ、変わっていれば作り直す。自分の Sublayer への書き込みで起きた通知は無視する。
+- **作り直しで引き継ぐもの**：関節値（名前で）、根の姿勢、既定の状態（名前で）、利用者が足した「無視する組」。作り直すもの：モデル、Sublayer の中身（消えた prim への上書きは消す。増えた prim だけ書き足す）、書き込み先、コライダーの一覧。
+- **古いものの扱い**：作り直す前に作った `KinematicChain` と IK ソルバーは、`solve_ik` に渡した時点で `GeometricStructureChangedError`。`GeometricRobotView` は、中のロボットのどれかが作り直されたら同じエラー。`robot.add_structure_listener(fn)` で、前後の DOF 名を受け取れる。
+
+### 16.4 コマンド変換（ログとロボットで表現が違う場合）
+
+- 変換の差し込み口はロボット側に置き、変換の中身はデータの形式ごとに書く。mimic（ロボット自身の拘束）とは分ける。
+- `GeometricCommandConverter`：`input_names`（コマンド側の名前）、`output_dofs`（書く DOF 名）、`to_dof_positions`（まとめて計算できる）、`from_dof_positions`（任意。記録用の逆変換）。
+- 用意するもの：`LinearCommandConverter`（DOF = A·入力 + b）、`InterpCommandConverter`（1 入力の表の補間）、`FunctionCommandConverter`（関数）。
+- `robot.set_command_converter(name, converter, when={(prim, VariantSet): 名前})`：Variant が条件に合うときだけ使う。作り直しの後に選び直す。
+- `robot.apply_command({"gripper_width": 0.04, "shoulder_pan_joint": 0.3})`：変換の入力はまとめて変換し、DOF 名そのものはそのまま渡し、`set_dof_positions` を 1 回だけ呼ぶ。
+
+### 16.5 性能
+
+- 順運動学：全関節の動きをまとめて計算し、木の深さごとに 1 回の行列積で親から子へ伝える（ループの回数はリンク数ではなく木の深さ）。
+- 作り直し：Sublayer は丸ごと書き直さず、増えた prim だけ書き足し、消えた prim への上書きを消す。
+
+### 16.6 実装（2026-11-18）
+
+16.3〜16.5 のとおり実装した。使い方と確かめたことは拡張機能の `docs/README.md`。
+
+| 処理（4 本アーム、54 軸・59 リンク） | 変更前 | 変更後 |
+|---|---:|---:|
+| 器具を切り替えて作り直す | 47〜53 ms | 18〜21 ms |
+| USD の読み取り | 21.5 ms | 9.1 ms（関節ごとの小さな行列計算をまとめ、USD のベクトルを一括で numpy に変換し、木を作る探索を表引きに） |
+| 順運動学 1 回 | 0.56 ms | 0.10 ms |
+| `set_dof_positions`（Fabric） | 0.94 ms | 0.49 ms |
+
+実装中に分かったこと：
+
+- 変更前の実装で幾何モード中に Variant を切り替えると、モデルは古いまま例外も出ず、新しいグリッパの剛体は物理のまま残り、Play すると 0.49 m 落ちた（UR10e + 2F-140）。
+- 2F-140 は閉ループで、ループを閉じる Joint 2 本が `excludeFromArticulation`。今回は扱わない（決定どおり）。
+- 作り直しの約 4.5 ms は、prim の組が変わったことによる Fabric の一括書き込みの準備で、避けられない。
