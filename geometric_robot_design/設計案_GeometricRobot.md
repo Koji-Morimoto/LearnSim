@@ -1,6 +1,16 @@
 # 設計案：幾何モードのロボット API（GeometricRobot）
 
-作成日：2026-11-10（同日に §9〜§13 を追加）　対象：Isaac Sim 6.2.0　状態：**設計案（未実装）**。§14 の未回答を決めてもらってから実装に入る。
+作成日：2026-11-10（同日に §9〜§13 を追加）　対象：Isaac Sim 6.2.0　状態：**2026-11-16 に実装済み**。
+
+> **実装（2026-11-16）**：`C:\isaacsim-6.2.0\extsUser\Extentions\myext.robot.geometric\`。使い方・設定・確かめたこと・この設計案からの変更点は、その中の [docs/README.md](../../extsUser/Extentions/myext.robot.geometric/docs/README.md) にある。以下は設計時点の記録で、クラス名は §13.5 の表が正。
+>
+> 実装中に測って決まったこと：
+> - DOF の並び（D6）：根から幅優先、兄弟は Joint prim の並び順。Play した Articulation と一致した。
+> - mimic の offset の単位（D9）：回転は度、直動はステージの長さ。`NewtonMimicAPI` も読む。
+> - 関節の正負（D13）：body0 から見た body1 の右ねじ方向。木の親が body1 側の Joint は軸を反転して読む。Play した Articulation との差は最大 5.1e-7 m。
+> - ワールドに対して動く Joint は、Articulation では DOF に数えられない。既定ではそれに合わせた。
+> - Stop 中に PhysX へ読み込んだシーンは、後から足した prim を拾わない。prim の追加・削除の後は読み直す。
+> - PhysX が返す「重なった相手」のパスは、CollisionAPI が付いたいちばん上の prim（Xform のこともある）。親をたどってリンクを決める。
 
 ## 1. 骨子
 
