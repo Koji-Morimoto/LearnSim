@@ -11,6 +11,7 @@
 !/physx_overlap_contact_verification/
 !/2026-11-12_点群の球表示/
 !/Extentions/
+!/2026-11-18_headlessデバッグ/
 
 # 各フォルダ共通で除外
 __pycache__/

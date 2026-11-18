@@ -1,0 +1,7 @@
+// 2026-11-18  このフォルダを開いたときだけ効く設定
+{
+    // このフォルダで使う Python の場所。ユーザー設定の値より優先される。
+    // 【環境に合わせて書き換える】 C:/isaacsim-6.2.0 を Isaac Sim をインストールしたフォルダにする
+    // （launch.json の値と揃える）
+    "python.defaultInterpreterPath": "C:/isaacsim-6.2.0/kit/python/python.exe"
+}

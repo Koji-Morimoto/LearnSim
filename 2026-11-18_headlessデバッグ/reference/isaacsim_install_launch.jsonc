@@ -1,0 +1,159 @@
+// =====================================================================================
+// Isaac Sim 6.2.0 のインストールフォルダに付いてくる .vscode/launch.json の写し（注釈付き）
+//   元ファイル : <Isaac Sim のインストールフォルダ>/.vscode/launch.json
+//   写した日   : 2026-11-18
+//   設定の値は元ファイルのまま変えていない。// のコメントだけを書き足した。
+//   注釈は 2026-11-18 にこの PC で確かめた内容。確かめた環境は次のとおり。
+//     Windows 11 / Isaac Sim 6.2.0
+//     Python 拡張 ms-python.python 2026.10.0 / Python デバッガ拡張 ms-python.debugpy 2026.6.0
+//     C/C++ 拡張 ms-vscode.cpptools
+//
+// 【このファイルの前提】
+//   ${workspaceFolder} は「VSCode で開いているフォルダ」に置き換わる。
+//   元ファイルは、Isaac Sim のインストールフォルダそのものを VSCode で開いたときに使う作りになっている。
+//   別のフォルダ（自分の作業フォルダなど）を開いた場合は ${workspaceFolder} がそのフォルダになり、
+//   パスがすべてずれて動かない。
+//   → その場合の書き方は、このフォルダの .vscode/launch.json を参照（パスを直接書いてある）。
+//
+// 【3 つの設定の使い分け】
+//   1. Python: Current File
+//        SimulationApp を使う単体スクリプト（headless でも GUI でも）を、デバッガ付きで起動する。
+//   2. Python: Attach
+//        すでに動いている Isaac Sim（GUI でも headless でも）の Python 部分に、後から接続する。
+//        拡張機能のコードや、--exec で渡したスクリプトを止めたいときに使う。
+//   3. (windows-x86_64) isaac-sim [release]
+//        kit.exe を C++ のデバッガの下で起動する。落ちる（クラッシュする）場所を調べるときに使う。
+// =====================================================================================
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+
+    // launch.json の書式のバージョン。常に "0.2.0" と書く決まり
+    "version": "0.2.0",
+    // 実行とデバッグの画面のプルダウンに並ぶ起動設定の一覧
+    "configurations": [
+        // -----------------------------------------------------------------------------
+        // 1. Python: Current File
+        //   【何をする】いま開いているファイルを Isaac Sim 同梱の Python で起動し、ブレークポイントで止める。
+        //               やっていることは python.bat <ファイル> とほぼ同じ。
+        //   【使える場面】
+        //     ・from isaacsim import SimulationApp で始まる単体スクリプト（standalone_examples など）
+        //     ・SimulationApp({"headless": True}) の headless 実行でも、そのまま使える
+        //   【使えない場面】
+        //     ・拡張機能のコードや、Isaac Sim の画面で動いているコード（→ 2. Attach を使う）
+        //     ・C++ の部分（→ 3. を使う）
+        //   【注意】
+        //     ・VSCode のユーザー設定 python.defaultInterpreterPath が存在しないファイルを指していると、
+        //       何も表示されずに「デバッグが停止しました」で終わる。
+        //       これはデバッガ本体を動かす Python に、下の "python" ではなくユーザー設定側が使われるため。
+        //       "debugAdapterPython" を足すと直る（このフォルダの .vscode/launch.json と README を参照）
+        // -----------------------------------------------------------------------------
+        {
+            // プルダウンに出る名前。自由に付けてよい
+            "name": "Python: Current File",
+            // 使うデバッガの種類。"python" は古い書き方で、Python 拡張が受け付ける。
+            // Python 拡張は「間もなく非推奨。'python' を 'debugpy' に置き換えてください」と案内している。
+            // 新しく書くなら "debugpy" にする（中身は同じ debugpy で動く）
+            "type": "python",
+            // "launch" = デバッガがプログラムを起動する。"attach" = 動いているプログラムに接続する
+            "request": "launch",
+            // 起動するファイル。${file} は「エディタでいま開いて選んでいるファイル」に置き換わる。
+            // 毎回同じファイルを起動したいなら "${workspaceFolder}/my_script.py" のように固定する
+            "program": "${file}",
+            // 出力を出す場所。"integratedTerminal" = VSCode 内のターミナル（input() も使える）。
+            // ほかに "internalConsole"（デバッグコンソール）と "externalTerminal"（別ウィンドウ）がある
+            "console": "integratedTerminal",
+            // 起動するプログラムに渡す環境変数。python.bat が設定するものと同じ役目をする
+            "env": {
+                // このインストール内の .py と .bat には、この変数を読んでいる所が見つからなかった。
+                // 消しても動くかは確かめていないので、残しておくのが無難
+                "RESOURCE_NAME": "IsaacSim",
+                // Kit（Isaac Sim の土台のアプリ本体）のフォルダ。python.bat も同じ値を設定する。
+                // Python から Kit を起動するときに、本体の場所としてこれが使われる
+                "CARB_APP_PATH": "${workspaceFolder}/kit",
+                // Isaac Sim のインストールフォルダ。python.bat も同じ値を設定する
+                "ISAAC_PATH": "${workspaceFolder}",
+                // アプリ設定ファイル（*.kit）の置き場所。python.bat も同じ値を設定する。
+                // SimulationApp はここから isaacsim.exp.base.python.kit などを読む
+                "EXP_PATH": "${workspaceFolder}/apps",
+                // site/sitecustomize.py を Python 起動時に読ませるための設定（setup_python_env.bat と同じ値）。
+                // sitecustomize.py が exts/isaacsim.simulation_app、kit/kernel/py などを import の探索先に足す。
+                // これが無いと from isaacsim import SimulationApp が失敗する
+                "PYTHONPATH": "${workspaceFolder}/site"
+            },
+            // 起動に使う Python。Isaac Sim 同梱の Python 3.12 を指す。
+            // python.bat は、ここを同じ中身で名前だけ違う kit/python/kit.exe にして起動している。
+            // 「GPU ドライバの設定が kit.exe という名前で当たるため」と python.bat のコメントにある。
+            // この設定は python.exe のままで、A の動作確認ではそれで問題なかった
+            "python": "${workspaceFolder}/kit/python/python.exe",
+        },
+        // -----------------------------------------------------------------------------
+        // 2. Python: Attach
+        //   【何をする】すでに動いている Isaac Sim の Python に、ポート 3000 で接続して止める。
+        //   【使える場面】
+        //     ・GUI の Isaac Sim。拡張機能の一覧画面で omni.kit.debug.vscode 拡張を有効にしてから接続する
+        //       （apps/*.kit のどれにも書かれていないので、初期状態では有効になっていない。
+        //        有効にすると、接続状態を表示する小さなウィンドウが出る）
+        //     ・headless の Isaac Sim。--enable omni.kit.debug.python を付けて起動する（このフォルダの run_b.ps1）
+        //     ・拡張機能の on_startup や、ボタンを押したときの処理、--exec で渡したスクリプトを止めたいとき
+        //   【注意】
+        //     ・Isaac Sim 側が接続を待っていないと「接続できない」で終わる。
+        //       待ち受けを担うのは omni.kit.debug.python 拡張。既定値は host=127.0.0.1、port=3000
+        //       （その拡張の config/extension.toml に書いてある）
+        //     ・ポート 3000 を別のプロセスが使っていると、Isaac Sim 側の待ち受けが失敗する。
+        //       前に起動した Isaac Sim が残っている場合などに起こる
+        // -----------------------------------------------------------------------------
+        {
+            "name": "Python: Attach (windows-x86_64/linux-x86_64)",
+            // 1. と同じく古い書き方。新しく書くなら "debugpy"
+            "type": "python",
+            // 動いているプログラムに接続する
+            "request": "attach",
+            // 接続先のポート。Isaac Sim 側の --/exts/omni.kit.debug.python/port と同じ値にする
+            "port": 3000,
+            // 接続先のアドレス。同じ PC なら localhost。
+            // 新しい書き方では "connect": { "host": ..., "port": ... } にまとめて書く
+            "host": "localhost"
+        },
+        // -----------------------------------------------------------------------------
+        // 3. (windows-x86_64) isaac-sim [release]
+        //   【何をする】kit.exe（Isaac Sim 本体）を、Windows の C++ デバッガの下で GUI 付きで起動する。
+        //   【使える場面】
+        //     ・Isaac Sim が落ちるとき、どの DLL のどこで落ちたかを呼び出し履歴で見る
+        //     ・自分で C++ のプラグインを作り、デバッグ情報（.pdb）付きでビルドしたとき、
+        //       その中にブレークポイントを置く
+        //   【できないこと】
+        //     ・Python のブレークポイントでは止まらない（Python は 2. Attach を併用する）
+        //     ・このインストールには .pdb ファイルが入っていない（kit・exts・extscache の中に 0 個）。
+        //       そのため Isaac Sim 自身の C++ ソースの行では止められない。名前の分からない関数が並ぶだけになる
+        //   【必要なもの】VSCode の C/C++ 拡張（ms-vscode.cpptools）。"cppvsdbg" はこの拡張が受け付ける
+        // -----------------------------------------------------------------------------
+        {
+            "name": "(windows-x86_64) isaac-sim [release]",
+            // Windows 用の C++ デバッガ（Visual Studio と同じ仕組み）。Linux では "cppdbg" を使う
+            "type": "cppvsdbg",
+            "request": "launch",
+            // 起動する実行ファイル。isaac-sim.bat が中で起動しているのと同じ kit.exe
+            "program": "${workspaceFolder}/kit/kit.exe",
+            // kit.exe に渡す引数。
+            //   1 つ目 : アプリ設定ファイル。isaacsim.exp.full.kit は isaac-sim.bat が使うのと同じ GUI 版。
+            //            headless にしたいなら、ここに "--no-window" を足す
+            //   --ext-folder : 拡張機能を探すフォルダを足す。
+            //            apps フォルダは isaacsim.exp.full.kit の [settings.app.exts.folders] に "${app}" として
+            //            すでに入っているので、無くても同じ結果になるはず（確かめてはいない）
+            "args": ["${workspaceFolder}/apps/isaacsim.exp.full.kit",
+                "--ext-folder", "${workspaceFolder}/apps"],
+            // true にすると、起動直後（main の入口）で一度止まる
+            "stopAtEntry": false,
+            // 作業フォルダ。相対パスはここから探される
+            "cwd": "${workspaceFolder}",
+            // 足したい環境変数を [{"name": "...", "value": "..."}] の形で並べる。今は何も足していない
+            "environment": [],
+            // false = VSCode 内に出力する。true = 別のコンソールウィンドウを開く
+            "externalConsole": false,
+            // デバッグを始めたら、デバッグコンソールの画面を自動で開く
+            "internalConsoleOptions": "openOnSessionStart",
+        },
+    ]
+}

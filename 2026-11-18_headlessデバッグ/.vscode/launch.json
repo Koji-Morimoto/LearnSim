@@ -1,0 +1,51 @@
+// 2026-11-18  headless の Isaac Sim を VSCode のデバッガで止めるための起動設定
+//
+// 【環境に合わせて書き換えるところ】
+//   C:/isaacsim-6.2.0  … Isaac Sim をインストールした（展開した）フォルダ。
+//                         isaac-sim.bat と python.bat が入っているフォルダを書く。
+//                         区切りは / でも \\ でもよい（\ 1 個だけは JSON として不正なので不可）。
+//                         このファイルの中に 8 か所ある（cwd、env の 4 つ、python、debugAdapterPython、debugLauncherPython）。すべて同じ値にする。
+//   3000               … B の接続先ポート。Isaac Sim 側の
+//                         --/exts/omni.kit.debug.python/port=XXXX と同じ値にする（既定は 3000）。
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            // やり方 A: SimulationApp(headless=True) のスクリプトを、デバッガ付きで直接起動する
+            "name": "A: SimulationApp (headless)",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/a_simulation_app.py",
+            "console": "integratedTerminal",
+            // 作業フォルダ。Isaac Sim のフォルダにしておくと、相対パスの扱いが python.bat で起動したときと同じになる
+            "cwd": "C:/isaacsim-6.2.0",
+            // python.bat が設定するのと同じ環境変数（値はすべて Isaac Sim のフォルダ基準）
+            "env": {
+                "RESOURCE_NAME": "IsaacSim",
+                "CARB_APP_PATH": "C:/isaacsim-6.2.0/kit",
+                "ISAAC_PATH": "C:/isaacsim-6.2.0",
+                "EXP_PATH": "C:/isaacsim-6.2.0/apps",
+                "PYTHONPATH": "C:/isaacsim-6.2.0/site"
+            },
+            // 実行する Python（Isaac Sim 同梱のもの）
+            "python": "C:/isaacsim-6.2.0/kit/python/python.exe",
+            // デバッガ自身を動かす Python。これを書かないと、ユーザー設定の
+            // python.defaultInterpreterPath が使われる。そこが存在しないファイルや .bat を指していると、
+            // 何も表示されずに「デバッグが停止しました」で終わる（README の「つまずいたところ」参照）
+            "debugAdapterPython": "C:/isaacsim-6.2.0/kit/python/python.exe",
+            "debugLauncherPython": "C:/isaacsim-6.2.0/kit/python/python.exe",
+            // true: 自分のスクリプトだけで止まる。Isaac Sim の中のコードにも入りたいときは false にする
+            "justMyCode": true
+        },
+        {
+            // やり方 B: run_b.ps1 で headless 起動した Isaac Sim に、後から接続する
+            "name": "B: Attach (port 3000)",
+            "type": "debugpy",
+            "request": "attach",
+            // 別の PC で動いている Isaac Sim に接続するなら host をその PC のアドレスにする
+            // （そのときは Isaac Sim 側も --/exts/omni.kit.debug.python/host=0.0.0.0 にする必要がある）
+            "connect": { "host": "127.0.0.1", "port": 3000 },
+            "justMyCode": true
+        }
+    ]
+}
