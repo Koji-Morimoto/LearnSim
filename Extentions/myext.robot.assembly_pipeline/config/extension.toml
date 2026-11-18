@@ -1,0 +1,21 @@
+[package]
+version = "0.1.0"
+title = "MyExt Robot Assembly Pipeline"
+description = "URDF から usda を作り、usda どうしを結合した結合ファイルを、何度実行しても同じ結果になる形で作る(結合ファイルは次の結合の親にも子にもでき、VariantSet で子を選び分けられる)。事前に URDF と usda を調べて既知の罠を判定し(止める / 進めるを選べる)、最後にその症状が実際に起きたかを、公式のまま(Robot Assembler)と修正後の両方で測って報告する"
+category = "MyExt"
+keywords = ["myext", "robot", "urdf", "usd", "join", "variant", "pipeline", "articulation"]
+authors = ["myext"]
+readme = "docs/README.md"
+
+[dependencies]
+"omni.usd" = {}
+"omni.timeline" = {}
+"omni.physx" = {}
+"omni.physx.tensors" = {}
+"omni.usd.schema.physx" = {}
+"isaacsim.asset.importer.urdf" = {}
+"isaacsim.robot_setup.assembler" = {}
+"isaacsim.robot.schema" = {}
+
+[[python.module]]
+name = "myext.robot.assembly_pipeline"

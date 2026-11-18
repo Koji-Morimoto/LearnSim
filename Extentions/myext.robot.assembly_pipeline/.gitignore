@@ -1,0 +1,6 @@
+examples/out/
+tests_kit/out/
+*.log
+tests_kit/last_run.json
+__pycache__/
+docs/LOCAL_NOTES.md

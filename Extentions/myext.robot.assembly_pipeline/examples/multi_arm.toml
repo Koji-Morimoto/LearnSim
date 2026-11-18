@@ -1,0 +1,69 @@
+# 4 本アームのロボット。
+#   arm_unit.usda : アーム + エンドエフェクタ(VariantSet "EndEffector": gripper / rod / None)。単体でも使える
+#   robot.usda    : ベース + arm_unit を 4 本(arm1〜arm4)。アームごとにエンドエフェクタを選ぶ
+output_dir = "out/multi_arm"
+
+[urdf.multi_base]
+path = "urdf/multi_base.urdf"
+
+[urdf.arm]
+path = "urdf/arm.urdf"
+
+[urdf.gripper]
+path = "urdf/gripper.urdf"
+
+[urdf.rod]
+path = "urdf/tool.urdf"
+
+[join_file.arm_unit]
+parent = "arm"
+
+[[join_file.arm_unit.join]]
+name = "gripper"
+child = "gripper"
+parent_link = "flange"
+child_link = "gripper_base"
+prim_name = "end_effector"
+variant_set = "EndEffector"
+variant = "gripper"
+
+[[join_file.arm_unit.join]]
+name = "rod"
+child = "rod"
+parent_link = "flange"
+child_link = "tool_link"
+prim_name = "end_effector"
+variant_set = "EndEffector"
+variant = "rod"
+
+[join_file.robot]
+parent = "multi_base"
+
+[[join_file.robot.join]]
+name = "arm1"
+child = "arm_unit"
+parent_link = "port1"
+child_link = "base_link"
+
+[[join_file.robot.join]]
+name = "arm2"
+child = "arm_unit"
+parent_link = "port2"
+child_link = "base_link"
+select = { EndEffector = "rod" }
+
+[[join_file.robot.join]]
+name = "arm3"
+child = "arm_unit"
+parent_link = "port3"
+child_link = "base_link"
+
+[[join_file.robot.join]]
+name = "arm4"
+child = "arm_unit"
+parent_link = "port4"
+child_link = "base_link"
+select = { EndEffector = "None" }
+
+[probe]
+revolute_target = 0.3

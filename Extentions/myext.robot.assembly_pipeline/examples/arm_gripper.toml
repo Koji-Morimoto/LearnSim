@@ -1,0 +1,17 @@
+# 腕(arm.urdf)の先端の flange(形も慣性も無いリンク)に、mimic 付きの二本指のエンドエフェクタ(gripper.urdf)を結合する。
+output_dir = "out/arm_gripper"
+
+[urdf.arm]
+path = "urdf/arm.urdf"
+
+[urdf.gripper]
+path = "urdf/gripper.urdf"
+
+[join_file.arm_gripper]
+parent = "arm"
+
+[[join_file.arm_gripper.join]]
+name = "gripper"
+child = "gripper"
+parent_link = "flange"
+child_link = "gripper_base"
