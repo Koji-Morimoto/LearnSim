@@ -468,9 +468,19 @@ def _r11_symptom(ctx: Context, target: str) -> tuple[Side, Side]:
 
 # ================================================================ R12 RobotPoser の teleport で置いて行かれる
 def _r12_detect(ctx: Context) -> list[Finding]:
-    return [Finding("R12", x.jid, "子を剛体の子に置かない(stage の親子が実際のリンクの親子と違う)うえ、Robot Assembler の固定関節には "
-                                  "IsaacJointAPI が無いので、RobotPoser の apply_joint_state(Stop 中)で子が置いて行かれる")
-            for x in join_facts(ctx) if x.under_rigid_body is False]
+    out = []
+    for x in join_facts(ctx):
+        why = []
+        if x.under_rigid_body is False:
+            why.append("子を剛体の子に置かない(stage の親子が実際のリンクの親子と違う)うえ、Robot Assembler の固定関節には IsaacJointAPI が無い")
+        m = ctx.models.get(x.child_link_urdf)
+        if m is not None and (x.child_link_urdf != x.child_urdf or x.child_link != m.root_link):
+            # 子のルートリンクでないリンクで固定すると、RobotPoser の木は子の中の関節を逆向き(子 → 親)にたどる。
+            # 2026-11-19 の実測で、子のエンドエフェクタの指のリンクに結合したとき teleport で子が 2.1 m ずれた
+            why.append(f"子のリンク {x.child_link_urdf}:{x.child_link} が子のルートリンクでない(RobotPoser の木が子の中の関節を逆向きにたどる)")
+        if why:
+            out.append(Finding("R12", x.jid, "、".join(why) + "ので、RobotPoser の apply_joint_state(Stop 中)で子が置いて行かれる"))
+    return out
 
 
 def _r12_symptom(ctx: Context, target: str) -> tuple[Side, Side]:

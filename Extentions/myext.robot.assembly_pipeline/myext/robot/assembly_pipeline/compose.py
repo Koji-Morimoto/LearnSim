@@ -95,15 +95,15 @@ def _relpath(top: str, path: str) -> str:
 
 def compose_file(spec: PipelineSpec, f: JoinFileSpec, infos: dict[str, UsdaInfo]) -> FileComposition:
     os.makedirs(spec.output_dir, exist_ok=True)
-    path = os.path.join(spec.output_dir, f"{f.name}.usda")
+    path = os.path.join(spec.output_dir, f.usda)
     layer = open_for_rewrite(path)
-    layer.customLayerData = {"myext.robot.assembly_pipeline": {"join_file": f.name}}
+    layer.customLayerData = {"myext.robot.assembly_pipeline": {"join_file": f.usda}}
     stage = Usd.Stage.Open(layer)
     parent = infos[f.parent]
     src = Usd.Stage.Open(parent.path)
     UsdGeom.SetStageUpAxis(stage, UsdGeom.GetStageUpAxis(src))
     UsdGeom.SetStageMetersPerUnit(stage, UsdGeom.GetStageMetersPerUnit(src))
-    top = f"/{f.name}"
+    top = f"/{f.stem}"
     top_prim = stage.DefinePrim(top, "Xform")
     top_prim.GetReferences().AddReference(_rel(parent.path, spec.output_dir))
     stage.SetDefaultPrim(top_prim)

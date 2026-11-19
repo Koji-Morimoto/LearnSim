@@ -65,7 +65,7 @@ def build_official(spec: PipelineSpec, f: JoinFileSpec, j: JoinSpec, builds: dic
     child_b = builds[spec.root_urdf(j.child).name]
     stage = runtime.new_probe_stage()
     stage.SetDefaultPrim(UsdGeom.Xform.Define(stage, ROOT).GetPrim())  # base を default prim にしない = 直接編集ではない結合
-    top = f"{ROOT}/{f.name}"
+    top = f"{ROOT}/{f.stem}"
     _add(stage, top, parent_b)
     runtime.update(2)
     p_owner = _owner(stage, top, parent_b, "")

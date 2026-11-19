@@ -1,17 +1,20 @@
 # 腕(arm.urdf)の先端の flange(形も慣性も無いリンク)に、mimic 付きの二本指のエンドエフェクタ(gripper.urdf)を結合する。
-output_dir = "out/arm_gripper"
+output_dir = "out/arm_gripper"               # 出力先フォルダ(この TOML からの相対パス)
 
-[urdf.arm]
-path = "urdf/arm.urdf"
+[[urdf_to_usda]]
+urdf = "urdf/arm.urdf"                       # 入力: URDF
+usda = "arm.usda"                            # 出力: output_dir/arm.usda
 
-[urdf.gripper]
-path = "urdf/gripper.urdf"
+[[urdf_to_usda]]
+urdf = "urdf/gripper.urdf"                   # 入力: URDF
+usda = "two_finger.usda"                     # 出力: output_dir/two_finger.usda
 
-[join_file.arm_gripper]
-parent = "arm"
+[[join_file]]
+usda = "arm_with_two_finger.usda"            # 出力: output_dir/arm_with_two_finger.usda
+parent_usda = "arm.usda"                     # 入力: 親(上の [[urdf_to_usda]] の usda)
 
-[[join_file.arm_gripper.join]]
-name = "gripper"
-child = "gripper"
-parent_link = "flange"
-child_link = "gripper_base"
+[[join_file.join]]
+name = "ee"                                  # この結合の名前 = 子を置く prim の名前
+child_usda = "two_finger.usda"               # 入力: 子(上の [[urdf_to_usda]] の usda)
+parent_link = "flange"                       # arm.urdf のリンク名
+child_link = "gripper_base"                  # gripper.urdf のリンク名

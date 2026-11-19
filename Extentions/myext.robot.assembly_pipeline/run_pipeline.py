@@ -1,8 +1,10 @@
-"""コマンドラインから実行する(headless の Isaac Sim を別プロセスで起動する)。
+"""コマンドラインから実行する。
 
-    C:\\isaacsim-6.2.0\\python.bat run_pipeline.py <仕様.toml>
+    C:\\isaacsim-6.2.0\\python.bat run_pipeline.py <仕様.toml>            実行する(headless の Isaac Sim を起動する)
+    C:\\isaacsim-6.2.0\\python.bat run_pipeline.py <仕様.toml> --check    仕様を検査して、参照関係の一覧を表示するだけ(Isaac Sim を起動しない。数秒)
 
-終了コード: 0 = 問題なし、1 = 修正後も起きた症状か判定外の症状がある、2 = 判定で止めた、3 = 例外
+どちらも、Isaac Sim を起動する前に仕様を検査する(TOML のキー、usda のファイル名の参照、リンク名、子の VariantSet の選択)。
+終了コード: 0 = 問題なし、1 = 修正後も起きた症状か判定外の症状がある、2 = 判定で止めた、3 = 例外、4 = 仕様の誤り
 報告は <output_dir>/report.md と report.json。
 """
 
@@ -14,14 +16,40 @@ import sys
 HERE = os.path.dirname(os.path.abspath(__file__))
 
 
+def check_only(spec_path: str):
+    """Isaac Sim なしで仕様を読んで検査する。問題があれば表示して None。"""
+    sys.path.insert(0, HERE)
+    from myext.robot.assembly_pipeline.spec import load_spec
+    from myext.robot.assembly_pipeline.spec_check import check_links, describe
+
+    try:
+        spec = load_spec(spec_path)
+    except ValueError as exc:
+        print(f"[SPEC ERROR] {exc}", flush=True)
+        return None
+    problems = check_links(spec)
+    for p in problems:
+        print(f"[SPEC ERROR] {p}", flush=True)
+    if problems:
+        return None
+    print("\n".join(describe(spec)), flush=True)
+    return spec
+
+
 def main() -> int:
-    if len(sys.argv) < 2:
+    args = [a for a in sys.argv[1:] if not a.startswith("--")]
+    if not args:
         print(__doc__)
         return 3
-    spec_path = os.path.abspath(sys.argv[1])
+    spec_path = os.path.abspath(args[0])
+    if check_only(spec_path) is None:
+        return 4
+    if "--check" in sys.argv:
+        print("[CHECK] 仕様に誤りは無い", flush=True)
+        return 0
     from isaacsim import SimulationApp
 
-    app = SimulationApp({"headless": True})
+    app = SimulationApp({"headless": True})  # noqa: F841
     code = 3
     try:
         import omni.kit.app
@@ -46,8 +74,8 @@ def main() -> int:
         code = 3
     finally:
         sys.stdout.flush()
-    os._exit(code)  # Kit の終了処理を待たずに、終了コードを確実に返す
+    return code
 
 
 if __name__ == "__main__":
-    os._exit(main())
+    os._exit(main())  # Kit の終了処理を待たずに、終了コードを確実に返す

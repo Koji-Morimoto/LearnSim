@@ -1,9 +1,9 @@
 """部品の import と正規化層。
 
 - import は入力(URDF・メッシュ・設定・importer の版)のハッシュが前回と同じなら飛ばす。
-- 修正 R13 を入れると、一時フォルダに import してから決まった出力先 urdf/<名前>/ を置き換える
+- 修正 R13 を入れると、一時フォルダに import してから決まった出力先 _import/<usda の名前>/ を置き換える
   (importer に任せると、出力先が空でなければ <名前>_1 のような別フォルダになる)。
-- 正規化層 urdf/<名前>/<名前>_fixed.usda は生成物を参照し、over だけを書く。生成物は触らない。
+- 正規化層 <output_dir>/<usda>(TOML の [[urdf_to_usda]] の usda)は生成物を参照し、over だけを書く。生成物は触らない。
 """
 
 from __future__ import annotations
@@ -96,16 +96,16 @@ def build_part(spec: PipelineSpec, part: UrdfSource, model: UrdfModel) -> PartBu
     from isaacsim.asset.importer.urdf import URDFImporter, URDFImporterConfig
     from isaacsim.asset.importer.utils import importer_utils
 
-    parts_dir = os.path.join(spec.output_dir, "urdf")
+    parts_dir = os.path.join(spec.output_dir, "_import")  # URDF Importer の生成物を置く場所
     os.makedirs(parts_dir, exist_ok=True)
     cfv = part.collision_from_visuals if part.collision_from_visuals is not None else not model.has_collisions()
     stem = os.path.splitext(os.path.basename(part.path))[0]
-    expected_dir = os.path.join(parts_dir, part.name)
-    manifest_path = os.path.join(parts_dir, f"{part.name}.manifest.json")
+    expected_dir = os.path.join(parts_dir, part.stem)
+    manifest_path = os.path.join(parts_dir, f"{part.stem}.manifest.json")
     digest = input_hash(part, model, cfv)
     target_nonempty = os.path.isdir(expected_dir) and any(os.scandir(expected_dir))
     # importer にそのまま出力させた場合の出力先(公式のままの比較用。importer 自身の関数で求める)
-    would = importer_utils.resolve_unique_path(os.path.join(parts_dir, part.name), is_file=False)
+    would = importer_utils.resolve_unique_path(os.path.join(parts_dir, part.stem), is_file=False)
     importer_would_suffix = os.path.normcase(os.path.abspath(would)) != os.path.normcase(os.path.abspath(expected_dir))
 
     manifest = {}
@@ -121,7 +121,7 @@ def build_part(spec: PipelineSpec, part: UrdfSource, model: UrdfModel) -> PartBu
     imported = False
     if not reuse:
         if spec.fix_applied("R13"):
-            staging = os.path.join(spec.output_dir, ".staging", part.name)
+            staging = os.path.join(spec.output_dir, ".staging", part.stem)
             shutil.rmtree(staging, ignore_errors=True)
             os.makedirs(staging)
             out = URDFImporter(URDFImporterConfig(usd_path=staging, **cfg)).import_urdf()
@@ -130,7 +130,7 @@ def build_part(spec: PipelineSpec, part: UrdfSource, model: UrdfModel) -> PartBu
             shutil.rmtree(staging, ignore_errors=True)
             generated = os.path.join(expected_dir, os.path.basename(out))
         else:
-            # 修正なし:importer の既定どおり urdf/ の下に出させる(出力先が空でなければ別名になる)
+            # 修正なし:importer の既定どおり _import/ の下に出させる(出力先が空でなければ別名になる)
             out = URDFImporter(URDFImporterConfig(usd_path=parts_dir, **cfg)).import_urdf()
             generated = out
         imported = True
@@ -147,20 +147,22 @@ def build_part(spec: PipelineSpec, part: UrdfSource, model: UrdfModel) -> PartBu
 
 
 def write_normalized(spec: PipelineSpec, part: UrdfSource, generated: str) -> tuple[str, str | None]:
-    """生成物を参照し、Physics variant の選択(R06)と mimic follower の drive を 0 にする(R03)over を書く。"""
-    folder = os.path.dirname(generated)
-    path = os.path.join(folder, f"{part.name}_fixed.usda")
+    """<output_dir>/<usda> に、生成物を参照し、Physics variant の選択(R06)と mimic follower の drive を 0 にする(R03)over を書く。
+
+    一番上の prim の名前は usda のファイル名の .usda より前(URDF の名前とは限らない)。
+    """
+    path = os.path.join(spec.output_dir, part.usda)
     src_layer = Sdf.Layer.FindOrOpen(generated)
-    dp_name = src_layer.defaultPrim
     layer = open_for_rewrite(path)
-    layer.customLayerData = {"myext.robot.assembly_pipeline": {"normalize_version": NORMALIZE_VERSION, "part": part.name}}
+    layer.customLayerData = {"myext.robot.assembly_pipeline": {"normalize_version": NORMALIZE_VERSION, "urdf": os.path.basename(part.urdf)}}
     stage = Usd.Stage.Open(layer)
     from pxr import UsdGeom
 
     UsdGeom.SetStageUpAxis(stage, UsdGeom.GetStageUpAxis(Usd.Stage.Open(src_layer)))
     UsdGeom.SetStageMetersPerUnit(stage, UsdGeom.GetStageMetersPerUnit(Usd.Stage.Open(src_layer)))
-    prim = stage.DefinePrim(f"/{dp_name}", "Xform")
-    prim.GetReferences().AddReference("./" + os.path.basename(generated))
+    prim = stage.DefinePrim(f"/{part.stem}", "Xform")
+    rel = os.path.relpath(generated, spec.output_dir).replace("\\", "/")
+    prim.GetReferences().AddReference(rel if rel.startswith(".") else "./" + rel)
     stage.SetDefaultPrim(prim)
     variant = None
     if spec.fix_applied("R06"):

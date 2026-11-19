@@ -89,16 +89,8 @@ def resolve(owners: list[Owner], scoped: str) -> tuple[Owner, str]:
 
 
 def static_resolve(spec, usda_name: str, scoped: str) -> tuple[str, str]:
-    """ステージを開かずに、仕様だけからリンクの書き方を (URDF の名前, リンク名) にする(事前チェック用)。"""
-    f = spec.join_file(usda_name)
-    if f is None:
-        return usda_name, scoped
-    head, _, rest = scoped.partition("/")
-    if rest:
-        j = next((j for j in f.joins if j.name == head), None)
-        if j is not None:
-            return static_resolve(spec, j.child, rest)
-    return static_resolve(spec, f.parent, scoped)
+    """ステージを開かずに、仕様だけからリンクの書き方を (URDF から作った usda のファイル名, リンク名) にする(事前チェック用)。"""
+    return spec.resolve_link(usda_name, scoped)
 
 
 def _join(a: str, b: str) -> str:

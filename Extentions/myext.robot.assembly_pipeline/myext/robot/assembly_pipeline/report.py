@@ -73,6 +73,8 @@ def write_report(output_dir: str, *, status: str, findings: list[Finding], outco
 
 def render_markdown(data: dict) -> str:
     lines = [f"# 結合パイプラインの報告", "", f"{data['time']} / 状態: **{data['status']}**", ""]
+    if data.get("spec_description"):
+        lines += data["spec_description"] + [""]
     if data.get("stopped_by"):
         lines += ["## 止めた理由", ""] + [f"- {s}" for s in data["stopped_by"]] + [""]
     if data.get("changes_since_previous"):

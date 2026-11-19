@@ -55,14 +55,21 @@ def urdf_info(b: PartBuild) -> UsdaInfo:
 
 
 def run_pipeline(spec: PipelineSpec, log=print) -> PipelineResult:
+    from .spec_check import check_links, describe
+
+    models = {u.name: load_urdf(u.path) for u in spec.urdfs}
+    problems = check_links(spec, models)
+    if problems:
+        raise ValueError("仕様の誤り:\n" + "\n".join(f"- {p}" for p in problems))
+    description = describe(spec)
     _enable_extensions()
-    ctx = Context(spec=spec, models={u.name: load_urdf(u.path) for u in spec.urdfs})
+    ctx = Context(spec=spec, models=models)
 
     # ---- 1. URDF だけで判定できるもの(import の前)
     findings = detect(ctx, "urdf")
     stop = _stoppers(spec, findings)
     if stop:
-        rep = write_report(spec.output_dir, status="stopped_before_import", findings=findings, outcomes=[], extra={"stopped_by": stop})
+        rep = write_report(spec.output_dir, status="stopped_before_import", findings=findings, outcomes=[], extra={"stopped_by": stop, "spec_description": description})
         raise PipelineStopped("URDF の判定で止めた:\n" + "\n".join(stop), rep)
 
     # ---- 2. import と正規化層
@@ -83,7 +90,7 @@ def run_pipeline(spec: PipelineSpec, log=print) -> PipelineResult:
     findings = [f for f in findings if (f.rule, f.target) not in seen] + later
     stop = _stoppers(spec, findings)
     if stop:
-        rep = write_report(spec.output_dir, status="stopped_before_join", findings=findings, outcomes=[], extra={"stopped_by": stop})
+        rep = write_report(spec.output_dir, status="stopped_before_join", findings=findings, outcomes=[], extra={"stopped_by": stop, "spec_description": description})
         raise PipelineStopped("usda の判定で止めた:\n" + "\n".join(stop), rep)
 
     # ---- 4. 結合ファイルを依存の順に作る(2 回作って、2 回目に中身が変わらないことも確かめる)
@@ -145,7 +152,7 @@ def run_pipeline(spec: PipelineSpec, log=print) -> PipelineResult:
         from .geometric_bridge import check_against_physx
 
         for name, c in comps.items():
-            geometric[name] = check_against_physx(c.path, name)
+            geometric[name] = check_against_physx(c.path, c.top.lstrip("/"))
             g = geometric[name]
             log(f"[geometric] {name}: {g.get('error') or 'リンク位置の最大差 %s m' % g.get('max_link_position_error_m')}")
     runtime.new_probe_stage()  # 測定用ステージを閉じる
@@ -160,7 +167,7 @@ def run_pipeline(spec: PipelineSpec, log=print) -> PipelineResult:
     status = "ok" if not bad and not geo_bad else "problems"
     outputs = {**{n: b.fixed_usd for n, b in ctx.builds.items()}, **{n: c.path for n, c in comps.items()}}
     rep = write_report(spec.output_dir, status=status, findings=findings, outcomes=outcomes, extra={
-        "geometric": geometric, "outputs": outputs,
+        "spec_description": description, "geometric": geometric, "outputs": outputs,
         "join_errors": {r.jid: r.error for c in comps.values() for r in c.joins if r.error},
         "measurements": {"statics": ctx.statics, "mimic_official": ctx.mimic_official, "mimic_fixed": ctx.mimic_fixed,
                          "official": ctx.official, "fixed": ctx.fixed, "official_reassemble": ctx.official_reassemble,

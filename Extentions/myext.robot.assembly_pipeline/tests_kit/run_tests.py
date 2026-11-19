@@ -74,13 +74,14 @@ def urdf(name: str) -> str:
     return os.path.join(EX, "urdf", name)
 
 
-def one_join(out: str, child_urdf: str = "gripper.urdf", child_link: str = "gripper_base", parent_prim: str | None = None,
+def one_join(out: str, child_urdf: str = "gripper.urdf", child_link: str = "gripper_base", place: str | None = None,
              child_kw: dict | None = None, **kw) -> PipelineSpec:
-    """腕(arm)の flange に子(gripper)を 1 回結合する結合ファイル arm_gripper。"""
+    """arm.usda の flange に two_finger.usda を 1 回結合して arm_with_ee.usda を作る(結合の名前 ee)。"""
     return PipelineSpec(
         output_dir=os.path.join(OUT, out),
-        urdfs=(UrdfSource("arm", urdf("arm.urdf")), UrdfSource("gripper", urdf(child_urdf), **(child_kw or {}))),
-        join_files=(JoinFileSpec("arm_gripper", "arm", (JoinSpec("gripper", "gripper", "flange", child_link, parent_prim=parent_prim),)),),
+        urdfs=(UrdfSource(urdf=urdf("arm.urdf"), usda="arm.usda"), UrdfSource(urdf=urdf(child_urdf), usda="two_finger.usda", **(child_kw or {}))),
+        join_files=(JoinFileSpec(usda="arm_with_ee.usda", parent_usda="arm.usda", joins=(
+            JoinSpec(name="ee", child_usda="two_finger.usda", parent_link="flange", child_link=child_link, place_child_under=place),)),),
         **kw)
 
 
@@ -105,7 +106,8 @@ def sha(path: str) -> str:
         return hashlib.sha256(f.read()).hexdigest()
 
 
-J = "arm_gripper/gripper"
+J = "arm_with_ee.usda/ee"
+A, C = "arm.usda", "two_finger.usda"
 
 
 # ====================================================================== 純粋な部分
@@ -123,22 +125,56 @@ def test_urdf_model_ghost_and_fk():
     assert g.fixed_descendants("gripper_mount") == ["gripper_base"]
 
 
+def raises(fn, *words: str) -> None:
+    try:
+        fn()
+    except ValueError as exc:
+        for w in words:
+            assert w in str(exc), (w, str(exc))
+        return
+    raise AssertionError(f"誤りを通した: {words}")
+
+
 @test
 def test_spec_validation():
-    try:
-        PipelineSpec(output_dir=OUT, urdfs=(UrdfSource("a", urdf("arm.urdf")),),
-                     join_files=(JoinFileSpec("f", "a", (JoinSpec("x", "missing", "flange", "b"),)),))
-    except ValueError as exc:
-        assert "missing" in str(exc)
-    else:
-        raise AssertionError("存在しない子を通した")
-    try:
-        PipelineSpec(output_dir=OUT, urdfs=(UrdfSource("a", urdf("arm.urdf")),),
-                     join_files=(JoinFileSpec("f", "g", (JoinSpec("x", "a", "flange", "base_link"),)), JoinFileSpec("g", "f", ())))
-    except ValueError as exc:
-        assert "循環" in str(exc)
-    else:
-        raise AssertionError("循環を通した")
+    from myext.robot.assembly_pipeline.spec_check import check_links
+
+    arm = UrdfSource(urdf=urdf("arm.urdf"), usda="arm.usda")
+    two = UrdfSource(urdf=urdf("gripper.urdf"), usda="two_finger.usda")
+    raises(lambda: PipelineSpec(output_dir=OUT, urdfs=(arm, UrdfSource(urdf=urdf("tool.urdf"), usda="arm.usda"))),
+           "'arm.usda' を 2 か所で作ろうとしている", "[[urdf_to_usda]] 1 番目", "[[urdf_to_usda]] 2 番目")
+    raises(lambda: PipelineSpec(output_dir=OUT, urdfs=(arm,), join_files=(JoinFileSpec("u.usda", "arms.usda"),)),
+           "parent_usda = 'arms.usda' は、この TOML のどこでも作っていない", "'arm.usda'")
+    raises(lambda: JoinFileSpec("unit", "arm.usda"), "拡張子 .usda まで書く")
+    raises(lambda: PipelineSpec(output_dir=OUT, urdfs=(arm,), join_files=(
+        JoinFileSpec("f.usda", "g.usda", (JoinSpec("x", "arm.usda", "flange", "base_link"),)), JoinFileSpec("g.usda", "f.usda"))), "循環")
+    bad_link = PipelineSpec(output_dir=OUT, urdfs=(arm, two), join_files=(
+        JoinFileSpec("u.usda", "arm.usda", (JoinSpec("ee", "two_finger.usda", "flang", "gripper_base"),)),))
+    msgs = check_links(bad_link)
+    assert len(msgs) == 1 and "parent_link = 'flang'" in msgs[0] and "'flange'" in msgs[0], msgs
+    bad_sel = PipelineSpec(output_dir=OUT, urdfs=(arm, two), join_files=(
+        JoinFileSpec("u.usda", "arm.usda", (JoinSpec("ee", "two_finger.usda", "flange", "gripper_base", variant_set="EE", variant="A"),)),
+        JoinFileSpec("r.usda", "arm.usda", (JoinSpec("u1", "u.usda", "flange", "base_link", child_variant_selection=(("EE", "B"),)),))))
+    msgs = check_links(bad_sel)
+    assert len(msgs) == 1 and "選択肢 'B' が無い" in msgs[0], msgs
+    # 選ばれていない VariantSet の選択肢の中のリンク(child_link は child_variant_selection、parent_link は既定の選択で決まる)
+    two_ab = (JoinSpec("ee_a", "two_finger.usda", "flange", "gripper_base", variant_set="EE", variant="A"),
+              JoinSpec("ee_b", "two_finger.usda", "flange", "gripper_base", variant_set="EE", variant="B"))
+
+    def in_variant(child_link: str, sel: tuple = ()) -> list[str]:
+        return check_links(PipelineSpec(output_dir=OUT, urdfs=(arm, two), join_files=(
+            JoinFileSpec("u.usda", "arm.usda", two_ab),
+            JoinFileSpec("r.usda", "arm.usda", (JoinSpec("u1", "u.usda", "flange", child_link, child_variant_selection=sel),)))))
+    assert in_variant("ee_a/finger_l") == [], in_variant("ee_a/finger_l")
+    msgs = in_variant("ee_b/finger_l")
+    assert len(msgs) == 1 and "選ばれているのは 'A'" in msgs[0], msgs
+    assert in_variant("ee_b/finger_l", (("EE", "B"),)) == []
+    msgs = in_variant("ee_a/finger_l", (("EE", "None"),))
+    assert len(msgs) == 1 and "選ばれているのは 'None'" in msgs[0], msgs
+    msgs = check_links(PipelineSpec(output_dir=OUT, urdfs=(arm, two), join_files=(
+        JoinFileSpec("u.usda", "arm.usda", two_ab),
+        JoinFileSpec("r.usda", "u.usda", (JoinSpec("x", "arm.usda", "ee_b/finger_l", "base_link"),)))))
+    assert len(msgs) == 1 and "parent_link = 'ee_b/finger_l'" in msgs[0], msgs
 
 
 # ====================================================================== 1 回の結合:リンクの子に置く(既定)
@@ -148,18 +184,18 @@ def test_join_under_link():
     rep = run_pipeline(one_join("under_link")).report
     v = verdicts(rep)
     assert rep["status"] == "ok", problems(rep)
-    for key, want in {("R06", "arm"): "fixed", ("R06", "gripper"): "fixed", ("R07", J): "fixed", ("R09", J): "fixed",
-                      ("R14", J): "fixed", ("R10", "arm"): "upstream_fixed", ("R02", J): "ok", ("R12", J): "ok", ("R08", J): "ok"}.items():
+    for key, want in {("R06", A): "fixed", ("R06", C): "fixed", ("R07", J): "fixed", ("R09", J): "fixed",
+                      ("R14", J): "fixed", ("R10", A): "upstream_fixed", ("R02", J): "ok", ("R12", J): "ok", ("R08", J): "ok"}.items():
         expect(v, key, want, rep)
-    g = rep["geometric"]["arm_gripper"]
+    g = rep["geometric"]["arm_with_ee.usda"]
     assert g["dof_names_match"] and g["max_link_position_error_m"] < 1e-4, g
-    assert set(g["components_in_model"]) == {"arm_gripper", "gripper"}, g
+    assert set(g["components_in_model"]) == {"arm_with_ee", "ee"}, g
 
 
 @test
 def test_idempotent_rerun():
     out = os.path.join(OUT, "under_link")
-    if not os.path.exists(os.path.join(out, "arm_gripper.usda")):
+    if not os.path.exists(os.path.join(out, "arm_with_ee.usda")):
         run_pipeline(one_join("under_link"))
     files = {p: sha(p) for p in glob.glob(os.path.join(out, "**", "*.usd*"), recursive=True)}
     logs: list[str] = []
@@ -167,14 +203,14 @@ def test_idempotent_rerun():
     assert sum(s.startswith("[import]") and "入力が同じなので飛ばした" in s for s in logs) == 2, logs
     assert any("1 回目 変化なし、2 回目 変化なし" in s for s in logs), logs
     assert files == {p: sha(p) for p in glob.glob(os.path.join(out, "**", "*.usd*"), recursive=True)}, "USD ファイルが変わった"
-    assert not glob.glob(os.path.join(out, "urdf", "*_1")), "別名のフォルダができた"
+    assert not glob.glob(os.path.join(out, "_import", "*_1")), "別名のフォルダができた"
     assert rep["status"] == "ok" and os.path.exists(os.path.join(out, "report_previous.json"))
 
 
 # ====================================================================== 1 回の結合:一番上の prim の子に置く
 @test
 def test_join_under_top():
-    rep = run_pipeline(one_join("under_top", parent_prim=".")).report
+    rep = run_pipeline(one_join("under_top", place=".")).report
     v = verdicts(rep)
     assert rep["status"] == "ok", problems(rep)
     expect(v, ("R02", J), "fixed", rep)  # Robot Assembler では親の関節が動かない
@@ -185,7 +221,7 @@ def test_join_under_top():
 @test
 def test_skip_shows_still_broken():
     rules = {r: RuleSetting(fix="skip") for r in ("R02", "R07", "R12")}
-    rep = run_pipeline(one_join("under_top_skip", parent_prim=".", rules=rules)).report
+    rep = run_pipeline(one_join("under_top_skip", place=".", rules=rules)).report
     v = verdicts(rep)
     assert rep["status"] == "problems"
     for r in ("R02", "R07", "R12"):
@@ -196,13 +232,13 @@ def test_skip_shows_still_broken():
 
 @test
 def test_stop_before_join():
-    s = one_join("stop", parent_prim=".", rules={"R02": RuleSetting(on_violation="stop")})
+    s = one_join("stop", place=".", rules={"R02": RuleSetting(on_violation="stop")})
     try:
         run_pipeline(s)
     except PipelineStopped as exc:
         assert exc.report["status"] == "stopped_before_join"
         assert any(x.startswith(f"[R02] {J}") for x in exc.report["stopped_by"]), exc.report["stopped_by"]
-        assert not os.path.exists(os.path.join(OUT, "stop", "arm_gripper.usda")), "止めたのに結合ファイルができている"
+        assert not os.path.exists(os.path.join(OUT, "stop", "arm_with_ee.usda")), "止めたのに結合ファイルができている"
         return
     raise AssertionError("止まらなかった")
 
@@ -210,12 +246,12 @@ def test_stop_before_join():
 # ====================================================================== 空のルートリンクの子(子のリンクも空のリンク)
 @test
 def test_ghost_root_child():
-    rep = run_pipeline(one_join("ghost", child_urdf="gripper_ghost.urdf", child_link="gripper_mount", parent_prim=".")).report
+    rep = run_pipeline(one_join("ghost", child_urdf="gripper_ghost.urdf", child_link="gripper_mount", place=".")).report
     v = verdicts(rep)
     assert rep["status"] == "ok", problems(rep)
     expect(v, ("R08", J), "fixed", rep)  # Robot Assembler は ValueError
-    expect(v, ("R01", "gripper"), "fixed", rep)  # ワールド固定 joint の名前が mount_joint
-    assert rep["geometric"]["arm_gripper"]["max_link_position_error_m"] < 1e-4
+    expect(v, ("R01", C), "fixed", rep)  # ワールド固定 joint の名前が mount_joint
+    assert rep["geometric"]["arm_with_ee.usda"]["max_link_position_error_m"] < 1e-4
 
 
 # ====================================================================== mimic follower の drive
@@ -223,11 +259,11 @@ def test_ghost_root_child():
 def test_mimic_damping():
     # URDF の <dynamics damping> は newton:damping に入るだけで PhysX の drive には入らない → 判定も症状も無し
     rep = run_pipeline(one_join("damp_urdf", child_urdf="gripper_damp.urdf")).report
-    expect(verdicts(rep), ("R03", "gripper:finger_r_joint"), "ok", rep)
-    assert rep["measurements"]["statics"]["gripper"]["raw_follower_drive"]["finger_r_joint"] == {"stiffness": 0.0, "damping": 0.0}
+    expect(verdicts(rep), ("R03", f"{C}:finger_r_joint"), "ok", rep)
+    assert rep["measurements"]["statics"][C]["raw_follower_drive"]["finger_r_joint"] == {"stiffness": 0.0, "damping": 0.0}
     # importer の一括 damping 指定は follower にも入る → 判定あり、公式のままで遅れる、修正後は無し
     rep = run_pipeline(one_join("damp_override", child_kw={"joint_drive_damping": 5.0})).report
-    expect(verdicts(rep), ("R03", "gripper:finger_r_joint"), "fixed", rep)
+    expect(verdicts(rep), ("R03", f"{C}:finger_r_joint"), "fixed", rep)
 
 
 # ====================================================================== 4 本アーム(結合ファイルを 2 段、VariantSet、選択)
@@ -238,15 +274,15 @@ def test_multi_arm():
     rep = run_pipeline(s).report
     assert rep["status"] == "ok", problems(rep)
     v = verdicts(rep)
-    for jid in ("arm_unit/gripper", "arm_unit/rod", "robot/arm1", "robot/arm2", "robot/arm3", "robot/arm4"):
+    for jid in ("arm_unit.usda/ee_two_finger", "arm_unit.usda/ee_rod", "robot.usda/arm1", "robot.usda/arm2", "robot.usda/arm3", "robot.usda/arm4"):
         expect(v, ("R09", jid), "fixed", rep)
         expect(v, ("R07", jid), "fixed", rep)
-    fx = rep["measurements"]["fixed"]["robot/arm1"]
+    fx = rep["measurements"]["fixed"]["robot.usda/arm1"]
     assert fx["articulation_roots"] == ["/robot/Geometry/base_body"], fx["articulation_roots"]
     assert [a["path"] for a in fx["robot_anchors"]] == ["/robot/Physics/root_joint"]
     assert len(fx["dof_names"]) == 13, fx["dof_names"]  # 台座 1 + アーム 4×2 + 二本指 2 個×2(arm2 は rod、arm4 は None)
     assert all(r["error"] is not None and r["error"] < 1e-3 for r in fx["reach"].values()), fx["reach"]
-    g = rep["geometric"]["robot"]
+    g = rep["geometric"]["robot.usda"]
     assert set(g["components_in_model"]) == {"robot", "arm1", "arm2", "arm3", "arm4", "arm1/end_effector", "arm2/end_effector",
                                              "arm3/end_effector"}, g
     assert g["max_link_position_error_m"] < 1e-4
@@ -254,11 +290,11 @@ def test_multi_arm():
 
     unit = Usd.Stage.Open(os.path.join(s.output_dir, "arm_unit.usda"))  # 中間の結合ファイルは単体で開ける
     vs = unit.GetDefaultPrim().GetVariantSet("EndEffector")
-    assert vs.GetVariantNames() == ["None", "gripper", "rod"] and vs.GetVariantSelection() == "gripper", vs.GetVariantNames()
+    assert vs.GetVariantNames() == ["None", "Rod", "TwoFinger"] and vs.GetVariantSelection() == "TwoFinger", vs.GetVariantNames()
     robot = Usd.Stage.Open(os.path.join(s.output_dir, "robot.usda"))
     sel = {p.GetName(): p.GetVariantSet("EndEffector").GetVariantSelection() for p in robot.Traverse()
            if p.GetName() in ("arm1", "arm2", "arm3", "arm4")}
-    assert sel == {"arm1": "gripper", "arm2": "rod", "arm3": "gripper", "arm4": "None"}, sel
+    assert sel == {"arm1": "TwoFinger", "arm2": "Rod", "arm3": "TwoFinger", "arm4": "None"}, sel
 
 
 @test
@@ -280,23 +316,24 @@ def test_franka_example():
     rep = run_pipeline(s).report
     v = verdicts(rep)
     assert rep["status"] == "ok", problems(rep)
-    expect(v, ("R09", "franka/hand"), "fixed", rep)
-    expect(v, ("R04", "hand"), "ok", rep)  # 公式のまま側は offset を除いて比べるので、Assembler で 45° ずれても数えない
-    al = rep["measurements"]["fixed"]["franka/hand"]["joins"]["franka/hand"]["urdf_mount_alignment"]
+    expect(v, ("R09", "panda_with_hand.usda/hand_mount"), "fixed", rep)
+    expect(v, ("R04", "panda_hand.usda"), "ok", rep)  # 公式のまま側は offset を除いて比べるので、Assembler で 45° ずれても数えない
+    jid = "panda_with_hand.usda/hand_mount"
+    al = rep["measurements"]["fixed"][jid]["joins"][jid]["urdf_mount_alignment"]
     assert al[0] < 1e-6 and al[1] < 1e-3, al  # offset(z 軸まわり -45°)込みで結合面が一致
-    g = rep["geometric"]["franka"]
-    assert g["max_link_position_error_m"] < 1e-4 and set(g["components_in_model"]) == {"franka", "hand"}, g
+    g = rep["geometric"]["panda_with_hand.usda"]
+    assert g["max_link_position_error_m"] < 1e-4 and set(g["components_in_model"]) == {"panda_with_hand", "hand_mount"}, g
 
 
 # ====================================================================== TOML の例
 @test
 def test_example_toml():
     s = load_spec(os.path.join(EX, "arm_gripper.toml"))
-    assert s.urdfs[0].path.endswith(os.path.join("examples", "urdf", "arm.urdf"))
+    assert s.urdfs[0].urdf.endswith(os.path.join("examples", "urdf", "arm.urdf")) and s.urdfs[0].usda == "arm.usda"
     assert s.join_files[0].joins[0].parent_link == "flange"
     m = load_spec(os.path.join(EX, "multi_arm.toml"))
-    assert [f.name for f in m.file_order()] == ["arm_unit", "robot"]
-    assert m.join_file("robot").join("arm2").select == (("EndEffector", "rod"),)
+    assert [f.usda for f in m.file_order()] == ["arm_unit.usda", "robot.usda"]
+    assert m.join_file("robot.usda").join("arm2").child_variant_selection == (("EndEffector", "Rod"),)
 
 
 summary = {"passed": sum(r["ok"] for r in results), "failed": sum(not r["ok"] for r in results), "results": results}
