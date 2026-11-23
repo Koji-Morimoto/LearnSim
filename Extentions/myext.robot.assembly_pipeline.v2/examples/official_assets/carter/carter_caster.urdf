@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Rear swivel caster unit of official Isaac Sim NVIDIA Carter v1 (carter.urdf) -->
+<robot name="carter_caster">
+   <link name="caster_mount">
+      <inertial>
+         <origin rpy="0 0 0" xyz="0 0 0" />
+         <mass value="0.001" />
+         <inertia ixx="1e-6" ixy="0" ixz="0" iyy="1e-6" iyz="0" izz="1e-6" />
+      </inertial>
+   </link>
+   <link name="rear_pivot_link">
+      <visual>
+         <origin rpy="-1.57057 0 0" xyz="-.03809695 0 -.088" />
+         <geometry>
+            <mesh filename="package://carter/meshes/pivot.obj" />
+         </geometry>
+         <material name="black"/>
+      </visual>
+      <collision>
+         <origin rpy="0 0 0" xyz="-.01 0 -.03" />
+         <geometry>
+            <box size=".09 .08 .12"/>
+         </geometry>
+      </collision>
+      <inertial>
+         <origin rpy="0 0 0" xyz="-.01 0 -.03" />
+         <mass value="0.579519"/>
+         <inertia ixx="0.001361" ixy="-0.000003" ixz="0.000347" iyx="-0.000003" iyy="0.001287" iyz="-0.000010" izx="0.000347" izy="-0.000010" izz="0.000632"/>
+      </inertial>
+   </link>
+   <link name="rear_wheel_link">
+      <visual>
+         <origin rpy="1.57057 0 0" xyz="0 0 0" />
+         <geometry>
+            <mesh filename="package://carter/meshes/caster_wheel.obj" />
+         </geometry>
+      </visual>
+      <collision>
+         <origin rpy="1.57057 0 0" xyz="0 0 0" />
+         <geometry>
+            <cylinder length = "0.04" radius = "0.076"/>
+         </geometry>
+      </collision>
+      <inertial>
+         <origin rpy="1.57057 0 0" xyz="0.000000 0.000000 0.000000" />
+         <mass value="1.25"/>
+         <inertia ixx="0.02888" ixy="0.000000" ixz="0.000000" iyx="0.000000" iyy="0.02888" iyz="0.000000" izx="0.000000" izy="0.000000" izz="0.02888"/>
+      </inertial>
+   </link>
+   <joint name="rear_pivot" type="continuous">
+      <origin rpy="0 0 0" xyz="0 0 0" />
+      <axis xyz="0 0 1" />
+      <parent link="caster_mount" />
+      <child link="rear_pivot_link" />
+   </joint>
+   <joint name="rear_axle" type="continuous">
+      <origin rpy="0 0 0" xyz="-.03809695 0 -.08961022" />
+      <axis xyz="0 1 0" />
+      <parent link="rear_pivot_link" />
+      <child link="rear_wheel_link" />
+   </joint>
+</robot>

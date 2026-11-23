@@ -1,0 +1,46 @@
+# Official Isaac Sim UR10e arm + Robotiq 2F-85 / 2F-140 grippers (USD + USD, VariantSet "Gripper").
+# Base arm references configuration/ur10e_physics.usd (identical to ur10e.usd with Gripper="None", Physics="PhysX",
+# without ur10e.usd's built-in "Gripper" VariantSet so USD LIVERPS does not collide with this join_file's "Gripper").
+output_dir = "../../out/official_assets/ur10e"
+
+[[usd_to_usda]]
+usd = "C:/isaacsim-6.2.0/exts/isaacsim.asset.transformer.rules/data/tests/ur10e/configuration/ur10e_physics.usd"
+usda = "ur10e_base.usda"
+
+[[usd_to_usda]]
+usd = "C:/isaacsim-6.2.0/exts/isaacsim.asset.transformer.rules/data/tests/ur10e/Robotiq/2F-85/Robotiq_2F_85.usda"
+usda = "robotiq_2f_85.usda"
+variant_selections = { Physics = "Physx_Mimic" }
+
+[[usd_to_usda]]
+usd = "C:/isaacsim-6.2.0/exts/isaacsim.asset.transformer.rules/data/tests/ur10e/Robotiq/2F-140/Robotiq_2F_140_physics_edit.usd"
+usda = "robotiq_2f_140.usda"
+
+[[join_file]]
+usda = "ur10e_assembled.usda"
+parent_usda = "ur10e_base.usda"
+
+[[join_file.join]]
+name = "robotiq_2f_85"
+child_usda = "robotiq_2f_85.usda"
+parent_link = "wrist_3_link"
+child_link = "base_link"
+child_prim_name = "gripper"
+offset_xyz = [0.0, 0.0, 0.0]
+offset_rpy = [0.0, 0.0, 1.5707963267948966]
+variant_set = "Gripper"
+variant = "Robotiq_2F_85"
+
+[[join_file.join]]
+name = "robotiq_2f_140"
+child_usda = "robotiq_2f_140.usda"
+parent_link = "wrist_3_link"
+child_link = "robotiq_base_link"
+child_prim_name = "gripper"
+offset_xyz = [0.0, 0.0, 0.0]
+offset_rpy = [0.0, 0.0, 1.5707963267948966]
+variant_set = "Gripper"
+variant = "Robotiq_2F_140"
+
+[probe]
+revolute_target = 0.3

@@ -1,0 +1,47 @@
+# Official Isaac Sim NVIDIA Carter v1 (differential-drive mobile robot, floating-base, 2x identical carter_wheel.urdf + carter_caster.urdf).
+# Note: right_wheel is rotated by Rz(pi), so its local +Y spin axis points along -Y in chassis_link frame (negate right-wheel command/readback vs official carter.urdf).
+output_dir = "../../out/official_assets/carter"
+
+[[urdf_to_usda]]
+urdf = "carter_base.urdf"
+usda = "carter_base.usda"
+fix_base = false
+ros_package_paths = [{ name = "carter", path = "C:/isaacsim-6.2.0/exts/isaacsim.asset.importer.urdf/data/urdf/robots/carter" }]
+
+[[urdf_to_usda]]
+urdf = "carter_wheel.urdf"
+usda = "carter_wheel.usda"
+ros_package_paths = [{ name = "carter", path = "C:/isaacsim-6.2.0/exts/isaacsim.asset.importer.urdf/data/urdf/robots/carter" }]
+
+[[urdf_to_usda]]
+urdf = "carter_caster.urdf"
+usda = "carter_caster.usda"
+ros_package_paths = [{ name = "carter", path = "C:/isaacsim-6.2.0/exts/isaacsim.asset.importer.urdf/data/urdf/robots/carter" }]
+
+[[join_file]]
+usda = "carter.usda"
+parent_usda = "carter_base.usda"
+
+[[join_file.join]]
+name = "left_wheel"
+child_usda = "carter_wheel.usda"
+parent_link = "chassis_link"
+child_link = "wheel_mount"
+offset_xyz = [0.0, 0.31420517, 0.0]
+offset_rpy = [0.0, 0.0, 0.0]
+
+[[join_file.join]]
+name = "right_wheel"
+child_usda = "carter_wheel.usda"
+parent_link = "chassis_link"
+child_link = "wheel_mount"
+offset_xyz = [0.0, -0.31420517, 0.0]
+offset_rpy = [0.0, 0.0, 3.141592653589793]
+
+[[join_file.join]]
+name = "rear_caster"
+child_usda = "carter_caster.usda"
+parent_link = "chassis_link"
+child_link = "caster_mount"
+offset_xyz = [-0.31613607, 0.0, -0.0758]
+offset_rpy = [0.0, 0.0, 0.0]

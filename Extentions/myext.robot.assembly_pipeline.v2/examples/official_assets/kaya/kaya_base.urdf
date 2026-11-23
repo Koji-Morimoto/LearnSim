@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Split base body of official Isaac Sim NVIDIA Kaya (kaya.urdf lines 6-146) -->
+<robot name="kaya_base">
+  <link name="base_link">
+    <visual>
+      <geometry>
+        <mesh filename="package://meshes/base.dae" scale="0.1 0.1 0.1"/>
+      </geometry>
+    </visual>
+    <visual>
+      <origin xyz="0.000825 0.077436 0.024927"/>
+      <geometry>
+        <mesh filename="package://meshes/nano_chassis_base.dae" scale="0.1 0.1 0.1"/>
+      </geometry>
+    </visual>
+    <visual>
+      <origin xyz="0.001140 0.071549 0.062302"/>
+      <geometry>
+        <mesh filename="package://meshes/nano_chassis_bridge.dae" scale="0.1 0.1 0.1"/>
+      </geometry>
+    </visual>
+    <visual>
+      <origin xyz="0.001192 0.079804 0.084978"/>
+      <geometry>
+        <mesh filename="package://meshes/nano_chassis_rs_mount.dae" scale="0.1 0.1 0.1"/>
+      </geometry>
+    </visual>
+    <visual>
+      <origin xyz="0.001053 0.090384 0.090843"/>
+      <geometry>
+        <mesh filename="package://meshes/realsense.dae" scale="0.1 0.1 0.1"/>
+      </geometry>
+    </visual>
+    <collision>
+      <geometry>
+        <mesh filename="package://meshes/base_collision.dae" scale="0.1 0.1 0.1"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="0.1"/>
+    </inertial>
+  </link>
+  <link name="assembly_battery">
+    <visual>
+      <geometry>
+        <mesh filename="package://meshes/assembly_battery.dae" scale="0.1 0.1 0.1"/>
+      </geometry>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="0.0000033 -0.00127 0.000241"/>
+      <geometry>
+        <box size="0.0770 0.1140 0.0486"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <origin rpy="0 0 0" xyz="0.00033 -0.00127 0.000241"/>
+      <mass value="0.4266108"/>
+      <inertia ixx="0.000545989300164" ixy="0" ixz="0" iyy="0.000294751089864" iyz="0" izz="0.0006728007825"/>
+    </inertial>
+  </link>
+  <joint name="assembly_battery_joint" type="fixed">
+    <origin xyz="0.000996 0.055389 -0.033654"/>
+    <parent link="base_link"/>
+    <child link="assembly_battery"/>
+  </joint>
+  <link name="shock_mount_0">
+    <visual>
+      <geometry>
+        <mesh filename="package://meshes/shock_mount.dae" scale="0.1 0.1 0.1"/>
+      </geometry>
+    </visual>
+  </link>
+  <joint name="shock_mount_0_joint" type="fixed">
+    <origin xyz="-0.021377 0.075734 0.073117"/>
+    <parent link="base_link"/>
+    <child link="shock_mount_0"/>
+  </joint>
+  <link name="shock_mount_1">
+    <visual>
+      <geometry>
+        <mesh filename="package://meshes/shock_mount.dae" scale="0.1 0.1 0.1"/>
+      </geometry>
+    </visual>
+  </link>
+  <joint name="shock_mount_1_joint" type="fixed">
+    <origin xyz=" 0.023644 0.075734 0.073117"/>
+    <parent link="base_link"/>
+    <child link="shock_mount_1"/>
+  </joint>
+  <link name="shock_mount_2">
+    <visual>
+      <geometry>
+        <mesh filename="package://meshes/shock_mount.dae" scale="0.1 0.1 0.1"/>
+      </geometry>
+    </visual>
+  </link>
+  <joint name="shock_mount_2_joint" type="fixed">
+    <origin xyz=" 0.001141 0.054717 0.073117"/>
+    <parent link="base_link"/>
+    <child link="shock_mount_2"/>
+  </joint>
+  <link name="pusher">
+    <visual>
+      <geometry>
+        <mesh filename="package://meshes/pusher.dae" scale="0.1 0.1 0.1"/>
+      </geometry>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="        0 -0.000983 -0.047219"/>
+      <geometry>
+        <box size="0.0290 0.0090 0.0952"/>
+      </geometry>
+    </collision>
+    <collision>
+      <origin rpy="0 0 -0.41888" xyz="-0.049078  0.017466 -0.074854"/>
+      <geometry>
+        <box size="0.0904 0.0056 0.0394"/>
+      </geometry>
+    </collision>
+    <collision>
+      <origin rpy="0 0  0.41888" xyz=" 0.049078  0.017466 -0.074854"/>
+      <geometry>
+        <box size="0.0904 0.0056 0.0394"/>
+      </geometry>
+    </collision>
+    <collision>
+      <origin rpy="0 0 -1.05770" xyz="-0.095612  0.044530 -0.081565"/>
+      <geometry>
+        <box size="0.0198 0.0056 0.0258"/>
+      </geometry>
+    </collision>
+    <collision>
+      <origin rpy="0 0  1.05770" xyz=" 0.095612  0.044530 -0.081565"/>
+      <geometry>
+        <box size="0.0198 0.0056 0.0258"/>
+      </geometry>
+    </collision>
+  </link>
+  <joint name="pusher_joint" type="fixed">
+    <origin xyz="0.0 0.124025 0.015933"/>
+    <parent link="base_link"/>
+    <child link="pusher"/>
+  </joint>
+</robot>

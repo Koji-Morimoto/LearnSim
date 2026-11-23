@@ -1,0 +1,30 @@
+# Official Isaac Sim Denso Cobotta Pro 900 (6-DOF arm) + OnRobot RG6 (5-mimic gripper, VariantSet "Gripper").
+output_dir = "../../out/official_assets/cobotta_pro_900"
+
+[[urdf_to_usda]]
+urdf = "cobotta_pro_900_arm.urdf"
+usda = "cobotta_pro_900_arm.usda"
+ros_package_paths = [{ name = "cobotta_pro_900_visualization", path = "C:/isaacsim-6.2.0/exts/isaacsim.asset.importer.urdf/data/urdf/robots/cobotta_pro_900/cobotta_pro_900_visualization" }]
+
+[[urdf_to_usda]]
+urdf = "onrobot_rg6.urdf"
+usda = "onrobot_rg6.usda"
+ros_package_paths = [{ name = "onrobot_rg6_visualization", path = "C:/isaacsim-6.2.0/exts/isaacsim.asset.importer.urdf/data/urdf/robots/cobotta_pro_900/onrobot_rg6_visualization" }]
+
+[[join_file]]
+usda = "cobotta_pro_900.usda"
+parent_usda = "cobotta_pro_900_arm.usda"
+
+[[join_file.join]]
+name = "onrobot_rg6"
+child_usda = "onrobot_rg6.usda"
+parent_link = "J6"
+child_link = "onrobot_rg6_base_link"
+child_prim_name = "gripper"
+offset_xyz = [0.0, 0.0, 0.0]
+offset_rpy = [0.0, 0.0, 0.0]
+variant_set = "Gripper"
+variant = "OnRobot_RG6"
+
+[probe]
+revolute_target = 0.3

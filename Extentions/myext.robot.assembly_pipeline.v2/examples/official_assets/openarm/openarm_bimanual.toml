@@ -1,0 +1,52 @@
+# Official Isaac Sim 6.2 OpenArm Bimanual (pedestal body + 2x identical openarm_unimanual.usd arms).
+#
+# Base body isolates /openarm/openarm_body_link + /openarm/root_joint via openarm_body_base.usda
+# (sublayering configuration/openarm_bimanual_physics.usd with left/right arm subtrees and
+# shoulder-base link0 visuals/colliders deactivated).
+#
+# Both arms reuse the exact same official openarm_unimanual.usd (Physics="PhysX"), mounted on
+# openarm_body_link at the exact official bimanual link0 transforms:
+#   left_arm : offset_xyz = [0.0,  0.031, 0.698], offset_rpy = [-1.5708, 0.0, 0.0]
+#   right_arm: offset_xyz = [0.0, -0.031, 0.698], offset_rpy = [ 1.5708, 0.0, 0.0]
+#
+# VariantSets LeftArm / RightArm default to "Attached" (matching official openarm_bimanual.usd 1:1)
+# with auto-generated "None" options for single-arm or pedestal-only configurations.
+output_dir = "../../out/official_assets/openarm"
+
+[[usd_to_usda]]
+usd = "openarm_body_base.usda"
+usda = "openarm_base.usda"
+
+[[usd_to_usda]]
+usd = "_s3_cache/Isaac/Robots/OpenArm/openarm_unimanual/openarm_unimanual.usd"
+usda = "openarm_arm.usda"
+variant_selections = { Physics = "PhysX" }
+
+[[join_file]]
+usda = "openarm_bimanual_assembled.usda"
+parent_usda = "openarm_base.usda"
+
+[[join_file.join]]
+name = "left_arm"
+child_usda = "openarm_arm.usda"
+parent_link = "openarm_body_link"
+child_link = "openarm_link0"
+child_prim_name = "left_arm"
+offset_xyz = [0.0, 0.031, 0.698]
+offset_rpy = [-1.5708, 0.0, 0.0]
+variant_set = "LeftArm"
+variant = "Attached"
+
+[[join_file.join]]
+name = "right_arm"
+child_usda = "openarm_arm.usda"
+parent_link = "openarm_body_link"
+child_link = "openarm_link0"
+child_prim_name = "right_arm"
+offset_xyz = [0.0, -0.031, 0.698]
+offset_rpy = [1.5708, 0.0, 0.0]
+variant_set = "RightArm"
+variant = "Attached"
+
+[probe]
+revolute_target = 0.25

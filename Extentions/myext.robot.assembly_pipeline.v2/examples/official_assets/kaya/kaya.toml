@@ -1,0 +1,41 @@
+# Official Isaac Sim NVIDIA Kaya (3-wheel holonomic robot, floating-base, 3x identical kaya_wheel_unit.urdf).
+output_dir = "../../out/official_assets/kaya"
+
+[[urdf_to_usda]]
+urdf = "kaya_base.urdf"
+usda = "kaya_base.usda"
+fix_base = false
+ros_package_paths = [{ name = "meshes", path = "C:/isaacsim-6.2.0/exts/isaacsim.asset.importer.urdf/data/urdf/robots/kaya/meshes" }]
+
+[[urdf_to_usda]]
+urdf = "kaya_wheel_unit.urdf"
+usda = "kaya_wheel_unit.usda"
+ros_package_paths = [{ name = "meshes", path = "C:/isaacsim-6.2.0/exts/isaacsim.asset.importer.urdf/data/urdf/robots/kaya/meshes" }]
+
+[[join_file]]
+usda = "kaya.usda"
+parent_usda = "kaya_base.usda"
+
+[[join_file.join]]
+name = "wheel_0"
+child_usda = "kaya_wheel_unit.usda"
+parent_link = "base_link"
+child_link = "mx12w"
+offset_xyz = [0.000105, -0.025453, -0.032597]
+offset_rpy = [0.0, 0.0, 0.0]
+
+[[join_file.join]]
+name = "wheel_1"
+child_usda = "kaya_wheel_unit.usda"
+parent_link = "base_link"
+child_link = "mx12w"
+offset_xyz = [0.065344, 0.087794, -0.032597]
+offset_rpy = [0.0, 0.0, 2.0944]
+
+[[join_file.join]]
+name = "wheel_2"
+child_usda = "kaya_wheel_unit.usda"
+parent_link = "base_link"
+child_link = "mx12w"
+offset_xyz = [-0.065344, 0.087794, -0.032597]
+offset_rpy = [0.0, 0.0, 4.1888]

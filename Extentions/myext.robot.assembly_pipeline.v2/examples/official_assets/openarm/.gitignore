@@ -1,0 +1,4 @@
+# Downloaded official NVIDIA S3 OpenArm USD cache (kept locally, excluded from git)
+_s3_cache/
+# Local build artifacts
+build/

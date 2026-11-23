@@ -1,0 +1,96 @@
+# Official Isaac Sim Unitree G1 29DOF humanoid + ThreeFinger / Inspire hands + Thor backpack (USD + USD).
+# Base body references configuration/g1_29dof_with_hand_rev_1_0_physics.usda (identical to g1.usda with
+# left_hand="None", right_hand="None", Thor="None", Physics="PhysX", without g1.usda's built-in VariantSets
+# so USD LIVERPS does not collide with this join_file's "left_hand", "right_hand", and "Thor" VariantSets).
+output_dir = "../../out/official_assets/g1"
+
+[[usd_to_usda]]
+usd = "C:/isaacsim-6.2.0/exts/isaacsim.asset.transformer.rules/data/tests/G1/configuration/g1_29dof_with_hand_rev_1_0_physics.usda"
+usda = "g1_base.usda"
+
+[[usd_to_usda]]
+usd = "C:/isaacsim-6.2.0/exts/isaacsim.asset.transformer.rules/data/tests/G1/configuration/three_finger_hand/three_fingers_left_hand.usda"
+usda = "left_three_finger.usda"
+variant_selections = { Physics = "Physx" }
+
+[[usd_to_usda]]
+usd = "C:/isaacsim-6.2.0/exts/isaacsim.asset.transformer.rules/data/tests/G1/configuration/three_finger_hand/three_fingers_right_hand.usda"
+usda = "right_three_finger.usda"
+variant_selections = { Physics = "Physx" }
+
+[[usd_to_usda]]
+usd = "C:/isaacsim-6.2.0/exts/isaacsim.asset.transformer.rules/data/tests/G1/configuration/inspire_hand/inspire_left_hand.usda"
+usda = "left_inspire.usda"
+variant_selections = { Physics = "Physx" }
+
+[[usd_to_usda]]
+usd = "C:/isaacsim-6.2.0/exts/isaacsim.asset.transformer.rules/data/tests/G1/configuration/inspire_hand/inspire_right_hand.usda"
+usda = "right_inspire.usda"
+variant_selections = { Physics = "Physx" }
+
+[[usd_to_usda]]
+usd = "C:/isaacsim-6.2.0/exts/isaacsim.asset.transformer.rules/data/tests/G1/configuration/backpack/g1_29dof_NVBP.usda"
+usda = "thor_backpack.usda"
+variant_selections = { Physics = "PhysX" }
+
+[[join_file]]
+usda = "g1_assembled.usda"
+parent_usda = "g1_base.usda"
+
+[[join_file.join]]
+name = "left_three_finger"
+child_usda = "left_three_finger.usda"
+parent_link = "left_wrist_yaw_link"
+child_link = "left_hand_palm_link"
+child_prim_name = "left_hand"
+offset_xyz = [0.04150060128367161, 0.0029920613880035085, -0.0027271764604163418]
+offset_rpy = [5.999330814128222e-05, 5.504181598470448e-05, -0.00019129103968747036]
+variant_set = "left_hand"
+variant = "ThreeFinger"
+
+[[join_file.join]]
+name = "left_inspire"
+child_usda = "left_inspire.usda"
+parent_link = "left_wrist_yaw_link"
+child_link = "L_hand_base_link"
+child_prim_name = "left_hand"
+offset_xyz = [0.0415, 0.003, 0.0]
+offset_rpy = [0.0, 0.0, 0.0]
+variant_set = "left_hand"
+variant = "Inspire"
+
+[[join_file.join]]
+name = "right_three_finger"
+child_usda = "right_three_finger.usda"
+parent_link = "right_wrist_yaw_link"
+child_link = "right_hand_palm_link"
+child_prim_name = "right_hand"
+offset_xyz = [0.041500601172275164, -0.002992092736834845, -0.002727137193813886]
+offset_rpy = [-5.999520513331308e-05, 5.499343090359737e-05, 0.0001912537827666777]
+variant_set = "right_hand"
+variant = "ThreeFinger"
+
+[[join_file.join]]
+name = "right_inspire"
+child_usda = "right_inspire.usda"
+parent_link = "right_wrist_yaw_link"
+child_link = "R_hand_base_link"
+child_prim_name = "right_hand"
+offset_xyz = [0.0415, -0.003, 0.0]
+offset_rpy = [0.0, 0.0, 0.0]
+variant_set = "right_hand"
+variant = "Inspire"
+
+[[join_file.join]]
+name = "thor"
+child_usda = "thor_backpack.usda"
+parent_link = "torso_link"
+child_link = "backpack_link"
+child_prim_name = "Thor"
+offset_xyz = [0.0, 0.0, 0.0]
+offset_rpy = [1.5707963267948966, 0.0, 1.5707963267948966]
+variant_set = "Thor"
+variant = "Attached"
+
+[probe]
+revolute_target = 0.2

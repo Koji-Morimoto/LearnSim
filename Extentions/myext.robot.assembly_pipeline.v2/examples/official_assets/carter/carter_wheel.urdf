@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Reusable side wheel unit of official Isaac Sim NVIDIA Carter v1 (carter.urdf, attached 2x: left and right via Rz(pi)) -->
+<robot name="carter_wheel">
+   <link name="wheel_mount">
+      <inertial>
+         <origin rpy="0 0 0" xyz="0 0 0" />
+         <mass value="0.001" />
+         <inertia ixx="1e-6" ixy="0" ixz="0" iyy="1e-6" iyz="0" izz="1e-6" />
+      </inertial>
+   </link>
+   <link name="wheel_link">
+      <visual>
+         <origin rpy="1.57057 -1.57057 0" xyz="0 0 0" />
+         <geometry>
+            <mesh filename="package://carter/meshes/side_wheel.obj" />
+         </geometry>
+         <material name="black"/>
+      </visual>
+      <collision>
+         <origin rpy="1.57057 -1.57057 0" xyz="0 -0.05 0" />
+         <geometry>
+            <cylinder length = "0.1" radius = "0.240"/>
+         </geometry>
+      </collision>
+      <inertial>
+         <origin rpy="0 0 0" xyz="0 -0.05 0" />
+         <mass value="4.195729" />
+         <inertia ixx="0.063680" ixy="0.000000" ixz="0.000000" iyx="0.000000" iyy="0.121410" iyz="0.000000" izx="0.000000" izy="0.000000" izz="0.063680"/>
+      </inertial>
+   </link>
+   <joint name="wheel_joint" type="continuous">
+      <origin rpy="0 0 0" xyz="0 0 0" />
+      <axis xyz="0 1 0" />
+      <parent link="wheel_mount" />
+      <child link="wheel_link" />
+   </joint>
+</robot>
