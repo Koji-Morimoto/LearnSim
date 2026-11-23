@@ -1,0 +1,58 @@
+# テスト専用の軽量構成。描画と UI を外し、物理・Fabric・この拡張機能だけを読み込む(GUI の Isaac Sim とは別プロセス)。
+[package]
+title = "MyExt Geometric Robot Newton tests"
+version = "0.1.0"
+
+[dependencies]
+"omni.kit.loop-isaac" = {}
+"omni.usd" = {}
+"omni.usd.libs" = {}
+"omni.timeline" = {}
+"omni.usd.schema.physx" = {}
+"omni.usd.schema.newton" = {}
+"omni.usdphysics" = {}
+"omni.physics" = {}
+"omni.physx.foundation" = {}
+"omni.physx.cooking" = {}
+"omni.physx" = {}
+"omni.physics.physx" = {}
+"omni.physics.stageupdate" = {}
+"omni.physics.tensors" = {}
+"omni.physx.tensors" = {}
+"omni.kit.async_engine" = {}
+"omni.kit.usd.layers" = {}
+"omni.kit.stage_templates" = {}
+"omni.kit.pipapi" = {}
+"usdrt.scenegraph" = {}
+"omni.hydra.usdrt_delegate" = {}
+"isaacsim.core.simulation_manager" = {}
+"isaacsim.core.experimental.utils" = {}
+"isaacsim.core.experimental.prims" = {}
+"omni.warp.core" = {}
+"isaacsim.pip.newton" = {}
+"myext.robot.geometric_newton" = {}
+
+[settings]
+physics.autoPopupSimulationOutputWindow = false
+physics.resetOnStop = true
+
+[settings.app]
+name = "MyExt Geometric Robot Newton tests"
+version = "0.1.0"
+settings.persistent = false
+renderer.skipWhileMinimized = true
+useFabricSceneDelegate = true
+
+[settings.persistent]
+physics.visualizationDisplayJoints = false
+physics.visualizationSimulationOutput = false
+
+[settings.app.exts.folders]
+'++' = [
+    "${kit}/../exts",
+    "${kit}/../extscache",
+    "${kit}/../extsDeprecated",
+    "${kit}/exts",
+    "${kit}/extscore",
+    "${app}/../..",
+]

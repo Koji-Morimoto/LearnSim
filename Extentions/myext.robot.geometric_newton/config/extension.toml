@@ -1,0 +1,41 @@
+[package]
+version = "0.1.0"
+title = "MyExt Geometric Robot (Newton)"
+description = "物理ソルバーも Drive も使わず、関節値からリンクの Transform を計算して動かすロボットの Python API に、Newton 1.6.1 の内部 FK (eval_fk) と自前コリジョン空間 (GeometricScene / CollisionPipeline) を統合した拡張機能。Fabric のみの描画でも Play=ON / Stop ともに 0 フレーム遅延で干渉判定・めり込み量・クリアランス計算が可能"
+category = "MyExt"
+keywords = ["myext", "robot", "kinematics", "articulation", "sublayer", "ik", "collision", "newton", "warp", "dh"]
+authors = ["myext"]
+readme = "docs/README.md"
+
+[dependencies]
+"omni.usd" = {}
+"omni.timeline" = {}
+"omni.physx" = {}
+"omni.usd.schema.physx" = {}
+"omni.usd.schema.newton" = {}
+"omni.warp.core" = {}
+"isaacsim.pip.newton" = {}
+"usdrt.scenegraph" = {}
+"isaacsim.core.experimental.prims" = {}  # Fabric への一括書き込み
+"isaacsim.core.experimental.utils" = {}
+
+[[python.module]]
+name = "myext.robot.geometric_newton"
+
+[settings]
+# Sublayer を差し込む場所。"session" = Session Layer の下(保存しても元ファイルに混ざらない)、"root" = Root Layer の下
+exts."myext.robot.geometric_newton".layer_target = "session"
+# layer_target = "root" のときの Sublayer のファイルパス(.usda)
+exts."myext.robot.geometric_newton".root_layer_file = ""
+# リンクのコリジョンの残し方。"static" = 静的コライダー(Play しなくても干渉を調べられる)、"kinematic" = kinematic 剛体(Play 中に Contact Report が使える)
+exts."myext.robot.geometric_newton".collision_mode = "static"
+# リンクの姿勢の書き込み先。"fabric" = Fabric(Newton バックエンドなら USD フラッシュ不要で 0 フレーム遅延)、"usd" = 毎回 USD、"both" = 毎回両方
+exts."myext.robot.geometric_newton".write_target = "fabric"
+# 回転関節の値の既定の単位。"rad" か "deg"(直動関節はいつも長さ)
+exts."myext.robot.geometric_newton".angle_unit = "rad"
+# 干渉チェックのバックエンド。"newton" = 自前 GeometricScene (0 フレーム遅延・めり込み量・クリアランス対応)、"physx" = PhysX overlap_shape
+exts."myext.robot.geometric_newton".collision_backend = "newton"
+# 順運動学のバックエンド。"auto" = 単体小型は numpy・バッチ/大規模は Newton GPU、"numpy" = 常に numpy、"newton" = 常に Newton eval_fk
+exts."myext.robot.geometric_newton".fk_backend = "auto"
+# Newton バックエンドの実行デバイス。"auto" = CUDA があれば "cuda:0" なければ "cpu"
+exts."myext.robot.geometric_newton".newton_device = "auto"
