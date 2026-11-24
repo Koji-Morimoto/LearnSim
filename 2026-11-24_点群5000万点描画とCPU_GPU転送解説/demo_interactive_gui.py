@@ -36,6 +36,7 @@ simulation_app = create_simulation_app(
         "height": 720,
         "window_width": 1680,
         "window_height": 980,
+        "anti_aliasing": 4,  # DLAA default (Preset F2)
         "renderer": "RayTracedLighting",
         "experience": r"C:/isaacsim-6.2.0/apps/isaacsim.exp.full.kit",
     }
@@ -101,8 +102,9 @@ def main() -> None:
         "method_idx": 0,
         "methods": ["octree_lod", "usd_points", "point_instancer", "hybrid_compute_rtx"],
         "radius": 0.045,
-        "glossy": True,
-        "cast_shadows": True,
+        "shade_mode": 0,  # 0: F2 Unlit(全反射ゼロ), 1: Matte(拡散反射のみ), 2: Glossy(ツヤあり)
+        "outline": 0.08,
+        "cast_shadows": False,
         "color_mode": 0,
         "offset_z": 0.0,
     }
@@ -113,9 +115,19 @@ def main() -> None:
         colors=cols_rainbow,
         method="octree_lod",
         point_radius=state["radius"],
-        glossy=state["glossy"],
-        cast_shadows=state["cast_shadows"],
     )
+
+    def _apply_shade_state() -> None:
+        m = state["shade_mode"]
+        if m == 0:
+            pc.set_appearance(unlit=True, glossy=False)
+            btn_shade.text = "反射モード: Unlit 全反射ゼロ (F2デフォルト)"
+        elif m == 1:
+            pc.set_appearance(unlit=False, glossy=False, roughness=1.0, metallic=0.0, specular_level=0.0)
+            btn_shade.text = "反射モード: Matte 拡散反射のみ (テカリなし)"
+        else:
+            pc.set_appearance(unlit=False, glossy=True, roughness=0.08, metallic=0.12, specular_level=0.85)
+            btn_shade.text = "反射モード: Glossy ツヤあり (roughness=0.08)"
 
     def rebuild_method() -> None:
         nonlocal pc
@@ -128,20 +140,33 @@ def main() -> None:
             method=m,
             point_radius=state["radius"],
             world_offset=(0.0, 0.0, state["offset_z"]),
-            glossy=state["glossy"],
+            unlit=(state["shade_mode"] == 0),
+            glossy=(state["shade_mode"] == 2),
+            outline_thickness=state["outline"],
             cast_shadows=state["cast_shadows"],
         )
+        _apply_shade_state()
         btn_method.text = f"描画方式 (Method): {m}"
 
-    def toggle_glossy() -> None:
-        state["glossy"] = not state["glossy"]
-        pc.set_appearance(glossy=state["glossy"])
-        btn_gloss.text = f"テカリ (Glossy Specular): {'ON (ツヤあり roughness=0.08)' if state['glossy'] else 'OFF (マット roughness=0.92)'}"
+    def cycle_shade() -> None:
+        state["shade_mode"] = (state["shade_mode"] + 1) % 3
+        _apply_shade_state()
+
+    def cycle_outline() -> None:
+        opts = [0.08, 0.14, 0.0]
+        cur = opts.index(state["outline"]) if state["outline"] in opts else 0
+        state["outline"] = opts[(cur + 1) % len(opts)]
+        pc.set_outline(state["outline"])
+        btn_outline.text = (
+            f"黒縁取り (Outline): {int(round(state['outline'] * 100))}% (Inverted Hull)"
+            if state["outline"] > 0
+            else "黒縁取り (Outline): OFF (0%)"
+        )
 
     def toggle_shadows() -> None:
         state["cast_shadows"] = not state["cast_shadows"]
         pc.set_cast_shadows(state["cast_shadows"])
-        btn_shadow.text = f"影の描画 (Cast Shadows): {'ON (影あり)' if state['cast_shadows'] else 'OFF (影なし・高速)'}"
+        btn_shadow.text = f"影の描画 (Cast Shadows): {'ON (影あり)' if state['cast_shadows'] else 'OFF (影なし・デフォルト)'}"
 
     def cycle_radius() -> None:
         radii = [0.025, 0.045, 0.075, 0.11]
@@ -162,17 +187,18 @@ def main() -> None:
         pc.set_world_offset((0.0, 0.0, state["offset_z"]))
         btn_offset.text = f"点群の位置 (World Offset Z): {state['offset_z']:+.1f} m"
 
-    win = ui.Window("Unified Point Cloud API Controller", width=440, height=310)
+    win = ui.Window("Unified Point Cloud API Controller", width=440, height=345)
     with win.frame:
         with ui.VStack(spacing=6, style={"margin": 10}):
-            ui.Label("UnifiedPointCloud (create_pointcloud 統一IF)", style={"font_size": 15, "color": 0xFF66CCFF})
+            ui.Label("UnifiedPointCloud (既定: F2 全反射ゼロ＋細黒縁8%＋DLAA)", style={"font_size": 14, "color": 0xFF66CCFF})
             lbl_info = ui.Label("Active Spheres: -- | FPS: --", style={"font_size": 14, "color": 0xFF55FF55})
             btn_method = ui.Button("描画方式 (Method): octree_lod", height=28, clicked_fn=rebuild_method)
             btn_radius = ui.Button("点の大きさ (Radius): 45 mm", height=28, clicked_fn=cycle_radius)
             btn_color = ui.Button("点群の色 (Color): 3D Rainbow (点ごとRGB)", height=28, clicked_fn=toggle_color)
             btn_offset = ui.Button("点群の位置 (World Offset Z): +0.0 m", height=28, clicked_fn=cycle_offset)
-            btn_gloss = ui.Button("テカリ (Glossy Specular): ON (ツヤあり roughness=0.08)", height=28, clicked_fn=toggle_glossy)
-            btn_shadow = ui.Button("影の描画 (Cast Shadows): ON (影あり)", height=28, clicked_fn=toggle_shadows)
+            btn_shade = ui.Button("反射モード: Unlit 全反射ゼロ (F2デフォルト)", height=28, clicked_fn=cycle_shade)
+            btn_outline = ui.Button("黒縁取り (Outline): 8% (Inverted Hull)", height=28, clicked_fn=cycle_outline)
+            btn_shadow = ui.Button("影の描画 (Cast Shadows): OFF (影なし・デフォルト)", height=28, clicked_fn=toggle_shadows)
 
     xform_cache = UsdGeom.XformCache(Usd.TimeCode.Default())
     vp = viewport_utils.get_active_viewport()

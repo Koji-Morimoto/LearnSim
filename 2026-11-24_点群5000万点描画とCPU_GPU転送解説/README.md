@@ -10,7 +10,8 @@ Isaac Sim 6.2.0 上で点群を **3Dの球（Sphere）** として描画する�
 
 | ファイル | 内容 |
 | :--- | :--- |
-| `pointcloud_api.py` | 全6方式の統一関数 `create_pointcloud()` / `UnifiedPointCloud`（半径・色・位置・テカリ・影のリアルタイム調整対応） |
+| `pointcloud_api.py` | 全6方式の統一関数 `create_pointcloud()` / `UnifiedPointCloud`（既定値: `F2` 全反射ゼロ＋細黒縁8%＋DLAA＋影OFF） |
+| `appearance_reference.md` | 全9パターンの見た目画像（全体・3倍拡大・単体）と対応設定コードのリファレンス |
 | `demo_interactive_gui.py` | `UnifiedPointCloud` の各種パラメータをボタンでリアルタイムに切り替えられる Isaac Sim GUI デモ |
 | `octree_50m_full_isaacsim.py` | フル版 Isaac Sim（`isaac-sim.bat`）で 5,000万点 Octree LOD と全点Visibleモードを切り替えて検証するスクリプト |
 | `capture_pointcloud_video.py` | 動画用の Isaac Sim 3Dシーン・テレメトリ撮影スクリプト |

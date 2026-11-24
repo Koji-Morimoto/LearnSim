@@ -10,13 +10,18 @@ across all 6 point-cloud rendering architectures:
   6. "warp_compute_atomic64" : Warp CUDA 64-bit atomicMin((depth<<32)|color) software sphere rasterizer
 
 All methods share identical parameters and runtime setters for:
-  - positions     : (N, 3) float32 xyz coordinates (or world_offset translation)
-  - colors        : (N, 3) float32 RGB in [0, 1] or single (R, G, B) tuple
-  - point_radius  : Sphere radius in meters
-  - glossy        : bool or float (controls shininess / specular highlight via roughness & metallic)
-  - roughness     : float in [0.02, 1.0] (0.08 = glossy/shiny, 0.92 = matte/no-shine)
-  - metallic      : float in [0.0, 1.0]
-  - cast_shadows  : bool (True = cast raytraced shadows, False = no shadows via doNotCastShadows)
+  - positions         : (N, 3) float32 xyz coordinates (or world_offset translation)
+  - colors            : (N, 3) float32 RGB in [0, 1] or single (R, G, B) tuple
+  - point_radius      : Sphere radius in meters
+  - unlit             : bool (Default True [F2]: zero light reflection, emissive flat RGB)
+  - outline_thickness : float (Default 0.08 [F2]: inverted-hull black edge ratio, 0.0 = off)
+  - outline_color     : (R, G, B) tuple for edge outline (Default black (0, 0, 0))
+  - anti_aliasing     : "DLAA" (4, Default [F2]) or "DLSS" (3)
+  - glossy            : bool (when unlit=False: True=shiny roughness 0.08, False=matte 1.0)
+  - roughness         : float in [0.02, 1.0] (1.0 = pure matte, 0.08 = glossy)
+  - metallic          : float in [0.0, 1.0]
+  - specular_level    : float in [0.0, 1.0] (0.0 = zero specular highlight)
+  - cast_shadows      : bool (Default False [F2]: True = raytraced shadows, False = no shadows)
 """
 
 from __future__ import annotations
@@ -25,6 +30,7 @@ import math
 from dataclasses import dataclass, field
 from typing import Any, Literal
 
+import carb.settings
 import numpy as np
 import warp as wp
 from pxr import Gf, Sdf, Usd, UsdGeom, UsdLux, UsdShade, Vt
@@ -37,22 +43,31 @@ MethodType = Literal[
     "hybrid_compute_rtx",
     "warp_compute_atomic64",
 ]
+AntiAliasingType = Literal["DLAA", "DLSS"]
 
 
 @dataclass
 class PointCloudConfig:
-    """Unified configuration for all point cloud rendering methods."""
+    """Unified configuration for all point cloud rendering methods.
+
+    Default appearance preset is F2 (Zero-Reflection Unlit + 8% Thin Black Outline + DLAA + No Shadows).
+    """
 
     method: MethodType = "octree_lod"
     root_path: str = "/World/PointCloud"
     point_radius: float = 0.035
     world_offset: tuple[float, float, float] = (0.0, 0.0, 0.0)
-    # Appearance / Material settings
-    glossy: bool = True
-    roughness: float | None = None  # If None, derived from glossy (0.10 if glossy else 0.92)
-    metallic: float = 0.12
-    specular_level: float = 0.85
-    cast_shadows: bool = True
+    # Appearance / Material settings (Default: Preset F2)
+    unlit: bool = True
+    outline_thickness: float = 0.08
+    outline_color: tuple[float, float, float] = (0.0, 0.0, 0.0)
+    anti_aliasing: AntiAliasingType | int = "DLAA"
+    glossy: bool = False
+    roughness: float | None = None  # If None, derived from glossy (0.08 if glossy else 1.0)
+    metallic: float = 0.0
+    specular_level: float = 0.0
+    cast_shadows: bool = False
+    max_outline_points: int = 1_500_000
     # Method-specific tuning
     chunk_size: int = 1_000_000  # Max points per UsdGeom.Points prim (< 3.93M RTX 45MiB limit)
     octree_grid: tuple[int, int, int] = (4, 4, 2)
@@ -73,13 +88,19 @@ class PointCloudConfig:
     def effective_roughness(self) -> float:
         if self.roughness is not None:
             return float(np.clip(self.roughness, 0.02, 1.0))
-        return 0.08 if self.glossy else 0.92
+        return 0.08 if self.glossy else 1.0
 
     @property
     def effective_specular(self) -> float:
-        if self.roughness is not None:
-            return float(np.clip(1.0 - self.roughness, 0.05, 1.0))
-        return float(self.specular_level) if self.glossy else 0.05
+        if self.glossy:
+            return float(self.specular_level) if self.specular_level > 0.0 else 0.85
+        return float(np.clip(self.specular_level, 0.0, 1.0))
+
+    @property
+    def effective_aa_op(self) -> int:
+        if isinstance(self.anti_aliasing, int):
+            return int(self.anti_aliasing)
+        return 4 if str(self.anti_aliasing).upper() == "DLAA" else 3
 
 
 # =============================================================================
@@ -323,10 +344,13 @@ class UnifiedPointCloud:
         self.root_xform: UsdGeom.Xform | None = None
         self.material: UsdShade.Material | None = None
         self.shader: UsdShade.Shader | None = None
+        self.color_reader: UsdShade.Shader | None = None
         self.geometry_prims: list[Usd.Prim] = []
         self.width_attrs: list[tuple[Usd.Attribute, int, float]] = []
         self.proto_scale_ops: list[tuple[UsdGeom.XformOp, float]] = []
         self.color_primvars: list[UsdGeom.Primvar] = []
+        self._outline_scale_op: UsdGeom.XformOp | None = None
+        self._outline_shader: UsdShade.Shader | None = None
 
         # Method-specific runtime state
         self._octree_blocks: list[dict[str, Any]] = []
@@ -369,17 +393,13 @@ class UnifiedPointCloud:
 
     def _create_primvar_pbr_material(self) -> UsdShade.Material:
         """Create a UsdPreviewSurface material that reads per-point displayColor via UsdPrimvarReader_float3
-        while exposing roughness, metallic, and specular controls for glossy/matte appearance."""
+        and supports both zero-reflection Unlit (emissiveColor) and PBR Matte/Glossy modes."""
         mat_path = f"{self.cfg.root_path}/PointCloudMaterial"
         mat = UsdShade.Material.Define(self.stage, mat_path)
 
         pbr = UsdShade.Shader.Define(self.stage, f"{mat_path}/PBRShader")
         pbr.CreateIdAttr("UsdPreviewSurface")
-        pbr.CreateInput("roughness", Sdf.ValueTypeNames.Float).Set(self.cfg.effective_roughness)
-        pbr.CreateInput("metallic", Sdf.ValueTypeNames.Float).Set(float(self.cfg.metallic))
         pbr.CreateInput("useSpecularWorkflow", Sdf.ValueTypeNames.Int).Set(1)
-        spec_v = self.cfg.effective_specular
-        pbr.CreateInput("specularColor", Sdf.ValueTypeNames.Color3f).Set(Gf.Vec3f(spec_v, spec_v, spec_v))
 
         reader = UsdShade.Shader.Define(self.stage, f"{mat_path}/DisplayColorReader")
         reader.CreateIdAttr("UsdPrimvarReader_float3")
@@ -387,14 +407,77 @@ class UnifiedPointCloud:
         reader.CreateInput("fallback", Sdf.ValueTypeNames.Color3f).Set(Gf.Vec3f(0.25, 0.75, 1.0))
         reader.CreateOutput("result", Sdf.ValueTypeNames.Color3f)
 
-        pbr.CreateInput("diffuseColor", Sdf.ValueTypeNames.Color3f).ConnectToSource(
-            reader.ConnectableAPI(), "result"
-        )
         mat.CreateSurfaceOutput().ConnectToSource(pbr.ConnectableAPI(), "surface")
 
         self.material = mat
         self.shader = pbr
+        self.color_reader = reader
+        self._apply_material_inputs()
         return mat
+
+    def _apply_material_inputs(self) -> None:
+        if self.shader is None or self.color_reader is None:
+            return
+        pbr = self.shader
+        diff_in = pbr.CreateInput("diffuseColor", Sdf.ValueTypeNames.Color3f)
+        emis_in = pbr.CreateInput("emissiveColor", Sdf.ValueTypeNames.Color3f)
+        diff_in.DisconnectSource()
+        emis_in.DisconnectSource()
+
+        if self.cfg.unlit:
+            # Pure zero-reflection flat color: diffuse=0, specular=0, emissive=displayColor
+            diff_in.Set(Gf.Vec3f(0.0, 0.0, 0.0))
+            emis_in.ConnectToSource(self.color_reader.ConnectableAPI(), "result")
+            pbr.CreateInput("roughness", Sdf.ValueTypeNames.Float).Set(1.0)
+            pbr.CreateInput("metallic", Sdf.ValueTypeNames.Float).Set(0.0)
+            pbr.CreateInput("specularColor", Sdf.ValueTypeNames.Color3f).Set(Gf.Vec3f(0.0, 0.0, 0.0))
+        else:
+            diff_in.ConnectToSource(self.color_reader.ConnectableAPI(), "result")
+            emis_in.Set(Gf.Vec3f(0.0, 0.0, 0.0))
+            pbr.CreateInput("roughness", Sdf.ValueTypeNames.Float).Set(self.cfg.effective_roughness)
+            pbr.CreateInput("metallic", Sdf.ValueTypeNames.Float).Set(float(self.cfg.metallic))
+            sv = self.cfg.effective_specular
+            pbr.CreateInput("specularColor", Sdf.ValueTypeNames.Color3f).Set(Gf.Vec3f(sv, sv, sv))
+
+    @staticmethod
+    def _define_inward_unit_sphere(stage: Usd.Stage, path: str, n_lon: int = 24, n_lat: int = 16) -> UsdGeom.Mesh:
+        """Create a unit-radius UV sphere with inward-facing winding and normals for RTX inverted-hull outline."""
+        lat = np.linspace(0, np.pi, n_lat + 1)
+        lon = np.linspace(0, 2 * np.pi, n_lon, endpoint=False)
+        v = [(0.0, 0.0, 1.0)]
+        for th in lat[1:-1]:
+            for ph in lon:
+                v.append((math.sin(th) * math.cos(ph), math.sin(th) * math.sin(ph), math.cos(th)))
+        v.append((0.0, 0.0, -1.0))
+        idx, counts = [], []
+
+        def ring(i: int) -> int:
+            return 1 + i * n_lon
+
+        for j in range(n_lon):
+            idx += [0, ring(0) + (j + 1) % n_lon, ring(0) + j]
+            counts.append(3)
+        for i in range(n_lat - 2):
+            for j in range(n_lon):
+                a, b = ring(i) + j, ring(i) + (j + 1) % n_lon
+                c, d = ring(i + 1) + (j + 1) % n_lon, ring(i + 1) + j
+                idx += [a, b, c, d]
+                counts.append(4)
+        south = len(v) - 1
+        for j in range(n_lon):
+            idx += [south, ring(n_lat - 2) + j, ring(n_lat - 2) + (j + 1) % n_lon]
+            counts.append(3)
+
+        mesh = UsdGeom.Mesh.Define(stage, path)
+        pts = np.asarray(v, np.float32)
+        mesh.CreatePointsAttr(Vt.Vec3fArray.FromNumpy(pts))
+        mesh.CreateFaceVertexIndicesAttr(Vt.IntArray(idx))
+        mesh.CreateFaceVertexCountsAttr(Vt.IntArray(counts))
+        mesh.CreateNormalsAttr(Vt.Vec3fArray.FromNumpy(-pts))
+        mesh.SetNormalsInterpolation(UsdGeom.Tokens.vertex)
+        mesh.CreateSubdivisionSchemeAttr(UsdGeom.Tokens.none)
+        mesh.CreateDoubleSidedAttr(False)
+        return mesh
 
     def _apply_shadow_flag_to_prim(self, prim: Usd.Prim, cast_shadows: bool) -> None:
         pv_api = UsdGeom.PrimvarsAPI(prim)
@@ -430,7 +513,9 @@ class UnifiedPointCloud:
         else:
             raise ValueError(f"Unknown pointcloud method: {method}")
 
+        self.set_anti_aliasing(self.cfg.anti_aliasing)
         self.set_cast_shadows(self.cfg.cast_shadows)
+        self.set_outline(self.cfg.outline_thickness, self.cfg.outline_color)
 
     def _build_naive_spheres(self) -> None:
         r = float(self.cfg.point_radius)
@@ -630,7 +715,7 @@ class UnifiedPointCloud:
             self._translate_op.Set(Gf.Vec3d(*self.cfg.world_offset))
 
     def set_point_radius(self, radius: float) -> None:
-        """Adjust sphere radius dynamically."""
+        """Adjust sphere radius dynamically (also scales inverted-hull outline shell if active)."""
         self.cfg.point_radius = float(max(0.0005, radius))
         self._hybrid_dirty = True
         diam = self.cfg.point_radius * 2.0
@@ -639,6 +724,9 @@ class UnifiedPointCloud:
         for sc_op, scale_f in self.proto_scale_ops:
             r_eff = self.cfg.point_radius * scale_f
             sc_op.Set(Gf.Vec3d(r_eff, r_eff, r_eff))
+        if self._outline_scale_op is not None and self.cfg.outline_thickness > 0.0:
+            r_out = self.cfg.point_radius * (1.0 + self.cfg.outline_thickness)
+            self._outline_scale_op.Set(Gf.Vec3d(r_out, r_out, r_out))
         if self.cfg.method == "naive_spheres":
             for prim in self.geometry_prims:
                 UsdGeom.Sphere(prim).GetRadiusAttr().Set(self.cfg.point_radius)
@@ -646,16 +734,23 @@ class UnifiedPointCloud:
     def set_appearance(
         self,
         *,
+        unlit: bool | None = None,
         glossy: bool | None = None,
         roughness: float | None = None,
         metallic: float | None = None,
         specular_level: float | None = None,
     ) -> None:
-        """Toggle or fine-tune shininess (テカリのあるなし: roughness / metallic / specular)."""
+        """Toggle or fine-tune zero-reflection Unlit / Matte / Glossy appearance."""
+        if unlit is not None:
+            self.cfg.unlit = bool(unlit)
         if glossy is not None:
             self.cfg.glossy = bool(glossy)
             if roughness is None:
                 self.cfg.roughness = None
+            if specular_level is None:
+                self.cfg.specular_level = 0.85 if self.cfg.glossy else 0.0
+            if metallic is None and not self.cfg.glossy:
+                self.cfg.metallic = 0.0
         if roughness is not None:
             self.cfg.roughness = float(np.clip(roughness, 0.02, 1.0))
         if metallic is not None:
@@ -663,11 +758,76 @@ class UnifiedPointCloud:
         if specular_level is not None:
             self.cfg.specular_level = float(np.clip(specular_level, 0.0, 1.0))
 
-        if self.shader is not None:
-            self.shader.GetInput("roughness").Set(self.cfg.effective_roughness)
-            self.shader.GetInput("metallic").Set(float(self.cfg.metallic))
-            sv = self.cfg.effective_specular
-            self.shader.GetInput("specularColor").Set(Gf.Vec3f(sv, sv, sv))
+        self._apply_material_inputs()
+
+    def set_outline(
+        self,
+        thickness: float,
+        color: tuple[float, float, float] | None = None,
+    ) -> None:
+        """Add, resize, or remove inverted-hull black edge outline (thickness = ratio of point_radius; 0.0 = off)."""
+        self.cfg.outline_thickness = float(max(0.0, thickness))
+        if color is not None:
+            self.cfg.outline_color = (float(color[0]), float(color[1]), float(color[2]))
+
+        out_path = f"{self.cfg.root_path}/OutlineShell"
+        if self.cfg.outline_thickness <= 0.0 or self.cfg.method == "warp_compute_atomic64":
+            if self.stage.GetPrimAtPath(out_path).IsValid():
+                self.stage.RemovePrim(out_path)
+            self._outline_scale_op = None
+            self._outline_shader = None
+            return
+
+        if self.num_points > self.cfg.max_outline_points:
+            # Avoid VRAM overflow on ultra-large point clouds (>1.5M) unless explicitly raised
+            if self.stage.GetPrimAtPath(out_path).IsValid():
+                self.stage.RemovePrim(out_path)
+            self._outline_scale_op = None
+            self._outline_shader = None
+            return
+
+        r_out = self.cfg.point_radius * (1.0 + self.cfg.outline_thickness)
+        oc = self.cfg.outline_color
+        if self._outline_scale_op is not None and self.stage.GetPrimAtPath(out_path).IsValid():
+            self._outline_scale_op.Set(Gf.Vec3d(r_out, r_out, r_out))
+            if self._outline_shader is not None:
+                self._outline_shader.GetInput("emissiveColor").Set(Gf.Vec3f(oc[0], oc[1], oc[2]))
+            carb.settings.get_settings().set_bool("/rtx/hydra/faceCulling/enabled", True)
+            return
+
+        inst = UsdGeom.PointInstancer.Define(self.stage, out_path)
+        sp = self._define_inward_unit_sphere(self.stage, f"{out_path}/ShellProto")
+        prim = sp.GetPrim()
+        prim.CreateAttribute("singleSided", Sdf.ValueTypeNames.Bool).Set(True)
+        prim.CreateAttribute("primvars:doNotCastShadows", Sdf.ValueTypeNames.Bool).Set(True)
+        self._apply_shadow_flag_to_prim(inst.GetPrim(), False)
+
+        sc_op = UsdGeom.Xformable(prim).AddScaleOp()
+        sc_op.Set(Gf.Vec3d(r_out, r_out, r_out))
+        self._outline_scale_op = sc_op
+
+        mat = UsdShade.Material.Define(self.stage, f"{out_path}/ShellMat")
+        sh = UsdShade.Shader.Define(self.stage, f"{out_path}/ShellMat/Shader")
+        sh.CreateIdAttr("UsdPreviewSurface")
+        sh.CreateInput("diffuseColor", Sdf.ValueTypeNames.Color3f).Set(Gf.Vec3f(0.0, 0.0, 0.0))
+        sh.CreateInput("emissiveColor", Sdf.ValueTypeNames.Color3f).Set(Gf.Vec3f(oc[0], oc[1], oc[2]))
+        sh.CreateInput("roughness", Sdf.ValueTypeNames.Float).Set(1.0)
+        sh.CreateInput("metallic", Sdf.ValueTypeNames.Float).Set(0.0)
+        sh.CreateInput("useSpecularWorkflow", Sdf.ValueTypeNames.Int).Set(1)
+        sh.CreateInput("specularColor", Sdf.ValueTypeNames.Color3f).Set(Gf.Vec3f(0.0, 0.0, 0.0))
+        mat.CreateSurfaceOutput().ConnectToSource(sh.ConnectableAPI(), "surface")
+        UsdShade.MaterialBindingAPI.Apply(prim).Bind(mat)
+        self._outline_shader = sh
+
+        inst.CreatePrototypesRel().SetTargets([sp.GetPath()])
+        inst.GetPositionsAttr().Set(Vt.Vec3fArray.FromNumpy(self.positions))
+        inst.GetProtoIndicesAttr().Set(Vt.IntArray.FromNumpy(np.zeros(self.num_points, dtype=np.int32)))
+        carb.settings.get_settings().set_bool("/rtx/hydra/faceCulling/enabled", True)
+
+    def set_anti_aliasing(self, mode: AntiAliasingType | int = "DLAA") -> None:
+        """Set RTX post anti-aliasing: 'DLAA' (4, crisp edges) or 'DLSS' (3, upscaled)."""
+        self.cfg.anti_aliasing = mode
+        carb.settings.get_settings().set_int("/rtx/post/aa/op", self.cfg.effective_aa_op)
 
     def set_cast_shadows(self, cast_shadows: bool, light_paths: list[str] | None = None) -> None:
         """Toggle shadow casting (影有り無し) on the point cloud prims and optional lights."""
@@ -911,19 +1071,30 @@ def create_pointcloud(
     root_path: str = "/World/PointCloud",
     point_radius: float = 0.035,
     world_offset: tuple[float, float, float] = (0.0, 0.0, 0.0),
-    glossy: bool = True,
+    unlit: bool = True,
+    outline_thickness: float = 0.08,
+    outline_color: tuple[float, float, float] = (0.0, 0.0, 0.0),
+    anti_aliasing: AntiAliasingType | int = "DLAA",
+    glossy: bool = False,
     roughness: float | None = None,
-    metallic: float = 0.12,
-    specular_level: float = 0.85,
-    cast_shadows: bool = True,
+    metallic: float = 0.0,
+    specular_level: float = 0.0,
+    cast_shadows: bool = False,
     **kwargs: Any,
 ) -> UnifiedPointCloud:
-    """One-call unified factory function for all 6 point cloud rendering patterns."""
+    """One-call unified factory function for all 6 point cloud rendering patterns.
+
+    Default appearance is Preset F2 (unlit=True, outline_thickness=0.08, anti_aliasing='DLAA', cast_shadows=False).
+    """
     cfg = PointCloudConfig(
         method=method,
         root_path=root_path,
         point_radius=point_radius,
         world_offset=world_offset,
+        unlit=unlit,
+        outline_thickness=outline_thickness,
+        outline_color=outline_color,
+        anti_aliasing=anti_aliasing,
         glossy=glossy,
         roughness=roughness,
         metallic=metallic,
