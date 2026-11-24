@@ -1,3 +1,4 @@
+#:schema ../../../schema/assembly_pipeline.schema.json
 # Official Isaac Sim Unitree G1 29DOF humanoid + ThreeFinger / Inspire hands + Thor backpack (USD + USD).
 # Base body references configuration/g1_29dof_with_hand_rev_1_0_physics.usda (identical to g1.usda with
 # left_hand="None", right_hand="None", Thor="None", Physics="PhysX", without g1.usda's built-in VariantSets

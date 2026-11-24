@@ -1,3 +1,4 @@
+#:schema ../../../schema/assembly_pipeline.schema.json
 # Official Isaac Sim NVIDIA Carter v1 (differential-drive mobile robot, floating-base, 2x identical carter_wheel.urdf + carter_caster.urdf).
 # Note: right_wheel is rotated by Rz(pi), so its local +Y spin axis points along -Y in chassis_link frame (negate right-wheel command/readback vs official carter.urdf).
 output_dir = "../../out/official_assets/carter"

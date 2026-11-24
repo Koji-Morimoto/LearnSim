@@ -1,3 +1,4 @@
+#:schema ../../../schema/assembly_pipeline.schema.json
 # Official Isaac Sim Denso Cobotta Pro 900 (6-DOF arm) + OnRobot RG6 (5-mimic gripper, VariantSet "Gripper").
 output_dir = "../../out/official_assets/cobotta_pro_900"
 

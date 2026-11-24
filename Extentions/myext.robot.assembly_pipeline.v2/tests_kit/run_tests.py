@@ -1,4 +1,4 @@
-r"""assembly_pipeline.v2 の統合テストスイート（全 18 テスト）。
+r"""assembly_pipeline.v2 の統合テストスイート（全 21 テスト）。
 
 テスト方針:
   - Headless の Isaac Sim を 1 プロセスだけ起動し、v2 パイプラインの全機能と
@@ -11,6 +11,7 @@ r"""assembly_pipeline.v2 の統合テストスイート（全 18 テスト）。
       10〜13 : 多段結合・VariantSet（4 本アーム）・実機 Franka・サンプル TOML 読み込み
       14〜16 : 非破壊ビルド（build_assembly）・Descriptor/discover_components・混在 Variant 順序・外部依存ゼロ確認
       17〜18 : 公式 USD+USD（UR10e + Robotiq）・混在 URDF+USD パイプラインと冪等性
+      19〜21 : 親 Prim 名指定（parent_prim_name）・非 0 含む関節リミット対応・TOML JSON Schema 同期と全サンプル適合検証
 
 実行方法:
   # 全テスト実行（推奨: PowerShell ラッパー経由）
@@ -1010,6 +1011,117 @@ def test_urdf_non_zero_joint_limit_clamping():
         j4 = first_probe["reach"]["panda_joint4"]
         assert -3.0718 < j4["target"] < -0.0698, f"Franka panda_joint4 target がリミット外: {j4}"
         assert j4["error"] < 0.01, f"Franka panda_joint4 到達誤差が大きい: {j4}"
+
+
+# ====================================================================== 21: TOML JSON Schema 同期・全サンプル適合検証
+@test
+def test_toml_json_schema_sync_and_examples():
+    """`schema/assembly_pipeline.schema.json` が `spec.py` と完全同期し全サンプル TOML が適合することを検証する。
+
+    検証内容:
+      - `schema/assembly_pipeline.schema.json` が存在し、`build_json_schema()` と内容一致すること。
+      - `verify_schema_sync()` がエラー 0 件（`spec.py` / `kinds.py` のキー・enum と完全一致）。
+      - `examples/` 配下の全サンプル TOML が `validate_toml_file()` を 0 エラーで通過し、
+        先頭行 `#:schema ...` が実在する `schema/assembly_pipeline.schema.json` を指していること。
+      - 不正データ（未知キー・拡張子なし `usda`・`variant = "None"`・`offset_xyz` 長さ不足・
+        `variant_set` 単独指定）をすべてスキーマ検証が弾くこと。
+    """
+    from pathlib import Path
+    from myext.robot.assembly_pipeline_v2.schema import (
+        DEFAULT_SCHEMA_PATH,
+        build_json_schema,
+        validate_dict_against_schema,
+        validate_toml_file,
+        verify_schema_sync,
+    )
+
+    assert DEFAULT_SCHEMA_PATH.exists(), f"スキーマファイルが無い: {DEFAULT_SCHEMA_PATH}"
+    disk_schema = json.loads(DEFAULT_SCHEMA_PATH.read_text(encoding="utf-8"))
+    built_schema = build_json_schema()
+    assert disk_schema == built_schema, "schema/assembly_pipeline.schema.json が spec.py と古い（--export-schema を実行してください）"
+
+    sync_errs = verify_schema_sync(disk_schema)
+    assert not sync_errs, f"スキーマと spec.py の不一致: {sync_errs}"
+
+    # 全サンプル TOML の適合チェックと #:schema リンク切れチェック
+    examples_root = Path(ROOT) / "examples"
+    toml_files = sorted(examples_root.rglob("*.toml"))
+    assert len(toml_files) >= 9, f"サンプル TOML が想定より少ない: {toml_files}"
+    for tf in toml_files:
+        errs = validate_toml_file(tf, disk_schema)
+        assert not errs, f"{tf} がスキーマに不適合: {errs}"
+        first_line = tf.read_text(encoding="utf-8").splitlines()[0]
+        assert first_line.startswith("#:schema "), f"{tf} の先頭に #:schema が無い: {first_line!r}"
+        rel_schema = first_line[len("#:schema ") :].strip()
+        resolved = (tf.parent / rel_schema).resolve()
+        assert resolved == DEFAULT_SCHEMA_PATH.resolve(), f"{tf} の #:schema 先が不一致: {resolved}"
+
+    # 異常系: スキーマが誤りを検出すること
+    bad_cases = [
+        {"output_dir": "out", "urdf_to_usda": [{"urdf": "a.urdf", "usda": "a.usda"}], "typo_key": True},
+        {"output_dir": "out", "urdf_to_usda": [{"urdf": "a.urdf", "usda": "no_ext"}]},
+        {
+            "output_dir": "out",
+            "urdf_to_usda": [{"urdf": "a.urdf", "usda": "a.usda"}],
+            "join_file": [
+                {
+                    "usda": "r.usda",
+                    "parent_usda": "a.usda",
+                    "join": [
+                        {
+                            "name": "c",
+                            "child_usda": "a.usda",
+                            "parent_link": "l0",
+                            "child_link": "l1",
+                            "variant_set": "Gripper",
+                            "variant": "None",
+                        }
+                    ],
+                }
+            ],
+        },
+        {
+            "output_dir": "out",
+            "urdf_to_usda": [{"urdf": "a.urdf", "usda": "a.usda"}],
+            "join_file": [
+                {
+                    "usda": "r.usda",
+                    "parent_usda": "a.usda",
+                    "join": [
+                        {
+                            "name": "c",
+                            "child_usda": "a.usda",
+                            "parent_link": "l0",
+                            "child_link": "l1",
+                            "offset_xyz": [0.0, 0.0],
+                        }
+                    ],
+                }
+            ],
+        },
+        {
+            "output_dir": "out",
+            "urdf_to_usda": [{"urdf": "a.urdf", "usda": "a.usda"}],
+            "join_file": [
+                {
+                    "usda": "r.usda",
+                    "parent_usda": "a.usda",
+                    "join": [
+                        {
+                            "name": "c",
+                            "child_usda": "a.usda",
+                            "parent_link": "l0",
+                            "child_link": "l1",
+                            "variant_set": "OnlySet",
+                        }
+                    ],
+                }
+            ],
+        },
+    ]
+    for idx, bad in enumerate(bad_cases):
+        errs = validate_dict_against_schema(bad, disk_schema)
+        assert errs, f"異常ケース {idx} がスキーマ検証で検出されなかった: {bad}"
 
 
 # ====================================================================== 集計・出力

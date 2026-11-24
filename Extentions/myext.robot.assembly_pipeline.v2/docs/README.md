@@ -154,6 +154,26 @@ C:\isaacsim-6.2.0\tools\myext\run_sim.bat run_pipeline.py examples\multi_arm.tom
 
 仕様ファイルのパスはすべて TOML ファイルのあるフォルダからの相対パス（または絶対パス）で記述します。`.usda` 名はフォルダを含まないファイル名（例: `"arm.usda"`）で統一し、`output_dir` 配下に生成されます。
 
+### エディタでの補完・リアルタイム検証（JSON Schema + Even Better TOML）
+
+本拡張には `spec.py` / `kinds.py` から自動生成された JSON Schema（`schema\assembly_pipeline.schema.json`）と `.taplo.toml` が同梱されています。VS Code / Antigravity 等で **Even Better TOML**（`tamasfe.even-better-toml`）拡張を入れておくと、以下が編集時に自動で効きます。
+
+- キー名・テーブル名・`enum`（`physics_variant`, `on_violation`, `fix`, `R01`〜`R14`）の自動補完
+- 各キーへのマウスホバーでの日本語説明表示
+- 未知キー（タイプミス）・必須キー欠落・型違い・`.usda` 拡張子抜け・`offset_xyz` 配列長ミスの即時赤波線表示
+
+新しく TOML ファイルを作るときは、1 行目に次のように書いておくと、どのフォルダをワークスペースルートにして開いても補完が効きます（`examples\` 配下のサンプルには設定済みです）。
+
+```toml
+#:schema ../schema/assembly_pipeline.schema.json
+```
+
+`spec.py` に新しいキーを追加したときは、次のコマンドでスキーマ JSON を再生成できます（Isaac Sim は起動しません）。
+
+```powershell
+C:\isaacsim-6.2.0\tools\myext\run_sim.bat run_pipeline.py --export-schema
+```
+
 ### トップレベル設定
 
 | キー | 必須 | 既定値 | 説明 |
@@ -287,9 +307,9 @@ print(result.report["status"], result.outputs["robot.usda"])
 
 テスト方針・各テストの検証内容と合格基準・新しいテストの追加手順は [tests_kit/README.md](../tests_kit/README.md) にまとめています。
 
-1. **パイプライン統合テスト（全 20 テスト・Headless 自動終了）**
+1. **パイプライン統合テスト（全 21 テスト・Headless 自動終了）**
    - 出力: `tests_kit\last_run.log`, `tests_kit\last_run.json`
-   - 成功の合図: `[SUMMARY] passed 20 / failed 0` および `== exit=0`
+   - 成功の合図: `[SUMMARY] passed 21 / failed 0` および `== exit=0`
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File run_tests.ps1
@@ -309,8 +329,10 @@ C:\isaacsim-6.2.0\tools\myext\run_sim.bat tests_kit\test_official_motion_match.p
 
 ```text
 myext.robot.assembly_pipeline.v2/
+├── .taplo.toml                                # Taplo (Even Better TOML) 用スキーマ関連付け設定
 ├── config/extension.toml                      # Kit 拡張マニフェスト
 ├── docs/README.md                             # 本ドキュメント（使い方・仕様・API）
+├── schema/assembly_pipeline.schema.json       # TOML 補完・静的検証用 JSON Schema (Draft-07)
 ├── examples/
 │   ├── README.md                              # 同梱サンプル TOML と実行手順ガイド
 │   ├── arm_gripper.toml / multi_arm.toml      # 基本・多段 VariantSet サンプル
@@ -328,6 +350,7 @@ myext.robot.assembly_pipeline.v2/
 │   ├── extension.py                           # Kit 拡張エントリポイント (omni.ext.IExt)
 │   ├── kinds.py                               # Literal 型定義と実行時バリデータ
 │   ├── spec.py                                # TOML 仕様読み込みとデータクラス定義
+│   ├── schema.py                              # JSON Schema 生成・同期検証・純 Python バリデータ
 │   ├── spec_check.py                          # リンク・VariantSet の静的検査と仕様サマリ生成
 │   ├── urdf_model.py                          # URDF パーサ・ゴーストリンク判定・解析的 FK
 │   ├── usd_util.py                            # USD 行列変換・剛体/関節探索・API 判定
@@ -346,6 +369,6 @@ myext.robot.assembly_pipeline.v2/
 ├── run_tests.ps1                              # 統合テストスイート実行ラッパー
 └── tests_kit/
     ├── README.md                              # テスト方針・テスト一覧・追加手順
-    ├── run_tests.py                           # 統合テストスイート (全 20 テスト)
+    ├── run_tests.py                           # 統合テストスイート (全 21 テスト)
     └── test_official_motion_match.py          # 公式アセット定量 PhysX 動作一致テスト (全 6 テスト)
 ```

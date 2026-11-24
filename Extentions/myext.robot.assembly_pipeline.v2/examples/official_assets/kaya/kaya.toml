@@ -1,3 +1,4 @@
+#:schema ../../../schema/assembly_pipeline.schema.json
 # Official Isaac Sim NVIDIA Kaya (3-wheel holonomic robot, floating-base, 3x identical kaya_wheel_unit.urdf).
 output_dir = "../../out/official_assets/kaya"
 

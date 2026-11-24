@@ -1,0 +1,8 @@
+# Taplo (Even Better TOML 拡張) 用のスキーマ関連付け設定。
+# examples/ 配下のパイプライン仕様 TOML すべてに JSON Schema の補完・ホバー説明・静的検証を適用する。
+
+[[rule]]
+include = ["examples/**/*.toml"]
+
+[rule.schema]
+path = "schema/assembly_pipeline.schema.json"

@@ -1,3 +1,4 @@
+#:schema ../schema/assembly_pipeline.schema.json
 # 腕(arm.urdf)の先端の flange(形も慣性も無いリンク)に、mimic 付きの二本指のエンドエフェクタ(gripper.urdf)を結合する。
 output_dir = "out/arm_gripper"               # 出力先フォルダ(この TOML からの相対パス)
 

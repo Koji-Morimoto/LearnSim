@@ -41,6 +41,14 @@ from .spec import (
     join_id,
     load_spec,
 )
+from .schema import (
+    DEFAULT_SCHEMA_PATH,
+    build_json_schema,
+    validate_dict_against_schema,
+    validate_toml_file,
+    verify_schema_sync,
+    write_json_schema,
+)
 from .spec_check import check_links, describe
 from .urdf_model import UrdfGeometry, UrdfJoint, UrdfLink, UrdfMimic, UrdfModel, load_urdf
 
@@ -129,6 +137,12 @@ __all__ = [
     "DEFAULT_RULES",
     "join_id",
     "load_spec",
+    "DEFAULT_SCHEMA_PATH",
+    "build_json_schema",
+    "write_json_schema",
+    "verify_schema_sync",
+    "validate_dict_against_schema",
+    "validate_toml_file",
     "check_links",
     "describe",
     "UrdfGeometry",

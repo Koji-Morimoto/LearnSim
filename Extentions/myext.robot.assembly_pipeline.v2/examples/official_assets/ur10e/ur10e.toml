@@ -1,3 +1,4 @@
+#:schema ../../../schema/assembly_pipeline.schema.json
 # Official Isaac Sim UR10e arm + Robotiq 2F-85 / 2F-140 grippers (USD + USD, VariantSet "Gripper").
 # Base arm references configuration/ur10e_physics.usd (identical to ur10e.usd with Gripper="None", Physics="PhysX",
 # without ur10e.usd's built-in "Gripper" VariantSet so USD LIVERPS does not collide with this join_file's "Gripper").

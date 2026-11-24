@@ -1,3 +1,4 @@
+#:schema ../../../schema/assembly_pipeline.schema.json
 # Official Isaac Sim 6.2 OpenArm Bimanual (pedestal body + 2x identical openarm_unimanual.usd arms).
 #
 # Base body isolates /openarm/openarm_body_link + /openarm/root_joint via openarm_body_base.usda

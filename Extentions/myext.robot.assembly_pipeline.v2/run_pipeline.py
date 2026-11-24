@@ -21,6 +21,9 @@ r"""`myext.robot.assembly_pipeline.v2` のコマンドライン実行エント�
     # 4. Headless で .usda 生成 + 物理 / RobotPoser / 順運動学検証 + レポート出力を行う
     C:\isaacsim-6.2.0\tools\myext\run_sim.bat run_pipeline.py <仕様.toml>
 
+    # 5. TOML 補完・検証用の JSON Schema を再生成する（Isaac Sim を起動しない）
+    C:\isaacsim-6.2.0\tools\myext\run_sim.bat run_pipeline.py --export-schema
+
 終了コード:
     0 = 正常終了
     1 = 検証で問題あり（修正後も残った症状、判定外の症状、または順運動学の不一致）
@@ -78,13 +81,20 @@ def _build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument(
         "spec",
-        help="入力する TOML 仕様ファイルのパス（例: examples\\multi_arm.toml）",
+        nargs="?",
+        default=None,
+        help="入力する TOML 仕様ファイルのパス（例: examples\\multi_arm.toml）。--export-schema 時は不要。",
     )
     mode = parser.add_mutually_exclusive_group()
     mode.add_argument(
         "--check",
         action="store_true",
         help="Isaac Sim を起動せず、TOML 仕様とリンク・VariantSet の整合性だけを静的検査して終了する。",
+    )
+    mode.add_argument(
+        "--export-schema",
+        action="store_true",
+        help="Isaac Sim を起動せず、schema\\assembly_pipeline.schema.json を最新仕様から再生成して終了する。",
     )
     mode.add_argument(
         "--gui",
@@ -467,6 +477,23 @@ def main(argv: list[str] | None = None) -> int:
     except SystemExit as exc:
         # `--help` は 0、引数誤りは 4 に統一する
         return 0 if exc.code == 0 else 4
+
+    if args.export_schema:
+        _bootstrap_python_paths()
+        from myext.robot.assembly_pipeline_v2.schema import verify_schema_sync, write_json_schema
+
+        out_path = write_json_schema()
+        sync_errs = verify_schema_sync()
+        if sync_errs:
+            for e in sync_errs:
+                print(f"[SCHEMA ERROR] {e}", flush=True)
+            return 4
+        print(f"[SCHEMA] 生成完了: {out_path}", flush=True)
+        return 0
+
+    if not args.spec:
+        print("[SPEC ERROR] TOML 仕様ファイルのパスを指定してください（--help で使い方を確認）", flush=True)
+        return 4
 
     if args.target is not None and not args.gui:
         print("[SPEC ERROR] --target は --gui モードでのみ指定できます", flush=True)
