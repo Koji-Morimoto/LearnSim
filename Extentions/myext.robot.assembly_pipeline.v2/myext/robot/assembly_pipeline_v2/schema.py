@@ -98,18 +98,31 @@ def build_json_schema() -> dict[str, Any]:
 
     rule_setting_def: dict[str, Any] = {
         "type": "object",
-        "description": "個別規則の上書き設定。省略した項目は [checks] の全体設定を継承する。",
+        "description": (
+            "個別規則（[checks.rules.<R01..R14>]）の上書き設定。省略した項目は [checks] の全体設定を継承する。\n"
+            "例:\n"
+            "[checks.rules.R02]\n"
+            "on_violation = \"stop\"\n"
+            "fix = \"skip\""
+        ),
         "additionalProperties": False,
         "properties": {
             "on_violation": {
                 "type": "string",
                 "enum": list(ON_VIOLATION_VALUES),
-                "description": "事前チェックで違反を検知したときの挙動（'continue': 結合を継続、'stop': 結合前に停止）。",
+                "description": (
+                    "事前チェックで判定が出たときの動作。'continue'（既定）は続行して最後に実測確認する。"
+                    "'stop' は URDF 規則（R01/R04/R10）なら import 前、その他は結合ファイル生成前にレポートを書き出して停止する（終了コード 2）。"
+                    "注意: R11・R14 は結合があれば必ず判定が出るため、全体 [checks] に 'stop' を書くと毎回止まる。止めたい規則だけ [checks.rules.<規則>] に書く。"
+                ),
             },
             "fix": {
                 "type": "string",
                 "enum": list(FIX_MODES),
-                "description": "既知不具合への自動修正を適用するか（'apply': 修正適用、'skip': 比較用に修正をスキップ）。",
+                "description": (
+                    "パイプラインの修正を適用するか。'apply'（既定）は修正を適用、'skip' は比較検証のため修正を外す。"
+                    "注意: R01・R09 は R02 の修正で同時に解消（R02 の fix で切替）、R10 は修正なし、R14（固定パス 1 本生成）は skip 不可。"
+                ),
             },
         },
     }
@@ -212,7 +225,10 @@ def build_json_schema() -> dict[str, Any]:
                 "type": "object",
                 "additionalProperties": {"type": "string"},
                 "default": {},
-                "description": "入力 USD の VariantSet に対して事前選択する { VariantSet名 = '選択肢' } マップ。",
+                "description": (
+                    "入力 USD の defaultPrim（または prim_path）が持つ VariantSet に対して事前選択する対応表。"
+                    "キーに VariantSet 名、値に選択肢名を書く。例: variant_selections = { Physics = \"PhysX\", Gripper = \"None\" }"
+                ),
             },
             "physics_variant": {
                 "type": "string",
@@ -284,37 +300,53 @@ def build_json_schema() -> dict[str, Any]:
                 "type": "object",
                 "additionalProperties": {"type": "string"},
                 "default": {},
-                "description": "子 .usda が持つ VariantSet の選択（例: { EndEffector = 'Rod' }）。",
+                "description": (
+                    "子 usda（先行の [[join_file]] または [[usd_to_usda]]）の一番上の prim が持つ VariantSet の選択を指定する。"
+                    "キーに VariantSet 名、値に選択肢名（'None' も指定可）を書く。"
+                    "例: child_variant_selection = { EndEffector = \"Rod\" } または { EndEffector = \"None\" }。"
+                    "省略した VariantSet は子側の既定選択（variant_defaults または先頭結合）が使われる。"
+                ),
             },
         },
     }
 
     join_file_def: dict[str, Any] = {
         "type": "object",
-        "description": "親 .usda に 1 つ以上の子 .usda を結合した結合ファイルを生成する設定（[[join_file]]）。",
+        "description": "親 usda に 1 つ以上の子 usda を結合した結合ファイルを生成する設定（[[join_file]]）。",
         "additionalProperties": False,
         "required": ["usda", "parent_usda"],
         "properties": {
             "usda": {
                 "type": "string",
                 "pattern": USDA_NAME_PATTERN,
-                "description": "output_dir に出力する結合ファイルのファイル名（拡張子前が defaultPrim 名になる）。",
+                "description": "output_dir に出力する結合ファイルのファイル名（拡張子 .usda より前が一番上の prim 名になる。例: 'robot.usda' → /robot）。",
             },
             "parent_usda": {
                 "type": "string",
                 "pattern": USDA_NAME_PATTERN,
-                "description": "親となる .usda のファイル名（[[urdf_to_usda]] / [[usd_to_usda]] / 先行 [[join_file]]）。",
+                "description": "親となる usda のファイル名（[[urdf_to_usda]] / [[usd_to_usda]] / 先行 [[join_file]] のいずれか）。",
             },
             "parent_prim_name": {
                 "type": "string",
                 "pattern": IDENTIFIER_PATTERN,
-                "description": "指定すると親 parent_usda を /<usda stem>/<parent_prim_name> の 1 段下に子 prim として配置し、一番親のパーツ名も Stage 上に残す。",
+                "description": (
+                    "親 parent_usda を一番上の prim の 1 段下（/<usda stem>/<parent_prim_name>）に子 prim として配置するときの prim 名。"
+                    "例: usda = \"robot.usda\", parent_prim_name = \"base\" とすると Stage 上は /robot/base/... となり、"
+                    "一番親の部品名も prim 名・構成要素名として残る。省略時は /<usda stem> へ直接 Reference 合成する。"
+                ),
             },
             "variant_defaults": {
                 "type": "object",
                 "additionalProperties": {"type": "string"},
                 "default": {},
-                "description": "この結合ファイルで作る VariantSet ごとの既定選択肢（例: { Gripper = 'Robotiq_2F_85' }。'None' 指定可）。",
+                "description": (
+                    "この [[join_file]] 配下の [[join_file.join]] で定義した VariantSet ごとの既定選択肢を指定するテーブル。"
+                    "キーに variant_set 名、値に variant 名または自動追加される \"None\"（未装着）を書く。"
+                    "省略した VariantSet は TOML 上で最初に定義された [[join_file.join]] の variant が既定になる。\n"
+                    "書き方（インラインテーブル形式）:\n"
+                    "  variant_defaults = { Gripper = \"None\" }\n"
+                    "  variant_defaults = { left_hand = \"ThreeFinger\", right_hand = \"None\" }"
+                ),
             },
             "join": {
                 "type": "array",
@@ -327,24 +359,42 @@ def build_json_schema() -> dict[str, Any]:
 
     checks_def: dict[str, Any] = {
         "type": "object",
-        "description": "規則 R01〜R14 の事前チェック・修正適用の制御設定（[checks]）。",
+        "description": (
+            "規則 R01〜R14 の事前チェック・修正適用の制御設定（[checks]）。"
+            "全規則の既定値を [checks] に書き、特定の規則だけ [checks.rules.<R01..R14>] で上書きする。\n"
+            "例:\n"
+            "[checks]\n"
+            "on_violation = \"continue\"\n"
+            "fix = \"apply\"\n"
+            "[checks.rules.R02]\n"
+            "on_violation = \"stop\""
+        ),
         "additionalProperties": False,
         "properties": {
             "on_violation": {
                 "type": "string",
                 "enum": list(ON_VIOLATION_VALUES),
                 "default": "continue",
-                "description": "全規則の既定の違反時動作（'continue': 継続、'stop': 結合前に停止）。",
+                "description": (
+                    "全規則の既定の違反時動作（'continue': 続行して実測確認、'stop': 結合前に停止）。"
+                    "注意: R11・R14 は結合が 1 回でもあれば必ず判定が出るため、全体に 'stop' を指定すると毎回止まる。"
+                    "止めたい規則だけ [checks.rules.R02] 等で個別に 'stop' を指定すること。"
+                ),
             },
             "fix": {
                 "type": "string",
                 "enum": list(FIX_MODES),
                 "default": "apply",
-                "description": "全規則の既定の修正適用モード（'apply': 修正適用、'skip': 修正なし）。",
+                "description": (
+                    "全規則の既定の修正適用モード（'apply': パイプラインの修正を適用、'skip': 修正を外して比較検証）。"
+                    "個別規則での切り替えは [checks.rules.<R01..R14>] に書く。"
+                ),
             },
             "rules": {
                 "type": "object",
-                "description": "規則 ID（R01〜R14）ごとの個別上書き設定（[checks.rules.<R01..R14>]）。",
+                "description": (
+                    "規則 ID（R01〜R14）ごとの個別上書き設定。[checks.rules.R02] のようにサブテーブルで記述し、[checks] の全体設定より優先される。"
+                ),
                 "additionalProperties": False,
                 "properties": {
                     rid: {
@@ -359,72 +409,90 @@ def build_json_schema() -> dict[str, Any]:
 
     probe_def: dict[str, Any] = {
         "type": "object",
-        "description": "フル検証時の PhysX / mimic / RobotPoser 測定パラメータ（[probe]）。",
+        "description": (
+            "フル検証（run_pipeline）時の PhysX Play・mimic・RobotPoser・順運動学の測定条件と許容誤差（[probe]）。"
+            "省略可。ロボットの質量や関節剛性に合わせて調整する。\n"
+            "例:\n"
+            "[probe]\n"
+            "steps = 240\n"
+            "drive_stiffness = 10000.0\n"
+            "drive_damping = 1000.0\n"
+            "revolute_target = 0.5\n"
+            "angle_tol_deg = 1.0\n"
+            "length_tol_m = 0.001"
+        ),
         "additionalProperties": False,
         "properties": {
             "steps": {
                 "type": "integer",
                 "minimum": 1,
                 "default": probe_defaults.steps,
-                "description": "結合ステージの Play 検証で進める PhysX ステップ数。",
+                "description": "Play 検証で関節を駆動しながら進める PhysX ステップ数（既定 240）。重いロボットで到達が間に合わない場合に増やす。",
             },
             "drive_stiffness": {
                 "type": "number",
                 "default": probe_defaults.drive_stiffness,
-                "description": "Play 検証で関節を駆動する drive 剛性（回転は deg 基準、直動は m 基準）。",
+                "description": "Play 検証で可動関節（mimic follower・excludeFromArticulation を除く）に一時設定する drive 剛性。単位は USD と同じ（回転: N·m/deg、直動: N/m、既定 10000.0）。",
             },
             "drive_damping": {
                 "type": "number",
                 "default": probe_defaults.drive_damping,
-                "description": "Play 検証で関節を駆動する drive 減衰。",
+                "description": "Play 検証で可動関節に一時設定する drive 減衰。単位は USD と同じ（回転: N·m·s/deg、直動: N·s/m、既定 1000.0）。",
             },
             "revolute_target": {
                 "type": "number",
                 "default": probe_defaults.revolute_target,
-                "description": "回転関節の目標角 [rad]（リミットがある場合は自動的に可動域内側の安全範囲へクランプされる）。",
+                "description": (
+                    "回転関節の目標角 [rad]（既定 0.5）。"
+                    "可動域 [lower, upper] を持つ revolute 関節は両端 10% の安全マージンを引いた [lower + 0.1*(upper-lower), upper - 0.1*(upper-lower)] へ自動クランプされる"
+                    "（0 を含まない可動域でも可動域内に収まる）。continuous 関節はそのまま適用。"
+                ),
             },
             "prismatic_ratio": {
                 "type": "number",
                 "default": probe_defaults.prismatic_ratio,
-                "description": "直動関節の目標位置を可動域の何割（0.0〜1.0）にするか。",
+                "description": (
+                    "直動関節の目標位置を可動域の何割（0.0〜1.0）にするか（既定 0.5）。"
+                    "計算式: lower + prismatic_ratio * (upper - lower)。可動域未定義の場合は lower = 0.0 m、upper = 0.1 m として計算。"
+                ),
             },
             "mimic_leader_stiffness_linear": {
                 "type": "number",
                 "default": probe_defaults.mimic_leader_stiffness_linear,
-                "description": "直動 mimic プローブ（R03）で leader 関節に与える柔らかい drive 剛性。",
+                "description": "直動 mimic 検証（R03）で leader 関節に与える意図的に弱い drive 剛性 [N/m]（既定 20.0）。follower に不要な drive が残っていると leader の到達遅れとして検出しやすくするため弱く設定する。",
             },
             "mimic_leader_damping_linear": {
                 "type": "number",
                 "default": probe_defaults.mimic_leader_damping_linear,
-                "description": "直動 mimic プローブ（R03）で leader 関節に与える drive 減衰。",
+                "description": "直動 mimic 検証（R03）で leader 関節に与える drive 減衰 [N·s/m]（既定 2.0）。",
             },
             "mimic_leader_stiffness_angular": {
                 "type": "number",
                 "default": probe_defaults.mimic_leader_stiffness_angular,
-                "description": "回転 mimic プローブ（R03）で leader 関節に与える柔らかい drive 剛性。",
+                "description": "回転 mimic 検証（R03）で leader 関節に与える意図的に弱い drive 剛性 [N·m/deg]（既定 0.05）。",
             },
             "mimic_leader_damping_angular": {
                 "type": "number",
                 "default": probe_defaults.mimic_leader_damping_angular,
-                "description": "回転 mimic プローブ（R03）で leader 関節に与える drive 減衰。",
+                "description": "回転 mimic 検証（R03）で leader 関節に与える drive 減衰 [N·m·s/deg]（既定 0.005）。",
             },
             "mimic_steps": {
                 "type": "integer",
                 "minimum": 1,
                 "default": probe_defaults.mimic_steps,
-                "description": "mimic プローブ（R03）で進める PhysX ステップ数。",
+                "description": "mimic 検証（R03）で進める PhysX ステップ数（既定 300）。10・30・60 ステップ目と最終ステップ（mimic_steps）で leader 到達と follower 追従誤差を測る。",
             },
             "angle_tol_deg": {
                 "type": "number",
                 "minimum": 0.0,
                 "default": probe_defaults.angle_tol_deg,
-                "description": "角度誤差の許容上限 [deg]。",
+                "description": "症状ありと判定する角度差の許容上限 [deg]（既定 1.0）。回転関節の到達誤差・結合面の向きずれ・teleport 後の結合ずれがこれを超えると症状あり。",
             },
             "length_tol_m": {
                 "type": "number",
                 "minimum": 0.0,
                 "default": probe_defaults.length_tol_m,
-                "description": "位置・長さ誤差の許容上限 [m]。",
+                "description": "症状ありと判定する長さ・位置差の許容上限 [m]（既定 0.001 = 1 mm）。直動関節の到達誤差・結合面の位置ずれ・teleport 後の位置ずれ・順運動学と PhysX のリンク位置差がこれを超えると症状あり。",
             },
         },
     }
