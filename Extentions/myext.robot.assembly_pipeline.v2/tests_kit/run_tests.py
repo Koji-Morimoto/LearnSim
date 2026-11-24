@@ -872,6 +872,146 @@ def test_mixed_urdf_and_usd_pipeline():
     assert {"arm_with_robotiq", "gripper"}.issubset(set(g["components_in_model"])), g
 
 
+# ====================================================================== 19: parent_prim_name（親パーツも Prim 名として残す 2 段結合）
+@test
+def test_parent_prim_name_hierarchy():
+    """`[[join_file]]` の `parent_prim_name` で親パーツも 1 段下に配置し全パーツ名が Stage に現れることを検証する。
+
+    セットアップ:
+      - 1 段目: `arm.usda` + `gripper.usda` → `child_unit.usda`（結合名 `grandchild`）
+      - 2 段目: `base.usda` + `child_unit.usda` → `robot.usda`（`parent_prim_name = "base"`, 結合名 `child`）
+    検証内容:
+      - Stage 上に `/robot`・`/robot/base`・`/robot/base/.../child`・`/robot/base/.../child/.../grandchild` がすべて存在すること。
+      - `discover_components(stage, "/robot")` に `"robot"`, `"base"`, `"base/child"`, `"base/child/grandchild"` が含まれること。
+      - `run_pipeline` が `"ok"`、Play / RobotPoser / 順運動学検証（`< 1e-4 m`）すべて通ること。
+      - TOML からの `parent_prim_name` 読み込みと、`place_child_under = "."` 衝突時のバリデーションが機能すること。
+    """
+    from pxr import Usd
+    from myext.robot.assembly_pipeline_v2 import discover_components
+
+    out = os.path.join(OUT, "parent_prim_name")
+    shutil.rmtree(out, ignore_errors=True)
+    os.makedirs(out, exist_ok=True)
+    toml_path = os.path.join(out, "robot_with_parent_prim.toml")
+    with open(toml_path, "w", encoding="utf-8") as fh:
+        fh.write(
+            f"""output_dir = "build"
+
+[[urdf_to_usda]]
+urdf = {urdf("multi_base.urdf")!r}
+usda = "base.usda"
+
+[[urdf_to_usda]]
+urdf = {urdf("arm.urdf")!r}
+usda = "arm.usda"
+
+[[urdf_to_usda]]
+urdf = {urdf("gripper.urdf")!r}
+usda = "gripper.usda"
+
+[[join_file]]
+usda = "child_unit.usda"
+parent_usda = "arm.usda"
+
+  [[join_file.join]]
+  name = "grandchild"
+  child_usda = "gripper.usda"
+  parent_link = "flange"
+  child_link = "gripper_base"
+
+[[join_file]]
+usda = "robot.usda"
+parent_usda = "base.usda"
+parent_prim_name = "base"
+
+  [[join_file.join]]
+  name = "child"
+  child_usda = "child_unit.usda"
+  parent_link = "port1"
+  child_link = "base_link"
+"""
+        )
+
+    spec = load_spec(toml_path)
+    assert spec.join_file("robot.usda").parent_prim_name == "base"
+    rep = run_pipeline(spec).report
+    assert rep["status"] == "ok", problems(rep)
+
+    g = rep["kinematics"]["robot.usda"]
+    assert g.get("dof_names_match"), g
+    assert g["max_link_position_error_m"] < 1e-4, g
+
+    st = Usd.Stage.Open(os.path.join(spec.output_dir, "robot.usda"))
+    assert st.GetPrimAtPath("/robot").IsValid()
+    assert st.GetPrimAtPath("/robot/base").IsValid()
+    assert st.GetPrimAtPath("/robot/base/Geometry/base_body/turret/port1/child").IsValid()
+    assert st.GetPrimAtPath(
+        "/robot/base/Geometry/base_body/turret/port1/child/Geometry/base_link/link1/link2/flange/grandchild"
+    ).IsValid()
+
+    comps = discover_components(st, "/robot", include_inactive_variants=True)
+    assert {"robot", "base", "base/child", "base/child/grandchild"}.issubset(set(comps.keys())), comps
+    assert comps["base"] == "/robot/base", comps
+
+    # バリデーション: place_child_under="." で parent_prim_name と同名はエラー
+    try:
+        JoinFileSpec(
+            usda="bad.usda",
+            parent_usda="base.usda",
+            parent_prim_name="base",
+            joins=(
+                JoinSpec(
+                    name="base",
+                    child_usda="arm.usda",
+                    parent_link="port1",
+                    child_link="base_link",
+                    place_child_under=".",
+                ),
+            ),
+        )
+        raise AssertionError("parent_prim_name と place_child_under='.' の衝突がエラーにならなかった")
+    except ValueError:
+        pass
+
+
+# ====================================================================== 20: 0 を跨がない URDF 関節リミット内の目標角クランプ検証
+@test
+def test_urdf_non_zero_joint_limit_clamping():
+    """0 を含まない URDF 関節リミットでも `_drive_targets` がリミット内側の目標角を選ぶことを検証する。
+
+    セットアップ:
+      - `_clamp_revolute_target` を負区間（Franka `panda_joint4`: `[-3.0718, -0.0698]`）・正区間（`[0.5, 2.0]`）・
+        0 端区間（`[0.0, 0.8]`）・対称区間（`[-3.0, 3.0]`）で単体検証。
+      - `test_franka_example` と同じ Franka パイプラインの `reach["panda_joint4"]` で目標値が上限 `-0.0698 rad` より
+        内側に設定され、リミット衝突なく到達することを確認。
+    """
+    from myext.robot.assembly_pipeline_v2.probes import _clamp_revolute_target
+
+    # 負のみの可動域（Franka panda_joint4）: 以前のように 0.8 * (-0.0698) = -0.05584 (上限外) にならない
+    t_neg = _clamp_revolute_target(0.3, -3.0718, -0.0698)
+    assert -3.0718 < t_neg < -0.0698, f"負区間のリミット外: {t_neg}"
+
+    # 正のみの可動域: 以前のように 0.8 * 0.5 = 0.4 (下限外) にならない
+    t_pos = _clamp_revolute_target(0.3, 0.5, 2.0)
+    assert 0.5 < t_pos < 2.0, f"正区間のリミット外: {t_pos}"
+
+    # 0 境界区間・対称区間
+    t_zero = _clamp_revolute_target(0.0, 0.0, 0.8)
+    assert 0.0 < t_zero < 0.8, f"0 境界区間の内側でない: {t_zero}"
+    assert abs(_clamp_revolute_target(0.3, -3.0, 3.0) - 0.3) < 1e-12
+
+    # Franka 実測確認: panda_joint4 の目標角が URDF 上限 (-0.0698 rad) の内側で、誤差 < 0.01 rad で到達する
+    franka_rep_path = os.path.join(OUT, "franka", "report.json")
+    if os.path.exists(franka_rep_path):
+        with open(franka_rep_path, encoding="utf-8") as fh:
+            frep = json.load(fh)
+        fixed_map = frep["measurements"]["fixed"]
+        first_probe = next(iter(fixed_map.values()))
+        j4 = first_probe["reach"]["panda_joint4"]
+        assert -3.0718 < j4["target"] < -0.0698, f"Franka panda_joint4 target がリミット外: {j4}"
+        assert j4["error"] < 0.01, f"Franka panda_joint4 到達誤差が大きい: {j4}"
+
+
 # ====================================================================== 集計・出力
 summary = {"passed": sum(r["ok"] for r in results), "failed": sum(not r["ok"] for r in results), "results": results}
 with open(os.path.join(HERE, "last_run.json"), "w", encoding="utf-8") as f:

@@ -345,11 +345,13 @@ def _resolve_spec_infos(
         owners: list[Owner] = list(parent.owners)
         comp_rel: dict[str, str] = dict(parent.components_rel)
         def_vars: dict[tuple[str, str], str] = dict(parent.default_variants)
-        # 親 usda の defaultPrim が既に同名の VariantSet を持っている場合、`compose.py` は衝突回避のため
-        # 親全体を `<parent_stem>` 子 prim にラップして Reference する。ここでも同じオフセットを適用し、
-        # `Owner.rel_top` と実際の結合 USD パスが常に一致するように保つ。
+        # 親パーツを 1 段下の子 prim (<holder_name>) に配置する条件:
+        #   1. TOML の [[join_file]] で parent_prim_name が明示指定されている場合
+        #   2. 親 usda の defaultPrim が結合側と同名の VariantSet を持っていて衝突回避が必要な場合
+        # `compose.py` と同一のオフセットを適用し、Owner.rel_top と実際の結合 USD パスを一致させる。
         join_vsets = {j.variant_set for j in f.joins if j.variant_set}
-        if join_vsets and allow_open_stage and os.path.exists(parent.path):
+        holder_name: str | None = f.parent_prim_name
+        if holder_name is None and join_vsets and allow_open_stage and os.path.exists(parent.path):
             try:
                 from pxr import Usd
 
@@ -359,10 +361,16 @@ def _resolve_spec_infos(
             except Exception:  # noqa: BLE001
                 parent_vsets = set()
             if join_vsets & parent_vsets:
-                parent_stem = f.parent[: -len(".usda")]
-                owners = [o.under("", parent_stem) for o in owners]
-                comp_rel = {k: _join(parent_stem, v) for k, v in comp_rel.items()}
-                def_vars = {(_join(parent_stem, r), vs): val for (r, vs), val in def_vars.items()}
+                holder_name = f.parent[: -len(".usda")]
+        if holder_name is not None:
+            owners = [o.under("", holder_name) for o in owners]
+            parent_sub = dict(comp_rel)
+            if f.parent_prim_name is not None:
+                comp_rel = {}
+                _register_component_rel(comp_rel, holder_name, holder_name, parent_sub)
+            else:
+                comp_rel = {k: _join(holder_name, v) for k, v in parent_sub.items()}
+            def_vars = {(_join(holder_name, r), vs): val for (r, vs), val in def_vars.items()}
         for j in f.joins:
             if j.variant_set and j.variant:
                 v_def = f.default_variant(j.variant_set) if hasattr(f, "default_variant") else j.variant

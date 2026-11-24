@@ -10,7 +10,7 @@
 
 | スイート | テスト数 | 役割と検証対象 | 結果ファイル |
 |---|---|---|---|
-| `tests_kit\run_tests.py` | 全 18 テスト | **パイプライン機能・規則・API・冪等性の統合テスト**。URDF パーサ、TOML 静的検査、規則 R01〜R14 の検知・修正・`skip`/`stop` 制御、再実行時の SHA-256 冪等性、非破壊ビルド `build_assembly`、`AssembledRobotDescriptor` / `discover_components`、複数 `VariantSet` の順序制御、外部幾何拡張への依存ゼロ、URDF+USD 混在結合を検証する。 | `tests_kit\last_run.json`（`run_tests.ps1` 経由時は `tests_kit\last_run.log` も生成） |
+| `tests_kit\run_tests.py` | 全 20 テスト | **パイプライン機能・規則・API・冪等性の統合テスト**。URDF パーサ、TOML 静的検査、規則 R01〜R14 の検知・修正・`skip`/`stop` 制御、再実行時の SHA-256 冪等性、非破壊ビルド `build_assembly`、`AssembledRobotDescriptor` / `discover_components`、複数 `VariantSet` の順序制御、外部幾何拡張への依存ゼロ、URDF+USD 混在結合、`parent_prim_name` 親 Prim 保持、0 を跨がない URDF 関節リミットクランプを検証する。 | `tests_kit\last_run.json`（`run_tests.ps1` 経由時は `tests_kit\last_run.log` も生成） |
 | `tests_kit\test_official_motion_match.py` | 全 6 テスト | **公式 Isaac Sim アセットとの定量的な PhysX 動作一致テスト**。Isaac Sim 公式ロボット（UR10e / Unitree G1 / NVIDIA Kaya / NVIDIA Carter v1 / Denso Cobotta Pro 900 / OpenArm Bimanual）を部品から本パイプラインで再構成し、公式アセットと同一の関節指令・重力・接地条件で PhysX シミュレーションを実行して、全リンクの位置・姿勢および全 DOF・mimic 追従が定量的に一致することを検証する。 | `tests_kit\last_official_motion_run.json` |
 
 ### 設計上の共通ルール
@@ -29,15 +29,15 @@
 cd C:\isaacsim-6.2.0\extsUser\Extentions\myext.robot.assembly_pipeline.v2
 ```
 
-### 2-1. 統合テストスイート（`tests_kit\run_tests.py`：全 18 テスト）
+### 2-1. 統合テストスイート（`tests_kit\run_tests.py`：全 20 テスト）
 
 PowerShell ラッパー `run_tests.ps1` を使う方法（推奨：`PYTHONPATH` の自動クリアと `[SUMMARY]` 行の厳密チェックを含む）:
 
 - **出力先**: 全ログ `tests_kit\last_run.log`、構造化結果 `tests_kit\last_run.json`
-- **成功の合図**: 端末に `[SUMMARY] passed 18 / failed 0` および `== exit=0` が表示されること
+- **成功の合図**: 端末に `[SUMMARY] passed 20 / failed 0` および `== exit=0` が表示されること
 
 ```powershell
-# 全 18 テストを実行
+# 全 20 テストを実行
 powershell -ExecutionPolicy Bypass -File run_tests.ps1
 
 # テスト関数名に "franka" を含むテストだけ実行
@@ -73,7 +73,7 @@ C:\isaacsim-6.2.0\tools\myext\run_sim.bat tests_kit\test_official_motion_match.p
 
 ## 3. テスト一覧と合格基準
 
-### 3-1. `tests_kit\run_tests.py`（全 18 テスト）
+### 3-1. `tests_kit\run_tests.py`（全 20 テスト）
 
 | # | テスト関数名 | 検証対象 | 主な合格基準 |
 |---|---|---|---|
@@ -95,6 +95,8 @@ C:\isaacsim-6.2.0\tools\myext\run_sim.bat tests_kit\test_official_motion_match.p
 | 16 | `test_zero_external_geometric_dependency` | 外部幾何拡張（`myext.robot.geometric*`）への依存ゼロ | `sys.modules` 未読込、`config\extension.toml` の `dependencies` に未記載 |
 | 17 | `test_usd_to_usd_ur10e_pipeline` | `examples\official_assets\ur10e\ur10e.toml` の USD+USD フル検証と冪等性 | `status == "ok"`、DOF 名一致、順運動学 `< 1e-4 m`、2 回目実行の SHA-256 完全一致 |
 | 18 | `test_mixed_urdf_and_usd_pipeline` | 親 URDF（`arm.urdf`）+ 子 USD（`Robotiq_2F_85.usda`）混在結合 | `status == "ok"`、DOF 名一致、順運動学 `< 1e-4 m`、構成要素 `arm_with_robotiq` / `gripper` 検出 |
+| 19 | `test_parent_prim_name_hierarchy` | `[[join_file]]` の `parent_prim_name` による親パーツ Prim 保持（2 段結合） | `/robot`, `/robot/base`, `.../child`, `.../grandchild` がすべて存在、`discover_components` に 4 要素とも検出、`run_pipeline` `status == "ok"`・順運動学 `< 1e-4 m`、衝突バリデーション正常 |
+| 20 | `test_urdf_non_zero_joint_limit_clamping` | 0 を跨がない URDF 関節リミット内の目標角クランプ | 負区間（Franka `panda_joint4`）・正区間・0 境界区間すべてリミット内側へ収まり、Franka 実測で `panda_joint4` がリミット衝突なく到達（誤差 `< 0.01 rad`） |
 
 ### 3-2. `tests_kit\test_official_motion_match.py`（全 6 テスト）
 

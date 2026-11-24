@@ -253,26 +253,32 @@ def compose_file(
     parent_vsets = set(src_dp.GetVariantSets().GetNames()) if (src_dp and src_dp.IsValid()) else set()
     colliding_vsets = join_vsets & parent_vsets
 
-    if colliding_vsets:
-        # 親の defaultPrim が結合側と同名の VariantSet を持つ場合、top_prim へ直接 Reference すると
-        # top_prim の VariantSet 選択が親の内部 VariantSet にも波及して二重ロード・衝突が起きる。
-        # そのため親を 1 段下の子 prim (<top>/<parent_stem>) に隔離して Reference する。
-        parent_stem = f.parent[: -len(".usda")]
-        parent_holder = stage.DefinePrim(f"{top}/{parent_stem}", "Xform")
+    holder_name: str | None = f.parent_prim_name or (f.parent[: -len(".usda")] if colliding_vsets else None)
+
+    if holder_name is not None:
+        # 以下のいずれかに該当するとき、親を最上位 prim の 1 段下 (<top>/<holder_name>) に配置して Reference する:
+        #   - TOML で parent_prim_name が明示指定された場合（一番親のパーツ名も Stage 上の prim 名として残す）
+        #   - 親の defaultPrim が結合側と同名の VariantSet を持ち、直接 Reference すると衝突する場合
+        parent_holder = stage.DefinePrim(f"{top}/{holder_name}", "Xform")
         parent_holder.GetReferences().AddReference(_rel(parent.path, spec.output_dir))
-        owners: list[Owner] = [o.under("", parent_stem) for o in parent.owners]
-        components_rel: dict[str, str] = {k: f"{parent_stem}/{v}".strip("/") for k, v in parent.components_rel.items()}
+        owners: list[Owner] = [o.under("", holder_name) for o in parent.owners]
+        parent_sub = dict(parent.components_rel)
         for k, v in _extract_authored_components(parent_holder).items():
             if k and v:
-                components_rel.setdefault(k, f"{parent_stem}/{v}".strip("/"))
+                parent_sub.setdefault(k, v)
+        if f.parent_prim_name is not None or has_api(parent_holder, "IsaacRobotAPI"):
+            components_rel: dict[str, str] = {}
+            _register_component_rel(components_rel, holder_name, holder_name, parent_sub)
+        else:
+            components_rel = {k: f"{holder_name}/{v}".strip("/") for k, v in parent_sub.items()}
         default_variants: dict[tuple[str, str], str] = {
-            (f"{parent_stem}/{r}".strip("/"), vs): val for (r, vs), val in parent.default_variants.items()
+            (f"{holder_name}/{r}".strip("/"), vs): val for (r, vs), val in parent.default_variants.items()
         }
         if has_api(parent_holder, "IsaacRobotAPI"):
             top_prim.ApplyAPI("IsaacRobotAPI")
             for rname in (ROBOT_LINKS, ROBOT_JOINTS):
                 r = top_prim.GetRelationship(rname) or top_prim.CreateRelationship(rname, custom=False)
-                r.AddTarget(Sdf.Path(f"{top}/{parent_stem}"), Usd.ListPositionBackOfAppendList)
+                r.AddTarget(Sdf.Path(f"{top}/{holder_name}"), Usd.ListPositionBackOfAppendList)
     else:
         top_prim.GetReferences().AddReference(_rel(parent.path, spec.output_dir))
         owners = list(parent.owners)

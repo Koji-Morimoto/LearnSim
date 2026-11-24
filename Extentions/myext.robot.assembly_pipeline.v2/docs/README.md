@@ -192,8 +192,9 @@ C:\isaacsim-6.2.0\tools\myext\run_sim.bat run_pipeline.py examples\multi_arm.tom
 
 | キー | 対象 | 必須 | 既定値 | 説明 |
 |---|---|---|---|---|
-| `usda` | `[[join_file]]` | 必須 | — | 出力する結合ファイルのファイル名（例: `"robot.usda"`） |
+| `usda` | `[[join_file]]` | 必須 | — | 出力する結合ファイルのファイル名（例: `"robot.usda"`）。既定のルート prim 名にもなる |
 | `parent_usda` | `[[join_file]]` | 必須 | — | 親となる `.usda` のファイル名 |
+| `parent_prim_name` | `[[join_file]]` | 任意 | `None` | 指定すると親 `parent_usda` を `/<usda stem>/<parent_prim_name>` の 1 段下に子 prim として配置し、一番親のパーツ名も Stage の prim 名・構成要素名として残す（例: `usda = "robot.usda"`, `parent_prim_name = "base"` → `/robot/base/.../child/.../grandchild`） |
 | `variant_defaults` | `[[join_file]]` | 任意 | `{}` | VariantSet ごとの既定選択を明示指定（`"None"` 指定可） |
 | `name` | `[[join_file.join]]` | 必須 | — | 結合名（結合ファイル内で一意・英数字と `_`） |
 | `child_usda` | `[[join_file.join]]` | 必須 | — | 子となる `.usda` のファイル名 |
@@ -286,9 +287,9 @@ print(result.report["status"], result.outputs["robot.usda"])
 
 テスト方針・各テストの検証内容と合格基準・新しいテストの追加手順は [tests_kit/README.md](../tests_kit/README.md) にまとめています。
 
-1. **パイプライン統合テスト（全 18 テスト・Headless 自動終了）**
+1. **パイプライン統合テスト（全 20 テスト・Headless 自動終了）**
    - 出力: `tests_kit\last_run.log`, `tests_kit\last_run.json`
-   - 成功の合図: `[SUMMARY] passed 18 / failed 0` および `== exit=0`
+   - 成功の合図: `[SUMMARY] passed 20 / failed 0` および `== exit=0`
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File run_tests.ps1
@@ -345,6 +346,6 @@ myext.robot.assembly_pipeline.v2/
 ├── run_tests.ps1                              # 統合テストスイート実行ラッパー
 └── tests_kit/
     ├── README.md                              # テスト方針・テスト一覧・追加手順
-    ├── run_tests.py                           # 統合テストスイート (全 18 テスト)
+    ├── run_tests.py                           # 統合テストスイート (全 20 テスト)
     └── test_official_motion_match.py          # 公式アセット定量 PhysX 動作一致テスト (全 6 テスト)
 ```

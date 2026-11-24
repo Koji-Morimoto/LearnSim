@@ -550,8 +550,26 @@ def check_against_physx(
 
         rng = np.random.default_rng(seed)
         dof_joints = tree.dof_joints
-        lo = np.array([j.lower_limit if np.isfinite(j.lower_limit) else -0.5 for j in dof_joints], dtype=float)
-        hi = np.array([j.upper_limit if np.isfinite(j.upper_limit) else 0.5 for j in dof_joints], dtype=float)
+        # 片側のみリミットが設定されている場合でも lo < hi を保つようにサンプリング区間を決める
+        lo_list: list[float] = []
+        hi_list: list[float] = []
+        for j in dof_joints:
+            lo_ok = np.isfinite(j.lower_limit)
+            hi_ok = np.isfinite(j.upper_limit)
+            if lo_ok and hi_ok and j.upper_limit > j.lower_limit:
+                lo_list.append(float(j.lower_limit))
+                hi_list.append(float(j.upper_limit))
+            elif lo_ok and not hi_ok:
+                lo_list.append(float(j.lower_limit))
+                hi_list.append(float(j.lower_limit) + 1.0)
+            elif hi_ok and not lo_ok:
+                lo_list.append(float(j.upper_limit) - 1.0)
+                hi_list.append(float(j.upper_limit))
+            else:
+                lo_list.append(-0.5)
+                hi_list.append(0.5)
+        lo = np.array(lo_list, dtype=float)
+        hi = np.array(hi_list, dtype=float)
 
         # 可動域の極端な端（リミット衝突）を避けるため、各関節の 20%〜80% の範囲で目標姿勢をサンプルする
         expected: list[tuple[dict[str, float], dict[str, np.ndarray]]] = []

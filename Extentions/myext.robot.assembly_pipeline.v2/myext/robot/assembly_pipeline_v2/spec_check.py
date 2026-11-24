@@ -145,7 +145,8 @@ def describe(spec: PipelineSpec) -> list[str]:
         lines.append(f"| {u.usda} | [[usd_to_usda]] | USD `{label}` | {'、'.join(used.get(u.usda, [])) or '使われない'} |")
     for f in spec.file_order():
         kids = "、".join(dict.fromkeys(j.child_usda for j in f.joins)) or "なし"
-        lines.append(f"| {f.usda} | [[join_file]] | 親 {f.parent_usda}、子 {kids} | {'、'.join(used.get(f.usda, [])) or 'どこにも使われない(最後の出力)'} |")
+        parent_label = f"{f.parent_usda}(prim: {f.parent_prim_name})" if f.parent_prim_name else f.parent_usda
+        lines.append(f"| {f.usda} | [[join_file]] | 親 {parent_label}、子 {kids} | {'、'.join(used.get(f.usda, [])) or 'どこにも使われない(最後の出力)'} |")
     if spec.join_files:
         lines += ["", "### 結合", "",
                   "| 結合(結合ファイル/name) | 親の usda のリンク | 子の usda | 子の usda のリンク | 子を置く prim | 子の prim の名前 | VariantSet の選択肢 | 子の VariantSet の選択 |",

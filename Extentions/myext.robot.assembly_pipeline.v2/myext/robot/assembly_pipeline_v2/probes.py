@@ -709,6 +709,18 @@ def _root_art_root(stage: Usd.Stage, top: str, child_paths: list[str]) -> str | 
     return None
 
 
+def _clamp_revolute_target(target: float, lo: float, hi: float) -> float:
+    """回転関節の目標角 [rad] を可動域 ``[lo, hi]`` の内側（両端 10% マージン）に収める。
+
+    0 を含まない可動域（例: Franka ``panda_joint4`` の ``[-3.0718, -0.0698]`` や ``[+0.5, +2.0]``）に
+    対して ``0.8 * bound`` を使うと上限・下限の外側に出てしまうため、必ず区間幅基準で内側へ丸める。
+    """
+    if not (math.isfinite(lo) and math.isfinite(hi) and hi > lo):
+        return target
+    margin = 0.1 * (hi - lo)
+    return float(np.clip(target, lo + margin, hi - margin))
+
+
 def _drive_targets(
     stage: Usd.Stage,
     top: str,
@@ -734,12 +746,12 @@ def _drive_targets(
                 if not prim or not prim.IsActive():
                     continue
                 if j.type == "prismatic":
-                    lo, hi = (j.lower, j.upper) if j.has_limit else (0.0, 0.1)
+                    lo, hi = (j.lower, j.upper) if (j.has_limit and j.upper > j.lower) else (0.0, 0.1)
                     t = lo + settings.prismatic_ratio * (hi - lo)
                 else:
                     t = settings.revolute_target
-                    if j.type == "revolute" and j.has_limit:
-                        t = float(np.clip(t, 0.8 * j.lower, 0.8 * j.upper))
+                    if j.type == "revolute" and j.has_limit and j.upper > j.lower:
+                        t = _clamp_revolute_target(t, j.lower, j.upper)
                 out[f"{o.prefix}:{j.name}" if o.prefix else j.name] = (path, t, j.type, o.prefix)
         else:
             for jname in o.joint_rel:
@@ -770,10 +782,7 @@ def _drive_targets(
                 else:
                     t = settings.revolute_target
                     if has_limit:
-                        lo_rad, hi_rad = math.radians(float(lo_raw)), math.radians(float(hi_raw))
-                        lo_c = 0.8 * lo_rad if lo_rad <= 0.0 else lo_rad + 0.1 * (hi_rad - lo_rad)
-                        hi_c = 0.8 * hi_rad if hi_rad >= 0.0 else hi_rad - 0.1 * (hi_rad - lo_rad)
-                        t = float(np.clip(t, lo_c, hi_c))
+                        t = _clamp_revolute_target(t, math.radians(float(lo_raw)), math.radians(float(hi_raw)))
                 out[f"{o.prefix}:{jname}" if o.prefix else jname] = (path, t, jtype, o.prefix)
     return out
 

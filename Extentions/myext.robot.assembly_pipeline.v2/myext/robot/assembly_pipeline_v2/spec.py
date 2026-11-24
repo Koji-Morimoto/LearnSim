@@ -265,16 +265,32 @@ class JoinFileSpec:
       joins           : この結合ファイルで行う `[[join_file.join]]` のタプル。
       variant_defaults: VariantSet ごとの既定選択肢 `((VariantSet名, 選択肢名), ...)`。
                         未指定の VariantSet は最初に定義された結合の `variant` が既定になる。
+      parent_prim_name: 出力(任意)。親 `parent_usda` を結合ファイル最上位 prim の 1 段下
+                        (`/<usda stem>/<parent_prim_name>`)に子 prim として配置するときの prim 名。
+                        省略(`None`)時は従来どおり最上位 prim へ直接 Reference 合成する。
     """
 
     usda: str
     parent_usda: str
     joins: tuple[JoinSpec, ...] = ()
     variant_defaults: tuple[tuple[str, str], ...] = ()
+    parent_prim_name: str | None = None
 
     def __post_init__(self) -> None:
         _check_usda_name(self.usda, "[[join_file]] の usda")
         _check_usda_name(self.parent_usda, f"[[join_file]] usda = {self.usda!r} の parent_usda")
+        if self.parent_prim_name is not None:
+            if not isinstance(self.parent_prim_name, str) or not self.parent_prim_name.isidentifier():
+                raise ValueError(
+                    f"[[join_file]] usda = {self.usda!r} の parent_prim_name は英数字と _ だけにする(先頭は数字以外): "
+                    f"{self.parent_prim_name!r}"
+                )
+            for j in self.joins:
+                if j.place_child_under == "." and j.prim == self.parent_prim_name:
+                    raise ValueError(
+                        f"[[join_file]] usda = {self.usda!r}: parent_prim_name = {self.parent_prim_name!r} が "
+                        f"place_child_under = '.' の結合 {j.name!r} (child_prim_name = {j.prim!r}) と衝突している"
+                    )
         names = [j.name for j in self.joins]
         dup = sorted({n for n in names if names.count(n) > 1})
         if dup:
@@ -695,7 +711,7 @@ def load_spec(path: str | Path) -> PipelineSpec:
             raise ValueError(f"{where}: {exc}") from None
 
     files = []
-    f_keys = {"usda", "parent_usda", "join", "variant_defaults"}
+    f_keys = {"usda", "parent_usda", "join", "variant_defaults", "parent_prim_name"}
     j_keys = {f.name for f in fields(JoinSpec)}
     for i, d in enumerate(data.get("join_file", []), 1):
         where = f"[[join_file]] {i} 番目(usda = {d.get('usda')!r})"
@@ -726,6 +742,7 @@ def load_spec(path: str | Path) -> PipelineSpec:
                     parent_usda=d["parent_usda"],
                     joins=tuple(joins),
                     variant_defaults=vdefs,
+                    parent_prim_name=d.get("parent_prim_name"),
                 )
             )
         except ValueError as exc:
