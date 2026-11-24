@@ -106,6 +106,7 @@ class GeometricRobotView:
         self._use_cuda_graph = bool(use_cuda_graph)
         self._use_gpu_fabric_writer = bool(use_gpu_fabric_writer)
         self._newton_scene: BatchedNewtonScene | None = None
+        self._newton_scene_collider_version: int = -1
         self._gpu_fabric_writer: GeometricGpuFabricWriter | None = None
         self._gpu_fabric_failed = False
 
@@ -182,6 +183,13 @@ class GeometricRobotView:
     def newton_scene(self) -> BatchedNewtonScene:
         """全 N 台を multi-world で扱う `BatchedNewtonScene` (初回アクセス時に遅延生成する)。"""
         self._check_fresh()
+        cur_cver = self._robots[0].collider_version
+        if self._newton_scene is not None and cur_cver != self._newton_scene_collider_version:
+            self._newton_scene.close()
+            self._newton_scene = None
+            if self._gpu_fabric_writer is not None:
+                self._gpu_fabric_writer.close()
+                self._gpu_fabric_writer = None
         if self._newton_scene is None:
             self._newton_scene = BatchedNewtonScene(
                 self,
@@ -189,7 +197,21 @@ class GeometricRobotView:
                 environment_roots=self._environment_roots,
                 use_cuda_graph=self._use_cuda_graph,
             )
+            self._newton_scene_collider_version = cur_cver
         return self._newton_scene
+
+    def reload_colliders(self) -> None:
+        """全ロボットのコライダーキャッシュと `BatchedNewtonScene` を破棄し、次の判定で最新 USD コライダーを読み直す。"""
+        self._check_fresh()
+        for robot in self._robots:
+            robot.reload_colliders()
+        if self._newton_scene is not None:
+            self._newton_scene.close()
+            self._newton_scene = None
+        if self._gpu_fabric_writer is not None:
+            self._gpu_fabric_writer.close()
+            self._gpu_fabric_writer = None
+        self._newton_scene_collider_version = -1
 
     def _use_newton_fk(self) -> bool:
         """現在の `fk_backend`・台数・CUDA 可否から、FK に `BatchedNewtonScene` を使うか判定する。"""

@@ -425,15 +425,21 @@ class GeometricLayer:
 
     def _author(self, entry: _Entry, scene_flags: bool = True) -> None:
         """`Usd.EditContext(stage, self._layer)` の内側で、物理無効化・姿勢 op 上書きを書き込む。"""
-        # Pure OpenUSD 環境 (Kit / PhysxSchema なし) でも `layer.py` 自体を import できるよう遅延 import にする
-        from pxr import PhysxSchema
+        # Pure OpenUSD 環境 (Kit / PhysxSchema なし) でも `GeometricLayer.apply()` が動くよう遅延・任意 import にする
+        try:
+            from pxr import PhysxSchema
+        except ImportError:
+            PhysxSchema = None
 
         stage, opt = self._stage, self._options
         kinematic = opt.collision_mode == "kinematic"
         for path in entry.articulation_root_paths:
             prim = stage.GetPrimAtPath(path)
             if prim:
-                self._put(prim, PhysxSchema.PhysxArticulationAPI.Apply(prim).CreateArticulationEnabledAttr(), False)
+                if PhysxSchema is not None:
+                    self._put(prim, PhysxSchema.PhysxArticulationAPI.Apply(prim).CreateArticulationEnabledAttr(), False)
+                else:
+                    self._put(prim, prim.CreateAttribute("physxArticulation:articulationEnabled", Sdf.ValueTypeNames.Bool), False)
         for path in entry.joint_prim_paths:
             prim = stage.GetPrimAtPath(path)
             if prim and prim.IsA(UsdPhysics.Joint):
@@ -448,7 +454,7 @@ class GeometricLayer:
                 body = UsdPhysics.RigidBodyAPI(prim) if has_body else UsdPhysics.RigidBodyAPI.Apply(prim)
                 self._put(prim, body.CreateRigidBodyEnabledAttr(), True)
                 self._put(prim, body.CreateKinematicEnabledAttr(), True)
-                if opt.report_contacts:
+                if opt.report_contacts and PhysxSchema is not None:
                     self._put(prim, PhysxSchema.PhysxContactReportAPI.Apply(prim).CreateThresholdAttr(), opt.contact_threshold)
             elif has_body:
                 self._put(prim, UsdPhysics.RigidBodyAPI(prim).CreateRigidBodyEnabledAttr(), False)
@@ -462,7 +468,7 @@ class GeometricLayer:
                 if prim and stage.GetPrimAtPath(b):
                     UsdPhysics.FilteredPairsAPI.Apply(prim).CreateFilteredPairsRel().AddTarget(b)
                     self._report.changes.append((a, "physics:filteredPairs", None, f"+{b}"))
-            if opt.report_contacts and scene_flags:
+            if opt.report_contacts and scene_flags and PhysxSchema is not None:
                 scenes = [p for p in stage.Traverse() if p.IsA(UsdPhysics.Scene)]
                 if not scenes:
                     self._report.warnings.append("PhysicsScene が無いので、kinematic 同士の接触の報告フラグを書けなかった")

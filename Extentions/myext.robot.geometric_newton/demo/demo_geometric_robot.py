@@ -146,9 +146,9 @@ class TrackingArm:
         self.stage = stage
         # from_mdh: 簡易形状の prim を組み、Sublayer を付けて幾何モードにする
         self.robot = GeometricRobot.from_mdh(stage, six_axis_arm(), "/World/Arm")
-        # 簡易形状は、短いリンクをはさんだ 2 リンクが関節の所で常に重なる。その組を無視する組に足す
+        # 簡易形状の現在の基準姿勢で重なっている非隣接組を無視フィルタへ登録する
         ignored = self.robot.ignore_touching_pairs()
-        log(f"左のアーム: DOF {self.robot.dof_names} / 常に重なるので無視する組 {ignored}")
+        log(f"左のアーム: DOF {self.robot.dof_names} / 初期姿勢で重なっているため無視する組 {ignored}")
         # IK ソルバーは名前で選ぶ("jacobian" = 自前、"ikpy" = IKPy)。位置だけ合わせる
         self.solver = self.robot.create_ik_solver("jacobian", "link0", "tool", IKSolverConfig(orientation_mode="none", num_restarts=2))
         self.robot.set_dof_positions([0.0, 0.4, 0.6, 0.0, 0.5, 0.0])

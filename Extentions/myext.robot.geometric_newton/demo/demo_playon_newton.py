@@ -1,8 +1,8 @@
 """Play=ON × Newton GeometricScene (0 フレーム遅延) の単独デモ。
 
 実行:
-    C:\\isaacsim-6.2.0\\python.bat demo\\demo_playon_newton.py --no-ros-env
-    C:\\isaacsim-6.2.0\\python.bat demo\\demo_playon_newton.py --headless --frames 120 --no-ros-env
+    C:\\isaacsim-6.2.0\\tools\\myext\\run_sim.bat demo\\demo_playon_newton.py
+    C:\\isaacsim-6.2.0\\tools\\myext\\run_sim.bat demo\\demo_playon_newton.py --headless --frames 120
 
 見せること:
     1. タイムラインを Play=ON にし、周囲の PhysX 動的剛体(落下する箱)が普通に物理シミュレーションされている状態
@@ -15,6 +15,7 @@ from __future__ import annotations
 
 import argparse
 import os
+import sys
 import time
 
 parser = argparse.ArgumentParser()
@@ -23,22 +24,22 @@ parser.add_argument("--frames", type=int, default=0, help="0 ならウィンド�
 args, _ = parser.parse_known_args()
 
 EXT_FOLDER = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+ISAAC_DIR = os.environ.get("ISAAC_PATH") or os.path.dirname(os.path.dirname(EXT_FOLDER))
+sys.path.insert(0, os.path.join(ISAAC_DIR, "tools", "myext"))
+from sim_app_launcher import create_simulation_app
 
-from isaacsim import SimulationApp
-
-app = SimulationApp({"headless": args.headless, "width": 1280, "height": 720, "extra_args": ["--ext-folder", EXT_FOLDER]})
+app = create_simulation_app(
+    {"headless": args.headless, "width": 1280, "height": 720},
+    extra_extensions=("myext.robot.geometric_newton",),
+)
 
 import numpy as np
-import omni.kit.app
 import omni.timeline
 import omni.usd
 from pxr import Gf, PhysxSchema, UsdGeom, UsdLux, UsdPhysics
 
-omni.kit.app.get_app().get_extension_manager().set_extension_enabled_immediate("myext.robot.geometric_newton", True)
-
 from myext.robot.geometric_newton import GeometricRobot
 
-ISAAC_DIR = os.environ.get("ISAAC_PATH") or os.path.dirname(os.path.dirname(EXT_FOLDER))
 UR10E_USD = os.path.join(ISAAC_DIR, "exts", "isaacsim.asset.transformer.rules", "data", "tests", "ur10e", "ur10e.usd")
 
 
@@ -112,6 +113,7 @@ def main() -> None:
     q_safe = np.array([0.0, -np.pi / 2, 0.0, -np.pi / 2, 0.0, 0.0])
     robot.set_dof_positions(q_safe)
     robot.flush_to_usd()
+    robot.compute_clearances("all", max_distance=0.10)  # ウォームアップ（初回 finalize をループ外へ）
     app.update()
 
     tl = omni.timeline.get_timeline_interface()
@@ -134,8 +136,10 @@ def main() -> None:
         )
         t0 = time.perf_counter()
         robot.set_dof_positions(q)  # Fabric のみに書き込み(USD flush なし)
-        hits = robot.check_collisions("all")  # Newton 0 フレーム遅延判定
-        near = [] if hits else robot.compute_clearances("all", max_distance=0.10)
+        # 1 パスで貫通(separation <= 0)と近接(0 < separation <= 0.10)を同時に取得
+        pairs = robot.compute_clearances("all", max_distance=0.10)
+        hits = [p for p in pairs if p.separation is not None and p.separation <= 0.0]
+        near = [p for p in pairs if p.separation is not None and p.separation > 0.0]
         t1 = time.perf_counter()
         step_ms.append((t1 - t0) * 1e3)
 

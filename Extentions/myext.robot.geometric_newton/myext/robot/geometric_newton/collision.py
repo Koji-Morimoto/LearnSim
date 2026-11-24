@@ -294,7 +294,7 @@ class GeometricCollisionChecker:
         return self._sorted(found.values())
 
     def touching_pairs(self, link_set: GeometricLinkSet) -> list[GeometricCollisionPair]:
-        """`collision_filter` を空にして現在重なっている組をすべて返す (`ignore_touching_pairs` の材料)。"""
+        """`collision_filter` を空にして現在重なっている組をすべて返す (診断用; `ignore_touching_pairs` は既存フィルタ適用済みの `check_within` を使う)。"""
         return self.check_within(link_set, collision_filter=GeometricCollisionFilter())
 
     def reload(self) -> None:

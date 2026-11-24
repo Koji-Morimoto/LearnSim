@@ -63,6 +63,23 @@ FkBackend = Literal["auto", "numpy", "newton"]
 _AUTO_FK_MIN_DOFS = 32
 _AUTO_FK_MIN_BATCH = 16
 
+# コライダーの有効状態や形状寸法に直結する USD 属性名一覧。
+# `xformOp:transform:geometric` などの姿勢属性を含めないことで、通常の姿勢更新では
+# Newton モデルの再構築 (`finalize`) を発火させず、コライダー属性変更時のみ確実に再構築する。
+_COLLIDER_ATTRS = frozenset(
+    (
+        "physics:collisionEnabled",
+        "physics:approximation",
+        "radius",
+        "size",
+        "height",
+        "axis",
+        "points",
+        "faceVertexCounts",
+        "faceVertexIndices",
+    )
+)
+
 
 def _import_newton():
     """`newton` / `newton.usd` / `warp` を遅延 import する (純 NumPy 機能のみの import 時間を抑えるため)。"""
@@ -384,6 +401,7 @@ class _RobotRecord:
     key: int
     robot: Any  # GeometricRobot または _ModelProxy
     structure_version: int
+    collider_version: int = 0
     link_idx_to_body: np.ndarray = field(default_factory=lambda: np.zeros(0, dtype=int))
     dof_to_newton_q: np.ndarray = field(default_factory=lambda: np.zeros(0, dtype=int))
     root_q_start: int = 0
@@ -415,7 +433,15 @@ class _ModelProxy:
         self._base = np.eye(4) if base_matrix is None else np.array(base_matrix, dtype=float)
         self._q = model.resolve_mimic(np.zeros(model.num_dofs, dtype=float))
         self.structure_version = 0
+        self.collider_version = 0
         self.root_prim_paths: list[str] = []
+
+    def reload_colliders(self) -> dict[str, list[str]]:
+        """USD から各リンクのコライダー一覧を読み直す。"""
+        all_paths = list(self.link_path_map.values())
+        self.collider_paths = {ln: find_colliders(self.stage, lp, all_paths) for ln, lp in self.link_path_map.items()}
+        self.collider_version += 1
+        return self.collider_paths
 
     def get_dof_positions(self, *, unit=None) -> np.ndarray:
         return self._q.copy()
@@ -489,6 +515,7 @@ class GeometricScene:
         # Finalized Newton objects
         self._dirty = True
         self._env_resync_dirty = False
+        self._colliders_dirty = False
         self._model = None
         self._state = None
         self._pipeline = None
@@ -550,7 +577,8 @@ class GeometricScene:
         if key in self._robots:
             return
         ver = getattr(robot, "structure_version", 0)
-        self._robots[key] = _RobotRecord(key=key, robot=robot, structure_version=ver)
+        cver = getattr(robot, "collider_version", 0)
+        self._robots[key] = _RobotRecord(key=key, robot=robot, structure_version=ver, collider_version=cver)
         if hasattr(robot, "add_structure_listener"):
             cb = lambda _old, _new, _k=key: self._on_robot_structure_changed(_k)  # noqa: E731
             robot.add_structure_listener(cb)
@@ -623,8 +651,24 @@ class GeometricScene:
         self._dirty = True
 
     def mark_dirty(self) -> None:
-        """次のクエリ時に Newton モデルを再構築させる(コライダー形状の追加後など)。"""
+        """次のクエリ時に Newton モデルを再構築させる (コライダー形状の追加後など)。"""
         self._dirty = True
+
+    def invalidate(self) -> None:
+        """全登録ロボットのコライダーキャッシュと Newton モデルを破棄し、次のクエリ時に再構築させる。
+
+        カスタムコライダー Sublayer の挿抜・Mute/Unmute や環境コライダーの追加・削除の後に、
+        キャッシュ残存を確実に防ぎたいときに呼ぶ。
+        """
+        for rec in self._robots.values():
+            robot = rec.robot
+            if isinstance(robot, _ModelProxy):
+                robot.reload_colliders()
+            elif hasattr(robot, "_colliders"):
+                robot._colliders = None
+        self._dirty = True
+        self._env_resync_dirty = True
+        self._colliders_dirty = False
 
     def _on_robot_structure_changed(self, _key: int) -> None:
         self._dirty = True
@@ -634,6 +678,14 @@ class GeometricScene:
             return
         if notice.GetResyncedPaths():
             self._env_resync_dirty = True
+            self._colliders_dirty = True
+            self._dirty = True
+            return
+        for path in notice.GetChangedInfoOnlyPaths():
+            if path.IsPropertyPath() and path.name in _COLLIDER_ATTRS:
+                self._colliders_dirty = True
+                self._dirty = True
+                return
 
     # ==========================================================================
     # Newton モデル構築 (finalize)
@@ -697,6 +749,7 @@ class GeometricScene:
                 robot._ensure_current()
             model: GeometricRobotModel = robot.model
             rec.structure_version = getattr(robot, "structure_version", 0)
+            rec.collider_version = getattr(robot, "collider_version", 0)
             rec.articulation_id = art_idx
 
             # BFS トポロジカル順でリンク剛体と関節を登録する (親が必ず子より先になる)
@@ -860,6 +913,7 @@ class GeometricScene:
         self._joint_qd_wp = wp.zeros(self._model.joint_dof_count, dtype=wp.float32, device=dev)
         self._dirty = False
         self._env_resync_dirty = False
+        self._colliders_dirty = False
 
     def _ensure_finalized(self) -> None:
         if self._closed:
@@ -869,7 +923,17 @@ class GeometricScene:
                 rec.robot._ensure_current()
             if getattr(rec.robot, "structure_version", 0) != rec.structure_version:
                 self._dirty = True
-                break
+            if getattr(rec.robot, "collider_version", 0) != rec.collider_version:
+                self._dirty = True
+        if self._colliders_dirty:
+            for rec in self._robots.values():
+                robot = rec.robot
+                if isinstance(robot, _ModelProxy):
+                    robot.reload_colliders()
+                elif hasattr(robot, "_colliders"):
+                    robot._colliders = None
+            self._colliders_dirty = False
+            self._dirty = True
         if self._env_resync_dirty and (self._auto_discover or self._use_explicit_env):
             self._dirty = True
         if self._dirty or self._model is None:
@@ -1353,7 +1417,7 @@ class GeometricScene:
         return self._filter_environment(raw, link_set, exclude=exclude, ignore_prim_paths=ignore_prim_paths)
 
     def touching_pairs(self, link_set: GeometricLinkSet, *, clearance: float = 0.0) -> list[GeometricCollisionPair]:
-        """フィルタを使わずに重なっている組をすべて返す(ignore_touching_pairs の材料)。"""
+        """`collision_filter` を空にして現在重なっている組をすべて返す (診断用; `ignore_touching_pairs` は既存フィルタ適用済みの `check_within` を使う)。"""
         return self.check_within(link_set, clearance=clearance, collision_filter=GeometricCollisionFilter())
 
     def check_collisions(

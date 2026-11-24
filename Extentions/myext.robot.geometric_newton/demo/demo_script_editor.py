@@ -58,7 +58,7 @@ async def main():
     UsdPhysics.CollisionAPI.Apply(box.GetPrim())
 
     robot = GeometricRobot.from_mdh(stage, arm_parameters(), "/World/Arm")  # collision_backend="newton" が既定
-    robot.ignore_touching_pairs()  # 簡易形状で常に重なる組を、無視する組に足す
+    robot.ignore_touching_pairs()  # 現在の初期姿勢で重なっている非隣接組を無視フィルタへ登録する
     solver = robot.create_ik_solver("jacobian", "link0", "tool", IKSolverConfig(orientation_mode="none", num_restarts=2))
     robot.set_dof_positions([0.0, 0.4, 0.6, 0.0, 0.5, 0.0])
     await app.next_update_async()

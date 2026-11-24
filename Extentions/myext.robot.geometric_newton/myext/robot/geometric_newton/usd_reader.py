@@ -232,6 +232,103 @@ def component_of_prim(path: str, components: dict[str, str | Sequence[str]]) -> 
     return best
 
 
+def _resolve_root_prim(
+    stage: Usd.Stage,
+    prim: Usd.Prim,
+    info: UsdRobotInfo,
+) -> tuple[Usd.Prim, set[str]]:
+    """指定された prim がリンク剛体・`ArticulationRootAPI`・`Joint` の場合、接続 Joint を含むロボットルートへ広げる。
+
+    設計上の理由 (なぜ 1 段親だけでは不十分か):
+        URDF Converter v0.3.2 や `myext.robot.assembly_pipeline` (`multi_arm.toml` 等) の USD 構成では、
+        `ArticulationRootAPI` が `/robot/Geometry/base_body` (2〜3 階層下) に付き、
+        一方で根の関節 (`root_joint`, `turret_joint`) は兄弟スコープ `/robot/Physics/` に置かれる。
+        従来の「配下に Joint が無ければ 1 段親へ広げる」だけの実装では、
+        1) `/base/Geometry/base_body` は 1 段上が `/base/Geometry` で Joint が見つからず例外になり、
+        2) `/robot/Geometry/base_body` は配下のアーム群に Joint があるため一度も親へ登らず、
+           `/robot/Physics/turret_joint` を取りこぼして木が分断されていた。
+
+    解決策:
+        `IsaacRobotAPI` を既に持つロボットルート prim はそのまま使う。
+        それ以外で `Joint` / `RigidBodyAPI` / `ArticulationRootAPI` または配下 Joint 0 個の prim が渡された場合、
+        上位の祖先をたどり、元の prim 配下の剛体 (`inner_bodies`) に接続する外部 Joint を持つ
+        最小のロボット祖先 (または `IsaacRobotAPI` を持つ祖先) まで探索範囲を広げる。
+        広げた場合は `seed_bodies` を返し、Phase 3 で元の prim が属する連結成分だけを抽出できるようにする。
+    """
+    orig_path = str(prim.GetPath())
+    if prim.HasAPI("IsaacRobotAPI"):
+        return prim, set()
+
+    has_inner_joint = any(p.IsA(UsdPhysics.Joint) for p in Usd.PrimRange(prim) if p != prim)
+    is_body_or_joint = (
+        prim.IsA(UsdPhysics.Joint)
+        or prim.HasAPI(UsdPhysics.RigidBodyAPI)
+        or prim.HasAPI(UsdPhysics.ArticulationRootAPI)
+    )
+    if not is_body_or_joint and has_inner_joint:
+        return prim, set()
+
+    inner_bodies: set[str] = {
+        str(p.GetPath()) for p in Usd.PrimRange(prim) if p.HasAPI(UsdPhysics.RigidBodyAPI)
+    }
+    if prim.IsA(UsdPhysics.Joint):
+        j = UsdPhysics.Joint(prim)
+        for rel in (j.GetBody0Rel(), j.GetBody1Rel()):
+            for t in rel.GetTargets():
+                tp = stage.GetPrimAtPath(t)
+                b = _body_of(tp) if tp else None
+                if b is not None:
+                    inner_bodies.add(str(b.GetPath()))
+
+    def _has_connecting_joint_outside(anc: Usd.Prim, skip_prefix: str) -> bool:
+        it = iter(Usd.PrimRange(anc))
+        for p in it:
+            ps = str(p.GetPath())
+            if ps == skip_prefix:
+                it.PruneChildren()
+                continue
+            if not p.IsA(UsdPhysics.Joint):
+                continue
+            if not inner_bodies:
+                return True
+            j = UsdPhysics.Joint(p)
+            for rel in (j.GetBody0Rel(), j.GetBody1Rel()):
+                for t in rel.GetTargets():
+                    tp = stage.GetPrimAtPath(t)
+                    b = _body_of(tp) if tp else None
+                    if b is not None and str(b.GetPath()) in inner_bodies:
+                        return True
+        return False
+
+    best = prim
+    prev_prefix = orig_path
+    anc = prim.GetParent()
+    while anc and anc.IsValid() and not anc.IsPseudoRoot():
+        anc_path = str(anc.GetPath())
+        is_world_root = anc.GetParent().IsPseudoRoot() and anc.GetName().lower() == "world"
+        if anc.HasAPI("IsaacRobotAPI"):
+            if _has_connecting_joint_outside(anc, orig_path) or (not has_inner_joint) or prim.IsA(UsdPhysics.Joint):
+                best = anc
+            break
+        if _has_connecting_joint_outside(anc, prev_prefix):
+            best = anc
+            if is_world_root:
+                break
+        elif is_world_root:
+            break
+        prev_prefix = anc_path
+        anc = anc.GetParent()
+
+    # 既存の挙動互換: Joint が全く見つからず 1 段親が有効なら 1 段親へフォールバック
+    if best == prim and (prim.IsA(UsdPhysics.Joint) or not has_inner_joint) and not prim.GetParent().IsPseudoRoot():
+        best = prim.GetParent()
+
+    if best != prim:
+        info.warnings.append(f"{orig_path} に接続する Joint を含めるため、親 {best.GetPath()} を探す範囲にした")
+        return best, inner_bodies
+    return prim, set()
+
+
 # ==============================================================================
 # メイン読み取り関数: read_articulation
 # ==============================================================================
@@ -257,17 +354,14 @@ def read_articulation(stage: Usd.Stage, source: UsdArticulationSource | str) -> 
     # Phase 1: 探索範囲の確定と Joint / ArticulationRoot / FilteredPairs 収集
     # ==========================================================================
     roots: list[Usd.Prim] = []
+    seed_bodies: set[str] = set()
     for path in source.root_prim_paths:
         prim = stage.GetPrimAtPath(path)
         if not prim or not prim.IsValid():
             raise ValueError(f"prim が無い: {path}")
-        has_joint = any(p.IsA(UsdPhysics.Joint) for p in Usd.PrimRange(prim) if p != prim)
-        # 一部の USD アセットは `ArticulationRootAPI` をルートリンク剛体や固定 Joint 自身に付けるため、
-        # 配下に Joint が見当たらない場合は 1 段親のロボットルートへ広げて探索する
-        if (prim.IsA(UsdPhysics.Joint) or not has_joint) and not prim.GetParent().IsPseudoRoot():
-            info.warnings.append(f"{path} の下に Joint が無いので、親 {prim.GetParent().GetPath()} を探す範囲にした")
-            prim = prim.GetParent()
-        roots.append(prim)
+        resolved, seeds = _resolve_root_prim(stage, prim, info)
+        roots.append(resolved)
+        seed_bodies.update(seeds)
     info.root_prim_paths = [str(p.GetPath()) for p in roots]
 
     ignore = set(source.ignore_joint_paths)
@@ -304,6 +398,7 @@ def read_articulation(stage: Usd.Stage, source: UsdArticulationSource | str) -> 
     # ==========================================================================
     # 高速化のため USD 属性値をリストへ集約し、行列の逆変換・スケール分離を NumPy で一括処理する
     world_fixed: list[str] = []  # ワールドへ固定接続されている剛体 (根リンク候補)
+    world_fixed_prim_of: dict[str, Usd.Prim] = {}  # 剛体パス -> ワールド固定 Joint prim (複数サブツリー統合用)
     marker_layers = _marker_layers(stage)
     eye = Gf.Matrix4d(1.0)
     kept: list[tuple] = []  # (prim, type, body0, body1, axis, lower, upper, collision_enabled)
@@ -375,12 +470,18 @@ def read_articulation(stage: Usd.Stage, source: UsdArticulationSource | str) -> 
             info.warnings.append(f"{path}: 両端とも剛体が無いので読まない")
             continue
         if jtype == "fixed" and None in bodies:
-            world_fixed.append(bodies[0] or bodies[1])  # type: ignore[arg-type]
+            wf_body = bodies[0] or bodies[1]
+            assert wf_body is not None
+            world_fixed.append(wf_body)
+            world_fixed_prim_of.setdefault(wf_body, prim)
             continue
         if None in bodies and source.world_joints == "ignore":
             # PhysX の Articulation はワールドへ開いた可動 Joint を DOF に数えないため既定では除外する
             info.warnings.append(f'{path}: ワールドに対して動く Joint なので木に入れない(DOF にするなら world_joints="dof")')
-            world_fixed.append(bodies[0] or bodies[1])  # type: ignore[arg-type]
+            wf_body = bodies[0] or bodies[1]
+            assert wf_body is not None
+            world_fixed.append(wf_body)
+            world_fixed_prim_of.setdefault(wf_body, prim)
             continue
         axis_token = prim.GetAttribute("physics:axis").Get() if jtype != "fixed" and prim.GetAttribute("physics:axis") else "X"
         axis = {"X": (1.0, 0.0, 0.0), "Y": (0.0, 1.0, 0.0), "Z": (0.0, 0.0, 1.0)}[axis_token or "X"]
@@ -414,7 +515,7 @@ def read_articulation(stage: Usd.Stage, source: UsdArticulationSource | str) -> 
 
     mark("joints_math")
     # ==========================================================================
-    # Phase 3: 根リンク決定と幅優先探索 (BFS) による木構造化・逆向き関節正規化
+    # Phase 3: 連結成分分解・根リンク決定・幅優先探索 (BFS) による木構造化
     # ==========================================================================
     body_paths: list[str] = []
     for _, _, b0, b1, *_ in raw:
@@ -426,18 +527,97 @@ def read_articulation(stage: Usd.Stage, source: UsdArticulationSource | str) -> 
             body_paths.append(b)
     if not body_paths:
         raise ValueError(f"{info.root_prim_paths} の下に、剛体をつなぐ Joint が見つからない")
+
+    # 剛体グラフの連結成分を分解する (ワールド接続 None は辺から除いて剛体同士の連結性だけを見る)
+    body_adj: dict[str, list[str]] = {b: [] for b in body_paths}
+    for _, _, b0, b1, *_ in raw:
+        if b0 is not None and b1 is not None:
+            body_adj[b0].append(b1)
+            body_adj[b1].append(b0)
+    visited_comp: set[str] = set()
+    body_components: list[list[str]] = []
+    for b in body_paths:
+        if b in visited_comp:
+            continue
+        comp: list[str] = []
+        q_comp = [b]
+        visited_comp.add(b)
+        for cur_b in q_comp:
+            comp.append(cur_b)
+            for nb in body_adj[cur_b]:
+                if nb not in visited_comp:
+                    visited_comp.add(nb)
+                    q_comp.append(nb)
+        body_components.append(comp)
+
+    # `_resolve_root_prim` で特定の剛体/ArticulationRoot から上位へ広げた場合、
+    # 兄弟ロボットなど別成分の Joint を巻き込まないよう `seed_bodies` を含む連結成分だけを残す。
+    if seed_bodies and len(body_components) > 1:
+        matched_comps = [c for c in body_components if any(b in seed_bodies for b in c)]
+        if matched_comps:
+            body_components = matched_comps
+            allowed_bodies = {b for c in body_components for b in c}
+            raw = [item for item in raw if (item[2] is None or item[2] in allowed_bodies) and (item[3] is None or item[3] in allowed_bodies)]
+            world_fixed = [b for b in world_fixed if b in allowed_bodies]
+            body_paths = [b for b in body_paths if b in allowed_bodies]
+
     has_world_joint = any(b0 is None or b1 is None for _, _, b0, b1, *_ in raw)
     child_side = {b1 for _, _, b0, b1, *_ in raw if b0 is not None and b1 is not None}
-    # 根リンク優先順位: (1) ワールド可動関節があれば仮想根 `None`、(2) ワールド固定剛体、
-    # (3) `ArticulationRootAPI` を持つ剛体、(4) どの関節の `body1` にもなっていない剛体、(5) 先頭剛体
+    wf_set = set(world_fixed)
+    body_order_idx = {b: i for i, b in enumerate(body_paths)}
+
+    def _pick_component_root(comp_bodies: list[str]) -> str:
+        """連結成分内の根リンクを優先順位に従って決定する。
+
+        優先順位:
+            1. ワールド固定 (`world_fixed`) に含まれる剛体 -> その中で `ArticulationRootAPI` 保有・パス浅い順
+            2. `ArticulationRootAPI` を持つ剛体 -> パス浅い順
+            3. どの関節の `body1` にもなっていない剛体 (`never_child`) -> パス浅い順
+            4. 成分内の先頭剛体
+        なぜ単純な `world_fixed[0]` にしないか:
+            URDF Converter v0.3.2 の USD 階層では `Geometry/` が `Physics/` よりアルファベット順で先に走査される。
+            もし配下のサブ部品に未無効化の `root_joint` や静的固定 Joint が混ざっていると、`world_fixed[0]` が
+            深い子リンクになってしまい、本来の `ArticulationRootAPI` ルート剛体より先に選ばれて木が逆転・破綻するため。
+        """
+
+        def _rank(b: str) -> tuple[int, int, int]:
+            p = stage.GetPrimAtPath(b)
+            has_ar = 0 if (p and p.HasAPI(UsdPhysics.ArticulationRootAPI)) else 1
+            return (has_ar, b.count("/"), body_order_idx.get(b, 0))
+
+        comp_wf = [b for b in comp_bodies if b in wf_set]
+        if comp_wf:
+            return min(comp_wf, key=_rank)
+        with_api = [b for b in comp_bodies if stage.GetPrimAtPath(b).HasAPI(UsdPhysics.ArticulationRootAPI)]
+        if with_api:
+            return min(with_api, key=_rank)
+        never_child = [b for b in comp_bodies if b not in child_side]
+        if never_child:
+            return min(never_child, key=_rank)
+        return comp_bodies[0]
+
+    # 独立した複数サブツリー (例: 複数アームが各自ワールド/静的ベースへ固定されたマルチアームセル、
+    # あるいは複数ロボットを含むルート prim 指定) がある場合は、1 つ目の成分の根から他成分をたどろうとして
+    # 大量の「根からたどれない」エラーを出す代わりに、仮想根 `WORLD_LINK` (`None`) 配下へ各成分の根を
+    # ワールド姿勢付き固定関節で束ねて 1 本の正確な木にする。
     if has_world_joint:
         root_body: str | None = None
-    elif world_fixed:
-        root_body = world_fixed[0]
+    elif len(body_components) == 1:
+        root_body = _pick_component_root(body_components[0])
     else:
-        with_api = [b for b in body_paths if stage.GetPrimAtPath(b).HasAPI(UsdPhysics.ArticulationRootAPI)]
-        never_child = [b for b in body_paths if b not in child_side]
-        root_body = with_api[0] if with_api else (never_child[0] if never_child else body_paths[0])
+        root_body = None
+        comp_roots = [_pick_component_root(c) for c in body_components]
+        for comp_root in comp_roots:
+            root_prim_obj = stage.GetPrimAtPath(comp_root)
+            root_world_rigid = (
+                split_scale(_np(cache.GetLocalToWorldTransform(root_prim_obj)))[0]
+                if root_prim_obj and root_prim_obj.IsValid()
+                else np.eye(4)
+            )
+            wf_prim = world_fixed_prim_of.get(comp_root)
+            if wf_prim is None:
+                info.warnings.append(f"{comp_root}: 独立した浮遊サブツリーを仮想根 {WORLD_LINK!r} 配下に固定接続した")
+            raw.append((wf_prim, "fixed", None, comp_root, root_world_rigid, np.eye(4), (1.0, 0.0, 0.0), -np.inf, np.inf))
 
     used_links: dict[str, int] = {}
     used_joints: dict[str, int] = {}
@@ -471,17 +651,20 @@ def read_articulation(stage: Usd.Stage, source: UsdArticulationSource | str) -> 
                 continue
             prim, jtype, b0, b1, f0, f1, axis, lower, upper = raw[k]
             other = b1 if cur == b0 else b0
-            path = str(prim.GetPath())
+            path = str(prim.GetPath()) if prim is not None else None
             if other in link_name_of:
                 used_raw.add(k)
-                info.warnings.append(f"{path}: 閉じた輪を作るので木に入れない")
+                if path is not None:
+                    info.warnings.append(f"{path}: 閉じた輪を作るので木に入れない")
                 continue
             used_raw.add(k)
             add_link(other)
             queue.append(other)
             forward = cur == b0
-            name = _unique(prim.GetName(), used_joints)
-            joint_name_of_path[path] = name
+            raw_jname = prim.GetName() if prim is not None else f"{link_name_of[other]}_world_mount"
+            name = _unique(raw_jname, used_joints)
+            if path is not None:
+                joint_name_of_path[path] = name
             if not forward:
                 info.reversed_joints.append(name)
             specs.append(
@@ -501,10 +684,10 @@ def read_articulation(stage: Usd.Stage, source: UsdArticulationSource | str) -> 
                     prim_path=path,
                 )
             )
-            if jtype != "fixed":
+            if jtype != "fixed" and prim is not None:
                 pending_mimic[name] = prim
     for k, (prim, *_rest) in enumerate(raw):
-        if k not in used_raw:
+        if k not in used_raw and prim is not None:
             info.warnings.append(f"{prim.GetPath()}: 根 {root_body or 'ワールド'} からたどれないので木に入れない")
 
     mark("tree")
@@ -523,11 +706,15 @@ def read_articulation(stage: Usd.Stage, source: UsdArticulationSource | str) -> 
             continue
         schemas = prim.GetAppliedSchemas()
         instances = [s[len(_MIMIC_PREFIX) :] for s in schemas if s.startswith(_MIMIC_PREFIX)]
-        if "NewtonMimicAPI" in schemas:
+        # Pure OpenUSD 環境 (Kit の `omni.usd.schema.newton` 未登録) では `GetAppliedSchemas()` に
+        # `"NewtonMimicAPI"` が出ない場合があるため、`newton:mimicJoint` リレーションの存在でも判定する。
+        newton_mimic_rel = prim.GetRelationship("newton:mimicJoint")
+        has_newton_mimic = ("NewtonMimicAPI" in schemas) or bool(newton_mimic_rel and newton_mimic_rel.GetTargets())
+        if has_newton_mimic:
             enabled = prim.GetAttribute("newton:mimicEnabled").Get() if prim.GetAttribute("newton:mimicEnabled") else True
             if enabled is not None and not enabled:
                 continue
-            targets = prim.GetRelationship("newton:mimicJoint").GetTargets()
+            targets = newton_mimic_rel.GetTargets() if newton_mimic_rel else []
             coef0 = prim.GetAttribute("newton:mimicCoef0").Get() if prim.GetAttribute("newton:mimicCoef0") else None
             coef1 = prim.GetAttribute("newton:mimicCoef1").Get() if prim.GetAttribute("newton:mimicCoef1") else None
             multiplier, offset = float(1.0 if coef1 is None else coef1), float(coef0 or 0.0)

@@ -27,13 +27,14 @@
 from __future__ import annotations
 
 import dataclasses
+import os
 import time
 from typing import Callable, Literal, Mapping, Sequence, get_args
 
 import numpy as np
-from pxr import Tf, Usd, UsdGeom, UsdPhysics
+from pxr import Sdf, Tf, Usd, UsdGeom, UsdPhysics
 
-from .layer import GeometricLayer, GeometricLayerOptions, _setting, is_authoring
+from .layer import GeometricLayer, GeometricLayerOptions, LayerTarget, _setting, is_authoring
 from .model import (
     AngleUnit,
     DHParameters,
@@ -76,6 +77,23 @@ StructureListener = Callable[[list[str], list[str]], None]  # (再構築前の D
 # 再構築のたびにモデルと USD から自動生成し直す `GeometricCollisionFilter` の reason 一覧。
 # これ以外の reason でユーザーが追加したルールは再構築後も保持する。
 _AUTO_FILTER_REASONS = ("adjacent", "mount", "usd_filtered_pairs")
+
+# コライダーの有効状態や形状寸法に直結する USD 属性名一覧。
+# `GeometricUsdWriter` が毎フレーム書き込む `xformOp:transform:geometric` を含めないことで、
+# 通常の姿勢更新 (`write_target="usd"` / `flush_to_usd()`) でコライダーキャッシュを誤破棄しない。
+_COLLIDER_ATTRS = frozenset(
+    (
+        "physics:collisionEnabled",
+        "physics:approximation",
+        "radius",
+        "size",
+        "height",
+        "axis",
+        "points",
+        "faceVertexCounts",
+        "faceVertexIndices",
+    )
+)
 
 
 class GeometricStructureChangedError(RuntimeError):
@@ -230,6 +248,8 @@ class GeometricRobot:
         self._angle_unit: AngleUnit = check_angle_unit(angle_unit if angle_unit is not None else _setting("angle_unit", "rad"))
         self._closed = False
         self._structure_version = 0
+        self._collider_version = 0
+        self._collider_layers: list[tuple[str, LayerTarget]] = []
         self._structure_listeners: list[StructureListener] = []
         self._converters: dict[str, tuple[GeometricCommandConverter, dict[tuple[str, str], str] | None]] = {}
         self._active_converters: list[tuple[str, GeometricCommandConverter, np.ndarray, np.ndarray]] | None = None
@@ -256,9 +276,10 @@ class GeometricRobot:
         self._layer_token = self._layer.register(**self._entry_kwargs())
         self._layer.add_listener(self._on_layer_changed)
 
-        # 既存ロボットから作った場合のみ、外部からの Variant 変更や構造変更を監視する
+        # 既存ロボットの構造変更 (`source is not None` の Variant / Joint / 剛体) と、
+        # コライダー Sublayer の挿抜・Mute/Unmute・形状属性変更を自動検知するため常に通知を購読する。
         self._signature = self._structure_signature() if source is not None else None
-        self._notice = Tf.Notice.Register(Usd.Notice.ObjectsChanged, self._on_objects_changed, stage) if source is not None else None
+        self._notice = Tf.Notice.Register(Usd.Notice.ObjectsChanged, self._on_objects_changed, stage)
         if source is not None:
             self._subscribe_update()
 
@@ -330,6 +351,7 @@ class GeometricRobot:
             for a, b in info.filtered_pairs:
                 self._filter.add_pair(a, b, reason="usd_filtered_pairs")
         self._colliders: dict[str, list[str]] | None = None
+        self._collider_version += 1
         self._components: dict[str, GeometricRobotComponent] = {}
         self._active_converters = None
         self.joints = {spec.name: GeometricJoint(self, spec) for spec in model.joints}
@@ -843,20 +865,35 @@ class GeometricRobot:
             self._structure_listeners.remove(callback)
 
     def _on_objects_changed(self, notice, _sender) -> None:
-        """USD 変更通知コールバック。ロボット範囲に resync があればフラグのみ立てる。
+        """USD 変更通知コールバック。ロボット範囲の resync やコライダー属性変化を検知してフラグを立てる。
 
         通知コールバック内では USD への書き込み (再構築・Sublayer 更新) が安全でないため、
-        ここでは `self._maybe_changed = True` を記録するにとどめ、実際の再構築は次の `_on_update`
-        または次の API 呼び出し (`_ensure_current`) で実行する。
+        ここではキャッシュ破棄と dirty フラグ設定だけを行い、実際の再構築は次の `_on_update`
+        または次の API 呼び出し (`_ensure_current` / `GeometricScene._ensure_finalized`) で実行する。
         """
         if self._closed or is_authoring():
             return
         roots = self.root_prim_paths
+        watch_paths = list(dict.fromkeys([*roots, *self._prim_paths]))
+        collider_dirty = False
         for path in notice.GetResyncedPaths():
             p = str(path)
-            if any(p == r or p.startswith(r + "/") or r.startswith(p.rstrip("/") + "/") or p == "/" for r in roots):
-                self._maybe_changed = True
-                return
+            p_norm = p.rstrip("/")
+            if self._source is not None and not self._maybe_changed:
+                if any(p == "/" or p == r or p.startswith(r + "/") or r.startswith(p_norm + "/") for r in roots):
+                    self._maybe_changed = True
+            if not collider_dirty and watch_paths:
+                if any(p == "/" or p == w or p.startswith(w + "/") or w.startswith(p_norm + "/") for w in watch_paths):
+                    collider_dirty = True
+        if not collider_dirty and watch_paths:
+            for path in notice.GetChangedInfoOnlyPaths():
+                if path.IsPropertyPath() and path.name in _COLLIDER_ATTRS:
+                    prim_p = str(path.GetPrimPath())
+                    if any(prim_p == w or prim_p.startswith(w + "/") for w in watch_paths):
+                        collider_dirty = True
+                        break
+        if collider_dirty:
+            self._invalidate_colliders()
 
     def _structure_signature(self) -> tuple:
         """構造の指紋: Variant 選択・`Joint` prim 一覧・`RigidBodyAPI` prim 一覧のタプル。"""
@@ -1080,8 +1117,13 @@ class GeometricRobot:
         return self._filter
 
     @property
+    def collider_version(self) -> int:
+        """コライダー構成が破棄または更新されるたびに 1 増える番号 (`GeometricScene` / `GeometricRobotView` の同期用)。"""
+        return self._collider_version
+
+    @property
     def collider_paths(self) -> dict[str, list[str]]:
-        """`リンク名 -> コライダー形状の prim パス一覧`。初回アクセス時に USD から探索する (形状追加時は `refresh_colliders()`)。"""
+        """`リンク名 -> コライダー形状の prim パス一覧`。初回アクセス時に USD から探索する。"""
         self._ensure_current()
         if self._colliders is None:
             from .collision import find_colliders
@@ -1089,11 +1131,155 @@ class GeometricRobot:
             self._colliders = {name: find_colliders(self._stage, path, self._prim_paths) for name, path in self._link_path_map.items()}
         return self._colliders
 
-    def refresh_colliders(self) -> None:
-        """キャッシュ済みのコライダー一覧を破棄し、紐づく `GeometricScene` にも再構築マークを付ける。"""
+    def _invalidate_colliders(self) -> None:
+        """コライダー探索キャッシュと紐づく Newton / PhysX シーンを破棄し、`collider_version` を進める。"""
         self._colliders = None
+        self._collider_version += 1
         if self._scene is not None:
             self._scene.mark_dirty()
+        if self._checker is not None:
+            self._checker._needs_reload = True
+
+    def refresh_colliders(self) -> None:
+        """キャッシュ済みのコライダー一覧を破棄し、紐づく `GeometricScene` / `GeometricCollisionChecker` に再構築マークを付ける。"""
+        self._invalidate_colliders()
+
+    def reload_colliders(self) -> dict[str, list[str]]:
+        """コライダー探索キャッシュと Newton / PhysX シーンを破棄し、最新 USD 構成から読み直した一覧を返す。
+
+        カスタムコライダー用 `.usda` を手動で `subLayerPaths` へ追加・Mute/Unmute した直後や、
+        `CollisionAPI` / 形状寸法を直接編集した直後に明示的に再同期したいときに呼ぶ。
+        """
+        self._invalidate_colliders()
+        return self.collider_paths
+
+    @property
+    def collider_layers(self) -> list[str]:
+        """`attach_collider_layer()` で現在取り付けているカスタムコライダー Sublayer の識別子一覧。"""
+        return [ident for ident, _ in self._collider_layers]
+
+    def _host_layer_for_target(self, target: LayerTarget) -> Sdf.Layer:
+        if target not in get_args(LayerTarget):
+            raise ValueError(f"target は {get_args(LayerTarget)} のどれか: {target!r}")
+        return self._stage.GetSessionLayer() if target == "session" else self._stage.GetRootLayer()
+
+    def _resolve_collider_layer_id(self, layer_or_path: str | os.PathLike[str] | Sdf.Layer, *, must_open: bool = False) -> str:
+        """`Sdf.Layer` / レイヤー識別子 / ファイルパスを OpenUSD の `Sdf.Layer.identifier` へ正規化する。"""
+        if isinstance(layer_or_path, Sdf.Layer):
+            return layer_or_path.identifier
+        raw = os.fspath(layer_or_path)
+        for ident, _ in self._collider_layers:
+            if ident == raw:
+                return ident
+        found = Sdf.Layer.Find(raw)
+        if found is not None:
+            return found.identifier
+        if must_open:
+            opened = Sdf.Layer.FindOrOpen(raw)
+            if opened is None:
+                raise FileNotFoundError(f"コライダー Sublayer を開けない: {raw!r}")
+            return opened.identifier
+        norm_raw = os.path.normcase(os.path.abspath(raw))
+        for ident, _ in self._collider_layers:
+            if not ident.startswith("anon:") and os.path.normcase(os.path.abspath(ident)) == norm_raw:
+                return ident
+        return raw
+
+    @staticmethod
+    def _find_sublayer_entry(host: Sdf.Layer, ident: str) -> str | None:
+        """`host.subLayerPaths` の中から `ident` に一致する登録文字列を返す (無ければ `None`)。"""
+        norm_ident = None if ident.startswith("anon:") else os.path.normcase(os.path.abspath(ident))
+        for entry in host.subLayerPaths:
+            if entry == ident:
+                return entry
+            resolved = Sdf.Layer.Find(entry)
+            if resolved is not None and resolved.identifier == ident:
+                return entry
+            if norm_ident is not None and not entry.startswith("anon:"):
+                if os.path.normcase(os.path.abspath(entry)) == norm_ident:
+                    return entry
+        return None
+
+    def attach_collider_layer(
+        self,
+        layer_or_path: str | os.PathLike[str] | Sdf.Layer,
+        *,
+        target: LayerTarget = "session",
+    ) -> str:
+        """カスタムコライダー定義 `.usda` (または `Sdf.Layer`) を Sublayer として取り付け、即座にコライダーを再読込する。
+
+        `GeometricLayer` の直下 (Session Layer で `GeometricLayer` が先頭にある場合は index 1、無ければ index 0) へ
+        差し込むことで、`GeometricLayer` が書く `xformOp:transform:geometric` や `rigidBodyEnabled=false` の優先順位を
+        維持しつつ、元 USD (Root Layer) の `CollisionAPI` 無効化とカスタムコライダー追加を上書き適用する。
+        元のロボット USD ファイルは変更しない。戻り値は取り付けたレイヤーの識別子 (`Sdf.Layer.identifier`)。
+        """
+        ident = self._resolve_collider_layer_id(layer_or_path, must_open=True)
+        host = self._host_layer_for_target(target)
+        if self._find_sublayer_entry(host, ident) is None:
+            geom_layer = self._layer.sdf_layer
+            insert_idx = 0
+            if geom_layer is not None:
+                sub_paths = list(host.subLayerPaths)
+                if geom_layer.identifier in sub_paths:
+                    insert_idx = sub_paths.index(geom_layer.identifier) + 1
+            host.subLayerPaths.insert(insert_idx, ident)
+        if self._stage.IsLayerMuted(ident):
+            self._stage.UnmuteLayer(ident)
+        if not any(i == ident for i, _ in self._collider_layers):
+            self._collider_layers.append((ident, target))
+        self.reload_colliders()
+        return ident
+
+    def set_collider_layer_enabled(
+        self,
+        layer_or_path: str | os.PathLike[str] | Sdf.Layer,
+        enabled: bool,
+    ) -> None:
+        """取り付け済みのカスタムコライダー Sublayer を USD の Mute / Unmute で切り替え、即座にコライダーを再読込する。
+
+        `enabled=False` にすると Sublayer を Mute して元のコライダー構成へ戻し、
+        `enabled=True` にすると Unmute してカスタムコライダーを再び有効化する (0 フレーム遅延で Newton へ反映)。
+        """
+        ident = self._resolve_collider_layer_id(layer_or_path, must_open=False)
+        if enabled:
+            self._stage.UnmuteLayer(ident)
+        else:
+            self._stage.MuteLayer(ident)
+        self.reload_colliders()
+
+    def detach_collider_layer(
+        self,
+        layer_or_path: str | os.PathLike[str] | Sdf.Layer | None = None,
+    ) -> bool:
+        """カスタムコライダー Sublayer をステージから外し、元のコライダー構成へ戻す。
+
+        `layer_or_path=None` を渡すと、`attach_collider_layer()` で取り付けたすべてのカスタムコライダー Sublayer を外す。
+        1 つ以上外した場合は `True`、該当が無ければ `False` を返す。
+        """
+        if layer_or_path is None:
+            targets = list(self._collider_layers)
+        else:
+            ident = self._resolve_collider_layer_id(layer_or_path, must_open=False)
+            matched = [(i, t) for i, t in self._collider_layers if i == ident]
+            targets = matched if matched else [(ident, "session"), (ident, "root")]
+        removed_any = False
+        removed_ids: set[str] = set()
+        for ident, target in targets:
+            host = self._host_layer_for_target(target)
+            entry = self._find_sublayer_entry(host, ident)
+            if entry is not None:
+                host.subLayerPaths.remove(entry)
+                removed_any = True
+                removed_ids.add(ident)
+            if self._stage.IsLayerMuted(ident):
+                self._stage.UnmuteLayer(ident)
+        if removed_ids:
+            self._collider_layers = [(i, t) for i, t in self._collider_layers if i not in removed_ids]
+        elif layer_or_path is None:
+            self._collider_layers.clear()
+        if removed_any:
+            self.reload_colliders()
+        return removed_any
 
     @property
     def link_set(self):
@@ -1169,21 +1355,97 @@ class GeometricRobot:
             ignore_prim_paths=ignore_prim_paths,
         )
 
-    def ignore_touching_pairs(self, reason: str = "touching_at_setup") -> list[tuple[str, str]]:
-        """現在の姿勢でロボット内に重なっている組をすべて `collision_filter` へ追加し、追加した組一覧を返す。
+    def ignore_touching_pairs(
+        self,
+        reason: str | None = None,
+        *,
+        samples: int = 0,
+        seed: int = 0,
+        always_ratio: float = 1.0,
+    ) -> list[tuple[str, str]]:
+        """ロボット内で重なっているリンク組を `collision_filter` へ追加し、追加した `(link_a, link_b)` 一覧を返す。
 
-        簡易形状で組んだロボットでは、短いリンクを挟んだ 2 リンクが関節付近で常時重なることがある。
-        干渉のない基準姿勢で 1 回呼んでおくと以後のチェックから除外できる。解除は `collision_filter.remove_by_reason(reason)`。
+        2 つの動作モード:
+            - `samples == 0` (既定): **現在の 1 姿勢だけ**を検査し、その姿勢で重なっている組をすべて
+              `reason` (既定 `"touching_at_setup"`) で除外登録する。現在の 1 姿勢に偶然の自己干渉が含まれると
+              その組も除外されるため、干渉のない基準姿勢で呼ぶこと。
+            - `samples > 0`: 現在の `self._q` を退避し、可動範囲内の `samples` 個のランダム姿勢
+              (無制限の回転関節は `[-pi, pi]`、無制限の直動関節は `[-0.5, 0.5]`、mimic 解決済み) で
+              自己干渉を評価し、`always_ratio` (既定 `1.0` = 全サンプル) 以上の割合で重なり続けた組だけを
+              `reason` (既定 `"always_touching"`) で除外登録してから元の姿勢へ戻す。
+              `collision_backend="newton"` では USD / Fabric へ一切書き出さず、`GeometricScene` の
+              メモリ内だけでサンプリングする。
+
+        解除は `collision_filter.remove_by_reason(reason)` で行える。
         """
+        self._ensure_current()
+        if samples < 0:
+            raise ValueError(f"samples は 0 以上: {samples}")
+        if not (0.0 < always_ratio <= 1.0):
+            raise ValueError(f"always_ratio は (0.0, 1.0] の範囲: {always_ratio}")
+
+        tag = reason if reason is not None else ("touching_at_setup" if samples == 0 else "always_touching")
+
+        if samples == 0:
+            pairs = (
+                self.scene.check_within(self.link_set)
+                if self._collision_backend == "newton"
+                else self.collision_checker.check_within(self.link_set)
+            )
+            added: list[tuple[str, str]] = []
+            for pair in pairs:
+                self._filter.add_pair(pair.link_a, pair.link_b, reason=tag)
+                added.append((pair.link_a, pair.link_b))
+            return added
+
+        # 多姿勢サンプリング (`samples > 0`): 元の関節値を退避し、終了時に必ず復元する
+        saved_q = self._q.copy()
+        num_dofs = self._model.num_dofs
+        rng = np.random.default_rng(seed)
+        low = self._lower.copy()
+        high = self._upper.copy()
+        for i in range(num_dofs):
+            if not np.isfinite(low[i]):
+                low[i] = -np.pi if self._revolute[i] else -0.5
+            if not np.isfinite(high[i]):
+                high[i] = np.pi if self._revolute[i] else 0.5
+            if high[i] < low[i]:
+                low[i], high[i] = high[i], low[i]
+
+        counts: dict[tuple[str, str], int] = {}
+        try:
+            use_newton = self._collision_backend == "newton"
+            scene = self.scene if use_newton else None
+            for _ in range(samples):
+                q_sample = rng.uniform(low, high) if num_dofs > 0 else np.zeros(0, dtype=float)
+                q_sample = self._model.resolve_mimic(q_sample)
+                if use_newton and scene is not None:
+                    # `GeometricScene` のメモリ内のみで FK・衝突判定し、USD / Fabric は書き換えない
+                    self._q = q_sample
+                    pairs = scene.check_within(self.link_set)
+                else:
+                    self._set_positions_rad(q_sample, np.arange(num_dofs, dtype=int))
+                    pairs = self.collision_checker.check_within(self.link_set)
+                seen_in_sample: set[tuple[str, str]] = set()
+                for pair in pairs:
+                    key = (pair.link_a, pair.link_b) if pair.link_a <= pair.link_b else (pair.link_b, pair.link_a)
+                    if key not in seen_in_sample:
+                        seen_in_sample.add(key)
+                        counts[key] = counts.get(key, 0) + 1
+        finally:
+            if self._collision_backend == "newton":
+                self._q = saved_q
+                if self._scene is not None and self._scene._model is not None:
+                    self._scene.sync_robots()
+            else:
+                self._set_positions_rad(saved_q, np.arange(num_dofs, dtype=int))
+
+        min_hits = int(np.ceil(always_ratio * samples - 1e-12))
         added = []
-        pairs = (
-            self.scene.check_within(self.link_set)
-            if self._collision_backend == "newton"
-            else self.collision_checker.check_within(self.link_set)
-        )
-        for pair in pairs:
-            self._filter.add_pair(pair.link_a, pair.link_b, reason=reason)
-            added.append((pair.link_a, pair.link_b))
+        for a, b in sorted(counts):
+            if counts[(a, b)] >= min_hits:
+                self._filter.add_pair(a, b, reason=tag)
+                added.append((a, b))
         return added
 
     # ==========================================================================
@@ -1402,6 +1664,8 @@ class GeometricRobot:
         if self._closed:
             return
         if remove_layer:
+            if self._collider_layers:
+                self.detach_collider_layer()
             self._layer.remove()
         self._layer.remove_listener(self._on_layer_changed)
         self._update_subscription = None

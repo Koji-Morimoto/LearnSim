@@ -13,15 +13,15 @@
 
 ```mermaid
 flowchart TD
-    subgraph PureLayer["Pure Python / NumPy 層 (model/)"]
-        transforms["model/transforms.py\n同次変換・四元数"]
-        spec["model/spec.py\nGeometricRobotModel"]
-        sources["model/sources.py\nDH / MDH / Screw / UrdfSource"]
-        urdf["model/urdf.py\nURDF 読み書き"]
-        chain["model/chain.py\nKinematicChain"]
-        ik["model/ik.py / ik_ikpy.py\nJacobianIKSolver / IKPySolver"]
-        cfilter["model/collision_filter.py\nGeometricCollisionFilter"]
-        command["model/command.py\nCommandConverter"]
+    subgraph PureLayer["Pure NumPy 層（model/）　"]
+        transforms["transforms.py<br/>同次変換・四元数　"]
+        spec["spec.py<br/>GeometricRobotModel"]
+        sources["sources.py<br/>DH / MDH / Screw"]
+        urdf["urdf.py<br/>URDF 読み書き　"]
+        chain["chain.py<br/>KinematicChain"]
+        ik["ik.py / ik_ikpy.py<br/>Jacobian / IKPy"]
+        cfilter["collision_filter.py<br/>衝突フィルタ　"]
+        command["command.py<br/>CommandConverter"]
         transforms --> spec
         spec --> sources
         spec --> urdf
@@ -30,15 +30,15 @@ flowchart TD
         spec --> cfilter
     end
 
-    subgraph IntegrationLayer["USD / Fabric / Newton / PhysX 統合層"]
-        usd_reader["usd_reader.py\nread_articulation"]
-        builder["builder.py\nbuild_robot_prims"]
-        layer["layer.py\nGeometricLayer"]
-        writer["writer.py\nUsd / Fabric / GpuFabric Writer"]
-        collision["collision.py\nCollisionPair / PhysX Checker"]
-        newton_be["newton_backend.py\nGeometricScene / BatchedNewtonScene"]
-        robot["robot.py\nGeometricRobot / Component"]
-        robot_view["robot_view.py\nGeometricRobotView"]
+    subgraph IntegrationLayer["USD / Fabric / Newton 統合層　"]
+        usd_reader["usd_reader.py<br/>read_articulation"]
+        builder["builder.py<br/>build_robot_prims"]
+        layer["layer.py<br/>GeometricLayer"]
+        writer["writer.py<br/>Usd / Fabric / GPU"]
+        collision["collision.py<br/>CollisionPair / PhysX"]
+        newton_be["newton_backend.py<br/>GeometricScene<br/>BatchedNewtonScene"]
+        robot["robot.py<br/>GeometricRobot<br/>Component"]
+        robot_view["robot_view.py<br/>GeometricRobotView"]
         usd_reader --> spec
         builder --> spec
         writer --> layer
@@ -69,22 +69,31 @@ flowchart TD
 単体ロボット（`GeometricRobot`）および複数台バッチ（`GeometricRobotView`）で、`set_dof_positions()` から描画更新・干渉判定へ至る経路を示します。
 
 ```mermaid
-flowchart LR
-    Q["入力関節値 q\n(rad または deg)"] --> Unit["単位変換・可動範囲処理\nlimit_policy"]
-    Unit --> Mimic["Mimic 解決\nmodel.resolve_mimic(q)"]
-    Mimic --> FK{"順運動学バックエンド\nfk_backend"}
-    FK -- "numpy / auto(小型)" --> NumPyFK["GeometricRobotModel\n.forward_kinematics()"]
-    FK -- "newton / auto(大規模・View)" --> NewtonFK["newton.eval_fk()\n(GPU state.body_q)"]
+flowchart TD
+    Q["入力関節値 q<br/>rad または deg　"]
+    Unit["単位変換・可動範囲<br/>limit_policy　"]
+    Mimic["Mimic 解決<br/>resolve_mimic(q)　"]
+    FK{"FK バックエンド<br/>fk_backend　"}
+    NumPyFK["NumPy 順運動学<br/>forward_kinematics()"]
+    NewtonFK["Newton 順運動学<br/>newton.eval_fk()"]
+    Writer{"書き込み先<br/>write_target　"}
+    FabW["Fabric 書き込み<br/>GeometricFabricWriter"]
+    GpuFabW["GPU 直接書き込み<br/>GeometricGpuFabricWriter"]
+    UsdW["USD Sublayer<br/>GeometricUsdWriter"]
+    Col{"干渉バックエンド<br/>collision_backend　"}
+    NScene["Newton 判定（既定）<br/>GeometricScene<br/>USD 不要・0F 遅延　"]
+    PCheck["PhysX 判定<br/>flush_to_usd()<br/>overlap_shape　"]
 
-    NumPyFK --> Writer{"書き込み先\nwrite_target"}
-    NewtonFK --> Writer
-    Writer -- "fabric (通常)" --> FabW["GeometricFabricWriter\nIFabricHierarchy / XformPrim"]
-    Writer -- "fabric + GPU Writer" --> GpuFabW["GeometricGpuFabricWriter\nwp.fabricarray(worldMatrix)"]
-    Writer -- "usd / both" --> UsdW["GeometricUsdWriter\nSublayer Sdf.ChangeBlock"]
-
-    Mimic --> Col{"干渉判定バックエンド\ncollision_backend"}
-    Col -- "newton (既定)" --> NScene["GeometricScene / BatchedNewtonScene\neval_fk -> collide -> contact_kinematics\n(USD flush 不要・0 フレーム遅延)"]
-    Col -- "physx" --> PCheck["flush_to_usd() -> PhysX overlap_shape\n(Play=ON の Fabric のみは 1F 遅延)"]
+    Q --> Unit --> Mimic
+    Mimic --> FK
+    Mimic --> Col
+    FK -- "numpy / 小型　" --> NumPyFK --> Writer
+    FK -- "newton / 大規模　" --> NewtonFK --> Writer
+    Writer -- "fabric　" --> FabW
+    Writer -- "GPU Fabric　" --> GpuFabW
+    Writer -- "usd / both　" --> UsdW
+    Col -- "newton　" --> NScene
+    Col -- "physx　" --> PCheck
 ```
 
 ---
@@ -138,10 +147,10 @@ Newton には USD を直接読む `newton.ModelBuilder.add_usd(stage)` があり
 
 ### 4.3 なぜ `builder.rigid_gap = 0.0` と実行時 `model.shape_gap` 切替を使うのか
 
-Newton 1.6.1 の `ModelBuilder` は既定値 `rigid_gap = 0.1` [m] を持ち、0.1 m 以内の非貫通ペアも接触候補として返します。`newton_backend.py` では構築時に `rigid_gap = 0.0` / `default_shape_cfg.gap = 0.0` / `margin = 0.0` とし、`finalize()` 直後に `model.shape_gap.zero_()` を実行します。
+Newton 1.6.1 の `ModelBuilder` は既定値 `rigid_gap = 0.1` [m] を持ち、0.1 m 以内の非貫通ペアも接触候補として返します。なお Newton では `margin`（PhysX の `restOffset` 相当）が物理表面を膨張させて `out_distance` を減算するのに対し、`gap`（PhysX の `contactOffset - restOffset` 相当）は検出到達距離だけを広げ `out_distance` の値自体は変えません。`newton_backend.py` では USD の `physxCollision:contactOffset` / `restOffset` は読まず、構築時に `builder.rigid_gap = 0.0` とローカル `ShapeConfig(margin=0.0, gap=0.0)` を指定し、`finalize()` 直後に `model.shape_gap.zero_()` を実行します。
 
-- 干渉判定（`clearance == 0.0`）では `shape_gap` を `0.0` にして貫通（`separation <= 0.0`）だけを抽出します。
-- クリアランス計測（`compute_clearances(max_distance=d)` や `check_collisions(clearance=d)`）では、モデルを再構築せず `model.shape_gap` を `0.5 * d` に書き換えるだけで、2 形状の和 `gap_a + gap_b = d` 以内のペアと厳密な符号付き距離を同一パイプラインで取得できます。
+- 干渉判定（`clearance == 0.0`）では `shape_gap` を `0.0` にして真の幾何的貫通（`separation <= 0.0`）だけを抽出します。
+- クリアランス計測（`compute_clearances(max_distance=d)` や `check_collisions(clearance=d)`）では、モデルを再構築せず `_set_gap(d)` で `model.shape_gap` を `0.5 * d + 1e-4` へ書き換え、2 形状の和 `gap_a + gap_b = d + 2e-4` 以内で検出した候補を `separation <= d` で厳密に絞り込みます。なお `compute_clearances()` は貫通ペア（`separation <= 0.0`）も含めて昇順で返すため、干渉と近接クリアランスの両方が必要なループでは `check_collisions()` と `compute_clearances()` を 2 回呼ばず、`compute_clearances()` 1 回で両方を分類する方が約 2 倍高速です。
 - 接触バッファ溢れによる `IndexError` を防ぐため、読み取り件数は常に `min(int(rigid_contact_count[0]), int(rigid_contact_max))` でクランプしています。
 
 ### 4.4 なぜ `sync_environment()` の既定値が `use_fabric="auto"` なのか

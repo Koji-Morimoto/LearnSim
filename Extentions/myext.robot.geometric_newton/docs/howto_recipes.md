@@ -1,7 +1,8 @@
 # ハウツー / レシピ集（`myext.robot.geometric_newton`）
 
-この文書は、特定の実装タスクを最短で解決するための実用コード集（**How-to**）です。
+この文書は、起動中の Isaac Sim 6.2.0 の Script Editor にそのまま貼り付けて動く実用コード集（**How-to**）です。各レシピは先頭の `ISAAC_ROOT`（既定 `r"C:\isaacsim-6.2.0"`）から同梱アセットを自動参照し、ステージ作成・照明・ロボット配置までを自己完結で行います（実行すると開いているステージは新規ステージへ置き換わります）。
 
+- コマンドライン単独起動にも対応した完全版デモは `demo/demo_01_*.py`〜`demo/demo_06_*.py`（一覧は [README.md](README.md)）にあります。
 - 設計の背景や内部構造は [explanation_architecture.md](explanation_architecture.md) を参照してください。
 - 全クラス・引数・既定値の仕様は [reference_api.md](reference_api.md) を参照してください。
 
@@ -9,171 +10,291 @@
 
 ## レシピ 1：既存 Articulation を `Play=ON` で 0 フレーム遅延・Fabric 駆動する
 
-タイムラインが `Play=ON` のまま、周囲の PhysX 動的剛体を物理シミュレーションさせつつ、ロボットだけは `GeometricLayer` で物理を無効化して Fabric 駆動し、同一フレーム（Frame 0）で干渉判定します。
+`Play=ON` のまま周囲の PhysX 動的剛体（`/World/DynamicBox`）を重力で落下させつつ、UR10e は `GeometricLayer` で物理を無効化して Fabric 駆動し、同一フレーム（Frame 0）で自己干渉 5 組を検出します。
 
 ```python
+import asyncio
+from pathlib import Path
 import numpy as np
 import omni.kit.app
 import omni.timeline
 import omni.usd
+from pxr import Gf, PhysxSchema, UsdGeom, UsdPhysics
+
+ISAAC_ROOT = Path(r"C:\isaacsim-6.2.0")
+UR10E_USD = ISAAC_ROOT / "exts/isaacsim.asset.transformer.rules/data/tests/ur10e/ur10e.usd"
+
+mgr = omni.kit.app.get_app().get_extension_manager()
+mgr.add_path((ISAAC_ROOT / "extsUser/Extentions").as_posix())
+mgr.set_extension_enabled_immediate("myext.robot.geometric_newton", True)
 from myext.robot.geometric_newton import GeometricRobot
 
-stage = omni.usd.get_context().get_stage()
-app = omni.kit.app.get_app()
 
-# 既定値で collision_backend="newton", write_target="fabric", apply_layer=True
-robot = GeometricRobot.from_articulation(stage, "/World/UR10e")
+async def main():
+    app = omni.kit.app.get_app()
+    ctx = omni.usd.get_context()
+    await ctx.new_stage_async()
+    stage = ctx.get_stage()
+    UsdGeom.SetStageUpAxis(stage, UsdGeom.Tokens.z)
+    UsdGeom.SetStageMetersPerUnit(stage, 1.0)
+    UsdGeom.Xform.Define(stage, "/World")
 
-q_safe = np.array([0.0, -np.pi / 2, 0.0, -np.pi / 2, 0.0, 0.0])
-q_self = np.array([1.57, -0.5, 2.95, -np.pi / 2, -np.pi / 2, 0.0])
+    ps = UsdPhysics.Scene.Define(stage, "/World/physicsScene")
+    ps.CreateGravityDirectionAttr(Gf.Vec3f(0, 0, -1))
+    ps.CreateGravityMagnitudeAttr(9.81)
+    PhysxSchema.PhysxSceneAPI.Apply(ps.GetPrim()).CreateEnableGPUDynamicsAttr(False)
 
-# Play 開始前に初期姿勢を USD へ反映しておく
-robot.set_dof_positions(q_safe)
-robot.flush_to_usd()
+    # 共存する PhysX 動的剛体
+    dyn = UsdGeom.Cube.Define(stage, "/World/DynamicBox")
+    dyn.CreateSizeAttr(0.18)
+    dyn.AddTranslateOp().Set(Gf.Vec3d(-0.9, -0.5, 1.4))
+    UsdPhysics.RigidBodyAPI.Apply(dyn.GetPrim())
+    UsdPhysics.CollisionAPI.Apply(dyn.GetPrim())
+    UsdPhysics.MassAPI.Apply(dyn.GetPrim()).CreateMassAttr(1.0)
 
-timeline = omni.timeline.get_timeline_interface()
-timeline.play()
-app.update()
+    stage.DefinePrim("/World/UR10e", "Xform").GetReferences().AddReference(UR10E_USD.as_posix())
+    await app.next_update_async()
 
-# Fabric のみに書き込み（USD 書き出しなし）
-robot.set_dof_positions(q_self)
+    # 既定値: collision_backend="newton", write_target="fabric", apply_layer=True
+    robot = GeometricRobot.from_articulation(stage, "/World/UR10e")
+    q_safe = np.array([0.0, -np.pi / 2, 0.0, -np.pi / 2, 0.0, 0.0])
+    q_self = np.array([1.57, -0.5, 2.95, -np.pi / 2, -np.pi / 2, 0.0])
+    robot.set_dof_positions(q_safe)
+    robot.flush_to_usd()
 
-# app.update() を待たず Frame 0 で全組を検出（USD は書き換わらない）
-pairs = robot.check_collisions("within")
-for p in pairs:
-    print(p.names, f"separation={p.separation:.4f} m", "normal=", p.normal)
+    tl = omni.timeline.get_timeline_interface()
+    tl.play()
+    await app.next_update_async()
 
-# 元の Articulation 構成へ戻す（Root Layer は無変更）
-timeline.stop()
-robot.close()
+    # Fabric のみに書き込み（USD フラッシュなし）-> Frame 0 で 5 組すべて検出
+    robot.set_dof_positions(q_self)
+    pairs = robot.check_collisions("within")
+    print(f"Frame 0 検出={len(pairs)}組:", [(p.names, round(p.separation * 1e3, 1)) for p in pairs])
+
+    tl.stop()
+    await app.next_update_async()
+    robot.close()
+
+
+asyncio.ensure_future(main())
 ```
 
 ---
 
 ## レシピ 2：自前コリジョン空間 `GeometricScene` でロボット＋環境物（静的・動的）の干渉とクリアランスを測る
 
-`UsdPhysics.Scene` の有無にかかわらず、静的・動的な環境コライダーとの干渉判定、めり込み量、近接クリアランスを 0 フレーム遅延で取得します。
+`UsdPhysics.Scene` を作成せず、`GeometricScene` 単体で移動障害物の同期（`sync_environment()` / `set_obstacle_pose()`）とクリアランス計測（`compute_clearances()`）を行います。
 
 ```python
+import asyncio
+from pathlib import Path
 import numpy as np
-from pxr import Gf, UsdGeom
+import omni.kit.app
+import omni.usd
+from pxr import Gf, UsdGeom, UsdPhysics
+
+ISAAC_ROOT = Path(r"C:\isaacsim-6.2.0")
+UR10E_USD = ISAAC_ROOT / "exts/isaacsim.asset.transformer.rules/data/tests/ur10e/ur10e.usd"
+
+mgr = omni.kit.app.get_app().get_extension_manager()
+mgr.add_path((ISAAC_ROOT / "extsUser/Extentions").as_posix())
+mgr.set_extension_enabled_immediate("myext.robot.geometric_newton", True)
 from myext.robot.geometric_newton import GeometricRobot, GeometricScene
 
-# 1. 明示的に GeometricScene を作り、対象環境ルートを登録する
-scene = GeometricScene(stage)
-robot = GeometricRobot.from_articulation(stage, "/World/UR10e", scene=scene)
-scene.add_environment("/World/Obstacles", exclude_robots=True)
 
-# 2. USD 上で静的障害物を動かした直後にモデル再構築なしで同期（use_fabric="auto" が既定）
-obs_prim = stage.GetPrimAtPath("/World/Obstacles/Box0")
-UsdGeom.Xformable(obs_prim).GetOrderedXformOps()[0].Set(Gf.Vec3d(0.60, 0.20, 0.40))
-scene.sync_environment()
+async def main():
+    app = omni.kit.app.get_app()
+    ctx = omni.usd.get_context()
+    await ctx.new_stage_async()
+    stage = ctx.get_stage()
+    UsdGeom.SetStageUpAxis(stage, UsdGeom.Tokens.z)
+    UsdGeom.SetStageMetersPerUnit(stage, 1.0)
+    UsdGeom.Xform.Define(stage, "/World")  # UsdPhysics.Scene は不要
 
-hits = robot.check_collisions("environment")
-if hits:
-    print("干渉あり:", [(p.names, round(p.separation * 1e3, 2)) for p in hits])
+    UsdGeom.Xform.Define(stage, "/World/Obstacles")
+    box = UsdGeom.Cube.Define(stage, "/World/Obstacles/Box0")
+    box.CreateSizeAttr(0.22)
+    box_op = box.AddTranslateOp()
+    box_op.Set(Gf.Vec3d(2.0, 0.0, 0.5))
+    UsdPhysics.CollisionAPI.Apply(box.GetPrim())
 
-# 3. USD / Fabric を触らず、Newton 側の障害物姿勢だけを高速に差し替えてクリアランス計測
-scene.set_obstacle_pose("/World/Obstacles/Box0", position=[0.78, 0.20, 0.40], orientation=(1.0, 0.0, 0.0, 0.0))
-near = robot.compute_clearances("environment", max_distance=0.15)
-for p in near:
-    print(f"{p.names}: distance={p.separation * 1e3:.1f} mm, point_a={p.point_a}, point_b={p.point_b}")
+    stage.DefinePrim("/World/UR10e", "Xform").GetReferences().AddReference(UR10E_USD.as_posix())
+    await app.next_update_async()
 
-# 4. clearance 引数で「安全マージン込みの干渉判定」（3 cm 未満を干渉扱い）
-margin_hits = robot.check_collisions("all", clearance=0.03)
+    scene = GeometricScene(stage)
+    robot = GeometricRobot.from_articulation(stage, "/World/UR10e", scene=scene)
+    scene.add_environment("/World/Obstacles", exclude_robots=True)
+    robot.set_dof_positions(np.array([0.0, -0.55, 0.90, -0.35, 1.57, 0.0]))
+    tip = robot.links["wrist_3_link"].get_world_pose()[0]
 
-# 5. set_obstacle_pose の手動上書きを解除し、USD / Fabric の姿勢へ戻す
-scene.sync_environment(reset_manual_overrides=True)
+    # 1. USD 上で障害物を動かし sync_environment() でモデル再構築なし同期
+    box_op.Set(Gf.Vec3d(*tip.tolist()))
+    scene.sync_environment()
+    print("干渉:", [(p.names, round(p.separation * 1e3, 1)) for p in robot.check_collisions("environment")])
 
-robot.close()
-scene.close()
+    # 2. USD を触らず set_obstacle_pose() で少し離し、クリアランス計測
+    scene.set_obstacle_pose("/World/Obstacles/Box0", position=(tip + np.array([0.0, 0.20, 0.0])).tolist())
+    near = robot.compute_clearances("environment", max_distance=0.15)
+    print("クリアランス:", [(p.names, round(p.separation * 1e3, 1)) for p in near])
+
+    # 3. 安全マージン込みの干渉判定（5 cm 以内を干渉扱い）
+    print("マージン5cm:", [p.names for p in robot.check_collisions("environment", clearance=0.05)])
+
+    scene.sync_environment(reset_manual_overrides=True)
+    robot.close()
+    scene.close()
+
+
+asyncio.ensure_future(main())
 ```
 
 ---
 
 ## レシピ 3：複数ロボットの共有シーンとロボット間干渉（`check_between`）
 
-複数台のロボットを 1 つの `GeometricLayer` と 1 つの `GeometricScene` に登録し、ロボット間干渉（`kind == "between_robots"`）や構成要素間干渉（`kind == "between_components"`）を調べます。
+2 台の UR10e を 1 つの `GeometricLayer` と 1 つの `GeometricScene` に登録し、ベース移動とロボット間干渉（`kind == "between_robots"`）を調べます。
 
 ```python
+import asyncio
+from pathlib import Path
+import omni.kit.app
+import omni.usd
+from pxr import Gf, UsdGeom
+
+ISAAC_ROOT = Path(r"C:\isaacsim-6.2.0")
+UR10E_USD = ISAAC_ROOT / "exts/isaacsim.asset.transformer.rules/data/tests/ur10e/ur10e.usd"
+
+mgr = omni.kit.app.get_app().get_extension_manager()
+mgr.add_path((ISAAC_ROOT / "extsUser/Extentions").as_posix())
+mgr.set_extension_enabled_immediate("myext.robot.geometric_newton", True)
 from myext.robot.geometric_newton import GeometricLayer, GeometricRobot, GeometricScene
 
-layer = GeometricLayer(stage)
-scene = GeometricScene(stage)
 
-# apply_layer=False で登録をまとめ、最後に 1 回だけ layer.apply() する
-r0 = GeometricRobot.from_articulation(stage, "/World/Robot0", layer=layer, scene=scene, apply_layer=False)
-r1 = GeometricRobot.from_articulation(stage, "/World/Robot1", layer=layer, scene=scene, apply_layer=False)
-layer.apply()
+async def main():
+    app = omni.kit.app.get_app()
+    ctx = omni.usd.get_context()
+    await ctx.new_stage_async()
+    stage = ctx.get_stage()
+    UsdGeom.SetStageUpAxis(stage, UsdGeom.Tokens.z)
+    UsdGeom.SetStageMetersPerUnit(stage, 1.0)
+    UsdGeom.Xform.Define(stage, "/World")
 
-# ベース姿勢を動的に移動しても root FREE joint 経由で即反映される
-r1.set_world_poses(positions=[0.6, 0.0, 0.0])
+    for path, x in (("/World/Robot0", 0.0), ("/World/Robot1", 1.5)):
+        p = stage.DefinePrim(path, "Xform")
+        p.GetReferences().AddReference(UR10E_USD.as_posix())
+        UsdGeom.Xformable(p).AddTranslateOp().Set(Gf.Vec3d(x, 0.0, 0.0))
+    await app.next_update_async()
 
-# ロボット間の干渉とクリアランス
-between_hits = scene.check_between(r0.link_set, r1.link_set)
-between_margin = scene.check_between(r0.link_set, r1.link_set, clearance=0.05)
+    layer = GeometricLayer(stage)
+    scene = GeometricScene(stage)
+    r0 = GeometricRobot.from_articulation(stage, "/World/Robot0", layer=layer, scene=scene, apply_layer=False)
+    r1 = GeometricRobot.from_articulation(stage, "/World/Robot1", layer=layer, scene=scene, apply_layer=False)
+    layer.apply()
 
-# 片方のロボットの特定リンク集合だけを対象にする場合
-arm0_set = r0.get_component("arm").link_set if "arm" in r0.component_names else r0.link_set
-partial_hits = scene.check_between(arm0_set, r1.link_set)
+    print("初期距離(1.5m)の干渉:", scene.check_between(r0.link_set, r1.link_set))
 
-# 共有リソースの後片付け
-r0.close(remove_layer=False)
-r1.close(remove_layer=False)
-layer.remove()
-scene.close()
+    # ベース姿勢を動的に接近させると root FREE joint 経由で即座に反映される
+    r1.set_world_poses(positions=[0.10, 0.0, 0.0])
+    hits = scene.check_between(r0.link_set, r1.link_set)
+    print("接近時(0.1m)のロボット間干渉:", [(p.names, p.kind, round(p.separation * 1e3, 1)) for p in hits])
+
+    r0.close(remove_layer=False)
+    r1.close(remove_layer=False)
+    layer.remove()
+    scene.close()
+
+
+asyncio.ensure_future(main())
 ```
 
 ---
 
 ## レシピ 4：`GeometricRobotView` で多数台・多数姿勢を GPU バッチ処理する
 
-同じ構造のロボット複数台を `GeometricRobotView` にまとめ、`BatchedNewtonScene`（multi-world + CUDA Graph）で順運動学と干渉・クリアランスを一括評価し、`GeometricGpuFabricWriter` で GPU から直接 Fabric へ書き込みます。
+8 台の UR10e を `GeometricRobotView` でまとめ、`BatchedNewtonScene`（CUDA Graph + GPU 直接 Fabric 書込）で一括 FK・一括干渉・一括クリアランスを実行します。
 
 ```python
+import asyncio
+from pathlib import Path
 import numpy as np
+import omni.kit.app
+import omni.usd
+from pxr import Gf, UsdGeom
+
+ISAAC_ROOT = Path(r"C:\isaacsim-6.2.0")
+UR10E_USD = ISAAC_ROOT / "exts/isaacsim.asset.transformer.rules/data/tests/ur10e/ur10e.usd"
+
+mgr = omni.kit.app.get_app().get_extension_manager()
+mgr.add_path((ISAAC_ROOT / "extsUser/Extentions").as_posix())
+mgr.set_extension_enabled_immediate("myext.robot.geometric_newton", True)
 from myext.robot.geometric_newton import GeometricRobotView
 
-paths = [f"/World/UR_{i}" for i in range(32)]
-view = GeometricRobotView.from_articulations(
-    stage,
-    paths,
-    write_target="fabric",
-    collision_backend="newton",
-    fk_backend="auto",                    # N >= 16 で自動的に Newton GPU FK を選択（強制は "newton"）
-    environment_roots=["/World/Obstacles"],
-    use_cuda_graph=True,                  # CUDA 環境で eval_fk + collide をグラフキャプチャ
-    use_gpu_fabric_writer=True,           # wp.fabricarray("omni:fabric:worldMatrix") へ直接書き込み
-)
 
-# 全 32 台分の関節値 (32, num_dofs) を一括反映
-q_batch = np.zeros((len(paths), view.num_dofs), dtype=np.float32)
-q_batch[1] = [1.57, -0.5, 2.95, -np.pi / 2, -np.pi / 2, 0.0]
-view.set_dof_positions(q_batch)
+async def main():
+    app = omni.kit.app.get_app()
+    ctx = omni.usd.get_context()
+    await ctx.new_stage_async()
+    stage = ctx.get_stage()
+    UsdGeom.SetStageUpAxis(stage, UsdGeom.Tokens.z)
+    UsdGeom.SetStageMetersPerUnit(stage, 1.0)
+    UsdGeom.Xform.Define(stage, "/World")
 
-# 一部ロボット・一部軸だけを更新する（Articulation と同じ indices / dof_indices 引数）
-view.set_dof_positions([[0.5]], indices=[0], dof_indices=[2])
+    paths = []
+    for i in range(8):
+        p = f"/World/UR_{i}"
+        prim = stage.DefinePrim(p, "Xform")
+        prim.GetReferences().AddReference(UR10E_USD.as_posix())
+        r, c = divmod(i, 4)
+        UsdGeom.Xformable(prim).AddTranslateOp().Set(Gf.Vec3d(c * 1.6, r * 1.8, 0.0))
+        paths.append(p)
+    await app.next_update_async()
 
-# 共有環境障害物（world=-1）を同期し、全 32 台の干渉とクリアランスを 1 回で判定
-view.sync_environment()
-hits_per_robot = view.check_collisions_batch("all")
-clearances_per_robot = view.compute_clearances_batch("all", max_distance=0.05)
+    view = GeometricRobotView.from_articulations(
+        stage,
+        paths,
+        write_target="fabric",
+        collision_backend="newton",
+        fk_backend="newton",
+        use_cuda_graph=True,
+        use_gpu_fabric_writer=True,
+    )
 
-for i, hits in enumerate(hits_per_robot):
-    if hits:
-        print(f"robot[{i}]: {len(hits)} pairs, min_sep={min(p.separation for p in hits):.4f} m")
+    q_safe = np.array([0.0, -np.pi / 2, 0.0, -np.pi / 2, 0.0, 0.0], dtype=np.float32)
+    q_self = np.array([1.57, -0.5, 2.95, -np.pi / 2, -np.pi / 2, 0.0], dtype=np.float32)
+    q_batch = np.stack([q_self if i % 2 else q_safe for i in range(len(view))])
+    view.set_dof_positions(q_batch)
 
-view.close()
+    hits_per_robot = view.check_collisions_batch("within")
+    cl_per_robot = view.compute_clearances_batch("within", max_distance=0.08)
+    print("各ロボットの干渉数:", [len(h) for h in hits_per_robot])
+    print("各ロボットの近接数:", [len(c) for c in cl_per_robot])
+
+    view.close()
+
+
+asyncio.ensure_future(main())
 ```
 
 ---
 
 ## レシピ 5：パラメータ（DH / 修正 DH / スクリュー軸 / URDF）からのロボット構築と `attach()` 結合
 
-既存の USD Articulation がないロボットを数式パラメータや URDF から構築し、`attach()` で台車＋双腕などの複合ロボットへ結合します。
+外部 USD 不要で DH・MDH・スクリュー軸・同梱 Franka URDF からモデルを生成し、台車＋双腕へ結合します。
 
 ```python
+import asyncio
+from pathlib import Path
 import numpy as np
+import omni.kit.app
+import omni.usd
+from pxr import UsdGeom
+
+ISAAC_ROOT = Path(r"C:\isaacsim-6.2.0")
+FRANKA_URDF = ISAAC_ROOT / "exts/isaacsim.asset.importer.urdf/data/urdf/robots/franka_description/robots/panda_arm_hand.urdf"
+
+mgr = omni.kit.app.get_app().get_extension_manager()
+mgr.add_path((ISAAC_ROOT / "extsUser/Extentions").as_posix())
+mgr.set_extension_enabled_immediate("myext.robot.geometric_newton", True)
 from myext.robot.geometric_newton import (
     DHParameters,
     DHRow,
@@ -189,143 +310,270 @@ from myext.robot.geometric_newton import (
 )
 from myext.robot.geometric_newton import transforms as tf
 
-# 1. 修正 DH パラメータから 6 軸モデルを作成
-pi = np.pi
-mdh = MDHParameters(
-    rows=[
-        MDHRow(alpha=0.0, a=0.0, theta=0.0, d=0.40, lower_limit=-pi, upper_limit=pi),
-        MDHRow(alpha=-pi / 2, a=0.05, theta=-pi / 2, d=0.0, lower_limit=-pi, upper_limit=pi),
-        MDHRow(alpha=0.0, a=0.45, theta=0.0, d=0.0, lower_limit=-pi, upper_limit=pi),
-        MDHRow(alpha=-pi / 2, a=0.04, theta=0.0, d=0.42, lower_limit=-pi, upper_limit=pi),
-        MDHRow(alpha=pi / 2, a=0.0, theta=0.0, d=0.0, lower_limit=-pi, upper_limit=pi),
-        MDHRow(alpha=-pi / 2, a=0.0, theta=0.0, d=0.10, lower_limit=-pi, upper_limit=pi),
-    ],
-    tool=tf.translation(z=0.08),
-    name="arm6",
-)
-arm_model = mdh.to_model()
 
-# 2. その他の生成元（標準 DH / スクリュー軸 / URDF）
-dh_model = DHParameters(rows=[DHRow(theta=0.0, d=0.3, a=0.25, alpha=0.0)]).to_model()
-screw_model = ScrewParameters(
-    rows=[ScrewAxisRow.through(point=(0.0, 0.0, 0.3), direction=(0.0, 1.0, 0.0))],
-    tool_home=tf.translation(x=0.3, z=0.3),
-).to_model()
-urdf_model = UrdfSource(r"C:\path\to\robot.urdf").to_model()
+async def main():
+    ctx = omni.usd.get_context()
+    await ctx.new_stage_async()
+    stage = ctx.get_stage()
+    UsdGeom.SetStageUpAxis(stage, UsdGeom.Tokens.z)
+    UsdGeom.SetStageMetersPerUnit(stage, 1.0)
+    UsdGeom.Xform.Define(stage, "/World")
 
-# 3. 台車に左右 2 本のアームを結合し、簡易形状 prim ごとステージへ生成
-cart = GeometricRobotModel("cart", (GeometricLinkSpec("body"),), ())
-dual_model = (
-    cart.attach(arm_model, "body", tf.translation(y=0.25), name="left")
-        .attach(arm_model, "body", tf.translation(y=-0.25), name="right")
-)
+    pi = np.pi
+    lim = dict(lower_limit=-pi, upper_limit=pi)
+    mdh_arm = MDHParameters(
+        rows=[
+            MDHRow(alpha=0.0, a=0.0, theta=0.0, d=0.40, **lim),
+            MDHRow(alpha=-pi / 2, a=0.05, theta=-pi / 2, d=0.0, **lim),
+            MDHRow(alpha=0.0, a=0.45, theta=0.0, d=0.0, **lim),
+            MDHRow(alpha=-pi / 2, a=0.04, theta=0.0, d=0.42, **lim),
+            MDHRow(alpha=pi / 2, a=0.0, theta=0.0, d=0.0, **lim),
+            MDHRow(alpha=-pi / 2, a=0.0, theta=0.0, d=0.10, **lim),
+        ],
+        tool=tf.translation(z=0.08),
+    ).to_model()
 
-style = GeometricVisualStyle(link_radius=0.03, collisions=True)
-dual_robot = GeometricRobot.from_model(stage, dual_model, "/World/DualArm", style=style)
+    # 台車 + 左右 2 本のアームを attach() で結合
+    cart = GeometricRobotModel("cart", (GeometricLinkSpec("body"),), ())
+    dual = cart.attach(mdh_arm, "body", tf.translation(y=0.25), name="left").attach(mdh_arm, "body", tf.translation(y=-0.25), name="right")
+    robot = GeometricRobot.from_model(stage, dual, "/World/DualArm", style=GeometricVisualStyle(collisions=True))
+    # 既定 samples=0 は現在の 1 姿勢のみ検査（複数姿勢で常に重なる組だけ除外する場合は samples=16 等を指定）
+    robot.ignore_touching_pairs()
 
-# 簡易形状で初期姿勢から常に重なる非隣接組をフィルタへ登録
-dual_robot.ignore_touching_pairs()
+    # 標準 DH / スクリュー軸 / 同梱 URDF からの生成
+    dh_r = GeometricRobot.from_dh(stage, DHParameters(rows=[DHRow(theta=0.0, d=0.3, a=0.25, alpha=0.0)]), "/World/DH", base_transform=tf.translation(x=-1.0))
+    sc_r = GeometricRobot.from_screw(stage, ScrewParameters(rows=[ScrewAxisRow.through((0, 0, 0.3), (0, 1, 0))]), "/World/Screw", base_transform=tf.translation(x=-1.0, y=0.6))
+    ur_r = GeometricRobot.from_urdf(stage, UrdfSource(str(FRANKA_URDF)), "/World/Panda", base_transform=tf.translation(x=1.0))
 
-# 構成要素ごとの操作と干渉チェック
-left = dual_robot.get_component("left")
-right = dual_robot.get_component("right")
-left.set_dof_positions([0.3, 0.2, 0.4, 0.0, 0.2, 0.0])
-print("左アーム内:", left.check_collisions("within"))
-print("左右間:", dual_robot.scene.check_between(left.link_set, right.link_set))
+    left = robot.get_component("left")
+    left.set_dof_positions([0.3, 0.2, 0.4, 0.0, 0.2, 0.0])
+    print("DualArm 左アーム内干渉:", left.check_collisions("within"))
+    print("Panda DOFs:", ur_r.dof_names)
+
+    for r in (robot, dh_r, sc_r, ur_r):
+        r.close()
+
+
+asyncio.ensure_future(main())
 ```
 
 ---
 
 ## レシピ 6：IK（`jacobian` / `ikpy` / 自作ソルバー登録）とアクティブ軸マスク
 
-`GeometricRobot.create_ik_solver()` で手先目標を解き、使う軸のマスクや姿勢制約を動的に切り替えます。
+UR10e に対して 3 軸マスク付き位置 IK、6 軸位置＋姿勢 IK、自作 IK ソルバー登録を実行します。
 
 ```python
+import asyncio
+from pathlib import Path
 import numpy as np
-from myext.robot.geometric_newton import (
-    IKResult,
-    IKSolver,
-    IKSolverConfig,
-    register_ik_solver,
-)
+import omni.kit.app
+import omni.usd
+from pxr import UsdGeom
 
-# 1. 位置のみ追従（orientation_mode="none"）で JacobianIKSolver を作成
-cfg = IKSolverConfig(orientation_mode="none", num_restarts=4, damping=0.01)
-solver = robot.create_ik_solver("jacobian", base_link="base_link", tip_link="wrist_3_link", config=cfg)
+ISAAC_ROOT = Path(r"C:\isaacsim-6.2.0")
+UR10E_USD = ISAAC_ROOT / "exts/isaacsim.asset.transformer.rules/data/tests/ur10e/ur10e.usd"
 
-# ワールド座標で目標を渡し、成功時にそのまま関節値へ反映
-res = robot.solve_ik(solver, target_position=[0.55, 0.20, 0.45], apply=True)
-print(res.success, f"pos_err={res.position_error:.2e} m", f"iters={res.iterations}")
+mgr = omni.kit.app.get_app().get_extension_manager()
+mgr.add_path((ISAAC_ROOT / "extsUser/Extentions").as_posix())
+mgr.set_extension_enabled_immediate("myext.robot.geometric_newton", True)
+from myext.robot.geometric_newton import GeometricRobot, IKResult, IKSolver, IKSolverConfig, register_ik_solver
 
-# 2. 特定の軸だけを動かす（名前リストまたは bool マスク）
-solver.set_active_dofs(["shoulder_pan_joint", "shoulder_lift_joint", "elbow_joint"])
-res_3dof = robot.solve_ik(solver, target_position=[0.50, 0.25, 0.50])
 
-# 3. 位置 + 姿勢（(w, x, y, z) 四元数）の 6-DOF IK へ切り替え
-solver.set_active_dofs([True] * solver.chain.num_variables)
-solver.set_config(orientation_mode="full", orientation_tolerance=1e-3)
-res_6dof = robot.solve_ik(solver, target_position=[0.50, 0.25, 0.50], target_orientation=[1.0, 0.0, 0.0, 0.0])
-
-# 4. 自作 IK ソルバーを登録して名前で呼び出す
 class ZeroIKSolver(IKSolver):
     def solve(self, target_position, target_orientation=None, *, seed=None) -> IKResult:
-        q = np.zeros(self.chain.num_variables, dtype=float)
-        return IKResult(dof_positions=q, success=True, position_error=0.0, orientation_error=0.0)
+        return IKResult(dof_positions=np.zeros(self.chain.num_variables), success=True, position_error=0.0, orientation_error=0.0)
 
-register_ik_solver("my_zero", ZeroIKSolver)
-custom = robot.create_ik_solver("my_zero", "base_link", "wrist_3_link")
+
+async def main():
+    app = omni.kit.app.get_app()
+    ctx = omni.usd.get_context()
+    await ctx.new_stage_async()
+    stage = ctx.get_stage()
+    UsdGeom.SetStageUpAxis(stage, UsdGeom.Tokens.z)
+    UsdGeom.SetStageMetersPerUnit(stage, 1.0)
+    UsdGeom.Xform.Define(stage, "/World")
+    stage.DefinePrim("/World/UR10e", "Xform").GetReferences().AddReference(UR10E_USD.as_posix())
+    await app.next_update_async()
+
+    robot = GeometricRobot.from_articulation(stage, "/World/UR10e")
+    solver = robot.create_ik_solver("jacobian", "base_link", "wrist_3_link", IKSolverConfig(orientation_mode="none", num_restarts=4))
+
+    # 1. 全軸で位置追従
+    res = robot.solve_ik(solver, target_position=[0.55, 0.20, 0.45], apply=True)
+    print("位置IK:", res.success, f"err={res.position_error:.2e} m")
+
+    # 2. アクティブ軸マスク（最初の 3 軸のみ動かす）
+    solver.set_active_dofs(["shoulder_pan_joint", "shoulder_lift_joint", "elbow_joint"])
+    res_3 = robot.solve_ik(solver, target_position=[0.50, 0.25, 0.50])
+    print("3軸マスクIK:", res_3.success, f"err={res_3.position_error:.2e} m")
+
+    # 3. 6-DOF 位置＋姿勢 IK（(w, x, y, z) 四元数）
+    solver.set_active_dofs([True] * solver.chain.num_variables)
+    solver.set_config(orientation_mode="full", orientation_tolerance=1e-3)
+    res_6 = robot.solve_ik(solver, target_position=[0.50, 0.25, 0.50], target_orientation=[1.0, 0.0, 0.0, 0.0])
+    print("6軸IK:", res_6.success, f"pos={res_6.position_error:.2e}, ori={res_6.orientation_error:.2e}")
+
+    # 4. 自作ソルバー登録
+    register_ik_solver("my_zero", ZeroIKSolver)
+    custom = robot.create_ik_solver("my_zero", "base_link", "wrist_3_link")
+    print("自作ソルバー:", robot.solve_ik(custom, [0.0, 0.0, 0.5]).success)
+
+    robot.close()
+
+
+asyncio.ensure_future(main())
 ```
 
 ---
 
 ## レシピ 7：VariantSet 切り替え・角度単位（度）・`CommandConverter` による外部指令変換
 
-グリッパ等の `VariantSet` を切り替えつつ、度単位での指令とログ形式のコマンド変換を適用します。`VariantSet` 切り替え時は `GeometricScene` も自動的に再構築されます。
+UR10e の `Gripper` VariantSet を実行中に切り替え、`angle_unit="deg"` と `when=` 条件付き `LinearCommandConverter` が連動する流れを確認します。
 
 ```python
-from myext.robot.geometric_newton import (
-    GeometricRobot,
-    LinearCommandConverter,
-    UsdArticulationSource,
-)
+import asyncio
+from pathlib import Path
+import omni.kit.app
+import omni.usd
+from pxr import UsdGeom
 
-source = UsdArticulationSource(
-    "/World/UR10e",
-    components={"arm": "/World/UR10e", "gripper": "/World/UR10e/Robotiq_2F_85"},
-)
-robot = GeometricRobot.from_articulation(stage, source, angle_unit="deg")
+ISAAC_ROOT = Path(r"C:\isaacsim-6.2.0")
+UR10E_USD = ISAAC_ROOT / "exts/isaacsim.asset.transformer.rules/data/tests/ur10e/ur10e.usd"
 
-# 1. 既定単位（deg）と呼び出し単位（rad）の混用（直動軸は常にステージの長さ単位）
-robot.set_dof_positions([90.0, -60.0], dof_indices=[0, 1])
-robot.set_dof_positions([0.5], dof_indices=[2], unit="rad")
-print("deg:", robot.get_dof_positions(unit="deg"))
+mgr = omni.kit.app.get_app().get_extension_manager()
+mgr.add_path((ISAAC_ROOT / "extsUser/Extentions").as_posix())
+mgr.set_extension_enabled_immediate("myext.robot.geometric_newton", True)
+from myext.robot.geometric_newton import GeometricRobot, LinearCommandConverter
 
-# 2. VariantSet の確認と切り替え（選択は Session Layer に書かれる）
-print("選択肢:", robot.get_variant_choices())
-robot.set_variant("Gripper", "Robotiq_2F_140")   # DOF 数・GeometricLayer・GeometricScene が自動更新
 
-# 構造変更通知を受け取って IK ソルバーを作り直す
-def on_rebuilt(old_dofs: list[str], new_dofs: list[str]) -> None:
-    print(f"構造更新: {len(old_dofs)} -> {len(new_dofs)} DOFs")
+async def main():
+    app = omni.kit.app.get_app()
+    ctx = omni.usd.get_context()
+    await ctx.new_stage_async()
+    stage = ctx.get_stage()
+    UsdGeom.SetStageUpAxis(stage, UsdGeom.Tokens.z)
+    UsdGeom.SetStageMetersPerUnit(stage, 1.0)
+    UsdGeom.Xform.Define(stage, "/World")
 
-robot.add_structure_listener(on_rebuilt)
+    prim = stage.DefinePrim("/World/UR10e", "Xform")
+    prim.GetReferences().AddReference(UR10E_USD.as_posix())
+    prim.GetVariantSet("Gripper").SetVariantSelection("Robotiq_2F_85")
+    await app.next_update_async()
 
-# 3. 外部コマンド名 -> 複数 DOF の変換を Variant 条件付きで登録
-grip_conv = LinearCommandConverter(
-    input_names=["grip_width"],
-    output_dofs=["finger_joint"],
-    matrix=[[12.0]],
-    offset=[0.0],
-    output_angle_unit="deg",
-)
-robot.set_command_converter("gripper_140", grip_conv, when={("", "Gripper"): "Robotiq_2F_140"})
-robot.apply_command({"grip_width": 0.03, "shoulder_pan_joint": 45.0})
-print("逆変換:", robot.read_command())
+    robot = GeometricRobot.from_articulation(stage, "/World/UR10e", angle_unit="deg")
+    robot.add_structure_listener(lambda old, new: print(f"構造更新: {len(old)} -> {len(new)} DOFs"))
+
+    # 度単位と呼び出しごとの rad 指定の混用
+    robot.set_dof_positions([45.0, -75.0], dof_indices=[0, 1])
+    robot.set_dof_positions([0.5], dof_indices=[2], unit="rad")
+
+    # Variant 条件付きコマンド変換を登録
+    conv_140 = LinearCommandConverter(["grip_ratio"], ["finger_joint"], [[35.0]], output_angle_unit="deg")
+    robot.set_command_converter("grip_140", conv_140, when={("", "Gripper"): "Robotiq_2F_140"})
+
+    # Variant 切り替え -> GeometricLayer と GeometricScene が自動再構築
+    robot.set_variant("Gripper", "Robotiq_2F_140")
+    robot.apply_command({"grip_ratio": 0.6, "shoulder_pan_joint": 30.0})
+    print("変換後 DOF(deg):", robot.joints["finger_joint"].get_position(), "逆変換:", robot.read_command())
+
+    robot.close()
+
+
+asyncio.ensure_future(main())
 ```
 
 ---
 
-## レシピ 8：既存 `myext.robot.geometric` からの移行手順と PhysX バックエンドへの切替
+## レシピ 8：カスタムコライダー用 `.usda` Sublayer の実行時 ON/OFF 切替（非破壊・0 フレーム遅延）
+
+元のロボット USD ファイルを変更せず、カスタムコライダー `.usda` を `GeometricLayer` 直下の Session Sublayer として差し込み、`set_collider_layer_enabled()` で実行時に Mute / Unmute を切り替えます。完全版アニメーションデモは `demo/demo_03_collider_sublayer_toggle.py` にあります。
+
+```python
+import asyncio
+import shutil
+import tempfile
+from pathlib import Path
+import numpy as np
+import omni.kit.app
+import omni.usd
+from pxr import Gf, Sdf, Usd, UsdGeom, UsdPhysics
+
+ISAAC_ROOT = Path(r"C:\isaacsim-6.2.0")
+UR10E_USD = ISAAC_ROOT / "exts/isaacsim.asset.transformer.rules/data/tests/ur10e/ur10e.usd"
+
+mgr = omni.kit.app.get_app().get_extension_manager()
+mgr.add_path((ISAAC_ROOT / "extsUser/Extentions").as_posix())
+mgr.set_extension_enabled_immediate("myext.robot.geometric_newton", True)
+from myext.robot.geometric_newton import GeometricRobot
+
+
+async def main():
+    app = omni.kit.app.get_app()
+    ctx = omni.usd.get_context()
+    await ctx.new_stage_async()
+    stage = ctx.get_stage()
+    UsdGeom.SetStageUpAxis(stage, UsdGeom.Tokens.z)
+    UsdGeom.SetStageMetersPerUnit(stage, 1.0)
+    UsdGeom.Xform.Define(stage, "/World")
+
+    probe = UsdGeom.Cube.Define(stage, "/World/SafetyProbe")
+    probe.CreateSizeAttr(0.16)
+    probe_op = probe.AddTranslateOp()
+    UsdPhysics.CollisionAPI.Apply(probe.GetPrim())
+
+    stage.DefinePrim("/World/UR10e", "Xform").GetReferences().AddReference(UR10E_USD.as_posix())
+    await app.next_update_async()
+
+    robot = GeometricRobot.from_articulation(stage, "/World/UR10e")
+    robot.set_dof_positions(np.array([0.0, -1.15, 1.35, -1.57, -1.57, 0.0]))
+    wrist_pos, _ = robot.links["wrist_1_link"].get_world_pose()
+    probe_op.Set(Gf.Vec3d(*(wrist_pos + np.array([0.0, 0.24, 0.0])).tolist()))
+    robot.scene.sync_environment()
+
+    # 1. 元コライダーを無効化し、wrist_1_link に半径 0.22 m の安全球を追加する .usda を一時生成
+    tmp_dir = Path(tempfile.mkdtemp(prefix="geom_newton_recipe08_"))
+    usda_path = tmp_dir / "custom_safety_colliders.usda"
+    sub = Usd.Stage.CreateNew(str(usda_path))
+    for cpaths in robot.collider_paths.values():
+        for cp in cpaths:
+            for anc in Sdf.Path(cp).GetPrefixes()[:-1]:
+                if anc != Sdf.Path.absoluteRootPath:
+                    sub.OverridePrim(anc)
+            UsdPhysics.CollisionAPI.Apply(sub.OverridePrim(cp)).CreateCollisionEnabledAttr(False)
+    lpath = robot.link_path_map["wrist_1_link"]
+    for anc in Sdf.Path(lpath).GetPrefixes():
+        if anc != Sdf.Path.absoluteRootPath:
+            sub.OverridePrim(anc)
+    bubble = UsdGeom.Sphere.Define(sub, f"{lpath}/CustomSafetyBubble")
+    bubble.CreateRadiusAttr(0.22)
+    UsdPhysics.CollisionAPI.Apply(bubble.GetPrim()).CreateCollisionEnabledAttr(True)
+    sub.GetRootLayer().Save()
+
+    print("元コライダー干渉:", len(robot.check_collisions("environment")))
+
+    # 2. Session Layer（GeometricLayer 直下）へ差し込み -> 0 フレーム遅延で干渉検出
+    layer_id = robot.attach_collider_layer(usda_path, target="session")
+    print("カスタムON 干渉:", len(robot.check_collisions("environment")), "ver=", robot.collider_version)
+
+    # 3. Mute で元コライダーへ復帰 -> Unmute で再びカスタム有効化
+    robot.set_collider_layer_enabled(layer_id, False)
+    print("カスタムOFF(Mute) 干渉:", len(robot.check_collisions("environment")), "ver=", robot.collider_version)
+    robot.set_collider_layer_enabled(layer_id, True)
+    print("カスタム再ON(Unmute) 干渉:", len(robot.check_collisions("environment")), "ver=", robot.collider_version)
+
+    # 4. Sublayer を外して元構成へ完全復帰
+    robot.detach_collider_layer(layer_id)
+    robot.close()
+    shutil.rmtree(tmp_dir, ignore_errors=True)
+
+
+asyncio.ensure_future(main())
+```
+
+---
+
+## レシピ 9：既存 `myext.robot.geometric` からの移行手順と PhysX バックエンドへの切替
 
 既存の `myext.robot.geometric` 向けコードを `myext.robot.geometric_newton` へ移す手順です。
 

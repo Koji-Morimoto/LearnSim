@@ -10,7 +10,8 @@ Newton バックエンド (`GeometricScene` / `BatchedNewtonScene`) と PhysX �
 
 設計上の意図 (`reason` タグによる管理):
     自動登録される隣接ペア (`reason="adjacent"`)、取り付け部 (`reason="mount"`)、USD 既存の `FilteredPairsAPI`
-    (`reason="usd_filtered_pairs"`)、初期接触ペア (`reason="touching"`)、ユーザー追加 (`reason="user"`) を
+    (`reason="usd_filtered_pairs"`)、基準姿勢または多姿勢サンプリングの接触ペア
+    (`reason="touching_at_setup"` / `reason="always_touching"`)、ユーザー追加 (`reason="user"`) を
     すべて同じ仕組みへ収め、`reason` タグで区別している。これにより、たとえばグリッパ換装 (VariantSet 切替) 時に
     ユーザー追加ルールを保ったまま古い自動ルールだけを `remove_by_reason(...)` で安全に入れ替えられる。
 """
