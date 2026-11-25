@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Isaac Sim 6.2.0 バックエンドデータフロー回路図（CPU/GPU分割・実測検証付）</title>
+<title>Isaac Sim 6.2.0 バックエンドデータフロー回路図（CPU/GPU分割・スイッチ操作・実測付）</title>
 <style>
   :root {
     --bg: #f8fafc;
@@ -21,11 +21,9 @@
     --c3: #d97706; --c3-bg: #fef3c7; --c3-glow: #fbbf24; /* 3: 物理・Tensor・制御系統 */
     --c4: #7c3aed; --c4-bg: #ede9fe; --c4-glow: #c084fc; /* 4: Hydra・描画・センサー系統 */
 
-    /* 回路基板ダークキャンバス */
     --pcb-bg: #0b1120;
     --pcb-ic-bg: #111827;
     --pcb-ic-border: #334155;
-    --pcie-color: #fb7185;
 
     --warn-bg: #fef3c7; --warn-text: #92400e;
     --err-bg: #fee2e2;  --err-text: #991b1b;
@@ -46,11 +44,11 @@
   .page-header {
     background: #0f172a;
     color: #f8fafc;
-    padding: 1.35rem 1.75rem 1.2rem;
+    padding: 1.25rem 1.6rem 1.15rem;
     border-bottom: 3px solid #1e293b;
   }
   .header-inner {
-    max-width: 1660px;
+    max-width: 1760px;
     margin: 0 auto;
     display: flex;
     flex-wrap: wrap;
@@ -59,9 +57,8 @@
     gap: 1rem;
   }
   .page-header h1 {
-    margin: 0 0 0.3rem;
-    font-size: 1.42rem;
-    letter-spacing: -0.01em;
+    margin: 0 0 0.28rem;
+    font-size: 1.38rem;
     display: flex;
     align-items: center;
     gap: 0.55rem;
@@ -87,21 +84,21 @@
   }
   .header-sub {
     margin: 0;
-    font-size: 0.88rem;
+    font-size: 0.87rem;
     color: #cbd5e1;
-    max-width: 82ch;
+    max-width: 86ch;
   }
   .legend-bar {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.55rem;
+    gap: 0.5rem;
     align-items: center;
   }
   .legend-pill {
     display: inline-flex;
     align-items: center;
     gap: 0.38rem;
-    padding: 0.22rem 0.6rem;
+    padding: 0.22rem 0.58rem;
     border-radius: 999px;
     font-size: 0.76rem;
     font-weight: 600;
@@ -109,17 +106,12 @@
     border: 1px solid rgba(255, 255, 255, 0.14);
     color: #f1f5f9;
   }
-  .legend-dot {
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    flex-shrink: 0;
-  }
+  .legend-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
 
   .container {
-    max-width: 1660px;
+    max-width: 1760px;
     margin: 0 auto;
-    padding: 1.15rem 1.4rem 4rem;
+    padding: 1.1rem 1.3rem 4rem;
   }
 
   /* プリセットバー */
@@ -127,7 +119,7 @@
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: 12px;
-    padding: 0.8rem 1rem;
+    padding: 0.78rem 1rem;
     margin-bottom: 1rem;
     box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05);
   }
@@ -137,21 +129,12 @@
     justify-content: space-between;
     align-items: center;
     gap: 0.5rem;
-    margin-bottom: 0.55rem;
+    margin-bottom: 0.52rem;
   }
-  .preset-strip-title {
-    font-size: 0.8rem;
-    font-weight: 700;
-    color: var(--muted);
-    letter-spacing: 0.03em;
-  }
-  .preset-actions {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.42rem;
-  }
+  .preset-strip-title { font-size: 0.8rem; font-weight: 700; color: var(--muted); }
+  .preset-actions { display: flex; flex-wrap: wrap; gap: 0.4rem; }
   .preset-btn {
-    padding: 0.4rem 0.74rem;
+    padding: 0.38rem 0.72rem;
     border-radius: 8px;
     border: 1px solid var(--border);
     background: var(--surface-subtle);
@@ -159,9 +142,9 @@
     font-size: 0.79rem;
     font-weight: 600;
     cursor: pointer;
-    transition: background 0.15s ease, border-color 0.15s ease;
+    transition: background 0.15s ease;
   }
-  .preset-btn:hover { background: #e2e8f0; border-color: #94a3b8; }
+  .preset-btn:hover { background: #e2e8f0; }
   .preset-btn.is-selected { background: #0f172a; color: #ffffff; border-color: #0f172a; }
   .preset-btn.is-trap { border-color: #fca5a5; background: #fef2f2; color: #991b1b; }
   .preset-btn.is-trap:hover { background: #fee2e2; }
@@ -170,11 +153,11 @@
   /* ワークベンチ 2カラム */
   .workbench {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) 392px;
+    grid-template-columns: minmax(0, 1fr) 360px;
     gap: 1rem;
     align-items: start;
   }
-  @media (max-width: 1200px) {
+  @media (max-width: 1280px) {
     .workbench { grid-template-columns: 1fr; }
   }
 
@@ -191,23 +174,16 @@
     flex-wrap: wrap;
     justify-content: space-between;
     align-items: center;
-    gap: 0.6rem;
-    padding: 0.65rem 0.95rem;
+    gap: 0.55rem;
+    padding: 0.62rem 0.95rem;
     background: #0f172a;
     border-bottom: 1px solid #1e293b;
     color: #e2e8f0;
   }
-  .status-readout {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 0.45rem;
-    font-size: 0.78rem;
-  }
+  .status-readout { display: flex; flex-wrap: wrap; align-items: center; gap: 0.42rem; }
   .meter-pill {
     display: inline-flex;
     align-items: center;
-    gap: 0.3rem;
     padding: 0.18rem 0.54rem;
     border-radius: 6px;
     font-weight: 700;
@@ -222,25 +198,19 @@
   .meter-pill.state-stop { border-color: #64748b; color: #cbd5e1; background: rgba(100, 116, 139, 0.16); }
   .meter-pill.state-off { border-color: #ef4444; color: #fca5a5; background: rgba(239, 68, 68, 0.12); }
 
-  /* 流れ制御・速度バー */
   .flow-bar {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
     justify-content: space-between;
-    gap: 0.6rem;
-    padding: 0.52rem 0.95rem;
+    gap: 0.55rem;
+    padding: 0.5rem 0.95rem;
     background: #0c1425;
     border-bottom: 1px solid #1e293b;
     color: #cbd5e1;
     font-size: 0.77rem;
   }
-  .flow-group {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 0.45rem;
-  }
+  .flow-group { display: flex; flex-wrap: wrap; align-items: center; gap: 0.45rem; }
   .action-btn {
     padding: 0.32rem 0.68rem;
     border-radius: 7px;
@@ -250,19 +220,10 @@
     font-size: 0.76rem;
     font-weight: 700;
     cursor: pointer;
-    transition: background 0.15s ease;
   }
   .action-btn:hover { background: rgba(56, 189, 248, 0.28); }
-  .action-btn.is-paused {
-    border-color: #f59e0b;
-    background: rgba(245, 158, 11, 0.18);
-    color: #fde68a;
-  }
-  .action-btn.secondary {
-    border-color: #475569;
-    background: #1e293b;
-    color: #e2e8f0;
-  }
+  .action-btn.is-paused { border-color: #f59e0b; background: rgba(245, 158, 11, 0.18); color: #fde68a; }
+  .action-btn.secondary { border-color: #475569; background: #1e293b; color: #e2e8f0; }
   .action-btn.secondary:hover { background: #334155; }
 
   .speed-control {
@@ -276,31 +237,21 @@
     font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
     font-size: 0.74rem;
   }
-  .speed-control input[type="range"] {
-    width: 96px;
-    accent-color: #38bdf8;
-    cursor: pointer;
-  }
+  .speed-control input[type="range"] { width: 92px; accent-color: #38bdf8; cursor: pointer; }
 
-  /* ①〜③ 駆動方式フィルタバー */
   .trigger-bar {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
     justify-content: space-between;
     gap: 0.5rem;
-    padding: 0.48rem 0.95rem;
+    padding: 0.46rem 0.95rem;
     background: #0a1020;
     border-bottom: 1px solid #1e293b;
     font-size: 0.76rem;
     color: #cbd5e1;
   }
-  .trigger-filter-group {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 0.35rem;
-  }
+  .trigger-filter-group { display: flex; flex-wrap: wrap; align-items: center; gap: 0.35rem; }
   .trigger-btn {
     padding: 0.24rem 0.62rem;
     border-radius: 999px;
@@ -310,18 +261,17 @@
     font-size: 0.74rem;
     font-weight: 700;
     cursor: pointer;
-    transition: background 0.15s ease, color 0.15s ease;
   }
   .trigger-btn:hover { background: #1e293b; color: #f8fafc; }
   .trigger-btn.is-active { background: #f8fafc; color: #0f172a; border-color: #f8fafc; }
   .trigger-btn[data-trigger="clock"].is-active { background: #fbbf24; border-color: #fbbf24; color: #0f172a; }
   .trigger-btn[data-trigger="dirty"].is-active { background: #34d399; border-color: #34d399; color: #0f172a; }
   .trigger-btn[data-trigger="event"].is-active { background: #38bdf8; border-color: #38bdf8; color: #0f172a; }
-  .wire-group.is-filter-dim { opacity: 0.13 !important; }
+  .wire-group.is-filter-dim { opacity: 0.12 !important; }
 
   .trig-chip {
     display: inline-block;
-    padding: 0.1rem 0.45rem;
+    padding: 0.1rem 0.44rem;
     border-radius: 5px;
     font-size: 0.73rem;
     font-weight: 800;
@@ -336,88 +286,114 @@
     position: relative;
     width: 100%;
     overflow-x: auto;
-    background: radial-gradient(circle, rgba(148, 163, 184, 0.15) 1px, transparent 1px);
-    background-size: 20px 20px;
+    background: radial-gradient(circle, rgba(148, 163, 184, 0.14) 1px, transparent 1px);
+    background-size: 22px 22px;
   }
   svg#circuit-svg {
     display: block;
     width: 100%;
-    min-width: 860px;
+    min-width: 1040px;
     height: auto;
     user-select: none;
   }
 
-  /* SVG IC ブロック */
+  /* IC ブロック */
   .ic-node { cursor: pointer; transition: opacity 0.18s ease; }
   .ic-node .ic-body {
     fill: var(--pcb-ic-bg);
     stroke: var(--pcb-ic-border);
-    stroke-width: 2;
+    stroke-width: 2.2;
     rx: 10;
     transition: stroke 0.18s ease, fill 0.18s ease;
   }
   .ic-node .ic-header { fill: #1e293b; }
-  .ic-node.is-energized[data-color="1"] .ic-body { stroke: var(--c1-glow); filter: drop-shadow(0 0 6px rgba(56, 189, 248, 0.28)); }
-  .ic-node.is-energized[data-color="2"] .ic-body { stroke: var(--c2-glow); filter: drop-shadow(0 0 6px rgba(52, 211, 153, 0.28)); }
-  .ic-node.is-energized[data-color="3"] .ic-body { stroke: var(--c3-glow); filter: drop-shadow(0 0 6px rgba(251, 191, 36, 0.28)); }
-  .ic-node.is-energized[data-color="4"] .ic-body { stroke: var(--c4-glow); filter: drop-shadow(0 0 6px rgba(192, 132, 252, 0.28)); }
+  .ic-node.is-energized[data-color="1"] .ic-body { stroke: var(--c1-glow); filter: drop-shadow(0 0 7px rgba(56, 189, 248, 0.28)); }
+  .ic-node.is-energized[data-color="2"] .ic-body { stroke: var(--c2-glow); filter: drop-shadow(0 0 7px rgba(52, 211, 153, 0.28)); }
+  .ic-node.is-energized[data-color="3"] .ic-body { stroke: var(--c3-glow); filter: drop-shadow(0 0 7px rgba(251, 191, 36, 0.28)); }
+  .ic-node.is-energized[data-color="4"] .ic-body { stroke: var(--c4-glow); filter: drop-shadow(0 0 7px rgba(192, 132, 252, 0.28)); }
   .ic-node.is-idle .ic-body { stroke: #334155; fill: #0d1424; }
   .ic-node.is-idle { opacity: 0.56; }
-  .ic-node.is-selected .ic-body { stroke-width: 3.4; fill: #172033; }
-  .ic-node:hover .ic-body { stroke-width: 3; }
+  .ic-node.is-selected .ic-body { stroke-width: 3.6; fill: #172033; }
+  .ic-node:hover .ic-body { stroke-width: 3.2; }
 
-  .ic-title { font-size: 12.5px; font-weight: 700; fill: #f8fafc; }
-  .ic-sub { font-size: 10px; fill: #94a3b8; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
-  .ic-detail { font-size: 10px; fill: #cbd5e1; }
-  .ic-state-pill { font-size: 9.5px; font-weight: 700; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
-  .domain-chip-cpu { fill: #0ea5e9; font-size: 9px; font-weight: 800; font-family: ui-monospace, monospace; }
-  .domain-chip-gpu { fill: #a855f7; font-size: 9px; font-weight: 800; font-family: ui-monospace, monospace; }
+  .ic-title { font-size: 13.5px; font-weight: 700; fill: #f8fafc; }
+  .ic-sub { font-size: 11px; fill: #94a3b8; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+  .ic-detail { font-size: 11px; fill: #cbd5e1; }
+  .ic-state-pill { font-size: 10.5px; font-weight: 700; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+  .domain-chip-cpu { fill: #38bdf8; font-size: 10px; font-weight: 800; font-family: ui-monospace, monospace; }
+  .domain-chip-gpu { fill: #c084fc; font-size: 10px; font-weight: 800; font-family: ui-monospace, monospace; }
 
-  /* SVG 配線 */
+  /* 配線 */
   .wire-group { cursor: pointer; transition: opacity 0.18s ease; }
-  .wire-hit { fill: none; stroke: transparent; stroke-width: 16; }
+  .wire-hit { fill: none; stroke: transparent; stroke-width: 18; }
   .wire-path {
     fill: none;
     stroke-linecap: round;
     stroke-linejoin: round;
-    transition: stroke 0.2s ease, stroke-width 0.2s ease, opacity 0.2s ease;
+    transition: stroke 0.2s ease, stroke-width 0.2s ease;
   }
-  .wire-group.is-off .wire-path { stroke: #334155; stroke-width: 1.9; stroke-dasharray: 5 5; opacity: 0.6; }
-  .wire-group.is-on .wire-path { stroke-width: 3.1; stroke-dasharray: none; opacity: 0.92; }
+  .wire-group.is-off .wire-path { stroke: #334155; stroke-width: 2.2; stroke-dasharray: 6 6; opacity: 0.62; }
+  .wire-group.is-on .wire-path { stroke-width: 3.4; stroke-dasharray: none; opacity: 0.94; }
   .wire-group.is-on[data-color="1"] .wire-path { stroke: var(--c1-glow); }
   .wire-group.is-on[data-color="2"] .wire-path { stroke: var(--c2-glow); }
   .wire-group.is-on[data-color="3"] .wire-path { stroke: var(--c3-glow); }
   .wire-group.is-on[data-color="4"] .wire-path { stroke: var(--c4-glow); }
-  .wire-group.is-partial .wire-path { stroke-width: 2.3; stroke-dasharray: 9 4; opacity: 0.8; }
+  .wire-group.is-partial .wire-path { stroke-width: 2.6; stroke-dasharray: 10 5; opacity: 0.85; }
   .wire-group.is-partial[data-color="1"] .wire-path { stroke: var(--c1-glow); }
   .wire-group.is-partial[data-color="2"] .wire-path { stroke: var(--c2-glow); }
   .wire-group.is-partial[data-color="3"] .wire-path { stroke: var(--c3-glow); }
   .wire-group.is-partial[data-color="4"] .wire-path { stroke: var(--c4-glow); }
-  .wire-group.is-selected .wire-path { stroke-width: 4.8; }
-  .wire-group:hover .wire-path { stroke-width: 4.2; }
+  .wire-group.is-selected .wire-path { stroke-width: 5; }
+  .wire-group:hover .wire-path { stroke-width: 4.4; }
 
-  .wire-tag-bg { fill: #0f172a; stroke: #334155; stroke-width: 1; rx: 4; }
-  .wire-group.is-on .wire-tag-bg { fill: #0b192e; stroke: #64748b; }
-  .wire-group.is-chain .wire-tag-bg { fill: #2c1018; stroke: #ef4444; }
+  /* ラベルピル（ゆったり余白・高コントラスト） */
+  .wire-tag-bg { fill: #0f172a; stroke: #475569; stroke-width: 1.2; rx: 5; }
+  .wire-group.is-on .wire-tag-bg { fill: #0d1d36; stroke: #64748b; }
+  .wire-group.is-chain .wire-tag-bg { fill: #3b111b; stroke: #f87171; }
   .wire-tag-text {
-    font-size: 9.2px;
+    font-size: 10.5px;
     font-weight: 700;
     font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-    fill: #64748b;
+    fill: #94a3b8;
     text-anchor: middle;
   }
-  .wire-group.is-on[data-color="1"] .wire-tag-text { fill: #7dd3fc; }
-  .wire-group.is-on[data-color="2"] .wire-tag-text { fill: #6ee7b7; }
-  .wire-group.is-on[data-color="3"] .wire-tag-text { fill: #fde68a; }
-  .wire-group.is-on[data-color="4"] .wire-tag-text { fill: #d8b4fe; }
-  .wire-group.is-chain .wire-tag-text { fill: #fca5a5 !important; }
-  .wire-group.is-partial .wire-tag-text { fill: #cbd5e1; }
+  .wire-group.is-on[data-color="1"] .wire-tag-text { fill: #bae6fd; }
+  .wire-group.is-on[data-color="2"] .wire-tag-text { fill: #a7f3d0; }
+  .wire-group.is-on[data-color="3"] .wire-tag-text { fill: #fef08a; }
+  .wire-group.is-on[data-color="4"] .wire-tag-text { fill: #e9d5ff; }
+  .wire-group.is-chain .wire-tag-text { fill: #fecaca !important; }
 
-  .sw-symbol-bg { fill: #0b1120; }
-  .sw-contact { fill: #475569; }
-  .wire-group.is-on .sw-contact { fill: #f8fafc; }
-  .sw-blade { stroke: #ef4444; stroke-width: 2.2; stroke-linecap: round; }
-  .wire-group.is-on .sw-blade { stroke: #22c55e; }
+  /* グラフィカル・ナイフスイッチ／リレー筐体（クリックで直接開閉可能！） */
+  .sw-sym { cursor: pointer; }
+  .sw-box {
+    fill: #0f172a;
+    stroke: #64748b;
+    stroke-width: 1.6;
+    rx: 6;
+    transition: stroke 0.16s ease, fill 0.16s ease;
+  }
+  .sw-sym:hover .sw-box { stroke: #f8fafc; fill: #1e293b; }
+  .sw-sym.is-closed .sw-box { stroke: #22c55e; fill: #0b2219; }
+  .sw-sym.is-open .sw-box { stroke: #ef4444; fill: #281016; }
+  .sw-contact { fill: #94a3b8; stroke: #0f172a; stroke-width: 1; }
+  .sw-sym.is-closed .sw-contact { fill: #4ade80; }
+  .sw-sym.is-open .sw-contact { fill: #f87171; }
+  .sw-blade {
+    stroke: #ef4444;
+    stroke-width: 3;
+    stroke-linecap: round;
+  }
+  .sw-sym.is-closed .sw-blade { stroke: #22c55e; }
+  .sw-led { fill: #ef4444; }
+  .sw-sym.is-closed .sw-led { fill: #22c55e; }
+  .sw-state-txt {
+    font-size: 8.5px;
+    font-weight: 800;
+    font-family: ui-monospace, monospace;
+    fill: #fca5a5;
+    text-anchor: middle;
+  }
+  .sw-sym.is-closed .sw-state-txt { fill: #86efac; }
 
   /* 診断バー */
   .diag-panel {
@@ -428,28 +404,12 @@
     flex-direction: column;
     gap: 0.42rem;
   }
-  .diag-item {
-    display: flex;
-    align-items: flex-start;
-    gap: 0.55rem;
-    padding: 0.48rem 0.72rem;
-    border-radius: 8px;
-    font-size: 0.8rem;
-    line-height: 1.45;
-  }
+  .diag-item { display: flex; align-items: flex-start; gap: 0.55rem; padding: 0.48rem 0.72rem; border-radius: 8px; font-size: 0.81rem; line-height: 1.45; }
   .diag-item.level-err  { background: rgba(239, 68, 68, 0.16); border: 1px solid #ef4444; color: #fecaca; }
   .diag-item.level-warn { background: rgba(245, 158, 11, 0.15); border: 1px solid #f59e0b; color: #fde68a; }
   .diag-item.level-ok   { background: rgba(34, 197, 94, 0.14); border: 1px solid #22c55e; color: #bbf7d0; }
   .diag-item.level-info { background: rgba(56, 189, 248, 0.14); border: 1px solid #38bdf8; color: #bae6fd; }
-  .diag-badge {
-    flex-shrink: 0;
-    font-weight: 800;
-    font-size: 0.7rem;
-    padding: 0.1rem 0.42rem;
-    border-radius: 4px;
-    background: rgba(0, 0, 0, 0.35);
-    letter-spacing: 0.03em;
-  }
+  .diag-badge { flex-shrink: 0; font-weight: 800; font-size: 0.7rem; padding: 0.1rem 0.42rem; border-radius: 4px; background: rgba(0, 0, 0, 0.35); }
 
   /* サイドパネル */
   .side-panel {
@@ -461,47 +421,33 @@
     position: sticky;
     top: 1rem;
   }
-  .panel-tabs {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    border-bottom: 1px solid var(--border);
-    background: var(--surface-subtle);
-  }
-  .panel-tab {
-    padding: 0.7rem 0.6rem;
-    border: none;
-    background: transparent;
-    font-size: 0.83rem;
-    font-weight: 700;
-    color: var(--muted);
-    cursor: pointer;
-    border-bottom: 2px solid transparent;
-  }
+  .panel-tabs { display: grid; grid-template-columns: 1fr 1fr; border-bottom: 1px solid var(--border); background: var(--surface-subtle); }
+  .panel-tab { padding: 0.68rem 0.5rem; border: none; background: transparent; font-size: 0.82rem; font-weight: 700; color: var(--muted); cursor: pointer; border-bottom: 2px solid transparent; }
   .panel-tab.is-active { color: var(--text); background: var(--surface); border-bottom-color: var(--c1); }
-  .panel-body { padding: 0.85rem 0.95rem; max-height: calc(100vh - 6.5rem); overflow-y: auto; }
+  .panel-body { padding: 0.85rem 0.9rem; max-height: calc(100vh - 6.5rem); overflow-y: auto; }
   .tab-pane { display: none; }
   .tab-pane.is-active { display: block; }
 
-  .bank-group { margin-bottom: 0.95rem; padding-bottom: 0.8rem; border-bottom: 1px solid var(--border-light); }
+  .bank-group { margin-bottom: 0.9rem; padding-bottom: 0.78rem; border-bottom: 1px solid var(--border-light); }
   .bank-group:last-child { margin-bottom: 0; padding-bottom: 0; border-bottom: none; }
-  .bank-title { font-size: 0.74rem; font-weight: 800; color: var(--muted); margin: 0 0 0.5rem; letter-spacing: 0.03em; }
+  .bank-title { font-size: 0.74rem; font-weight: 800; color: var(--muted); margin: 0 0 0.48rem; }
 
-  .seg-row { margin-bottom: 0.55rem; }
-  .seg-label { font-size: 0.79rem; font-weight: 700; color: var(--text); margin-bottom: 0.25rem; display: flex; justify-content: space-between; align-items: center; }
-  .seg-control { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 0.25rem; background: var(--surface-subtle); padding: 0.2rem; border-radius: 8px; border: 1px solid var(--border-light); }
-  .seg-btn { border: none; background: transparent; padding: 0.36rem 0.35rem; border-radius: 6px; font-size: 0.76rem; font-weight: 700; color: var(--muted); cursor: pointer; }
+  .seg-row { margin-bottom: 0.52rem; }
+  .seg-label { font-size: 0.78rem; font-weight: 700; color: var(--text); margin-bottom: 0.24rem; display: flex; justify-content: space-between; align-items: center; }
+  .seg-control { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 0.24rem; background: var(--surface-subtle); padding: 0.2rem; border-radius: 8px; border: 1px solid var(--border-light); }
+  .seg-btn { border: none; background: transparent; padding: 0.34rem 0.3rem; border-radius: 6px; font-size: 0.75rem; font-weight: 700; color: var(--muted); cursor: pointer; }
   .seg-btn.is-active { background: #0f172a; color: #ffffff; }
   .seg-btn.is-active[data-val="PLAY"] { background: #15803d; }
   .seg-btn.is-active[data-val="PAUSE"] { background: #b45309; }
   .seg-btn.is-active[data-val="newton"] { background: #6d28d9; }
 
-  .switch-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 0.55rem; padding: 0.38rem 0.44rem; border-radius: 8px; margin-bottom: 0.26rem; transition: background 0.12s ease, opacity 0.15s ease; }
+  .switch-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 0.5rem; padding: 0.36rem 0.42rem; border-radius: 8px; margin-bottom: 0.24rem; }
   .switch-row:hover { background: var(--surface-subtle); }
   .switch-row.is-disabled { opacity: 0.48; }
   .switch-meta { min-width: 0; }
-  .switch-name { font-size: 0.79rem; font-weight: 700; color: var(--text); display: block; line-height: 1.3; }
-  .switch-key { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 0.7rem; color: var(--muted); word-break: break-all; display: block; margin-top: 0.08rem; }
-  .switch-note { font-size: 0.7rem; color: #b45309; display: block; margin-top: 0.1rem; }
+  .switch-name { font-size: 0.78rem; font-weight: 700; color: var(--text); display: block; line-height: 1.3; }
+  .switch-key { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 0.69rem; color: var(--muted); word-break: break-all; display: block; margin-top: 0.08rem; }
+  .switch-note { font-size: 0.69rem; color: #b45309; display: block; margin-top: 0.1rem; }
 
   .toggle-pill { position: relative; width: 38px; height: 21px; flex-shrink: 0; margin-top: 2px; }
   .toggle-pill input { opacity: 0; width: 0; height: 0; position: absolute; }
@@ -511,32 +457,22 @@
   .toggle-pill input:checked + .toggle-track::after { transform: translateX(17px); }
   .toggle-pill input:disabled + .toggle-track { cursor: not-allowed; background: #e2e8f0; }
 
-  /* プローブ */
-  .probe-empty { font-size: 0.83rem; color: var(--muted); padding: 0.8rem; border: 1px dashed var(--border); border-radius: 10px; background: var(--surface-subtle); }
-  .probe-title { margin: 0 0 0.4rem; font-size: 0.98rem; color: var(--text); }
-  .probe-desc { font-size: 0.82rem; margin: 0 0 0.75rem; color: var(--text-body); }
-  .probe-subhead { font-size: 0.73rem; font-weight: 800; color: var(--muted); margin: 0.75rem 0 0.32rem; letter-spacing: 0.03em; }
-  .probe-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 0.32rem; }
-  .probe-list li { padding: 0.42rem 0.58rem; border-radius: 7px; font-size: 0.77rem; border: 1px solid var(--border-light); background: var(--surface-subtle); }
+  .probe-empty { font-size: 0.82rem; color: var(--muted); padding: 0.8rem; border: 1px dashed var(--border); border-radius: 10px; background: var(--surface-subtle); }
+  .probe-title { margin: 0 0 0.4rem; font-size: 0.96rem; color: var(--text); }
+  .probe-desc { font-size: 0.81rem; margin: 0 0 0.7rem; color: var(--text-body); }
+  .probe-subhead { font-size: 0.72rem; font-weight: 800; color: var(--muted); margin: 0.7rem 0 0.3rem; }
+  .probe-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 0.3rem; }
+  .probe-list li { padding: 0.4rem 0.56rem; border-radius: 7px; font-size: 0.76rem; border: 1px solid var(--border-light); background: var(--surface-subtle); }
   .probe-list li.is-on { border-left: 3px solid #16a34a; background: #f0fdf4; }
   .probe-list li.is-off { border-left: 3px solid #94a3b8; opacity: 0.88; }
   .probe-list li.is-evidence { border-left: 3px solid #2563eb; background: #eff6ff; }
-  .probe-code { margin: 0.35rem 0 0; padding: 0.52rem 0.65rem; border-radius: 8px; background: #0f172a; color: #e2e8f0; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 0.72rem; overflow-x: auto; white-space: pre-wrap; word-break: break-word; }
+  .probe-code { margin: 0.35rem 0 0; padding: 0.5rem 0.62rem; border-radius: 8px; background: #0f172a; color: #e2e8f0; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 0.71rem; overflow-x: auto; white-space: pre-wrap; word-break: break-word; }
 
   /* 解説セクション */
-  .doc-sections {
-    margin-top: 2rem;
-    display: grid;
-    grid-template-columns: 226px minmax(0, 1fr);
-    gap: 1.8rem;
-    align-items: start;
-  }
-  @media (max-width: 1040px) {
-    .doc-sections { grid-template-columns: 1fr; }
-    .toc-box { position: static; }
-  }
+  .doc-sections { margin-top: 2rem; display: grid; grid-template-columns: 224px minmax(0, 1fr); gap: 1.8rem; align-items: start; }
+  @media (max-width: 1040px) { .doc-sections { grid-template-columns: 1fr; } .toc-box { position: static; } }
   .toc-box { position: sticky; top: 1rem; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 0.85rem 0.95rem; }
-  .toc-title { font-size: 0.74rem; font-weight: 800; color: var(--muted); margin: 0 0 0.5rem; letter-spacing: 0.04em; }
+  .toc-title { font-size: 0.74rem; font-weight: 800; color: var(--muted); margin: 0 0 0.5rem; }
   .toc { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 0.28rem; }
   .toc a { display: block; padding: 0.28rem 0.52rem; border-radius: 6px; text-decoration: none; font-size: 0.82rem; font-weight: 600; color: var(--muted); border-left: 3px solid transparent; }
   .toc a:hover { background: var(--surface-subtle); color: var(--text); }
@@ -548,23 +484,7 @@
   .prose h3 { margin-top: 1.8rem; margin-bottom: 0.4rem; font-size: 1rem; color: var(--text); }
   .prose p { margin-top: 0; margin-bottom: 0.9rem; }
 
-  .ref-badge {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    min-width: 1.4em;
-    height: 1.4em;
-    padding: 0 0.26em;
-    border-radius: 999px;
-    font-size: 0.8em;
-    font-weight: 700;
-    color: #ffffff;
-    background: var(--c1);
-    cursor: pointer;
-    vertical-align: 0.06em;
-    border: none;
-    transition: transform 0.15s ease;
-  }
+  .ref-badge { display: inline-flex; align-items: center; justify-content: center; min-width: 1.4em; height: 1.4em; padding: 0 0.26em; border-radius: 999px; font-size: 0.8em; font-weight: 700; color: #ffffff; background: var(--c1); cursor: pointer; vertical-align: 0.06em; border: none; transition: transform 0.15s ease; }
   .ref-badge[data-color="1"] { background: var(--c1); }
   .ref-badge[data-color="2"] { background: var(--c2); }
   .ref-badge[data-color="3"] { background: var(--c3); }
@@ -619,33 +539,9 @@
   .diff-add  { background: #dcfce7; border-left: 3px solid #16a34a; color: #14532d; padding: 0.14rem 0.38rem; border-radius: 4px; display: inline-block; }
   .diff-del  { background: #fee2e2; border-left: 3px solid #dc2626; color: #7f1d1d; padding: 0.14rem 0.38rem; border-radius: 4px; display: inline-block; }
 
-  .evidence-banner {
-    background: #eff6ff;
-    border: 1px solid #bfdbfe;
-    border-left: 4px solid #2563eb;
-    border-radius: 10px;
-    padding: 0.8rem 1rem;
-    font-size: 0.84rem;
-    margin-bottom: 0.9rem;
-    max-width: 78ch;
-  }
+  .evidence-banner { background: #eff6ff; border: 1px solid #bfdbfe; border-left: 4px solid #2563eb; border-radius: 10px; padding: 0.8rem 1rem; font-size: 0.84rem; margin-bottom: 0.9rem; max-width: 78ch; }
 
-  #ref-return-btn {
-    position: fixed;
-    right: 1.25rem;
-    bottom: 1.25rem;
-    z-index: 9999;
-    display: none;
-    padding: 0.55rem 0.95rem;
-    border-radius: 999px;
-    border: 1px solid #1e293b;
-    background: #0f172a;
-    color: #ffffff;
-    font-size: 0.84rem;
-    font-weight: 700;
-    cursor: pointer;
-    box-shadow: 0 6px 18px rgba(15, 23, 42, 0.28);
-  }
+  #ref-return-btn { position: fixed; right: 1.25rem; bottom: 1.25rem; z-index: 9999; display: none; padding: 0.55rem 0.95rem; border-radius: 999px; border: 1px solid #1e293b; background: #0f172a; color: #ffffff; font-size: 0.84rem; font-weight: 700; cursor: pointer; box-shadow: 0 6px 18px rgba(15, 23, 42, 0.28); }
   #ref-return-btn.is-visible { display: inline-flex; align-items: center; gap: 0.4rem; }
 </style>
 </head>
@@ -660,18 +556,19 @@
       <h1>
         Isaac Sim バックエンドデータフロー回路図
         <span class="version-tag">Isaac Sim 6.2.0 / CPU・GPU分割</span>
-        <span class="verified-tag">ドキュメント + 実機 T1〜T9 実測済</span>
+        <span class="verified-tag">回路上スイッチ直接クリック開閉 + T1〜T9実測済</span>
       </h1>
       <p class="header-sub">
-        Host RAM（CPU）と VRAM（GPU）を PCIe 境界で分割し、各配線の駆動方式（① CLOCK 毎フレーム / ② DIRTY 差分同期 / ③ EVENT 単発）と通電状態をゆったりとした連続信号流で確認できます。
+        配線上の緑／赤ナイフスイッチを直接クリックして開閉できます。Host RAM（CPU）と VRAM（GPU）を PCIe 境界で分割し、① CLOCK・② DIRTY・③ EVENT の違いをゆったりした連続信号流で可視化します。
       </p>
     </div>
-    <div class="legend-bar" aria-label="信号系統と駆動方式の凡例">
+    <div class="legend-bar" aria-label="信号系統とスイッチの凡例">
       <span class="legend-pill"><span class="legend-dot" style="background:var(--c1-glow)"></span>USD 永続</span>
       <span class="legend-pill"><span class="legend-dot" style="background:var(--c2-glow)"></span>Fabric / USDRT</span>
       <span class="legend-pill"><span class="legend-dot" style="background:var(--c3-glow)"></span>物理・Tensor・制御</span>
       <span class="legend-pill"><span class="legend-dot" style="background:var(--c4-glow)"></span>Hydra・RTX・センサー</span>
-      <span class="legend-pill" style="border-color:rgba(251,113,133,0.5);color:#fda4af;">══ PCIe 境界 (CPU↔GPU)</span>
+      <span class="legend-pill" style="border-color:#22c55e;color:#86efac;">●──● ON(閉)</span>
+      <span class="legend-pill" style="border-color:#ef4444;color:#fca5a5;">● / ● OFF(開)</span>
     </div>
   </div>
 </header>
@@ -682,7 +579,7 @@
   <section class="preset-strip" id="preset-strip" aria-label="実運用シナリオのプリセット">
     <div class="preset-strip-head">
       <span class="preset-strip-title">シナリオ・プリセット（クリックでスイッチ盤を一括切替・実測 T1〜T9 対応）</span>
-      <span style="font-size:0.77rem;color:var(--muted);">IC ブロック・配線クリックでプローブ詳細（根拠ドキュメント＆実測値）を表示</span>
+      <span style="font-size:0.77rem;color:var(--muted);">回路図上のスイッチ筐体をクリックすると直接 ON/OFF 切替、IC・配線クリックで根拠プローブを表示</span>
     </div>
     <div class="preset-actions">
       <button type="button" class="preset-btn is-selected" data-preset="default_play">既定 GUI (full.kit / T1実測)</button>
@@ -709,7 +606,7 @@
           <span class="meter-pill" id="meter-engine">ENGINE: PhysX (CPU)</span>
           <span class="meter-pill" id="meter-delegate">HYDRA: FSD</span>
           <span class="meter-pill" id="meter-render">RENDER: ON</span>
-          <span class="meter-pill" id="meter-pcie">PCIe跨ぎ通電: 0</span>
+          <span class="meter-pill" id="meter-pcie">PCIe跨ぎ通電: 0本</span>
         </div>
         <div class="flow-group" id="pulse-controls">
           <button type="button" class="action-btn" id="btn-toggle-flow">⏸ 流れを一時停止</button>
@@ -729,7 +626,7 @@
           <button type="button" class="action-btn secondary" id="btn-pulse-sync">🔄 SynchronizeToFabric()</button>
           <button type="button" class="action-btn secondary" id="btn-pulse-save">💾 save_to_usd()</button>
         </div>
-        <div class="flow-group" style="font-size:0.73rem;color:#94a3b8;">
+        <div class="flow-group" style="font-size:0.74rem;color:#94a3b8;">
           <span>● 丸粒子 = ① CLOCK 毎フレーム</span>
           <span>■ 四角バッチ = ② DIRTY 差分同期</span>
           <span>◆ ダイヤ = ③ EVENT 単発</span>
@@ -745,11 +642,12 @@
           <button type="button" class="trigger-btn" data-trigger="dirty">② DIRTY 差分同期</button>
           <button type="button" class="trigger-btn" data-trigger="event">③ EVENT 単発</button>
         </div>
-        <span id="trigger-summary" style="font-family:ui-monospace,monospace;font-size:0.74rem;color:#94a3b8;">①: 0 / ②: 0 / ③: 0</span>
+        <span id="trigger-summary" style="font-family:ui-monospace,monospace;font-size:0.74rem;color:#94a3b8;">通電中 — ①: 0 / ②: 0 / ③: 0</span>
       </div>
 
+      <!-- 広々したゼロ重なり設計の SVG (1560 x 980) -->
       <div class="svg-wrap">
-        <svg id="circuit-svg" viewBox="0 0 1240 744" role="img" aria-label="Isaac Sim バックエンド CPU/GPU 分割データフロー回路図">
+        <svg id="circuit-svg" viewBox="0 0 1560 980" role="img" aria-label="Isaac Sim バックエンド CPU/GPU 分割データフロー回路図">
           <defs>
             <marker id="arrow-off" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
               <path d="M 1 1.5 L 8.5 5 L 1 8.5 z" fill="#475569"/>
@@ -769,439 +667,508 @@
           </defs>
 
           <!-- CPU DOMAIN 背景枠 -->
-          <rect x="14" y="12" width="1212" height="366" rx="12" fill="rgba(14,165,233,0.045)" stroke="#1e3a5f" stroke-width="1.2"/>
-          <text x="26" y="30" fill="#38bdf8" font-size="11" font-weight="800" font-family="ui-monospace,monospace">CPU DOMAIN — Host RAM (USD Authoring / CPU Fabric Mirror / CPU Physics / Kit UI / OmniGraph / ROS 2)</text>
+          <rect x="14" y="12" width="1532" height="516" rx="14" fill="rgba(14,165,233,0.04)" stroke="#1e3a5f" stroke-width="1.3"/>
+          <text x="30" y="33" fill="#38bdf8" font-size="12" font-weight="800" font-family="ui-monospace,monospace">CPU DOMAIN — Host RAM (Timeline / Editor UI / USD Stage / Fabric CPU / Physics CPU / OmniGraph / Hydra / ROS 2)</text>
 
-          <!-- PCIe 境界ライン -->
-          <line x1="18" y1="398" x2="1222" y2="398" stroke="#fb7185" stroke-width="2" stroke-dasharray="10 6" opacity="0.85"/>
-          <rect x="432" y="387" width="376" height="22" rx="11" fill="#2a0f18" stroke="#fb7185" stroke-width="1.2"/>
-          <text x="620" y="401.5" fill="#fda4af" font-size="10.5" font-weight="800" text-anchor="middle" font-family="ui-monospace,monospace">══ PCIe 境界 (Host RAM ↔ GPU VRAM 転送帯) ══</text>
+          <!-- PCIe 境界ライン（バナーは左端の空き領域に配置し縦配線と完全分離） -->
+          <line x1="18" y1="548" x2="1542" y2="548" stroke="#fb7185" stroke-width="2.2" stroke-dasharray="12 7" opacity="0.88"/>
+          <rect id="pcie-banner" x="30" y="535" width="346" height="26" rx="13" fill="#2d0f1a" stroke="#fb7185" stroke-width="1.4"/>
+          <text x="203" y="552" fill="#fda4af" font-size="11" font-weight="800" text-anchor="middle" font-family="ui-monospace,monospace">══ PCIe 境界 (Host RAM ↔ GPU VRAM) ══</text>
 
           <!-- GPU DOMAIN 背景枠 -->
-          <rect x="14" y="418" width="1212" height="314" rx="12" fill="rgba(168,85,247,0.05)" stroke="#3b1d66" stroke-width="1.2"/>
-          <text x="26" y="436" fill="#c084fc" font-size="11" font-weight="800" font-family="ui-monospace,monospace">GPU DOMAIN — VRAM / CUDA / Vulkan (GPU Fabric Mirror / PhysX GPU &amp; Newton Warp / CUDA Tensor / RTX Renderer)</text>
+          <rect x="14" y="570" width="1532" height="396" rx="14" fill="rgba(168,85,247,0.045)" stroke="#3b1d66" stroke-width="1.3"/>
+          <text x="30" y="592" fill="#c084fc" font-size="12" font-weight="800" font-family="ui-monospace,monospace">GPU DOMAIN — VRAM / CUDA / Vulkan (Fabric GPU / Physics GPU &amp; Newton Warp / CUDA Tensor Direct / RTX Renderer / RTX Sensors)</text>
 
-          <!-- ================= 配線レイヤ（22系統） ================= -->
+          <!-- ================= 配線レイヤ（全22系統・専用コリドー設計） ================= -->
           <g id="wires-layer">
 
-            <!-- W01: Timeline -> Physics (CPU) [① CLOCK] -->
+            <!-- W01: Timeline -> Physics [CPU] (Master PLAY Breaker) -->
             <g class="wire-group dim-candidate" id="wire-clock-phys-cpu" data-wire="clock_phys_cpu" data-color="3">
-              <path class="wire-hit" d="M 272 100 L 272 308 L 316 308"/>
-              <path class="wire-path" d="M 272 100 L 272 308 L 316 308" marker-end="url(#arrow-3)"/>
-              <rect class="wire-tag-bg" x="218" y="274" width="96" height="17"/>
-              <text class="wire-tag-text" x="266" y="286">① stageupdate</text>
+              <path class="wire-hit" d="M 412 114 L 412 444 L 476 444"/>
+              <path class="wire-path" d="M 412 114 L 412 444 L 476 444" marker-end="url(#arrow-3)"/>
+              <g class="sw-sym" data-toggle="play" transform="translate(412,346)">
+                <rect class="sw-box" x="-16" y="-26" width="32" height="52"/>
+                <circle class="sw-led" cx="10" cy="-19" r="2.6"/>
+                <circle class="sw-contact" cx="0" cy="-13" r="3.4"/>
+                <circle class="sw-contact" cx="0" cy="13" r="3.4"/>
+                <line class="sw-blade" x1="0" y1="-13" x2="0" y2="13"/>
+                <text class="sw-state-txt" x="0" y="23">ON</text>
+              </g>
+              <rect class="wire-tag-bg" x="276" y="336" width="110" height="20"/>
+              <text class="wire-tag-text" x="331" y="350">① PLAY(CPU)</text>
             </g>
 
-            <!-- W02: Timeline -> Physics (GPU) [① CLOCK] -->
+            <!-- W02: Timeline -> Physics [GPU/CUDA] (GPU Step Breaker) -->
             <g class="wire-group dim-candidate" id="wire-clock-phys-gpu" data-wire="clock_phys_gpu" data-color="3">
-              <path class="wire-hit" d="M 288 100 L 288 648 L 316 648"/>
-              <path class="wire-path" d="M 288 100 L 288 648 L 316 648" marker-end="url(#arrow-3)"/>
-              <rect class="wire-tag-bg" x="234" y="514" width="92" height="17"/>
-              <text class="wire-tag-text" x="280" y="526">① GPU Step</text>
+              <path class="wire-hit" d="M 448 114 L 448 866 L 476 866"/>
+              <path class="wire-path" d="M 448 114 L 448 866 L 476 866" marker-end="url(#arrow-3)"/>
+              <g class="sw-sym" data-toggle="gpuDynamics" transform="translate(448,668)">
+                <rect class="sw-box" x="-16" y="-26" width="32" height="52"/>
+                <circle class="sw-led" cx="10" cy="-19" r="2.6"/>
+                <circle class="sw-contact" cx="0" cy="-13" r="3.4"/>
+                <circle class="sw-contact" cx="0" cy="13" r="3.4"/>
+                <line class="sw-blade" x1="0" y1="-13" x2="0" y2="13"/>
+                <text class="sw-state-txt" x="0" y="23">ON</text>
+              </g>
+              <rect class="wire-tag-bg" x="260" y="658" width="136" height="20"/>
+              <text class="wire-tag-text" x="328" y="672">① GPU Step(CUDA)</text>
             </g>
 
-            <!-- W03: Timeline -> OmniGraph [① CLOCK] -->
+            <!-- W03: Timeline -> OmniGraph (OnPlaybackTick) -->
             <g class="wire-group dim-candidate" id="wire-clock-graph" data-wire="clock_graph" data-color="3">
-              <path class="wire-hit" d="M 334 100 L 334 114 L 780 114 L 780 132"/>
-              <path class="wire-path" d="M 334 100 L 334 114 L 780 114 L 780 132" marker-end="url(#arrow-3)"/>
-              <rect class="wire-tag-bg" x="598" y="105" width="110" height="17"/>
-              <text class="wire-tag-text" x="653" y="117">① PlaybackTick</text>
+              <path class="wire-hit" d="M 358 114 L 358 184 L 1060 184 L 1060 206"/>
+              <path class="wire-path" d="M 358 114 L 358 184 L 1060 184 L 1060 206" marker-end="url(#arrow-3)"/>
+              <rect class="wire-tag-bg" x="780" y="174" width="128" height="20"/>
+              <text class="wire-tag-text" x="844" y="188">① PlaybackTick</text>
             </g>
 
-            <!-- W04: Editor UI <-> USD Stage [③ EVENT] -->
-            <g class="wire-group dim-candidate" id="wire-ui-usd" data-wire="ui_usd" data-color="1">
-              <path class="wire-hit" d="M 432 100 L 432 122 L 130 122 L 130 144"/>
-              <path class="wire-path" d="M 432 100 L 432 122 L 130 122 L 130 144" marker-start="url(#arrow-1)" marker-end="url(#arrow-1)"/>
-              <rect class="wire-tag-bg" x="150" y="113" width="102" height="17"/>
-              <text class="wire-tag-text" x="201" y="125">③ UI USD編集</text>
-            </g>
-
-            <!-- W05: Editor UI <-> Fabric (CPU) [② DIRTY] -->
-            <g class="wire-group dim-candidate" id="wire-ui-fabric" data-wire="ui_fabric" data-color="2">
-              <path class="wire-hit" d="M 526 100 L 526 132"/>
-              <path class="wire-path" d="M 526 100 L 526 132" marker-start="url(#arrow-2)" marker-end="url(#arrow-2)"/>
-              <rect class="wire-tag-bg" x="536" y="108" width="104" height="17"/>
-              <text class="wire-tag-text" x="588" y="120">② Adapter読取</text>
-            </g>
-
-            <!-- W06: USD Stage (CPU) -> Fabric (CPU) [② DIRTY or ③ EVENT / 連鎖] -->
-            <g class="wire-group dim-candidate" id="wire-usd-fabric" data-wire="usd_fabric" data-color="2">
-              <path class="wire-hit" d="M 234 176 L 316 176"/>
-              <path class="wire-path" d="M 234 176 L 316 176" marker-end="url(#arrow-2)"/>
-              <g class="sw-sym" transform="translate(275,176)">
-                <rect class="sw-symbol-bg" x="-11" y="-8" width="22" height="16"/>
-                <circle class="sw-contact" cx="-7" cy="0" r="2.8"/>
-                <circle class="sw-contact" cx="7" cy="0" r="2.8"/>
-                <line class="sw-blade" x1="-7" y1="0" x2="7" y2="0"/>
-              </g>
-              <rect class="wire-tag-bg" x="220" y="151" width="112" height="17"/>
-              <text class="wire-tag-text" x="276" y="163" id="label-usd-fabric">② USDRT遅延同期</text>
-            </g>
-
-            <!-- W07: Fabric (CPU) -> USD Stage (CPU) [③ EVENT save_to_usd] -->
-            <g class="wire-group dim-candidate" id="wire-fabric-usd-save" data-wire="fabric_usd_save" data-color="1">
-              <path class="wire-hit" d="M 320 208 L 238 208"/>
-              <path class="wire-path" d="M 320 208 L 238 208" marker-end="url(#arrow-1)"/>
-              <rect class="wire-tag-bg" x="228" y="216" width="102" height="17"/>
-              <text class="wire-tag-text" x="279" y="228">③ save_to_usd()</text>
-            </g>
-
-            <!-- W08: USD Stage (CPU) -> Physics (CPU) [③ EVENT Notice] -->
-            <g class="wire-group dim-candidate" id="wire-usd-phys" data-wire="usd_phys" data-color="1">
-              <path class="wire-hit" d="M 164 338 L 164 352 L 316 352"/>
-              <path class="wire-path" d="M 164 338 L 164 352 L 316 352" marker-end="url(#arrow-1)"/>
-              <rect class="wire-tag-bg" x="176" y="343" width="106" height="17"/>
-              <text class="wire-tag-text" x="229" y="355" id="label-usd-phys">③ USD Notice</text>
-            </g>
-
-            <!-- W09: Physics (CPU) -> USD Stage (CPU) [① CLOCK updateToUsd] -->
-            <g class="wire-group dim-candidate" id="wire-phys-usd" data-wire="phys_usd" data-color="1">
-              <path class="wire-hit" d="M 320 330 L 106 330 L 106 342"/>
-              <path class="wire-path" d="M 320 330 L 106 330 L 106 342" marker-end="url(#arrow-1)"/>
-              <g class="sw-sym" transform="translate(216,330)">
-                <rect class="sw-symbol-bg" x="-11" y="-8" width="22" height="16"/>
-                <circle class="sw-contact" cx="-7" cy="0" r="2.8"/>
-                <circle class="sw-contact" cx="7" cy="0" r="2.8"/>
-                <line class="sw-blade" x1="-7" y1="0" x2="7" y2="0"/>
-              </g>
-              <rect class="wire-tag-bg" x="148" y="305" width="124" height="17"/>
-              <text class="wire-tag-text" x="210" y="317" id="label-phys-usd">① updateToUsd</text>
-            </g>
-
-            <!-- W10: Physics (CPU) -> Fabric (CPU) [① CLOCK fabricEnabled CPU] -->
-            <g class="wire-group dim-candidate" id="wire-phys-cpu-fabric-cpu" data-wire="phys_cpu_fabric_cpu" data-color="2">
-              <path class="wire-hit" d="M 450 264 L 450 236"/>
-              <path class="wire-path" d="M 450 264 L 450 236" marker-end="url(#arrow-2)"/>
-              <rect class="wire-tag-bg" x="462" y="241" width="114" height="17"/>
-              <text class="wire-tag-text" x="519" y="253">① Fabric CPU書出</text>
-            </g>
-
-            <!-- W11: Physics (GPU) -> Physics (CPU) [① CLOCK Readback — PCIe跨ぎ!] -->
-            <g class="wire-group dim-candidate" id="wire-gpu-readback" data-wire="gpu_readback" data-color="3">
-              <path class="wire-hit" d="M 358 588 L 358 368"/>
-              <path class="wire-path" d="M 358 588 L 358 368" marker-end="url(#arrow-3)"/>
-              <g class="sw-sym" transform="translate(358,408)">
-                <rect class="sw-symbol-bg" x="-10" y="-12" width="20" height="24"/>
-                <circle class="sw-contact" cx="0" cy="-7" r="2.8"/>
-                <circle class="sw-contact" cx="0" cy="7" r="2.8"/>
-                <line class="sw-blade" x1="0" y1="-7" x2="0" y2="7"/>
-              </g>
-              <rect class="wire-tag-bg" x="190" y="454" width="122" height="17"/>
-              <text class="wire-tag-text" x="251" y="466" id="label-gpu-readback">① PCIe Readback</text>
-            </g>
-
-            <!-- W12: Fabric (CPU) <-> Fabric (GPU) [② DIRTY Mirror — PCIe跨ぎ!] -->
-            <g class="wire-group dim-candidate" id="wire-fabric-mirror" data-wire="fabric_mirror" data-color="2">
-              <path class="wire-hit" d="M 556 232 L 556 446"/>
-              <path class="wire-path" d="M 556 232 L 556 446" marker-start="url(#arrow-2)" marker-end="url(#arrow-2)"/>
-              <rect class="wire-tag-bg" x="460" y="410" width="150" height="17"/>
-              <text class="wire-tag-text" x="535" y="422" id="label-fabric-mirror">② Dirty-bit PCIeミラー</text>
-            </g>
-
-            <!-- W13: Physics (GPU) -> Fabric (GPU) [① CLOCK GPU Interop / Newton Warp — VRAM内直結!] -->
-            <g class="wire-group dim-candidate" id="wire-phys-gpu-fabric-gpu" data-wire="phys_gpu_fabric_gpu" data-color="2">
-              <path class="wire-hit" d="M 450 588 L 450 554"/>
-              <path class="wire-path" d="M 450 588 L 450 554" marker-end="url(#arrow-2)"/>
-              <rect class="wire-tag-bg" x="462" y="562" width="144" height="17"/>
-              <text class="wire-tag-text" x="534" y="574" id="label-phys-gpu-fabric-gpu">① GPU Interop(VRAM)</text>
-            </g>
-
-            <!-- W14: Tensor API (GPU) <-> Physics (GPU) [① CLOCK CUDA Zero-Copy — VRAM内直結!] -->
-            <g class="wire-group dim-candidate" id="wire-tensor-gpu" data-wire="tensor_gpu" data-color="3">
-              <path class="wire-hit" d="M 244 652 L 316 652"/>
-              <path class="wire-path" d="M 244 652 L 316 652" marker-start="url(#arrow-3)" marker-end="url(#arrow-3)"/>
-              <rect class="wire-tag-bg" x="218" y="666" width="118" height="17"/>
-              <text class="wire-tag-text" x="277" y="678">① CUDA ZeroCopy</text>
-            </g>
-
-            <!-- W15: Python CPU <-> Physics (CPU) [① CLOCK CPU Tensor] -->
-            <g class="wire-group dim-candidate" id="wire-tensor-cpu" data-wire="tensor_cpu" data-color="3">
-              <path class="wire-hit" d="M 880 100 L 880 250 L 580 250 L 580 294"/>
-              <path class="wire-path" d="M 880 100 L 880 250 L 580 250 L 580 294" marker-start="url(#arrow-3)" marker-end="url(#arrow-3)"/>
-              <rect class="wire-tag-bg" x="598" y="241" width="102" height="17"/>
-              <text class="wire-tag-text" x="649" y="253">① CPU Tensor</text>
-            </g>
-
-            <!-- W16: Fabric (CPU) <-> OmniGraph (CPU) [① CLOCK] -->
-            <g class="wire-group dim-candidate" id="wire-fabric-graph" data-wire="fabric_graph" data-color="2">
-              <path class="wire-hit" d="M 580 176 L 668 176"/>
-              <path class="wire-path" d="M 580 176 L 668 176" marker-start="url(#arrow-2)" marker-end="url(#arrow-2)"/>
-              <rect class="wire-tag-bg" x="586" y="152" width="76" height="17"/>
-              <text class="wire-tag-text" x="624" y="164">① Graph</text>
-            </g>
-
-            <!-- W17: OmniGraph (CPU) -> USD Stage (CPU) [① CLOCK omnigraph.updateToUsd] -->
+            <!-- W04: OmniGraph -> USD Stage (omnigraph.updateToUsd) -->
             <g class="wire-group dim-candidate" id="wire-graph-usd" data-wire="graph_usd" data-color="1">
-              <path class="wire-hit" d="M 736 136 L 736 106 L 66 106 L 66 144"/>
-              <path class="wire-path" d="M 736 136 L 736 106 L 66 106 L 66 144" marker-end="url(#arrow-1)"/>
-              <rect class="wire-tag-bg" x="282" y="97" width="136" height="17"/>
-              <text class="wire-tag-text" x="350" y="109">① og.updateToUsd</text>
-            </g>
-
-            <!-- W18: Fabric (CPU) -> Hydra Delegate (CPU) [② DIRTY FSD] -->
-            <g class="wire-group dim-candidate" id="wire-fabric-hydra" data-wire="fabric_hydra" data-color="2">
-              <path class="wire-hit" d="M 580 206 L 634 206 L 634 304 L 668 304"/>
-              <path class="wire-path" d="M 580 206 L 634 206 L 634 304 L 668 304" marker-end="url(#arrow-2)"/>
-              <rect class="wire-tag-bg" x="582" y="294" width="88" height="17"/>
-              <text class="wire-tag-text" x="626" y="306" id="label-fabric-hydra">② FSD差分</text>
-            </g>
-
-            <!-- W19: USD Stage (CPU) -> Hydra Delegate (CPU) [② DIRTY OmniHydra直読] -->
-            <g class="wire-group dim-candidate" id="wire-usd-hydra" data-wire="usd_hydra" data-color="1">
-              <path class="wire-hit" d="M 44 338 L 44 372 L 696 372 L 696 364"/>
-              <path class="wire-path" d="M 44 338 L 44 372 L 696 372 L 696 364" marker-end="url(#arrow-1)"/>
-              <rect class="wire-tag-bg" x="458" y="362" width="128" height="17"/>
-              <text class="wire-tag-text" x="522" y="374">② OmniHydra直読</text>
-            </g>
-
-            <!-- W20: Hydra Delegate (CPU) -> RTX Renderer (GPU) [① CLOCK Render Gate — PCIe跨ぎ!] -->
-            <g class="wire-group dim-candidate" id="wire-hydra-rtx" data-wire="hydra_rtx" data-color="4">
-              <path class="wire-hit" d="M 786 364 L 786 446"/>
-              <path class="wire-path" d="M 786 364 L 786 446" marker-end="url(#arrow-4)"/>
-              <g class="sw-sym" transform="translate(786,408)">
-                <rect class="sw-symbol-bg" x="-10" y="-12" width="20" height="24"/>
-                <circle class="sw-contact" cx="0" cy="-7" r="2.8"/>
-                <circle class="sw-contact" cx="0" cy="7" r="2.8"/>
-                <line class="sw-blade" x1="0" y1="-7" x2="0" y2="7"/>
+              <path class="wire-hit" d="M 980 210 L 980 132 L 74 132 L 74 206"/>
+              <path class="wire-path" d="M 980 210 L 980 132 L 74 132 L 74 206" marker-end="url(#arrow-1)"/>
+              <g class="sw-sym" data-toggle="ogUsd" transform="translate(888,132)">
+                <rect class="sw-box" x="-26" y="-15" width="52" height="30"/>
+                <circle class="sw-led" cx="19" cy="-9" r="2.5"/>
+                <circle class="sw-contact" cx="-13" cy="2" r="3.4"/>
+                <circle class="sw-contact" cx="13" cy="2" r="3.4"/>
+                <line class="sw-blade" x1="-13" y1="2" x2="13" y2="2"/>
+                <text class="sw-state-txt" x="0" y="-5">ON</text>
               </g>
-              <rect class="wire-tag-bg" x="802" y="400" width="96" height="17"/>
-              <text class="wire-tag-text" x="850" y="412">① RenderGate</text>
+              <rect class="wire-tag-bg" x="700" y="122" width="152" height="20"/>
+              <text class="wire-tag-text" x="776" y="136">① og.updateToUsd</text>
             </g>
 
-            <!-- W21: Fabric (GPU) -> RTX Renderer (GPU) [② DIRTY GPU-direct render] -->
+            <!-- W05: Editor UI <-> USD Stage -->
+            <g class="wire-group dim-candidate" id="wire-ui-usd" data-wire="ui_usd" data-color="1">
+              <path class="wire-hit" d="M 540 118 L 540 158 L 194 158 L 194 206"/>
+              <path class="wire-path" d="M 540 118 L 540 158 L 194 158 L 194 206" marker-start="url(#arrow-1)" marker-end="url(#arrow-1)"/>
+              <rect class="wire-tag-bg" x="210" y="148" width="124" height="20"/>
+              <text class="wire-tag-text" x="272" y="162">③ UI USD編集</text>
+            </g>
+
+            <!-- W06: Editor UI <-> Fabric (CPU) (enableAdapter Switch) -->
+            <g class="wire-group dim-candidate" id="wire-ui-fabric" data-wire="ui_fabric" data-color="2">
+              <path class="wire-hit" d="M 650 118 L 650 206"/>
+              <path class="wire-path" d="M 650 118 L 650 206" marker-start="url(#arrow-2)" marker-end="url(#arrow-2)"/>
+              <g class="sw-sym" data-toggle="propAdapter" transform="translate(650,158)">
+                <rect class="sw-box" x="-16" y="-22" width="32" height="44"/>
+                <circle class="sw-led" cx="10" cy="-16" r="2.4"/>
+                <circle class="sw-contact" cx="0" cy="-10" r="3.2"/>
+                <circle class="sw-contact" cx="0" cy="10" r="3.2"/>
+                <line class="sw-blade" x1="0" y1="-10" x2="0" y2="10"/>
+                <text class="sw-state-txt" x="0" y="19">ON</text>
+              </g>
+              <rect class="wire-tag-bg" x="674" y="148" width="126" height="20"/>
+              <text class="wire-tag-text" x="737" y="162">② enableAdapter</text>
+            </g>
+
+            <!-- W07: USD Stage -> Fabric (CPU) (fabricNotice Switch) -->
+            <g class="wire-group dim-candidate" id="wire-usd-fabric" data-wire="usd_fabric" data-color="2">
+              <path class="wire-hit" d="M 250 242 L 476 242"/>
+              <path class="wire-path" d="M 250 242 L 476 242" marker-end="url(#arrow-2)"/>
+              <g class="sw-sym" data-toggle="fabricNotice" transform="translate(334,242)">
+                <rect class="sw-box" x="-26" y="-15" width="52" height="30"/>
+                <circle class="sw-led" cx="19" cy="-9" r="2.5"/>
+                <circle class="sw-contact" cx="-13" cy="2" r="3.4"/>
+                <circle class="sw-contact" cx="13" cy="2" r="3.4"/>
+                <line class="sw-blade" x1="-13" y1="2" x2="13" y2="2"/>
+                <text class="sw-state-txt" x="0" y="-5">ON</text>
+              </g>
+              <rect class="wire-tag-bg" x="266" y="204" width="136" height="20"/>
+              <text class="wire-tag-text" x="334" y="218" id="label-usd-fabric">② USDRT遅延同期</text>
+            </g>
+
+            <!-- W08: Fabric (CPU) -> USD Stage (Manual save_to_usd) -->
+            <g class="wire-group dim-candidate" id="wire-fabric-usd-save" data-wire="fabric_usd_save" data-color="1">
+              <path class="wire-hit" d="M 480 296 L 254 296"/>
+              <path class="wire-path" d="M 480 296 L 254 296" marker-end="url(#arrow-1)"/>
+              <rect class="wire-tag-bg" x="274" y="304" width="120" height="20"/>
+              <text class="wire-tag-text" x="334" y="318">③ save_to_usd()</text>
+            </g>
+
+            <!-- W09: Physics [CPU] -> USD Stage (updateToUsd Switch) -->
+            <g class="wire-group dim-candidate" id="wire-phys-usd" data-wire="phys_usd" data-color="1">
+              <path class="wire-hit" d="M 480 416 L 254 416"/>
+              <path class="wire-path" d="M 480 416 L 254 416" marker-end="url(#arrow-1)"/>
+              <g class="sw-sym" data-toggle="updateToUsd" transform="translate(334,416)">
+                <rect class="sw-box" x="-26" y="-15" width="52" height="30"/>
+                <circle class="sw-led" cx="19" cy="-9" r="2.5"/>
+                <circle class="sw-contact" cx="-13" cy="2" r="3.4"/>
+                <circle class="sw-contact" cx="13" cy="2" r="3.4"/>
+                <line class="sw-blade" x1="-13" y1="2" x2="13" y2="2"/>
+                <text class="sw-state-txt" x="0" y="-5">ON</text>
+              </g>
+              <rect class="wire-tag-bg" x="256" y="378" width="132" height="20"/>
+              <text class="wire-tag-text" x="322" y="392" id="label-phys-usd">① updateToUsd</text>
+            </g>
+
+            <!-- W10: USD Stage -> Physics [CPU] (usdNotice Switch) -->
+            <g class="wire-group dim-candidate" id="wire-usd-phys" data-wire="usd_phys" data-color="1">
+              <path class="wire-hit" d="M 250 472 L 476 472"/>
+              <path class="wire-path" d="M 250 472 L 476 472" marker-end="url(#arrow-1)"/>
+              <g class="sw-sym" data-toggle="usdNotice" transform="translate(334,472)">
+                <rect class="sw-box" x="-26" y="-15" width="52" height="30"/>
+                <circle class="sw-led" cx="19" cy="-9" r="2.5"/>
+                <circle class="sw-contact" cx="-13" cy="2" r="3.4"/>
+                <circle class="sw-contact" cx="13" cy="2" r="3.4"/>
+                <line class="sw-blade" x1="-13" y1="2" x2="13" y2="2"/>
+                <text class="sw-state-txt" x="0" y="-5">ON</text>
+              </g>
+              <rect class="wire-tag-bg" x="270" y="494" width="128" height="20"/>
+              <text class="wire-tag-text" x="334" y="508" id="label-usd-phys">③ USD Notice</text>
+            </g>
+
+            <!-- W11: Physics [CPU] -> Fabric (CPU) (fabricEnabled Switch) -->
+            <g class="wire-group dim-candidate" id="wire-phys-cpu-fabric-cpu" data-wire="phys_cpu_fabric_cpu" data-color="2">
+              <path class="wire-hit" d="M 556 386 L 556 326"/>
+              <path class="wire-path" d="M 556 386 L 556 326" marker-end="url(#arrow-2)"/>
+              <g class="sw-sym" data-toggle="fabricEnabled" transform="translate(556,356)">
+                <rect class="sw-box" x="-16" y="-22" width="32" height="44"/>
+                <circle class="sw-led" cx="10" cy="-16" r="2.4"/>
+                <circle class="sw-contact" cx="0" cy="-10" r="3.2"/>
+                <circle class="sw-contact" cx="0" cy="10" r="3.2"/>
+                <line class="sw-blade" x1="0" y1="-10" x2="0" y2="10"/>
+                <text class="sw-state-txt" x="0" y="19">ON</text>
+              </g>
+              <rect class="wire-tag-bg" x="582" y="346" width="136" height="20"/>
+              <text class="wire-tag-text" x="650" y="360">① fabricEnabled</text>
+            </g>
+
+            <!-- W12: Physics [GPU] -> Physics [CPU] (PCIe Readback & suppressReadback Breaker!) -->
+            <g class="wire-group dim-candidate" id="wire-gpu-readback" data-wire="gpu_readback" data-color="3">
+              <path class="wire-hit" d="M 526 810 L 526 766 L 408 766 L 408 548 L 526 548 L 526 502"/>
+              <path class="wire-path" d="M 526 810 L 526 766 L 408 766 L 408 548 L 526 548 L 526 502" marker-end="url(#arrow-3)"/>
+              <g class="sw-sym" data-toggle="suppressReadback" transform="translate(494,548)">
+                <rect class="sw-box" x="-28" y="-16" width="56" height="32"/>
+                <circle class="sw-led" cx="21" cy="-10" r="2.5"/>
+                <circle class="sw-contact" cx="-14" cy="2" r="3.4"/>
+                <circle class="sw-contact" cx="14" cy="2" r="3.4"/>
+                <line class="sw-blade" x1="-14" y1="2" x2="14" y2="2"/>
+                <text class="sw-state-txt" x="0" y="-5">ON</text>
+              </g>
+              <rect class="wire-tag-bg" x="530" y="538" width="152" height="20"/>
+              <text class="wire-tag-text" x="606" y="552" id="label-gpu-readback">① PCIe Readback</text>
+            </g>
+
+            <!-- W13: Fabric (CPU) <-> Fabric (GPU) (Dirty-bit PCIe Mirror) -->
+            <g class="wire-group dim-candidate" id="wire-fabric-mirror" data-wire="fabric_mirror" data-color="2">
+              <path class="wire-hit" d="M 766 296 L 786 296 L 786 640 L 766 640"/>
+              <path class="wire-path" d="M 766 296 L 786 296 L 786 640 L 766 640" marker-start="url(#arrow-2)" marker-end="url(#arrow-2)"/>
+              <rect class="wire-tag-bg" x="708" y="538" width="156" height="20"/>
+              <text class="wire-tag-text" x="786" y="552" id="label-fabric-mirror">② Dirty-bit PCIe</text>
+            </g>
+
+            <!-- W14: Physics [GPU] -> Fabric (GPU) (GPU Interop / Newton Warp Switch — VRAM直結!) -->
+            <g class="wire-group dim-candidate" id="wire-phys-gpu-fabric-gpu" data-wire="phys_gpu_fabric_gpu" data-color="2">
+              <path class="wire-hit" d="M 620 810 L 620 730"/>
+              <path class="wire-path" d="M 620 810 L 620 730" marker-end="url(#arrow-2)"/>
+              <g class="sw-sym" data-toggle="gpuInterop" transform="translate(620,770)">
+                <rect class="sw-box" x="-16" y="-24" width="32" height="48"/>
+                <circle class="sw-led" cx="10" cy="-17" r="2.5"/>
+                <circle class="sw-contact" cx="0" cy="-11" r="3.4"/>
+                <circle class="sw-contact" cx="0" cy="11" r="3.4"/>
+                <line class="sw-blade" x1="0" y1="-11" x2="0" y2="11"/>
+                <text class="sw-state-txt" x="0" y="21">ON</text>
+              </g>
+              <rect class="wire-tag-bg" x="646" y="760" width="166" height="20"/>
+              <text class="wire-tag-text" x="729" y="774" id="label-phys-gpu-fabric-gpu">① GPU Interop(VRAM)</text>
+            </g>
+
+            <!-- W15: Tensor API [GPU Direct] <-> Physics [GPU] (VRAM Zero-Copy) -->
+            <g class="wire-group dim-candidate" id="wire-tensor-gpu" data-wire="tensor_gpu" data-color="3">
+              <path class="wire-hit" d="M 274 874 L 476 874"/>
+              <path class="wire-path" d="M 274 874 L 476 874" marker-start="url(#arrow-3)" marker-end="url(#arrow-3)"/>
+              <rect class="wire-tag-bg" x="292" y="886" width="144" height="20"/>
+              <text class="wire-tag-text" x="364" y="900">① CUDA ZeroCopy</text>
+            </g>
+
+            <!-- W16: Python CPU <-> Physics [CPU] (CPU Tensor) -->
+            <g class="wire-group dim-candidate" id="wire-tensor-cpu" data-wire="tensor_cpu" data-color="3">
+              <path class="wire-hit" d="M 1206 118 L 1206 344 L 826 344 L 826 420 L 766 420"/>
+              <path class="wire-path" d="M 1206 118 L 1206 344 L 826 344 L 826 420 L 766 420" marker-start="url(#arrow-3)" marker-end="url(#arrow-3)"/>
+              <rect class="wire-tag-bg" x="1062" y="334" width="120" height="20"/>
+              <text class="wire-tag-text" x="1122" y="348">① CPU Tensor</text>
+            </g>
+
+            <!-- W17: Fabric (CPU) <-> OmniGraph (CPU) -->
+            <g class="wire-group dim-candidate" id="wire-fabric-graph" data-wire="fabric_graph" data-color="2">
+              <path class="wire-hit" d="M 766 246 L 946 246"/>
+              <path class="wire-path" d="M 766 246 L 946 246" marker-start="url(#arrow-2)" marker-end="url(#arrow-2)"/>
+              <rect class="wire-tag-bg" x="808" y="218" width="96" height="20"/>
+              <text class="wire-tag-text" x="856" y="232">① Graph Bus</text>
+            </g>
+
+            <!-- W18: Fabric (CPU) -> Hydra Delegate [CPU] (FSD Switch!) -->
+            <g class="wire-group dim-candidate" id="wire-fabric-hydra" data-wire="fabric_hydra" data-color="2">
+              <path class="wire-hit" d="M 762 272 L 856 272 L 856 430 L 946 430"/>
+              <path class="wire-path" d="M 762 272 L 856 272 L 856 430 L 946 430" marker-end="url(#arrow-2)"/>
+              <g class="sw-sym" data-toggle="fsd" transform="translate(898,430)">
+                <rect class="sw-box" x="-26" y="-15" width="52" height="30"/>
+                <circle class="sw-led" cx="19" cy="-9" r="2.5"/>
+                <circle class="sw-contact" cx="-13" cy="2" r="3.4"/>
+                <circle class="sw-contact" cx="13" cy="2" r="3.4"/>
+                <line class="sw-blade" x1="-13" y1="2" x2="13" y2="2"/>
+                <text class="sw-state-txt" x="0" y="-5">ON</text>
+              </g>
+              <rect class="wire-tag-bg" x="844" y="392" width="102" height="20"/>
+              <text class="wire-tag-text" x="895" y="406" id="label-fabric-hydra">② FSD差分</text>
+            </g>
+
+            <!-- W19: USD Stage -> Hydra Delegate [CPU] (OmniHydra Legacy Switch — FSDと排他!) -->
+            <g class="wire-group dim-candidate" id="wire-usd-hydra" data-wire="usd_hydra" data-color="1">
+              <path class="wire-hit" d="M 140 498 L 140 520 L 994 520 L 994 502"/>
+              <path class="wire-path" d="M 140 498 L 140 520 L 994 520 L 994 502" marker-end="url(#arrow-1)"/>
+              <g class="sw-sym" data-toggle="fsd" transform="translate(898,520)">
+                <rect class="sw-box" x="-26" y="-14" width="52" height="28"/>
+                <circle class="sw-led" cx="19" cy="-8" r="2.4"/>
+                <circle class="sw-contact" cx="-13" cy="2" r="3.2"/>
+                <circle class="sw-contact" cx="13" cy="2" r="3.2"/>
+                <line class="sw-blade" x1="-13" y1="2" x2="13" y2="2"/>
+                <text class="sw-state-txt" x="0" y="-4">OFF</text>
+              </g>
+              <rect class="wire-tag-bg" x="540" y="502" width="146" height="20"/>
+              <text class="wire-tag-text" x="613" y="516">② OmniHydra直読</text>
+            </g>
+
+            <!-- W20: Hydra Delegate [CPU] -> RTX Renderer [GPU] (Render Gate Breaker — PCIe跨ぎ!) -->
+            <g class="wire-group dim-candidate" id="wire-hydra-rtx" data-wire="hydra_rtx" data-color="4">
+              <path class="wire-hit" d="M 1070 498 L 1070 606"/>
+              <path class="wire-path" d="M 1070 498 L 1070 606" marker-end="url(#arrow-4)"/>
+              <g class="sw-sym" data-toggle="render" transform="translate(1070,548)">
+                <rect class="sw-box" x="-18" y="-26" width="36" height="52"/>
+                <circle class="sw-led" cx="11" cy="-19" r="2.6"/>
+                <circle class="sw-contact" cx="0" cy="-13" r="3.5"/>
+                <circle class="sw-contact" cx="0" cy="13" r="3.5"/>
+                <line class="sw-blade" x1="0" y1="-13" x2="0" y2="13"/>
+                <text class="sw-state-txt" x="0" y="23">ON</text>
+              </g>
+              <rect class="wire-tag-bg" x="1098" y="538" width="132" height="20"/>
+              <text class="wire-tag-text" x="1164" y="552">① Render Gate</text>
+            </g>
+
+            <!-- W21: Fabric (GPU) -> RTX Renderer [GPU] (VRAM直読) -->
             <g class="wire-group dim-candidate" id="wire-fabric-gpu-rtx" data-wire="fabric_gpu_rtx" data-color="4">
-              <path class="wire-hit" d="M 580 500 L 668 500"/>
-              <path class="wire-path" d="M 580 500 L 668 500" marker-end="url(#arrow-4)"/>
-              <rect class="wire-tag-bg" x="582" y="476" width="84" height="17"/>
-              <text class="wire-tag-text" x="624" y="488">② GPU直読</text>
+              <path class="wire-hit" d="M 762 674 L 946 674"/>
+              <path class="wire-path" d="M 762 674 L 946 674" marker-end="url(#arrow-4)"/>
+              <rect class="wire-tag-bg" x="802" y="644" width="110" height="20"/>
+              <text class="wire-tag-text" x="857" y="658">② VRAM直読</text>
             </g>
 
-            <!-- W22: RTX Renderer (GPU) -> RTX Sensors / Replicator (GPU) [① CLOCK] -->
+            <!-- W22: RTX Renderer [GPU] -> RTX Sensors / Replicator [GPU] -->
             <g class="wire-group dim-candidate" id="wire-rtx-sensors" data-wire="rtx_sensors" data-color="4">
-              <path class="wire-hit" d="M 786 556 L 786 588"/>
-              <path class="wire-path" d="M 786 556 L 786 588" marker-end="url(#arrow-4)"/>
-              <rect class="wire-tag-bg" x="802" y="564" width="90" height="17"/>
-              <text class="wire-tag-text" x="847" y="576">① AOV / SPG</text>
+              <path class="wire-hit" d="M 1190 674 L 1306 674"/>
+              <path class="wire-path" d="M 1190 674 L 1306 674" marker-end="url(#arrow-4)"/>
+              <rect class="wire-tag-bg" x="1202" y="644" width="94" height="20"/>
+              <text class="wire-tag-text" x="1249" y="658">① AOV/SPG</text>
             </g>
 
-            <!-- W23: Physics (CPU) -> PhysX Sensors (CPU) [① CLOCK Render独立] -->
+            <!-- W23: Physics [CPU] -> PhysX Sensors [CPU] (Render不要直結) -->
             <g class="wire-group dim-candidate" id="wire-phys-sensors" data-wire="phys_sensors" data-color="3">
-              <path class="wire-hit" d="M 580 342 L 624 342 L 624 252 L 946 252 L 946 312 L 970 312"/>
-              <path class="wire-path" d="M 580 342 L 624 342 L 624 252 L 946 252 L 946 312 L 970 312" marker-end="url(#arrow-3)"/>
-              <rect class="wire-tag-bg" x="820" y="242" width="118" height="17"/>
-              <text class="wire-tag-text" x="879" y="254">① Contact/IMU</text>
+              <path class="wire-hit" d="M 762 464 L 838 464 L 838 364 L 1264 364 L 1264 440 L 1306 440"/>
+              <path class="wire-path" d="M 762 464 L 838 464 L 838 364 L 1264 364 L 1264 440 L 1306 440" marker-end="url(#arrow-3)"/>
+              <rect class="wire-tag-bg" x="896" y="354" width="136" height="20"/>
+              <text class="wire-tag-text" x="964" y="368">① Contact / IMU</text>
             </g>
 
-            <!-- W24: OmniGraph (CPU) <-> ROS 2 Bridge (CPU) [① CLOCK] -->
+            <!-- W24: OmniGraph [CPU] <-> ROS 2 Bridge [CPU] -->
             <g class="wire-group dim-candidate" id="wire-graph-ros" data-wire="graph_ros" data-color="3">
-              <path class="wire-hit" d="M 896 184 L 970 184"/>
-              <path class="wire-path" d="M 896 184 L 970 184" marker-start="url(#arrow-3)" marker-end="url(#arrow-3)"/>
-              <rect class="wire-tag-bg" x="898" y="160" width="70" height="17"/>
-              <text class="wire-tag-text" x="933" y="172">① TF/Joint</text>
+              <path class="wire-hit" d="M 1194 264 L 1306 264"/>
+              <path class="wire-path" d="M 1194 264 L 1306 264" marker-start="url(#arrow-3)" marker-end="url(#arrow-3)"/>
+              <rect class="wire-tag-bg" x="1216" y="236" width="88" height="20"/>
+              <text class="wire-tag-text" x="1260" y="250">① TF/Joint</text>
             </g>
 
-            <!-- W25: RTX Sensors (GPU) -> ROS 2 Bridge (CPU) [① CLOCK PCIe Readback!] -->
+            <!-- W25: RTX Sensors [GPU] -> ROS 2 Bridge [CPU] (画像PCIe読戻し) -->
             <g class="wire-group dim-candidate" id="wire-sensors-ros" data-wire="sensors_ros" data-color="4">
-              <path class="wire-hit" d="M 896 648 L 1188 648 L 1188 232"/>
-              <path class="wire-path" d="M 896 648 L 1188 648 L 1188 232" marker-end="url(#arrow-4)"/>
-              <rect class="wire-tag-bg" x="1038" y="454" width="144" height="17"/>
-              <text class="wire-tag-text" x="1110" y="466">① 画像PCIe読戻し</text>
+              <path class="wire-hit" d="M 1420 610 L 1420 548 L 1546 548 L 1546 164 L 1420 164 L 1420 206"/>
+              <path class="wire-path" d="M 1420 610 L 1420 548 L 1546 548 L 1546 164 L 1420 164 L 1420 206" marker-end="url(#arrow-4)"/>
+              <rect class="wire-tag-bg" x="1310" y="538" width="150" height="20"/>
+              <text class="wire-tag-text" x="1385" y="552">① 画像PCIe読戻し</text>
             </g>
 
           </g>
 
-          <!-- 動的信号粒子レイヤ（JS requestAnimationFrame がここに滑らかな粒子を描画） -->
+          <!-- 動的信号粒子レイヤ（JS requestAnimationFrame） -->
           <g id="particles-layer" pointer-events="none"></g>
 
-          <!-- ================= IC ブロックレイヤ（CPU 9ノード + GPU 5ノード = 14ノード） ================= -->
+          <!-- ================= IC ブロックレイヤ（CPU 10 + GPU 5 = 15ノード・広々余白） ================= -->
           <g id="nodes-layer">
 
-            <!-- CPU 1: Timeline & Kit Loop -->
+            <!-- CPU Row 1 -->
             <g class="ic-node dim-candidate" id="ic-timeline" data-node="timeline" data-ref="node-timeline" data-ref-role="target" data-color="3">
-              <rect class="ic-body" x="24" y="40" width="332" height="60"/>
-              <rect class="ic-header" x="25" y="41" width="330" height="21" rx="9"/>
-              <circle cx="40" cy="51.5" r="8" fill="#d97706"/>
-              <text x="40" y="55" fill="#fff" font-size="10" font-weight="800" text-anchor="middle">1</text>
-              <text class="ic-title" x="54" y="55.5">Timeline &amp; Kit Loop [CPU]</text>
-              <text class="ic-state-pill" x="344" y="55.5" text-anchor="end" fill="#4ade80" id="ic-timeline-badge">PLAY</text>
-              <text class="ic-sub" x="36" y="76">omni.timeline / omni.kit.loop-isaac</text>
-              <text class="ic-detail" x="36" y="92" id="ic-timeline-sub">クロック駆動中・Render Gate: ON</text>
+              <rect class="ic-body" x="30" y="46" width="434" height="68"/>
+              <rect class="ic-header" x="31" y="47" width="432" height="24" rx="9"/>
+              <circle cx="48" cy="59" r="9" fill="#d97706"/>
+              <text x="48" y="63" fill="#fff" font-size="11" font-weight="800" text-anchor="middle">1</text>
+              <text class="ic-title" x="64" y="63">Timeline &amp; Kit Loop [CPU]</text>
+              <text class="ic-state-pill" x="450" y="63" text-anchor="end" fill="#4ade80" id="ic-timeline-badge">PLAY</text>
+              <text class="ic-sub" x="44" y="88">omni.timeline / omni.kit.loop-isaac</text>
+              <text class="ic-detail" x="44" y="105" id="ic-timeline-sub">クロック駆動中・Render Gate: ON</text>
             </g>
 
-            <!-- CPU 2: Editor UI -->
             <g class="ic-node dim-candidate" id="ic-ui" data-node="ui" data-ref="node-ui" data-ref-role="target" data-color="1">
-              <rect class="ic-body" x="394" y="40" width="330" height="60"/>
-              <rect class="ic-header" x="395" y="41" width="328" height="21" rx="9"/>
-              <circle cx="410" cy="51.5" r="8" fill="#2563eb"/>
-              <text x="410" y="55" fill="#fff" font-size="10" font-weight="800" text-anchor="middle">7</text>
-              <text class="ic-title" x="424" y="55.5">Editor UI: Property / Gizmo [CPU]</text>
-              <text class="ic-state-pill" x="712" y="55.5" text-anchor="end" fill="#7dd3fc" id="ic-ui-badge">USDのみ</text>
-              <text class="ic-sub" x="406" y="76">property.window / property.adapter.fabric</text>
-              <text class="ic-detail" x="406" y="92" id="ic-ui-sub">Property Window は USD Stage のみ参照</text>
+              <rect class="ic-body" x="500" y="46" width="380" height="68"/>
+              <rect class="ic-header" x="501" y="47" width="378" height="24" rx="9"/>
+              <circle cx="518" cy="59" r="9" fill="#2563eb"/>
+              <text x="518" y="63" fill="#fff" font-size="11" font-weight="800" text-anchor="middle">7</text>
+              <text class="ic-title" x="534" y="63">Editor UI: Property / Gizmo [CPU]</text>
+              <text class="ic-state-pill" x="866" y="63" text-anchor="end" fill="#7dd3fc" id="ic-ui-badge">USDのみ</text>
+              <text class="ic-sub" x="514" y="88">omni.kit.window.property / adapter.fabric</text>
+              <text class="ic-detail" x="514" y="105" id="ic-ui-sub">Property Window は USD Stage のみ参照</text>
             </g>
 
-            <!-- CPU 3: Python / CPU Tensor API -->
             <g class="ic-node dim-candidate" id="ic-py-cpu" data-node="py_cpu" data-color="3">
-              <rect class="ic-body" x="762" y="40" width="454" height="60"/>
-              <rect class="ic-header" x="763" y="41" width="452" height="21" rx="9"/>
-              <text class="ic-title" x="776" y="55.5">Python Script / CPU Tensor API [CPU]</text>
-              <text class="ic-state-pill" x="1204" y="55.5" text-anchor="end" fill="#fde68a" id="ic-py-cpu-badge">NUMPY / CPU</text>
-              <text class="ic-sub" x="776" y="76">pxr.Usd / usdrt.Usd / SimulationView(numpy)</text>
-              <text class="ic-detail" x="776" y="92">CPU 物理バッファ・USD Stage・Fabric CPU へアクセス</text>
+              <rect class="ic-body" x="940" y="46" width="584" height="68"/>
+              <rect class="ic-header" x="941" y="47" width="582" height="24" rx="9"/>
+              <text class="ic-title" x="956" y="63">Python Script / CPU Tensor API [CPU]</text>
+              <text class="ic-state-pill" x="1510" y="63" text-anchor="end" fill="#fde68a" id="ic-py-cpu-badge">NUMPY / CPU ACTIVE</text>
+              <text class="ic-sub" x="956" y="88">pxr.Usd / usdrt.Usd / SimulationView(numpy)</text>
+              <text class="ic-detail" x="956" y="105">CPU 物理バッファ・USD Stage・Fabric CPU へアクセス</text>
             </g>
 
-            <!-- CPU 4: USD Stage -->
+            <!-- CPU Row 2 & 3 -->
             <g class="ic-node dim-candidate" id="ic-usd" data-node="usd" data-ref="node-usd" data-ref-role="target" data-color="1">
-              <rect class="ic-body" x="24" y="148" width="210" height="190"/>
-              <rect class="ic-header" x="25" y="149" width="208" height="25" rx="9"/>
-              <circle cx="40" cy="161.5" r="8.5" fill="#2563eb"/>
-              <text x="40" y="165" fill="#fff" font-size="10.5" font-weight="800" text-anchor="middle">2</text>
-              <text class="ic-title" x="55" y="165.5">USD Stage [CPU]</text>
-              <text class="ic-sub" x="35" y="192">pxr.Usd / omni.usd</text>
-              <text class="ic-detail" x="35" y="210">永続オーサリング層 (MMIO)</text>
-              <text class="ic-detail" x="35" y="226">変更時は UsdNotice 発火</text>
-              <rect x="34" y="244" width="190" height="32" rx="6" fill="#0f172a" stroke="#1e3a5f"/>
-              <text class="ic-state-pill" x="129" y="264" text-anchor="middle" fill="#7dd3fc" id="ic-usd-status">PhysXから毎F書戻中</text>
-              <text class="ic-sub" x="35" y="298" id="ic-usd-notice-stat">T1実測: 25stepでNotice 28回</text>
-              <text class="ic-sub" x="35" y="314" id="ic-usd-t6-stat">T6実測: 静止10FでNotice 0回</text>
+              <rect class="ic-body" x="30" y="210" width="220" height="288"/>
+              <rect class="ic-header" x="31" y="211" width="218" height="28" rx="9"/>
+              <circle cx="48" cy="225" r="9" fill="#2563eb"/>
+              <text x="48" y="229" fill="#fff" font-size="11" font-weight="800" text-anchor="middle">2</text>
+              <text class="ic-title" x="64" y="229">USD Stage [CPU]</text>
+              <text class="ic-sub" x="44" y="260">pxr.Usd / omni.usd</text>
+              <text class="ic-detail" x="44" y="282">永続オーサリング層 (MMIO)</text>
+              <text class="ic-detail" x="44" y="302">編集時のみ UsdNotice 発火</text>
+              <rect x="42" y="324" width="196" height="36" rx="6" fill="#0f172a" stroke="#1e3a5f"/>
+              <text class="ic-state-pill" x="140" y="346" text-anchor="middle" fill="#7dd3fc" id="ic-usd-status">PhysXから毎F書戻中</text>
+              <text class="ic-sub" x="44" y="392">【実機実測】</text>
+              <text class="ic-sub" x="44" y="412">T1: 25stepでNotice 28回</text>
+              <text class="ic-sub" x="44" y="432">T2: Fabric時はNotice 0回</text>
+              <text class="ic-sub" x="44" y="452">T6: 静止10FでNotice 0回</text>
             </g>
 
-            <!-- CPU 5: Fabric (CPU Mirror) -->
             <g class="ic-node dim-candidate" id="ic-fabric-cpu" data-node="fabric_cpu" data-ref="node-fabric-cpu" data-ref-role="target" data-color="2">
-              <rect class="ic-body" x="320" y="136" width="260" height="96"/>
-              <rect class="ic-header" x="321" y="137" width="258" height="23" rx="9"/>
-              <circle cx="336" cy="148.5" r="8" fill="#059669"/>
-              <text x="336" y="152" fill="#fff" font-size="10" font-weight="800" text-anchor="middle">3</text>
-              <text class="ic-title" x="350" y="152.5">Fabric (CPU Mirror)</text>
-              <text class="domain-chip-cpu" x="570" y="152.5" text-anchor="end">cpuValid</text>
-              <text class="ic-sub" x="332" y="176">usdrt.Usd / IFabricHierarchy (Host RAM)</text>
-              <text class="ic-detail" x="332" y="193" id="ic-fab-cpu-xform">attr: omni:fabric:worldMatrix</text>
-              <rect x="330" y="201" width="240" height="22" rx="5" fill="#0f172a" stroke="#14532d"/>
-              <text class="ic-state-pill" x="450" y="216" text-anchor="middle" fill="#6ee7b7" id="ic-fab-cpu-status">USD同期 / CPU物理の受け皿</text>
+              <rect class="ic-body" x="480" y="210" width="282" height="112"/>
+              <rect class="ic-header" x="481" y="211" width="280" height="26" rx="9"/>
+              <circle cx="498" cy="224" r="9" fill="#059669"/>
+              <text x="498" y="228" fill="#fff" font-size="11" font-weight="800" text-anchor="middle">3</text>
+              <text class="ic-title" x="514" y="228">Fabric (CPU Mirror)</text>
+              <text class="domain-chip-cpu" x="750" y="228" text-anchor="end">cpuValid</text>
+              <text class="ic-sub" x="494" y="256">usdrt.Usd / IFabricHierarchy (RAM)</text>
+              <text class="ic-detail" x="494" y="276" id="ic-fab-cpu-xform">attr: omni:fabric:worldMatrix</text>
+              <rect x="492" y="286" width="258" height="26" rx="5" fill="#0f172a" stroke="#14532d"/>
+              <text class="ic-state-pill" x="621" y="303" text-anchor="middle" fill="#6ee7b7" id="ic-fab-cpu-status">USD同期 / CPU物理の受け皿</text>
             </g>
 
-            <!-- CPU 6: Physics Engine (CPU) -->
             <g class="ic-node dim-candidate" id="ic-phys-cpu" data-node="phys_cpu" data-ref="node-phys-cpu" data-ref-role="target" data-color="3">
-              <rect class="ic-body" x="320" y="264" width="260" height="100"/>
-              <rect class="ic-header" x="321" y="265" width="258" height="23" rx="9"/>
-              <circle cx="336" cy="276.5" r="8" fill="#d97706"/>
-              <text x="336" y="280" fill="#fff" font-size="10" font-weight="800" text-anchor="middle">4</text>
-              <text class="ic-title" x="350" y="280.5">Physics Engine [CPU]</text>
-              <text class="ic-sub" x="332" y="304">PhysX CPU Solver (MBP) / Readback受取</text>
-              <text class="ic-detail" x="332" y="321" id="ic-phys-cpu-mode">演算主体: CPU パイプライン</text>
-              <rect x="330" y="331" width="240" height="23" rx="5" fill="#0f172a" stroke="#78350f"/>
-              <text class="ic-state-pill" x="450" y="346" text-anchor="middle" fill="#fde68a" id="ic-phys-cpu-status">ACTIVE (CPU STEPPING)</text>
+              <rect class="ic-body" x="480" y="386" width="282" height="112"/>
+              <rect class="ic-header" x="481" y="387" width="280" height="26" rx="9"/>
+              <circle cx="498" cy="400" r="9" fill="#d97706"/>
+              <text x="498" y="404" fill="#fff" font-size="11" font-weight="800" text-anchor="middle">4</text>
+              <text class="ic-title" x="514" y="404">Physics Engine [CPU]</text>
+              <text class="ic-sub" x="494" y="432">PhysX CPU Solver / Readback受取</text>
+              <text class="ic-detail" x="494" y="452" id="ic-phys-cpu-mode">演算主体: CPU パイプライン (MBP)</text>
+              <rect x="492" y="462" width="258" height="26" rx="5" fill="#0f172a" stroke="#78350f"/>
+              <text class="ic-state-pill" x="621" y="479" text-anchor="middle" fill="#fde68a" id="ic-phys-cpu-status">ACTIVE (CPU STEPPING)</text>
             </g>
 
-            <!-- CPU 7: OmniGraph -->
             <g class="ic-node dim-candidate" id="ic-omnigraph" data-node="omnigraph" data-color="2">
-              <rect class="ic-body" x="672" y="136" width="224" height="96"/>
-              <rect class="ic-header" x="673" y="137" width="222" height="23" rx="9"/>
-              <text class="ic-title" x="684" y="152.5">OmniGraph [CPU]</text>
-              <text class="ic-sub" x="684" y="176">omni.graph.core / action</text>
-              <text class="ic-detail" x="684" y="193" id="ic-graph-usd-note">USD書戻: ON</text>
-              <rect x="682" y="201" width="204" height="22" rx="5" fill="#0f172a" stroke="#14532d"/>
-              <text class="ic-state-pill" x="784" y="216" text-anchor="middle" fill="#6ee7b7" id="ic-graph-status">TICK RUNNING</text>
+              <rect class="ic-body" x="950" y="210" width="240" height="112"/>
+              <rect class="ic-header" x="951" y="211" width="238" height="26" rx="9"/>
+              <text class="ic-title" x="966" y="228">OmniGraph [CPU]</text>
+              <text class="ic-sub" x="964" y="256">omni.graph.core / action</text>
+              <text class="ic-detail" x="964" y="276" id="ic-graph-usd-note">USD書戻: ON</text>
+              <rect x="962" y="286" width="216" height="26" rx="5" fill="#0f172a" stroke="#14532d"/>
+              <text class="ic-state-pill" x="1070" y="303" text-anchor="middle" fill="#6ee7b7" id="ic-graph-status">TICK RUNNING</text>
             </g>
 
-            <!-- CPU 8: Hydra Scene Delegate -->
             <g class="ic-node dim-candidate" id="ic-hydra" data-node="hydra" data-ref="node-hydra" data-ref-role="target" data-color="4">
-              <rect class="ic-body" x="672" y="264" width="224" height="100"/>
-              <rect class="ic-header" x="673" y="265" width="222" height="23" rx="9"/>
-              <circle cx="688" cy="276.5" r="8" fill="#7c3aed"/>
-              <text x="688" y="280" fill="#fff" font-size="10" font-weight="800" text-anchor="middle">6</text>
-              <text class="ic-title" x="702" y="280.5">Hydra Delegate [CPU]</text>
-              <text class="ic-sub" x="684" y="304" id="ic-hydra-ext">omni.hydra.usdrt_delegate</text>
-              <text class="ic-detail" x="684" y="321" id="ic-hydra-mode">モード: FSD (Fabric専用)</text>
-              <rect x="682" y="331" width="204" height="23" rx="5" fill="#0f172a" stroke="#4c1d95"/>
-              <text class="ic-state-pill" x="784" y="346" text-anchor="middle" fill="#d8b4fe" id="ic-hydra-status">FSD ACTIVE</text>
+              <rect class="ic-body" x="950" y="386" width="240" height="112"/>
+              <rect class="ic-header" x="951" y="387" width="238" height="26" rx="9"/>
+              <circle cx="968" cy="400" r="9" fill="#7c3aed"/>
+              <text x="968" y="404" fill="#fff" font-size="11" font-weight="800" text-anchor="middle">6</text>
+              <text class="ic-title" x="984" y="404">Hydra Delegate [CPU]</text>
+              <text class="ic-sub" x="964" y="432" id="ic-hydra-ext">omni.hydra.usdrt_delegate</text>
+              <text class="ic-detail" x="964" y="452" id="ic-hydra-mode">モード: FSD (Fabric専用)</text>
+              <rect x="962" y="462" width="216" height="26" rx="5" fill="#0f172a" stroke="#4c1d95"/>
+              <text class="ic-state-pill" x="1070" y="479" text-anchor="middle" fill="#d8b4fe" id="ic-hydra-status">FSD ACTIVE</text>
             </g>
 
-            <!-- CPU 9: ROS 2 Bridge -->
             <g class="ic-node dim-candidate" id="ic-ros2" data-node="ros2" data-color="3">
-              <rect class="ic-body" x="974" y="136" width="242" height="96"/>
-              <rect class="ic-header" x="975" y="137" width="240" height="23" rx="9"/>
-              <text class="ic-title" x="986" y="152.5">ROS 2 Bridge [CPU]</text>
-              <text class="ic-sub" x="986" y="176">isaacsim.ros2.bridge</text>
-              <text class="ic-detail" x="986" y="193">TF / JointState / Image / Lidar</text>
-              <rect x="984" y="201" width="222" height="22" rx="5" fill="#0f172a" stroke="#78350f"/>
-              <text class="ic-state-pill" x="1095" y="216" text-anchor="middle" fill="#fde68a" id="ic-ros2-status">PUB / SUB ACTIVE</text>
+              <rect class="ic-body" x="1310" y="210" width="214" height="112"/>
+              <rect class="ic-header" x="1311" y="211" width="212" height="26" rx="9"/>
+              <text class="ic-title" x="1324" y="228">ROS 2 Bridge [CPU]</text>
+              <text class="ic-sub" x="1324" y="256">isaacsim.ros2.bridge</text>
+              <text class="ic-detail" x="1324" y="276">TF / Joint / Image / Lidar</text>
+              <rect x="1322" y="286" width="190" height="26" rx="5" fill="#0f172a" stroke="#78350f"/>
+              <text class="ic-state-pill" x="1417" y="303" text-anchor="middle" fill="#fde68a" id="ic-ros2-status">TF + Image 配信中</text>
             </g>
 
-            <!-- CPU 10: PhysX Sensors -->
             <g class="ic-node dim-candidate" id="ic-physx-sensors" data-node="physx_sensors" data-color="3">
-              <rect class="ic-body" x="974" y="264" width="242" height="100"/>
-              <rect class="ic-header" x="975" y="265" width="240" height="23" rx="9"/>
-              <text class="ic-title" x="986" y="280.5">PhysX Sensors [CPU]</text>
-              <text class="ic-sub" x="986" y="304">isaacsim.sensors.physx</text>
-              <text class="ic-detail" x="986" y="321">Contact / IMU / Effort (描画不要)</text>
-              <rect x="984" y="331" width="222" height="23" rx="5" fill="#0f172a" stroke="#78350f"/>
-              <text class="ic-state-pill" x="1095" y="346" text-anchor="middle" fill="#fde68a" id="ic-physx-sensors-status">ACTIVE (Render不要)</text>
+              <rect class="ic-body" x="1310" y="386" width="214" height="112"/>
+              <rect class="ic-header" x="1311" y="387" width="212" height="26" rx="9"/>
+              <text class="ic-title" x="1324" y="404">PhysX Sensors [CPU]</text>
+              <text class="ic-sub" x="1324" y="432">isaacsim.sensors.physx</text>
+              <text class="ic-detail" x="1324" y="452">Contact / IMU (Render不要)</text>
+              <rect x="1322" y="462" width="190" height="26" rx="5" fill="#0f172a" stroke="#78350f"/>
+              <text class="ic-state-pill" x="1417" y="479" text-anchor="middle" fill="#fde68a" id="ic-physx-sensors-status">ACTIVE (Render不要)</text>
             </g>
 
-            <!-- GPU 1: Fabric (GPU Mirror) -->
+            <!-- GPU Row 4 & 5 -->
             <g class="ic-node dim-candidate" id="ic-fabric-gpu" data-node="fabric_gpu" data-ref="node-fabric-gpu" data-ref-role="target" data-color="2">
-              <rect class="ic-body" x="320" y="448" width="260" height="106"/>
-              <rect class="ic-header" x="321" y="449" width="258" height="23" rx="9"/>
-              <circle cx="336" cy="460.5" r="8" fill="#059669"/>
-              <text x="336" y="464" fill="#fff" font-size="10" font-weight="800" text-anchor="middle">3</text>
-              <text class="ic-title" x="350" y="464.5">Fabric (GPU Mirror)</text>
-              <text class="domain-chip-gpu" x="570" y="464.5" text-anchor="end">gpuValid</text>
-              <text class="ic-sub" x="332" y="488">getAttributeArrayGpu / wp.fabricarray</text>
-              <text class="ic-detail" x="332" y="505">VRAM内配列（必要時のみ遅延割当）</text>
-              <rect x="330" y="517" width="240" height="25" rx="5" fill="#0f172a" stroke="#14532d"/>
-              <text class="ic-state-pill" x="450" y="533" text-anchor="middle" fill="#6ee7b7" id="ic-fab-gpu-status">未割当 / 待機中</text>
+              <rect class="ic-body" x="480" y="610" width="282" height="116"/>
+              <rect class="ic-header" x="481" y="611" width="280" height="26" rx="9"/>
+              <circle cx="498" cy="624" r="9" fill="#059669"/>
+              <text x="498" y="628" fill="#fff" font-size="11" font-weight="800" text-anchor="middle">3</text>
+              <text class="ic-title" x="514" y="628">Fabric (GPU Mirror)</text>
+              <text class="domain-chip-gpu" x="750" y="628" text-anchor="end">gpuValid</text>
+              <text class="ic-sub" x="494" y="656">getAttributeArrayGpu / wp.fabricarray</text>
+              <text class="ic-detail" x="494" y="676">VRAM内配列（必要時のみ遅延割当）</text>
+              <rect x="492" y="688" width="258" height="26" rx="5" fill="#0f172a" stroke="#14532d"/>
+              <text class="ic-state-pill" x="621" y="705" text-anchor="middle" fill="#6ee7b7" id="ic-fab-gpu-status">未割当 / 待機中</text>
             </g>
 
-            <!-- GPU 2: Physics Engine (GPU / CUDA) -->
-            <g class="ic-node dim-candidate" id="ic-phys-gpu" data-node="phys_gpu" data-ref="node-phys-gpu" data-ref-role="target" data-color="3">
-              <rect class="ic-body" x="320" y="588" width="260" height="122"/>
-              <rect class="ic-header" x="321" y="589" width="258" height="24" rx="9"/>
-              <circle cx="336" cy="601" r="8.5" fill="#d97706"/>
-              <text x="336" y="604.5" fill="#fff" font-size="10" font-weight="800" text-anchor="middle">5</text>
-              <text class="ic-title" x="350" y="605" id="ic-phys-gpu-title">Physics Engine [GPU/CUDA]</text>
-              <text class="ic-sub" x="332" y="629" id="ic-phys-gpu-ext">PhysX GPU Dynamics / Newton Warp</text>
-              <text class="ic-detail" x="332" y="646" id="ic-phys-gpu-mode">VRAM上で並列剛体・関節ソルブ</text>
-              <text class="ic-detail" x="332" y="663" id="ic-phys-gpu-lock">Readback: 許可</text>
-              <rect x="330" y="675" width="240" height="24" rx="5" fill="#0f172a" stroke="#78350f"/>
-              <text class="ic-state-pill" x="450" y="691" text-anchor="middle" fill="#fde68a" id="ic-phys-gpu-status">IDLE (CPUモード中)</text>
-            </g>
-
-            <!-- GPU 3: Tensor API / RL (GPU Direct) -->
-            <g class="ic-node dim-candidate" id="ic-tensor-gpu" data-node="tensor_gpu" data-ref="node-tensor-gpu" data-ref-role="target" data-color="3">
-              <rect class="ic-body" x="24" y="588" width="220" height="122"/>
-              <rect class="ic-header" x="25" y="589" width="218" height="24" rx="9"/>
-              <circle cx="40" cy="601" r="8.5" fill="#d97706"/>
-              <text x="40" y="604.5" fill="#fff" font-size="10" font-weight="800" text-anchor="middle">8</text>
-              <text class="ic-title" x="54" y="605">Tensor API [GPU Direct]</text>
-              <text class="ic-sub" x="36" y="629">torch / warp CUDA Tensor</text>
-              <text class="ic-detail" x="36" y="647">USD・Fabric・PCIe を全バイパス</text>
-              <text class="ic-detail" x="36" y="663">T4/T9実測: Readback遮断下も動作</text>
-              <rect x="34" y="675" width="200" height="24" rx="5" fill="#0f172a" stroke="#78350f"/>
-              <text class="ic-state-pill" x="134" y="691" text-anchor="middle" fill="#fde68a" id="ic-tensor-gpu-status">IDLE (CPUモード)</text>
-            </g>
-
-            <!-- GPU 4: RTX Renderer / Viewport -->
             <g class="ic-node dim-candidate" id="ic-rtx" data-node="rtx" data-color="4">
-              <rect class="ic-body" x="672" y="448" width="224" height="106"/>
-              <rect class="ic-header" x="673" y="449" width="222" height="23" rx="9"/>
-              <text class="ic-title" x="684" y="464.5">RTX Renderer / Viewport [GPU]</text>
-              <text class="ic-sub" x="684" y="488">omni.hydra.rtx / Vulkan</text>
-              <text class="ic-detail" x="684" y="505">T7実測: render=OFFで13.2倍高速</text>
-              <rect x="682" y="517" width="204" height="25" rx="5" fill="#0f172a" stroke="#4c1d95"/>
-              <text class="ic-state-pill" x="784" y="533" text-anchor="middle" fill="#d8b4fe" id="ic-rtx-status">RENDERING</text>
+              <rect class="ic-body" x="950" y="610" width="240" height="116"/>
+              <rect class="ic-header" x="951" y="611" width="238" height="26" rx="9"/>
+              <text class="ic-title" x="966" y="628">RTX Renderer / Viewport</text>
+              <text class="ic-sub" x="964" y="656">omni.hydra.rtx / Vulkan [GPU]</text>
+              <text class="ic-detail" x="964" y="676">T7実測: render=OFFで13.2倍</text>
+              <rect x="962" y="688" width="216" height="26" rx="5" fill="#0f172a" stroke="#4c1d95"/>
+              <text class="ic-state-pill" x="1070" y="705" text-anchor="middle" fill="#d8b4fe" id="ic-rtx-status">RENDERING (Vulkan)</text>
             </g>
 
-            <!-- GPU 5: RTX Sensors / Replicator -->
             <g class="ic-node dim-candidate" id="ic-sensors" data-node="rtx_sensors" data-color="4">
-              <rect class="ic-body" x="672" y="588" width="224" height="122"/>
-              <rect class="ic-header" x="673" y="589" width="222" height="24" rx="9"/>
-              <text class="ic-title" x="684" y="605">RTX Sensors / Replicator [GPU]</text>
-              <text class="ic-sub" x="684" y="629">omni.rtx.spg / omni.replicator</text>
-              <text class="ic-detail" x="684" y="647">Camera / RTX Lidar / SDG AOV</text>
-              <text class="ic-detail" x="684" y="663" id="ic-rep-note">captureOnPlay: ON</text>
-              <rect x="682" y="675" width="204" height="24" rx="5" fill="#0f172a" stroke="#4c1d95"/>
-              <text class="ic-state-pill" x="784" y="691" text-anchor="middle" fill="#d8b4fe" id="ic-sensors-status">CAPTURING</text>
+              <rect class="ic-body" x="1310" y="610" width="214" height="116"/>
+              <rect class="ic-header" x="1311" y="611" width="212" height="26" rx="9"/>
+              <text class="ic-title" x="1324" y="628">RTX Sensors / Replicator</text>
+              <text class="ic-sub" x="1324" y="656">omni.rtx.spg / replicator</text>
+              <text class="ic-detail" x="1324" y="676" id="ic-rep-note">captureOnPlay: ON</text>
+              <rect x="1322" y="688" width="190" height="26" rx="5" fill="#0f172a" stroke="#4c1d95"/>
+              <text class="ic-state-pill" x="1417" y="705" text-anchor="middle" fill="#d8b4fe" id="ic-sensors-status">CAPTURING (GPU)</text>
+            </g>
+
+            <g class="ic-node dim-candidate" id="ic-tensor-gpu" data-node="tensor_gpu" data-ref="node-tensor-gpu" data-ref-role="target" data-color="3">
+              <rect class="ic-body" x="30" y="810" width="240" height="132"/>
+              <rect class="ic-header" x="31" y="811" width="238" height="26" rx="9"/>
+              <circle cx="48" cy="824" r="9" fill="#d97706"/>
+              <text x="48" y="828" fill="#fff" font-size="11" font-weight="800" text-anchor="middle">8</text>
+              <text class="ic-title" x="64" y="828">Tensor API [GPU Direct]</text>
+              <text class="ic-sub" x="44" y="856">torch / warp CUDA Tensor</text>
+              <text class="ic-detail" x="44" y="876">USD・Fabric・PCIe を全バイパス</text>
+              <text class="ic-detail" x="44" y="894">T4/T9実測: Readback遮断下も動作</text>
+              <rect x="42" y="906" width="216" height="26" rx="5" fill="#0f172a" stroke="#78350f"/>
+              <text class="ic-state-pill" x="150" y="923" text-anchor="middle" fill="#fde68a" id="ic-tensor-gpu-status">IDLE (CPUモード)</text>
+            </g>
+
+            <g class="ic-node dim-candidate" id="ic-phys-gpu" data-node="phys_gpu" data-ref="node-phys-gpu" data-ref-role="target" data-color="3">
+              <rect class="ic-body" x="480" y="810" width="282" height="132"/>
+              <rect class="ic-header" x="481" y="811" width="280" height="26" rx="9"/>
+              <circle cx="498" cy="824" r="9" fill="#d97706"/>
+              <text x="498" y="828" fill="#fff" font-size="11" font-weight="800" text-anchor="middle">5</text>
+              <text class="ic-title" x="514" y="828" id="ic-phys-gpu-title">Physics Engine [PhysX GPU]</text>
+              <text class="ic-sub" x="494" y="856" id="ic-phys-gpu-ext">omni.physics.physx (GPU Dynamics)</text>
+              <text class="ic-detail" x="494" y="876" id="ic-phys-gpu-mode">VRAM上で並列剛体・関節ソルブ</text>
+              <text class="ic-detail" x="494" y="894" id="ic-phys-gpu-lock">Readback: 許可</text>
+              <rect x="492" y="906" width="258" height="26" rx="5" fill="#0f172a" stroke="#78350f"/>
+              <text class="ic-state-pill" x="621" y="923" text-anchor="middle" fill="#fde68a" id="ic-phys-gpu-status">IDLE (CPUモード中)</text>
             </g>
 
           </g>
@@ -1226,7 +1193,7 @@
             <div class="seg-row">
               <div class="seg-label">
                 <span>Timeline 状態</span>
-                <span class="code-chip" style="font-size:0.71rem;">omni.timeline</span>
+                <span class="code-chip" style="font-size:0.7rem;">omni.timeline</span>
               </div>
               <div class="seg-control" id="seg-timeline">
                 <button type="button" class="seg-btn" data-val="STOP">STOP</button>
@@ -1237,7 +1204,7 @@
             <div class="seg-row">
               <div class="seg-label">
                 <span>物理エンジン</span>
-                <span class="code-chip" style="font-size:0.71rem;">PhysX / Newton</span>
+                <span class="code-chip" style="font-size:0.7rem;">PhysX / Newton</span>
               </div>
               <div class="seg-control" id="seg-engine">
                 <button type="button" class="seg-btn is-active" data-val="physx">PhysX 5</button>
@@ -1355,7 +1322,7 @@
         <div class="tab-pane" id="pane-probe">
           <div id="probe-content">
             <div class="probe-empty">
-              回路図上の IC ブロックまたは配線をクリックすると、通電状態・駆動方式（①〜③）・CPU/GPU PCIe 跨ぎの有無・<strong>ドキュメント出典と実機実測値</strong>が表示されます。
+              回路図上のスイッチ筐体をクリックすると直接 ON/OFF 切替できます。IC ブロックまたは配線をクリックすると、通電状態・駆動方式（①〜③）・<strong>公式ドキュメント出典と実機実測値</strong>が表示されます。
             </div>
           </div>
         </div>
@@ -1759,7 +1726,7 @@
 <script>
 (() => {
   // =========================================================================
-  // 1. 状態モデル & プリセット（単一の正本）
+  // 1. 状態モデル & プリセット
   // =========================================================================
   const state = {
     timeline: 'PLAY',
@@ -1969,7 +1936,7 @@
   };
 
   // =========================================================================
-  // 3. 全25本配線の論理評価エンジン（CPU/GPU分割・①〜③・出典・実測紐付け）
+  // 3. 配線ロジック評価
   // =========================================================================
   function evaluateCircuit(s) {
     const isPlay = s.timeline === 'PLAY';
@@ -1979,18 +1946,13 @@
     const readbackBlocked = isPhysX && s.gpuDynamics && s.suppressReadback;
     const gpuReadbackActive = isPlay && isPhysX && s.gpuDynamics && !s.suppressReadback;
 
-    // CPU側PhysXが生きている条件: CPUモードでPLAY、またはGPUモードでReadback許可
     const physCpuHasFreshPose = isPlay && isPhysX && (!s.gpuDynamics || !s.suppressReadback);
     const physWritesUsd = physCpuHasFreshPose && s.updateToUsd;
     const usdNoticeCascade = physWritesUsd && s.fabricNotice;
 
-    // PhysX -> Fabric (CPU) vs Fabric (GPU)
     const physGpuToFabricGpu = isPlay && (isNewton || (isPhysX && s.gpuDynamics && s.fabricEnabled && s.gpuInterop));
     const physCpuToFabricCpu = isPlay && isPhysX && s.fabricEnabled && (!s.gpuDynamics || (!s.gpuInterop && !s.suppressReadback));
 
-    // Fabric (CPU) <-> Fabric (GPU) の PCIe Dirty-bit ミラーが動く条件
-    // (1) GPU側が Fabric GPU に書き、かつ CPU側 (Property Adapter や OmniGraph や Hydra CPU) が読むとき (DtoH)
-    // (2) CPU側 (USD/PhysX CPU) が Fabric CPU に書き、かつ Render=ON (GPU側) へ渡すとき (HtoD)
     const fabricMirrorDtoH = physGpuToFabricGpu && (s.propAdapter || isPlay);
     const fabricMirrorHtoD = !physGpuToFabricGpu && s.render && s.fsd;
     const fabricMirrorMode = (fabricMirrorDtoH || fabricMirrorHtoD)
@@ -2000,9 +1962,9 @@
     const wires = {
       clock_phys_cpu: {
         id: 'wire-clock-phys-cpu', from: 'timeline', to: 'phys_cpu', color: 3, pcie: false,
-        trigger: 'clock', triggerNum: '①',
-        name: '① Timeline → Physics [CPU] (stageupdate)',
+        trigger: 'clock', name: '① Timeline → Physics [CPU] (stageupdate)',
         mode: (isPlay && isPhysX && !s.gpuDynamics) ? 'on' : 'off',
+        switchClosed: isPlay && !useGpuPhys,
         reason: !isPlay ? `Timeline が ${s.timeline} のため停止。`
           : (useGpuPhys ? 'GPU 物理モードのため主ステップは Physics [GPU/CUDA] 側へ送出。' : 'CPU PhysX ソルバーが毎ステップ駆動中。'),
         source: 'omni.physics.stageupdate / isaacsim.exp.base.kit',
@@ -2010,9 +1972,9 @@
       },
       clock_phys_gpu: {
         id: 'wire-clock-phys-gpu', from: 'timeline', to: 'phys_gpu', color: 3, pcie: true,
-        trigger: 'clock', triggerNum: '①',
-        name: '① Timeline → Physics [GPU/CUDA] (CUDA カーネル起動)',
+        trigger: 'clock', name: '① Timeline → Physics [GPU/CUDA] (CUDA カーネル起動)',
         mode: (isPlay && useGpuPhys) ? 'on' : 'off',
+        switchClosed: isPlay && useGpuPhys,
         reason: !isPlay ? `Timeline が ${s.timeline} のため停止。`
           : (!useGpuPhys ? 'CPU 物理モードのため GPU ソルバーは待機中。' : `${isNewton ? 'Newton Warp CUDA Graph' : 'PhysX GPU Dynamics'} を毎ステップ起動中。`),
         source: 'simulation_manager.py (set_device), newton_stage.py (step_sim)',
@@ -2020,17 +1982,24 @@
       },
       clock_graph: {
         id: 'wire-clock-graph', from: 'timeline', to: 'omnigraph', color: 3, pcie: false,
-        trigger: 'clock', triggerNum: '①',
-        name: '① Timeline → OmniGraph (OnPlaybackTick)',
+        trigger: 'clock', name: '① Timeline → OmniGraph (OnPlaybackTick)',
         mode: isPlay ? 'on' : 'off',
         reason: isPlay ? 'PLAY 中に OnPlaybackTick が毎フレーム発火。' : `Timeline が ${s.timeline} のため停止中。`,
         source: 'omni.graph.action',
         evidence: '再生系 ActionGraph は PLAY 時のみ駆動。',
       },
+      graph_usd: {
+        id: 'wire-graph-usd', from: 'omnigraph', to: 'usd', color: 1, pcie: false,
+        trigger: 'clock', name: '① OmniGraph → USD Stage (/persistent/omnigraph/updateToUsd)',
+        mode: (isPlay && s.ogUsd) ? 'on' : 'off',
+        switchClosed: s.ogUsd,
+        reason: (isPlay && s.ogUsd) ? '/persistent/omnigraph/updateToUsd=true のためグラフ出力を USD へ書き戻し中。' : 'OmniGraph からの USD 書き戻しは遮断中。',
+        source: 'apps/isaacsim.exp.full.fabric.kit (L32)',
+        evidence: 'full.fabric.kit で false 設定により高速化。',
+      },
       ui_usd: {
         id: 'wire-ui-usd', from: 'ui', to: 'usd', color: 1, pcie: false,
-        trigger: 'event', triggerNum: '③',
-        name: '③ Editor UI ↔ USD Stage (オーサリング編集)',
+        trigger: 'event', name: '③ Editor UI ↔ USD Stage (オーサリング編集)',
         mode: 'on',
         reason: 'ユーザー操作・選択変更の瞬間だけ USD Stage を読み書きするイベント経路。',
         source: 'omni.kit.window.property / omni.usd',
@@ -2038,9 +2007,9 @@
       },
       ui_fabric: {
         id: 'wire-ui-fabric', from: 'ui', to: 'fabric_cpu', color: 2, pcie: false,
-        trigger: 'dirty', triggerNum: '②',
-        name: '② Editor UI ↔ Fabric (CPU) (Property Adapter)',
+        trigger: 'dirty', name: '② Editor UI ↔ Fabric (CPU) (Property Adapter)',
         mode: s.propAdapter ? 'on' : 'off',
+        switchClosed: s.propAdapter,
         reason: s.propAdapter
           ? 'enableAdapter=true により Property Window が Fabric (CPU Mirror) からライブ値を表示（GPU物理時は PCIe DtoH ミラーを誘発）。'
           : 'Property Fabric Adapter OFF のため、Property Window は USD Stage のみ参照。',
@@ -2050,15 +2019,11 @@
       usd_fabric: {
         id: 'wire-usd-fabric', from: 'usd', to: 'fabric_cpu', color: 2, pcie: false,
         trigger: s.fsd ? 'dirty' : 'event',
-        triggerNum: s.fsd ? '②' : '③',
         chainTriggered: usdNoticeCascade,
         name: `${s.fsd ? '②' : '③'} USD Stage [CPU] → Fabric (CPU Mirror)`,
         mode: s.fabricNotice ? (usdNoticeCascade ? 'on' : (s.fsd ? 'on' : 'partial')) : 'off',
-        label: !s.fabricNotice
-          ? 'Notice遮断'
-          : (usdNoticeCascade
-              ? '② 連鎖発火(毎F)!'
-              : (s.fsd ? '② USDRT遅延同期' : '③ 即時同期')),
+        switchClosed: s.fabricNotice,
+        label: !s.fabricNotice ? 'Notice遮断' : (usdNoticeCascade ? '② 連鎖発火(毎F)!' : (s.fsd ? '② USDRT遅延同期' : '③ 即時同期')),
         reason: !s.fabricNotice
           ? 'enable_fabric_usd_notice_handler=False により USD→Fabric 監視を遮断中。'
           : (usdNoticeCascade
@@ -2071,33 +2036,18 @@
       },
       fabric_usd_save: {
         id: 'wire-fabric-usd-save', from: 'fabric_cpu', to: 'usd', color: 1, pcie: false,
-        trigger: 'event', triggerNum: '③',
-        name: '③ Fabric (CPU) → USD Stage (手動 save_to_usd())',
+        trigger: 'event', name: '③ Fabric (CPU) → USD Stage (手動 save_to_usd())',
         mode: 'off',
         reason: '通常フレームでは流れない。save_to_usd() 実行時だけ単発で USD Stage へ書き戻す。',
         source: 'omni.physx.fabric/scripts/settings.py (L32-40)',
         evidence: 'T2実測: save_to_usd() 1回呼び出しで USD が 5.0m → 3.81462m へ同期（Notice 7回）。',
       },
-      usd_phys: {
-        id: 'wire-usd-phys', from: 'usd', to: 'phys_cpu', color: 1, pcie: false,
-        trigger: 'event', triggerNum: '③',
-        name: '③ USD Stage → Physics (初回ロード / USD Notice)',
-        mode: s.usdNotice ? (isPlay ? 'partial' : 'partial') : 'off',
-        label: s.usdNotice ? '③ USD Notice' : 'Notice遮断',
-        reason: s.usdNotice
-          ? 'ステージ読込時および実行中の USD 編集イベント（UsdNotice）時だけ物理側へ取り込む。'
-          : 'enable_usd_notice_handler=False により USD 変更監視を遮断中。',
-        source: 'isaacsim.core.simulation_manager/include/.../UsdNoticeListener.hpp',
-        evidence: 'UsdNoticeListener が pxr::UsdNotice::ObjectsChanged をイベント購読。',
-      },
       phys_usd: {
         id: 'wire-phys-usd', from: 'phys_cpu', to: 'usd', color: 1, pcie: false,
-        trigger: 'clock', triggerNum: '①',
-        name: '① Physics [CPU] → USD Stage (/physics/updateToUsd)',
+        trigger: 'clock', name: '① Physics [CPU] → USD Stage (/physics/updateToUsd)',
         mode: physWritesUsd ? 'on' : 'off',
-        label: readbackBlocked && s.updateToUsd
-          ? 'Readback遮断!'
-          : (isNewton ? 'Newton非使用' : '① updateToUsd'),
+        switchClosed: !isNewton && s.updateToUsd,
+        label: readbackBlocked && s.updateToUsd ? 'Readback遮断!' : (isNewton ? 'Newton非使用' : '① updateToUsd'),
         reason: !isPlay ? `Timeline が ${s.timeline} のため出力なし。`
           : isNewton ? 'Newton は USD 書き戻しを行わない設計。'
           : !s.updateToUsd ? '/physics/updateToUsd=false により毎フレーム USD 書き戻しを遮断中。'
@@ -2106,11 +2056,21 @@
         source: 'omni.physx/bindings/_physx.pyi (SETTING_UPDATE_TO_USD), simulation_manager.py (L1139)',
         evidence: 'T1実測: USD が 5.0 → 3.96995m（Notice 28回）。T4実測: suppressReadback=True 時は 5.0m 凍結（Notice 0回）。',
       },
+      usd_phys: {
+        id: 'wire-usd-phys', from: 'usd', to: 'phys_cpu', color: 1, pcie: false,
+        trigger: 'event', name: '③ USD Stage → Physics (初回ロード / USD Notice)',
+        mode: s.usdNotice ? 'partial' : 'off',
+        switchClosed: s.usdNotice,
+        label: s.usdNotice ? '③ USD Notice' : 'Notice遮断',
+        reason: s.usdNotice ? 'ステージ読込時および実行中の USD 編集イベント（UsdNotice）時だけ物理側へ取り込む。' : 'enable_usd_notice_handler=False により USD 変更監視を遮断中。',
+        source: 'isaacsim.core.simulation_manager/include/.../UsdNoticeListener.hpp',
+        evidence: 'UsdNoticeListener が pxr::UsdNotice::ObjectsChanged をイベント購読。',
+      },
       phys_cpu_fabric_cpu: {
         id: 'wire-phys-cpu-fabric-cpu', from: 'phys_cpu', to: 'fabric_cpu', color: 2, pcie: false,
-        trigger: 'clock', triggerNum: '①',
-        name: '① Physics [CPU] → Fabric (CPU Mirror)',
+        trigger: 'clock', name: '① Physics [CPU] → Fabric (CPU Mirror)',
         mode: physCpuToFabricCpu ? 'on' : 'off',
+        switchClosed: isPhysX && s.fabricEnabled && (!s.gpuDynamics || !s.gpuInterop),
         reason: physCpuToFabricCpu
           ? 'omni.physx.fabric により PhysX 結果を Host RAM 側の Fabric (CPU Mirror) へ毎ステップ直接書き込み中。'
           : (physGpuToFabricGpu ? 'GPU Interop / Newton により VRAM 側（Physics GPU → Fabric GPU）で直接出力中。' : 'CPU 経由の Fabric 出力は OFF。'),
@@ -2119,9 +2079,9 @@
       },
       gpu_readback: {
         id: 'wire-gpu-readback', from: 'phys_gpu', to: 'phys_cpu', color: 3, pcie: true,
-        trigger: 'clock', triggerNum: '①',
-        name: '① Physics [GPU] → Physics [CPU] (PCIe Readback)',
+        trigger: 'clock', name: '① Physics [GPU] → Physics [CPU] (PCIe Readback)',
         mode: gpuReadbackActive ? 'on' : 'off',
+        switchClosed: isPhysX && s.gpuDynamics && !s.suppressReadback,
         label: readbackBlocked ? '遮断(suppressReadback)' : '① PCIe Readback',
         reason: !useGpuPhys ? 'CPU 物理モードのため PCIe Readback 不要。'
           : isNewton ? 'Newton は Warp GPU 上で完結し、PhysX Readback 経路は使わない。'
@@ -2132,12 +2092,9 @@
       },
       fabric_mirror: {
         id: 'wire-fabric-mirror', from: 'fabric_cpu', to: 'fabric_gpu', color: 2, pcie: true,
-        trigger: 'dirty', triggerNum: '②',
-        name: '② Fabric (CPU) ↔ Fabric (GPU) (Dirty-bit PCIe ミラー)',
+        trigger: 'dirty', name: '② Fabric (CPU) ↔ Fabric (GPU) (Dirty-bit PCIe ミラー)',
         mode: fabricMirrorMode,
-        label: physGpuToFabricGpu && s.propAdapter
-          ? '② GPU→CPU DtoH!'
-          : (fabricMirrorMode === 'off' ? '② ミラー待機' : '② Dirty-bit PCIe'),
+        label: physGpuToFabricGpu && s.propAdapter ? '② GPU→CPU DtoH!' : (fabricMirrorMode === 'off' ? '② ミラー待機' : '② Dirty-bit PCIe'),
         reason: physGpuToFabricGpu && s.propAdapter
           ? 'Fabric (GPU) が毎ステップ更新され、CPU 側の Property Adapter が読むため gpuValid→cpuValid の PCIe DtoH コピーが発生！'
           : (fabricMirrorMode !== 'off'
@@ -2148,11 +2105,10 @@
       },
       phys_gpu_fabric_gpu: {
         id: 'wire-phys-gpu-fabric-gpu', from: 'phys_gpu', to: 'fabric_gpu', color: 2, pcie: false,
-        trigger: 'clock', triggerNum: '①',
-        name: isNewton
-          ? '① Newton (Warp GPU) → Fabric (GPU Mirror) [VRAM直結]'
-          : '① PhysX [GPU] → Fabric (GPU Mirror) (GPU Interop)',
+        trigger: 'clock',
+        name: isNewton ? '① Newton (Warp GPU) → Fabric (GPU Mirror) [VRAM直結]' : '① PhysX [GPU] → Fabric (GPU Mirror) (GPU Interop)',
         mode: physGpuToFabricGpu ? 'on' : 'off',
+        switchClosed: isNewton || (s.gpuDynamics && s.fabricEnabled && s.gpuInterop),
         label: isNewton ? '① Warp→Fabric(VRAM)' : '① GPU Interop(VRAM)',
         reason: physGpuToFabricGpu
           ? (isNewton
@@ -2164,51 +2120,35 @@
       },
       tensor_gpu: {
         id: 'wire-tensor-gpu', from: 'tensor_gpu', to: 'phys_gpu', color: 3, pcie: false,
-        trigger: 'clock', triggerNum: '①',
-        name: '① Tensor API [GPU Direct] ↔ Physics [GPU/CUDA]',
+        trigger: 'clock', name: '① Tensor API [GPU Direct] ↔ Physics [GPU/CUDA]',
         mode: (useGpuPhys && isPlay) ? 'on' : (useGpuPhys && s.timeline === 'PAUSE' ? 'partial' : 'off'),
-        reason: (useGpuPhys && isPlay)
-          ? 'CUDA GPU バッファへ USD・Fabric・PCIe を一切通さずゼロコピー直結中。'
+        reason: (useGpuPhys && isPlay) ? 'CUDA GPU バッファへ USD・Fabric・PCIe を一切通さずゼロコピー直結中。'
           : (!useGpuPhys ? 'CPU 物理モードのため CPU Tensor 側を使用。' : `Timeline ${s.timeline} のため非ステップ状態。`),
         source: 'simulation_manager.py (L1046-1109)',
         evidence: 'T4・T9実測: suppressReadback=True 下でも torch CUDA Tensor で 3.81462m を直接読取。',
       },
       tensor_cpu: {
         id: 'wire-tensor-cpu', from: 'py_cpu', to: 'phys_cpu', color: 3, pcie: false,
-        trigger: 'clock', triggerNum: '①',
-        name: '① Python / CPU Tensor API ↔ Physics [CPU]',
+        trigger: 'clock', name: '① Python / CPU Tensor API ↔ Physics [CPU]',
         mode: (!useGpuPhys && isPlay) ? 'on' : (!useGpuPhys && s.timeline === 'PAUSE' ? 'partial' : 'off'),
-        reason: (!useGpuPhys && isPlay)
-          ? 'NumPy SimulationView で CPU PhysX バッファへ直接アクセス中。'
+        reason: (!useGpuPhys && isPlay) ? 'NumPy SimulationView で CPU PhysX バッファへ直接アクセス中。'
           : (useGpuPhys ? 'GPU 物理モードのため Tensor API [GPU Direct] 側を使用。' : `Timeline ${s.timeline} のため待機中。`),
         source: 'simulation_manager.py (L1109)',
         evidence: 'T1・T3実測: CPU モードで 3.96995m を直接取得。',
       },
       fabric_graph: {
         id: 'wire-fabric-graph', from: 'fabric_cpu', to: 'omnigraph', color: 2, pcie: false,
-        trigger: 'clock', triggerNum: '①',
-        name: '① Fabric (CPU) ↔ OmniGraph ランタイムバス',
+        trigger: 'clock', name: '① Fabric (CPU) ↔ OmniGraph ランタイムバス',
         mode: isPlay ? 'on' : 'off',
         reason: isPlay ? 'PLAY 中の ActionGraph 評価が Fabric 上で実行中。' : `Timeline ${s.timeline} のため停止。`,
         source: 'omni.graph.core',
         evidence: 'OmniGraph の実行バックエンドは Fabric ベース。',
       },
-      graph_usd: {
-        id: 'wire-graph-usd', from: 'omnigraph', to: 'usd', color: 1, pcie: false,
-        trigger: 'clock', triggerNum: '①',
-        name: '① OmniGraph → USD Stage (/persistent/omnigraph/updateToUsd)',
-        mode: (isPlay && s.ogUsd) ? 'on' : 'off',
-        reason: (isPlay && s.ogUsd)
-          ? '/persistent/omnigraph/updateToUsd=true のためグラフ出力を USD へ書き戻し中。'
-          : 'OmniGraph からの USD 書き戻しは遮断中。',
-        source: 'apps/isaacsim.exp.full.fabric.kit (L32)',
-        evidence: 'full.fabric.kit で false 設定により高速化。',
-      },
       fabric_hydra: {
         id: 'wire-fabric-hydra', from: 'fabric_cpu', to: 'hydra', color: 2, pcie: false,
-        trigger: 'dirty', triggerNum: '②',
-        name: '② Fabric (CPU) → Hydra Delegate [CPU]',
+        trigger: 'dirty', name: '② Fabric (CPU) → Hydra Delegate [CPU]',
         mode: s.render ? (s.fsd ? 'on' : 'partial') : 'off',
+        switchClosed: s.fsd,
         label: s.fsd ? '② FSD差分' : '② 補助Fabric',
         reason: !s.render ? 'Render Gate OFF のためスキップ中。'
           : (s.fsd ? 'FSD が RtChangeTracker で変化したバケットのみ差分同期。' : 'OmniHydra モードでは動的変形など一部のみ補助読取。'),
@@ -2217,9 +2157,9 @@
       },
       usd_hydra: {
         id: 'wire-usd-hydra', from: 'usd', to: 'hydra', color: 1, pcie: false,
-        trigger: 'dirty', triggerNum: '②',
-        name: '② USD Stage → Hydra Delegate (OmniHydra 直読)',
+        trigger: 'dirty', name: '② USD Stage → Hydra Delegate (OmniHydra 直読)',
         mode: (s.render && !s.fsd) ? 'on' : 'off',
+        switchClosed: !s.fsd,
         reason: !s.render ? 'Render Gate OFF のためスキップ中。'
           : (s.fsd ? 'FSD=true のため USD 直接読取は遮断（必ず Fabric 経由）。' : 'OmniHydra (UsdImagingDelegate) が USD Stage から直接読み取り中。'),
         source: 'usdrt.scenegraph/docs/fabricsd/fsd_vs_omnihydra.md (L18-46)',
@@ -2227,9 +2167,9 @@
       },
       hydra_rtx: {
         id: 'wire-hydra-rtx', from: 'hydra', to: 'rtx', color: 4, pcie: true,
-        trigger: 'clock', triggerNum: '①',
-        name: '① Hydra Delegate [CPU] → RTX Renderer [GPU] (Render Gate)',
+        trigger: 'clock', name: '① Hydra Delegate [CPU] → RTX Renderer [GPU] (Render Gate)',
         mode: s.render ? 'on' : 'off',
+        switchClosed: s.render,
         reason: s.render
           ? 'Render Gate ON: Hydra の描画コマンド・更新データを PCIe 経由で RTX Renderer (GPU) へ毎フレーム投入。'
           : 'Render Gate OFF (step(render=False)): 描画アップロードと RTX レンダリングを完全遮断。',
@@ -2238,8 +2178,7 @@
       },
       fabric_gpu_rtx: {
         id: 'wire-fabric-gpu-rtx', from: 'fabric_gpu', to: 'rtx', color: 4, pcie: false,
-        trigger: 'dirty', triggerNum: '②',
-        name: '② Fabric (GPU Mirror) → RTX Renderer [GPU] (VRAM直読)',
+        trigger: 'dirty', name: '② Fabric (GPU Mirror) → RTX Renderer [GPU] (VRAM直読)',
         mode: (s.render && s.fsd && physGpuToFabricGpu) ? 'on' : 'off',
         reason: (s.render && s.fsd && physGpuToFabricGpu)
           ? 'VRAM 内の Fabric (GPU Mirror) から GPU 常駐 Transform/頂点データを直接レンダラーへ供給。'
@@ -2249,8 +2188,7 @@
       },
       rtx_sensors: {
         id: 'wire-rtx-sensors', from: 'rtx', to: 'rtx_sensors', color: 4, pcie: false,
-        trigger: 'clock', triggerNum: '①',
-        name: '① RTX Renderer [GPU] → RTX Sensors / Replicator [GPU]',
+        trigger: 'clock', name: '① RTX Renderer [GPU] → RTX Sensors / Replicator [GPU]',
         mode: (s.render && isPlay) ? 'on' : (s.render ? 'partial' : 'off'),
         reason: !s.render ? 'Render Gate OFF のため Camera / RTX Lidar / Replicator は停止。'
           : (isPlay ? `GPU 上で RenderProduct (AOV / SPG) を生成中（captureOnPlay=${s.repPlay}）。` : 'STOP/PAUSE 中は自動キャプチャ待機。'),
@@ -2259,8 +2197,7 @@
       },
       phys_sensors: {
         id: 'wire-phys-sensors', from: 'phys_cpu', to: 'physx_sensors', color: 3, pcie: false,
-        trigger: 'clock', triggerNum: '①',
-        name: '① Physics [CPU] → PhysX Sensors [CPU] (Contact / IMU)',
+        trigger: 'clock', name: '① Physics [CPU] → PhysX Sensors [CPU] (Contact / IMU)',
         mode: (isPlay && isPhysX && (!s.gpuDynamics || !s.suppressReadback)) ? 'on' : 'off',
         reason: isNewton ? 'Newton 構成（full.newton.kit）では isaacsim.sensors.physx 拡張は無効。'
           : readbackBlocked ? 'suppressReadback=true により CPU 側 Readback が止まるため、接触取得には GPU Tensor View (ContactView) を使用。'
@@ -2270,8 +2207,7 @@
       },
       graph_ros: {
         id: 'wire-graph-ros', from: 'omnigraph', to: 'ros2', color: 3, pcie: false,
-        trigger: 'clock', triggerNum: '①',
-        name: '① OmniGraph [CPU] ↔ ROS 2 Bridge [CPU] (TF / Joint)',
+        trigger: 'clock', name: '① OmniGraph [CPU] ↔ ROS 2 Bridge [CPU] (TF / Joint)',
         mode: isPlay ? 'on' : 'off',
         reason: isPlay ? 'PLAY 中に ActionGraph 経由で ROS 2 トピックを送受信。' : `Timeline ${s.timeline} のため停止。`,
         source: 'apps/isaacsim.exp.full.kit (L151)',
@@ -2279,64 +2215,39 @@
       },
       sensors_ros: {
         id: 'wire-sensors-ros', from: 'rtx_sensors', to: 'ros2', color: 4, pcie: true,
-        trigger: 'clock', triggerNum: '①',
-        name: '① RTX Sensors [GPU] → ROS 2 Bridge [CPU] (画像PCIe読戻し)',
+        trigger: 'clock', name: '① RTX Sensors [GPU] → ROS 2 Bridge [CPU] (画像PCIe読戻し)',
         mode: (isPlay && s.render) ? 'on' : 'off',
-        reason: (isPlay && s.render)
-          ? 'GPU で描画した Camera 画像・RTX Lidar 点群を PCIe 経由で CPU へ読み戻してから ROS 2 配信。'
-          : 'Render Gate OFF または非 PLAY のため配信停止。',
+        reason: (isPlay && s.render) ? 'GPU で描画した Camera 画像・RTX Lidar 点群を PCIe 経由で CPU へ読み戻してから ROS 2 配信。' : 'Render Gate OFF または非 PLAY のため配信停止。',
         source: 'isaacsim.ros2.bridge / omni.syntheticdata',
         evidence: '高解像度カメラや大量点群の ROS 2 配信は PCIe DtoH 帯域を消費。',
       },
     };
 
-    // 診断アラート
     const diags = [];
     if (isPlay && isPhysX && s.render && !physWritesUsd && !physCpuToFabricCpu && !physGpuToFabricGpu) {
       if (readbackBlocked && s.updateToUsd) {
-        diags.push({
-          level: 'err', tag: 'T4実測: INTERLOCK',
-          text: '/physics/updateToUsd=true でも /physics/suppressReadback=true が PCIe Readback を遮断するため USD 書き戻しは流れません（T4実測: GPU Tensor 3.81462m に対し USD 5.0m 固定・Notice 0回）。GPU 描画には fabricEnabled + GPU Interop を ON にしてください。',
-        });
+        diags.push({ level: 'err', tag: 'T4実測: INTERLOCK', text: '/physics/updateToUsd=true でも /physics/suppressReadback=true が PCIe Readback を遮断するため USD 書き戻しは流れません（T4実測: GPU Tensor 3.81462m に対し USD 5.0m 固定・Notice 0回）。GPU 描画には fabricEnabled + GPU Interop を ON にしてください。' });
       } else {
-        diags.push({
-          level: 'err', tag: 'T3実測: 描画断線',
-          text: 'PhysX 出力（USD 書戻し・Fabric 出力）が両方 OFF のため、物理は進み Tensor API だけ更新されますが Viewport 上は静止します（T3実測: Tensor 3.96995m に対し USD・Fabric ともに 5.0m 固定）。',
-        });
+        diags.push({ level: 'err', tag: 'T3実測: 描画断線', text: 'PhysX 出力（USD 書戻し・Fabric 出力）が両方 OFF のため、物理は進み Tensor API だけ更新されますが Viewport 上は静止します（T3実測: Tensor 3.96995m に対し USD・Fabric ともに 5.0m 固定）。' });
       }
     }
     if (isNewton && !s.fsd) {
       diags.push({ level: 'err', tag: 'FSD必須', text: 'Newton は Warp で Fabric (GPU Mirror) の omni:fabric:worldMatrix へ直結するため、/app/useFabricSceneDelegate=true (FSD) が必須です。' });
     }
     if (isPlay && s.render && !s.propAdapter && !physWritesUsd && (physCpuToFabricCpu || physGpuToFabricGpu)) {
-      diags.push({
-        level: 'warn', tag: 'T2実測: UI値ズレ',
-        text: '物理結果が Fabric のみに流れており USD Stage は初期値凍結（T2実測: 5.0m 固定）のため、Property Window の数値が動きません。enableAdapter=true で Fabric ライブ表示できます。',
-      });
+      diags.push({ level: 'warn', tag: 'T2実測: UI値ズレ', text: '物理結果が Fabric のみに流れており USD Stage は初期値凍結（T2実測: 5.0m 固定）のため、Property Window の数値が動きません。enableAdapter=true で Fabric ライブ表示できます。' });
     }
     if (physGpuToFabricGpu && s.propAdapter) {
-      diags.push({
-        level: 'warn', tag: 'PCIe DtoH注意',
-        text: 'GPU 物理 → Fabric (GPU Mirror) の高速経路に対し、CPU 側の Property Adapter が有効なため、Fabric Dirty-bit ミラー経由の GPU→CPU 読戻しが発生します。',
-      });
+      diags.push({ level: 'warn', tag: 'PCIe DtoH注意', text: 'GPU 物理 → Fabric (GPU Mirror) の高速経路に対し、CPU 側の Property Adapter が有効なため、Fabric Dirty-bit ミラー経由の GPU→CPU 読戻しが発生します。' });
     }
     if (usdNoticeCascade && !physCpuToFabricCpu && !physGpuToFabricGpu) {
-      diags.push({
-        level: 'info', tag: 'T1実測: NOTICE連鎖',
-        text: 'USD→Fabric は本来 ② DIRTY 差分同期ですが、/physics/updateToUsd=true が毎ステップ USD を書き換えるため UsdNotice が毎ステップ連鎖発火しています（T1実測: 25step で Notice 28回 → T2 Fabric モードで 0回）。',
-      });
+      diags.push({ level: 'info', tag: 'T1実測: NOTICE連鎖', text: 'USD→Fabric は本来 ② DIRTY 差分同期ですが、/physics/updateToUsd=true が毎ステップ USD を書き換えるため UsdNotice が毎ステップ連鎖発火しています（T1実測: 25step で Notice 28回 → T2 Fabric モードで 0回）。' });
     }
     if (isPlay && !s.render) {
-      diags.push({
-        level: 'info', tag: 'T7実測: HEADLESS',
-        text: 'Render Gate OFF: Hydra→RTX Renderer (GPU) の PCIe 描画転送を遮断中（T7実測: 30step 12.58 ms vs 165.47 ms で 13.2 倍高速）。',
-      });
+      diags.push({ level: 'info', tag: 'T7実測: HEADLESS', text: 'Render Gate OFF: Hydra→RTX Renderer (GPU) の PCIe 描画転送を遮断中（T7実測: 30step 12.58 ms vs 165.47 ms で 13.2 倍高速）。' });
     }
     if (s.timeline === 'PAUSE') {
-      diags.push({
-        level: 'info', tag: 'T5実測: PAUSE保持',
-        text: '物理クロック停止中。リセットされず現在ポーズを保持したまま Viewport 描画が続きます（T5実測: 12F 更新後も 4.31058m 保持）。',
-      });
+      diags.push({ level: 'info', tag: 'T5実測: PAUSE保持', text: '物理クロック停止中。リセットされず現在ポーズを保持したまま Viewport 描画が続きます（T5実測: 12F 更新後も 4.31058m 保持）。' });
     }
     if (diags.length === 0) {
       const msg = !isPlay
@@ -2353,20 +2264,16 @@
   }
 
   // =========================================================================
-  // 4. DOM 更新 & 連続信号フローエンジン（requestAnimationFrame・速度可変）
+  // 4. DOM 更新 & グラフィカルナイフスイッチ描画
   // =========================================================================
   let selectedTarget = null;
   let lastEval = null;
   let triggerFilter = 'all';
   let flowRunning = true;
-  let flowSpeed = 0.6; // 人間が目で追えるゆったり速度（既定 0.6x）
-  const oneShotEvents = []; // { wireId, color, progress, length, shape }
+  let flowSpeed = 0.6;
+  const oneShotEvents = [];
 
-  const TRIGGER_LABELS = {
-    clock: '① CLOCK 毎フレーム',
-    dirty: '② DIRTY 差分同期',
-    event: '③ EVENT 単発',
-  };
+  const TRIGGER_LABELS = { clock: '① CLOCK 毎フレーム', dirty: '② DIRTY 差分同期', event: '③ EVENT 単発' };
   const COLOR_HEX = { 1: '#38bdf8', 2: '#34d399', 3: '#fbbf24', 4: '#c084fc' };
 
   const swEls = {
@@ -2386,56 +2293,55 @@
   };
 
   function syncControlsFromState() {
-    document.querySelectorAll('#seg-timeline .seg-btn').forEach((b) => {
-      b.classList.toggle('is-active', b.dataset.val === state.timeline);
-    });
-    document.querySelectorAll('#seg-engine .seg-btn').forEach((b) => {
-      b.classList.toggle('is-active', b.dataset.val === state.engine);
-    });
+    document.querySelectorAll('#seg-timeline .seg-btn').forEach((b) => b.classList.toggle('is-active', b.dataset.val === state.timeline));
+    document.querySelectorAll('#seg-engine .seg-btn').forEach((b) => b.classList.toggle('is-active', b.dataset.val === state.engine));
     Object.keys(swEls).forEach((k) => { swEls[k].checked = Boolean(state[k]); });
 
     const isNewton = state.engine === 'newton';
     swEls.gpuDynamics.disabled = isNewton;
     document.getElementById('row-gpuDynamics').classList.toggle('is-disabled', isNewton);
-
     swEls.updateToUsd.disabled = isNewton;
     document.getElementById('row-updateToUsd').classList.toggle('is-disabled', isNewton);
     const noteUsd = document.getElementById('note-updateToUsd');
     noteUsd.style.display = isNewton ? 'block' : 'none';
     noteUsd.textContent = isNewton ? 'Newton モードでは常に USD 書戻し OFF' : '';
-
     swEls.fabricEnabled.disabled = isNewton;
     document.getElementById('row-fabricEnabled').classList.toggle('is-disabled', isNewton);
     const noteFab = document.getElementById('note-fabricEnabled');
     noteFab.style.display = isNewton ? 'block' : 'none';
     noteFab.textContent = isNewton ? 'Newton モードでは Warp が常時 Fabric GPU へ直結' : '';
-
     const interopDisabled = isNewton || !state.fabricEnabled || !state.gpuDynamics;
     swEls.gpuInterop.disabled = interopDisabled;
     document.getElementById('row-gpuInterop').classList.toggle('is-disabled', interopDisabled);
-
     swEls.suppressReadback.disabled = isNewton || !state.gpuDynamics;
     document.getElementById('row-suppressReadback').classList.toggle('is-disabled', isNewton || !state.gpuDynamics);
   }
 
-  function updateSwitchBlade(wireEl, isOn) {
-    const blade = wireEl.querySelector('.sw-blade');
-    if (!blade) return;
-    const contacts = wireEl.querySelectorAll('.sw-contact');
-    if (contacts.length < 2) return;
+  function updateKnifeSwitch(wireEl, isClosed) {
+    const sw = wireEl.querySelector('.sw-sym');
+    if (!sw) return;
+    sw.classList.toggle('is-closed', isClosed);
+    sw.classList.toggle('is-open', !isClosed);
+    const txt = sw.querySelector('.sw-state-txt');
+    if (txt) txt.textContent = isClosed ? 'ON' : 'OFF';
+
+    const blade = sw.querySelector('.sw-blade');
+    const contacts = sw.querySelectorAll('.sw-contact');
+    if (!blade || contacts.length < 2) return;
     const x1 = parseFloat(contacts[0].getAttribute('cx'));
     const y1 = parseFloat(contacts[0].getAttribute('cy'));
     const x2 = parseFloat(contacts[1].getAttribute('cx'));
     const y2 = parseFloat(contacts[1].getAttribute('cy'));
-    if (isOn) {
+
+    if (isClosed) {
       blade.setAttribute('x1', x1); blade.setAttribute('y1', y1);
       blade.setAttribute('x2', x2); blade.setAttribute('y2', y2);
     } else if (Math.abs(x2 - x1) > Math.abs(y2 - y1)) {
       blade.setAttribute('x1', x1); blade.setAttribute('y1', y1);
-      blade.setAttribute('x2', x2 - 2); blade.setAttribute('y2', y2 - 8);
+      blade.setAttribute('x2', x2 - 4); blade.setAttribute('y2', y2 - 11);
     } else {
       blade.setAttribute('x1', x1); blade.setAttribute('y1', y1);
-      blade.setAttribute('x2', x2 + 8); blade.setAttribute('y2', y2 - 2);
+      blade.setAttribute('x2', x2 + 11); blade.setAttribute('y2', y2 - 4);
     }
   }
 
@@ -2444,8 +2350,7 @@
     Object.values(lastEval.wires).forEach((w) => {
       const g = document.getElementById(w.id);
       if (!g) return;
-      const matches = triggerFilter === 'all' || w.trigger === triggerFilter;
-      g.classList.toggle('is-filter-dim', !matches);
+      g.classList.toggle('is-filter-dim', !(triggerFilter === 'all' || w.trigger === triggerFilter));
     });
   }
 
@@ -2459,7 +2364,6 @@
     const energizedNodes = new Set(['timeline', 'ui', 'usd']);
     if (state.render) energizedNodes.add('hydra');
     if (useGpuPhys) energizedNodes.add('phys_gpu'); else energizedNodes.add('phys_cpu');
-
     const counts = { clock: 0, dirty: 0, event: 0 };
 
     Object.values(wires).forEach((w) => {
@@ -2474,7 +2378,8 @@
       if (path.hasAttribute('marker-end')) path.setAttribute('marker-end', markerUrl);
       if (path.hasAttribute('marker-start')) path.setAttribute('marker-start', markerUrl);
 
-      updateSwitchBlade(g, w.mode !== 'off');
+      const swClosed = typeof w.switchClosed === 'boolean' ? w.switchClosed : (w.mode !== 'off');
+      updateKnifeSwitch(g, swClosed);
 
       if (w.mode !== 'off') {
         counts[w.trigger]++;
@@ -2484,7 +2389,6 @@
       }
     });
 
-    // 動的ラベル
     document.getElementById('label-usd-fabric').textContent = wires.usd_fabric.label;
     document.getElementById('label-usd-phys').textContent = wires.usd_phys.label;
     document.getElementById('label-phys-usd').textContent = wires.phys_usd.label;
@@ -2493,14 +2397,12 @@
     document.getElementById('label-phys-gpu-fabric-gpu').textContent = wires.phys_gpu_fabric_gpu.label;
     document.getElementById('label-fabric-hydra').textContent = wires.fabric_hydra.label;
 
-    // ノード点灯更新
     document.querySelectorAll('.ic-node').forEach((nodeEl) => {
       const isLit = energizedNodes.has(nodeEl.dataset.node);
       nodeEl.classList.toggle('is-energized', isLit);
       nodeEl.classList.toggle('is-idle', !isLit);
     });
 
-    // 各ICテキスト更新
     const tlBadge = document.getElementById('ic-timeline-badge');
     tlBadge.textContent = state.timeline;
     tlBadge.setAttribute('fill', state.timeline === 'PLAY' ? '#4ade80' : (state.timeline === 'PAUSE' ? '#fbbf24' : '#cbd5e1'));
@@ -2510,20 +2412,13 @@
     const uiBadge = document.getElementById('ic-ui-badge');
     uiBadge.textContent = state.propAdapter ? 'USD + Fabric CPU' : 'USDのみ';
     uiBadge.setAttribute('fill', state.propAdapter ? '#6ee7b7' : '#7dd3fc');
-    document.getElementById('ic-ui-sub').textContent = state.propAdapter
-      ? 'Property Window が Fabric (CPU) を表示'
-      : 'Property Window は USD Stage のみ参照';
-
+    document.getElementById('ic-ui-sub').textContent = state.propAdapter ? 'Property Window が Fabric (CPU) を表示' : 'Property Window は USD Stage のみ参照';
     document.getElementById('ic-py-cpu-badge').textContent = useGpuPhys ? 'USD/USDRTのみ' : 'NUMPY / CPU ACTIVE';
 
     const usdSt = document.getElementById('ic-usd-status');
-    if (wires.phys_usd.mode === 'on') {
-      usdSt.textContent = 'PhysXから毎F書戻中'; usdSt.setAttribute('fill', '#7dd3fc');
-    } else if (state.timeline === 'PLAY') {
-      usdSt.textContent = 'PLAY中: 初期値凍結 (T2/T4)'; usdSt.setAttribute('fill', '#fbbf24');
-    } else {
-      usdSt.textContent = '静止待機 (Notice 0回)'; usdSt.setAttribute('fill', '#cbd5e1');
-    }
+    if (wires.phys_usd.mode === 'on') { usdSt.textContent = 'PhysXから毎F書戻中'; usdSt.setAttribute('fill', '#7dd3fc'); }
+    else if (state.timeline === 'PLAY') { usdSt.textContent = 'PLAY中: 初期値凍結 (T2/T4)'; usdSt.setAttribute('fill', '#fbbf24'); }
+    else { usdSt.textContent = '静止待機 (Notice 0回)'; usdSt.setAttribute('fill', '#cbd5e1'); }
 
     document.getElementById('ic-fab-cpu-xform').textContent = state.fsd ? 'attr: omni:fabric:worldMatrix' : 'attr: _localMatrix (Legacy)';
     document.getElementById('ic-fab-cpu-status').textContent =
@@ -2534,26 +2429,13 @@
       physGpuToFabricGpu ? (state.engine === 'newton' ? 'Newton Warp 直接更新中 (VRAM)' : 'PhysX GPU Interop 更新中 (VRAM)')
       : (wires.fabric_mirror.mode !== 'off' ? 'Dirty-bit ミラー待機' : '未割当 / 待機中');
 
-    document.getElementById('ic-phys-cpu-mode').textContent = useGpuPhys
-      ? (readbackBlocked ? 'Readback 遮断中 (未使用)' : 'GPU Readback 受信バッファ')
-      : '演算主体: CPU パイプライン (MBP)';
-    document.getElementById('ic-phys-cpu-status').textContent = !useGpuPhys
-      ? (state.timeline === 'PLAY' ? 'ACTIVE (CPU STEPPING)' : state.timeline)
-      : (wires.gpu_readback.mode === 'on' ? 'RECEIVING READBACK' : 'BYPASSED (GPU側で実行)');
-
-    document.getElementById('ic-phys-gpu-title').textContent =
-      state.engine === 'newton' ? 'Physics Engine [Newton Warp]' : 'Physics Engine [PhysX GPU]';
-    document.getElementById('ic-phys-gpu-ext').textContent =
-      state.engine === 'newton' ? 'isaacsim.physics.newton / warp CUDA' : 'omni.physics.physx (GPU Dynamics)';
-    document.getElementById('ic-phys-gpu-lock').textContent =
-      state.engine === 'newton' ? '出力: Warp → Fabric GPU 直結' : (readbackBlocked ? 'Readback: 遮断 (GPU完結)' : 'Readback: 許可');
-    document.getElementById('ic-phys-gpu-status').textContent = useGpuPhys
-      ? (state.timeline === 'PLAY' ? 'ACTIVE (CUDA KERNELS)' : state.timeline)
-      : 'IDLE (CPUモード中)';
-
-    document.getElementById('ic-tensor-gpu-status').textContent = (useGpuPhys && state.timeline === 'PLAY')
-      ? 'CUDA ZERO-COPY ACTIVE' : (useGpuPhys ? 'STANDBY (GPU)' : 'IDLE (CPUモード)');
-
+    document.getElementById('ic-phys-cpu-mode').textContent = useGpuPhys ? (readbackBlocked ? 'Readback 遮断中 (未使用)' : 'GPU Readback 受信バッファ') : '演算主体: CPU パイプライン (MBP)';
+    document.getElementById('ic-phys-cpu-status').textContent = !useGpuPhys ? (state.timeline === 'PLAY' ? 'ACTIVE (CPU STEPPING)' : state.timeline) : (wires.gpu_readback.mode === 'on' ? 'RECEIVING READBACK' : 'BYPASSED (GPU側で実行)');
+    document.getElementById('ic-phys-gpu-title').textContent = state.engine === 'newton' ? 'Physics Engine [Newton Warp]' : 'Physics Engine [PhysX GPU]';
+    document.getElementById('ic-phys-gpu-ext').textContent = state.engine === 'newton' ? 'isaacsim.physics.newton / warp CUDA' : 'omni.physics.physx (GPU Dynamics)';
+    document.getElementById('ic-phys-gpu-lock').textContent = state.engine === 'newton' ? '出力: Warp → Fabric GPU 直結' : (readbackBlocked ? 'Readback: 遮断 (GPU完結)' : 'Readback: 許可');
+    document.getElementById('ic-phys-gpu-status').textContent = useGpuPhys ? (state.timeline === 'PLAY' ? 'ACTIVE (CUDA KERNELS)' : state.timeline) : 'IDLE (CPUモード中)';
+    document.getElementById('ic-tensor-gpu-status').textContent = (useGpuPhys && state.timeline === 'PLAY') ? 'CUDA ZERO-COPY ACTIVE' : (useGpuPhys ? 'STANDBY (GPU)' : 'IDLE (CPUモード)');
     document.getElementById('ic-hydra-ext').textContent = state.fsd ? 'omni.hydra.usdrt_delegate' : 'OmniImaging + OmniHydra';
     document.getElementById('ic-hydra-mode').textContent = state.fsd ? 'モード: FSD (Fabric専用)' : 'モード: OmniHydra (USD主体)';
     document.getElementById('ic-hydra-status').textContent = !state.render ? 'RENDER GATE OFF' : (state.fsd ? 'FSD ACTIVE' : 'OMNIHYDRA ACTIVE');
@@ -2565,7 +2447,6 @@
     document.getElementById('ic-physx-sensors-status').textContent = wires.phys_sensors.mode === 'on' ? 'ACTIVE (Render不要)' : (state.engine === 'newton' ? 'Newton構成では無効' : 'IDLE / READBACK遮断');
     document.getElementById('ic-ros2-status').textContent = state.timeline === 'PLAY' ? (state.render ? 'TF + Image 配信中' : 'TF / Joint のみ配信中') : 'IDLE';
 
-    // 上部メーター
     const mTl = document.getElementById('meter-timeline');
     mTl.textContent = `TIMELINE: ${state.timeline}`;
     mTl.className = `meter-pill state-${state.timeline.toLowerCase()}`;
@@ -2578,16 +2459,14 @@
     document.getElementById('trigger-summary').textContent = `通電中 — ① CLOCK: ${counts.clock} / ② DIRTY: ${counts.dirty} / ③ EVENT: ${counts.event}`;
 
     applyTriggerFilter();
-
     document.getElementById('diag-panel').innerHTML = diags.map((d) =>
       `<div class="diag-item level-${d.level}"><span class="diag-badge">${d.tag}</span><span>${d.text}</span></div>`
     ).join('');
-
     if (selectedTarget) renderProbe();
   }
 
   // =========================================================================
-  // 5. 滑らかな連続信号フロー描画（JS requestAnimationFrame — CSS infinite 不使用）
+  // 5. 滑らかな連続信号フロー描画（JS requestAnimationFrame）
   // =========================================================================
   const particlesLayer = document.getElementById('particles-layer');
   const SVG_NS = 'http://www.w3.org/2000/svg';
@@ -2599,45 +2478,32 @@
     if (!g) return;
     const path = g.querySelector('.wire-path');
     if (!path) return;
-    oneShotEvents.push({
-      wireId,
-      path,
-      length: path.getTotalLength(),
-      progress: 0,
-      color: COLOR_HEX[color] || '#38bdf8',
-    });
+    oneShotEvents.push({ wireId, path, length: path.getTotalLength(), progress: 0, color: COLOR_HEX[color] || '#38bdf8' });
   }
 
   function stepAnimation(ts) {
     if (lastFrameTs === null) lastFrameTs = ts;
     const dt = Math.min(0.05, (ts - lastFrameTs) / 1000);
     lastFrameTs = ts;
+    if (flowRunning) animTime += dt * flowSpeed;
 
-    if (flowRunning) {
-      animTime += dt * flowSpeed;
-    }
-
-    // 粒子レイヤを再描画（最大 ~40 要素なので軽量かつ 60fps 滑らか）
     particlesLayer.textContent = '';
 
     if (lastEval) {
-      const basePxPerSec = 68; // 0.6x 時に約 41 px/sec — 人間が目で楽に追える速度
+      const basePxPerSec = 78;
       Object.values(lastEval.wires).forEach((w) => {
         if (w.mode === 'off') return;
         const g = document.getElementById(w.id);
         if (!g) return;
         if (triggerFilter !== 'all' && w.trigger !== triggerFilter) return;
-
         const path = g.querySelector('.wire-path');
         if (!path) return;
         const len = path.getTotalLength();
         if (len < 10) return;
 
         const fill = w.chainTriggered ? '#f87171' : (COLOR_HEX[w.color] || '#38bdf8');
-
         if (w.trigger === 'clock' || w.chainTriggered) {
-          // ① CLOCK: 等間隔の丸粒子がゆっくり途切れず流れる
-          const spacing = 115;
+          const spacing = 140;
           const count = Math.max(1, Math.min(5, Math.floor(len / spacing) + 1));
           const cycle = len / count;
           for (let i = 0; i < count; i++) {
@@ -2646,20 +2512,18 @@
             const c = document.createElementNS(SVG_NS, 'circle');
             c.setAttribute('cx', pt.x.toFixed(1));
             c.setAttribute('cy', pt.y.toFixed(1));
-            c.setAttribute('r', w.chainTriggered ? '5' : '4.4');
+            c.setAttribute('r', w.chainTriggered ? '5.4' : '4.8');
             c.setAttribute('fill', fill);
             c.setAttribute('stroke', '#0b1120');
-            c.setAttribute('stroke-width', '1.4');
+            c.setAttribute('stroke-width', '1.5');
             particlesLayer.appendChild(c);
           }
         } else if (w.trigger === 'dirty') {
-          // ② DIRTY: 「溜めて（ラッチ）→ まとめてゆっくり送る（フラッシュ）」四角バッチ表現
-          const periodSec = Math.max(2.6, len / (basePxPerSec * 0.85) + 1.1);
+          const periodSec = Math.max(2.8, len / (basePxPerSec * 0.85) + 1.1);
           const phase = (animTime % periodSec) / periodSec;
           if (phase < 0.28) {
-            // 送信端でラッチ蓄積中（サイズが少しだけ膨らむ）
-            const pt = path.getPointAtLength(6);
-            const sz = 6 + (phase / 0.28) * 3.5;
+            const pt = path.getPointAtLength(8);
+            const sz = 6.5 + (phase / 0.28) * 3.8;
             const r = document.createElementNS(SVG_NS, 'rect');
             r.setAttribute('x', (pt.x - sz / 2).toFixed(1));
             r.setAttribute('y', (pt.y - sz / 2).toFixed(1));
@@ -2668,45 +2532,37 @@
             r.setAttribute('rx', '2');
             r.setAttribute('fill', fill);
             r.setAttribute('stroke', '#0b1120');
-            r.setAttribute('stroke-width', '1.3');
+            r.setAttribute('stroke-width', '1.4');
             particlesLayer.appendChild(r);
           } else {
-            // バッチフラッシュ移動
             const moveT = (phase - 0.28) / 0.72;
             const pt = path.getPointAtLength(moveT * len);
             const r = document.createElementNS(SVG_NS, 'rect');
-            r.setAttribute('x', (pt.x - 4.5).toFixed(1));
-            r.setAttribute('y', (pt.y - 4.5).toFixed(1));
-            r.setAttribute('width', '9');
-            r.setAttribute('height', '9');
+            r.setAttribute('x', (pt.x - 5).toFixed(1));
+            r.setAttribute('y', (pt.y - 5).toFixed(1));
+            r.setAttribute('width', '10');
+            r.setAttribute('height', '10');
             r.setAttribute('rx', '2');
             r.setAttribute('fill', fill);
             r.setAttribute('stroke', '#0b1120');
-            r.setAttribute('stroke-width', '1.4');
+            r.setAttribute('stroke-width', '1.5');
             particlesLayer.appendChild(r);
           }
         }
-        // ③ EVENT は通常静止（イベント発火デモ時に oneShotEvents でダイヤ粒子がゆっくり1回流れる）
       });
     }
 
-    // ③ EVENT ワンショットダイヤ粒子の更新（ゆっくり流れる）
     for (let i = oneShotEvents.length - 1; i >= 0; i--) {
       const ev = oneShotEvents[i];
-      if (flowRunning) {
-        ev.progress += dt * flowSpeed * 72;
-      }
-      if (ev.progress >= ev.length) {
-        oneShotEvents.splice(i, 1);
-        continue;
-      }
+      if (flowRunning) ev.progress += dt * flowSpeed * 82;
+      if (ev.progress >= ev.length) { oneShotEvents.splice(i, 1); continue; }
       const pt = ev.path.getPointAtLength(ev.progress);
       const poly = document.createElementNS(SVG_NS, 'polygon');
-      const s = 6.2;
+      const s = 6.8;
       poly.setAttribute('points', `${pt.x},${pt.y - s} ${pt.x + s},${pt.y} ${pt.x},${pt.y + s} ${pt.x - s},${pt.y}`);
       poly.setAttribute('fill', ev.color);
       poly.setAttribute('stroke', '#ffffff');
-      poly.setAttribute('stroke-width', '1.4');
+      poly.setAttribute('stroke-width', '1.5');
       particlesLayer.appendChild(poly);
     }
 
@@ -2714,7 +2570,7 @@
   }
 
   // =========================================================================
-  // 6. プローブ詳細パネル（根拠ドキュメント ＋ 実機実測値を表示）
+  // 6. プローブ詳細パネル
   // =========================================================================
   function switchSideTab(tabName) {
     document.querySelectorAll('.panel-tab').forEach((btn) => {
@@ -2722,17 +2578,13 @@
       btn.classList.toggle('is-active', active);
       btn.setAttribute('aria-selected', String(active));
     });
-    document.querySelectorAll('.tab-pane').forEach((pane) => {
-      pane.classList.toggle('is-active', pane.id === `pane-${tabName}`);
-    });
+    document.querySelectorAll('.tab-pane').forEach((pane) => pane.classList.toggle('is-active', pane.id === `pane-${tabName}`));
   }
 
   function selectProbe(kind, key) {
     selectedTarget = { kind, key };
     document.querySelectorAll('.ic-node.is-selected, .wire-group.is-selected').forEach((el) => el.classList.remove('is-selected'));
-    const sel = kind === 'node'
-      ? document.querySelector(`.ic-node[data-node="${key}"]`)
-      : document.querySelector(`.wire-group[data-wire="${key}"]`);
+    const sel = kind === 'node' ? document.querySelector(`.ic-node[data-node="${key}"]`) : document.querySelector(`.wire-group[data-wire="${key}"]`);
     if (sel) sel.classList.add('is-selected');
     switchSideTab('probe');
     renderProbe();
@@ -2757,7 +2609,6 @@
               ${w.pcie ? '<span class="code-chip" style="margin-left:0.25rem;border-color:#fb7185;color:#be123c;">PCIe</span>' : ''}
               <br>${w.name}<br><span style="color:var(--muted)">${w.reason}</span>
             </li>`).join('');
-
       box.innerHTML = `
         <h3 class="probe-title">${meta.title}</h3>
         <div style="margin-bottom:0.45rem;display:flex;gap:0.35rem;flex-wrap:wrap;">
@@ -2809,7 +2660,7 @@
   }
 
   // =========================================================================
-  // 7. イベントバインディング
+  // 7. イベントバインディング（回路上スイッチの直接クリック開閉対応！）
   // =========================================================================
   function clearPresetSelection() {
     document.querySelectorAll('.preset-btn.is-selected').forEach((b) => b.classList.remove('is-selected'));
@@ -2819,102 +2670,87 @@
     const p = PRESETS[presetKey];
     if (!p) return;
     Object.assign(state, p);
-    document.querySelectorAll('.preset-btn').forEach((btn) => {
-      btn.classList.toggle('is-selected', btn.dataset.preset === presetKey);
-    });
+    document.querySelectorAll('.preset-btn').forEach((btn) => btn.classList.toggle('is-selected', btn.dataset.preset === presetKey));
     renderCircuit();
     if (shouldScroll) document.getElementById('workbench').scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
-  document.querySelectorAll('.preset-btn').forEach((btn) => {
-    btn.addEventListener('click', () => applyPreset(btn.dataset.preset, false));
-  });
-  document.querySelectorAll('.load-trap-btn').forEach((btn) => {
-    btn.addEventListener('click', () => applyPreset(btn.dataset.loadPreset, true));
-  });
+  document.querySelectorAll('.preset-btn').forEach((btn) => btn.addEventListener('click', () => applyPreset(btn.dataset.preset, false)));
+  document.querySelectorAll('.load-trap-btn').forEach((btn) => btn.addEventListener('click', () => applyPreset(btn.dataset.loadPreset, true)));
 
   document.querySelectorAll('#seg-timeline .seg-btn').forEach((btn) => {
-    btn.addEventListener('click', () => {
-      state.timeline = btn.dataset.val;
-      clearPresetSelection();
-      renderCircuit();
-    });
+    btn.addEventListener('click', () => { state.timeline = btn.dataset.val; clearPresetSelection(); renderCircuit(); });
   });
-
   document.querySelectorAll('#seg-engine .seg-btn').forEach((btn) => {
     btn.addEventListener('click', () => {
       state.engine = btn.dataset.val;
       if (state.engine === 'newton') {
-        state.gpuDynamics = true;
-        state.updateToUsd = false;
-        state.fabricEnabled = true;
-        state.gpuInterop = true;
-        state.suppressReadback = true;
+        state.gpuDynamics = true; state.updateToUsd = false; state.fabricEnabled = true; state.gpuInterop = true; state.suppressReadback = true;
+      }
+      clearPresetSelection(); renderCircuit();
+    });
+  });
+
+  Object.entries(swEls).forEach(([key, input]) => {
+    input.addEventListener('change', () => { state[key] = input.checked; clearPresetSelection(); renderCircuit(); });
+  });
+
+  // 回路図上のナイフスイッチ直接クリックで即座にフラグ切替！
+  document.querySelectorAll('.sw-sym[data-toggle]').forEach((swEl) => {
+    swEl.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const key = swEl.dataset.toggle;
+      if (key === 'play') {
+        state.timeline = state.timeline === 'PLAY' ? 'STOP' : 'PLAY';
+      } else if (key === 'gpuInterop') {
+        if (state.engine === 'newton') return;
+        if (!state.gpuDynamics) state.gpuDynamics = true;
+        if (!state.fabricEnabled) state.fabricEnabled = true;
+        state.gpuInterop = !state.gpuInterop;
+      } else if (key === 'suppressReadback') {
+        if (state.engine === 'newton') return;
+        if (!state.gpuDynamics) state.gpuDynamics = true;
+        state.suppressReadback = !state.suppressReadback;
+      } else if (key === 'updateToUsd' || key === 'fabricEnabled') {
+        if (state.engine === 'newton') return;
+        state[key] = !state[key];
+      } else if (key in state) {
+        state[key] = !state[key];
       }
       clearPresetSelection();
       renderCircuit();
     });
   });
 
-  Object.entries(swEls).forEach(([key, input]) => {
-    input.addEventListener('change', () => {
-      state[key] = input.checked;
-      clearPresetSelection();
-      renderCircuit();
-    });
-  });
-
-  document.querySelectorAll('.panel-tab').forEach((btn) => {
-    btn.addEventListener('click', () => switchSideTab(btn.dataset.tab));
-  });
-
+  document.querySelectorAll('.panel-tab').forEach((btn) => btn.addEventListener('click', () => switchSideTab(btn.dataset.tab)));
   document.querySelectorAll('.trigger-btn').forEach((btn) => {
     btn.addEventListener('click', () => {
       triggerFilter = btn.dataset.trigger;
-      document.querySelectorAll('.trigger-btn').forEach((b) => {
-        b.classList.toggle('is-active', b.dataset.trigger === triggerFilter);
-      });
+      document.querySelectorAll('.trigger-btn').forEach((b) => b.classList.toggle('is-active', b.dataset.trigger === triggerFilter));
       applyTriggerFilter();
     });
   });
+  document.querySelectorAll('.ic-node').forEach((el) => el.addEventListener('click', () => selectProbe('node', el.dataset.node)));
+  document.querySelectorAll('.wire-group').forEach((el) => el.addEventListener('click', () => selectProbe('wire', el.dataset.wire)));
 
-  document.querySelectorAll('.ic-node').forEach((el) => {
-    el.addEventListener('click', () => selectProbe('node', el.dataset.node));
-  });
-  document.querySelectorAll('.wire-group').forEach((el) => {
-    el.addEventListener('click', () => selectProbe('wire', el.dataset.wire));
-  });
-
-  // 流れ再生/停止 & 速度スライダー
   const toggleFlowBtn = document.getElementById('btn-toggle-flow');
   toggleFlowBtn.addEventListener('click', () => {
     flowRunning = !flowRunning;
     toggleFlowBtn.textContent = flowRunning ? '⏸ 流れを一時停止' : '▶ 流れを再開';
     toggleFlowBtn.classList.toggle('is-paused', !flowRunning);
   });
-
   const speedInput = document.getElementById('flow-speed');
   const speedLabel = document.getElementById('flow-speed-label');
-  speedInput.addEventListener('input', () => {
-    flowSpeed = parseFloat(speedInput.value);
-    speedLabel.textContent = `${flowSpeed.toFixed(1)}x`;
-  });
+  speedInput.addEventListener('input', () => { flowSpeed = parseFloat(speedInput.value); speedLabel.textContent = `${flowSpeed.toFixed(1)}x`; });
 
-  // ③ EVENT デモ発火ボタン
   document.getElementById('btn-demo-usd-edit').addEventListener('click', () => {
     spawnEventPacket('wire-ui-usd', 1);
     if (state.usdNotice) setTimeout(() => spawnEventPacket('wire-usd-phys', 1), 650);
     if (state.fabricNotice) setTimeout(() => spawnEventPacket('wire-usd-fabric', 2), 650);
     selectProbe('wire', 'usd_fabric');
   });
-  document.getElementById('btn-pulse-sync').addEventListener('click', () => {
-    spawnEventPacket('wire-usd-fabric', 2);
-    selectProbe('wire', 'usd_fabric');
-  });
-  document.getElementById('btn-pulse-save').addEventListener('click', () => {
-    spawnEventPacket('wire-fabric-usd-save', 1);
-    selectProbe('wire', 'fabric_usd_save');
-  });
+  document.getElementById('btn-pulse-sync').addEventListener('click', () => { spawnEventPacket('wire-usd-fabric', 2); selectProbe('wire', 'usd_fabric'); });
+  document.getElementById('btn-pulse-save').addEventListener('click', () => { spawnEventPacket('wire-fabric-usd-save', 1); selectProbe('wire', 'fabric_usd_save'); });
 
   // =========================================================================
   // 8. 双方向 data-ref 連動・スポットライト・SVG結線・戻るボタン・ScrollSpy
@@ -2922,38 +2758,23 @@
   const svgLayer = document.getElementById('ref-connector-layer');
   const returnBtn = document.getElementById('ref-return-btn');
   let savedScrollY = null;
-
-  const isInViewport = (el) => {
-    const r = el.getBoundingClientRect();
-    return r.width > 0 && r.height > 0 && r.top >= 0 && r.bottom <= window.innerHeight && r.left >= 0 && r.right <= window.innerWidth;
-  };
+  const isInViewport = (el) => { const r = el.getBoundingClientRect(); return r.width > 0 && r.height > 0 && r.top >= 0 && r.bottom <= window.innerHeight && r.left >= 0 && r.right <= window.innerWidth; };
   const clearLines = () => { if (svgLayer) svgLayer.innerHTML = ''; };
   const drawConnector = (fromEl, toEl) => {
     if (!svgLayer || !isInViewport(fromEl) || !isInViewport(toEl)) return;
-    const a = fromEl.getBoundingClientRect();
-    const b = toEl.getBoundingClientRect();
-    const x1 = a.left + a.width / 2, y1 = a.top + a.height / 2;
-    const x2 = b.left + b.width / 2, y2 = b.top + b.height / 2;
-    const mx = (x1 + x2) / 2;
+    const a = fromEl.getBoundingClientRect(), b = toEl.getBoundingClientRect();
+    const x1 = a.left + a.width / 2, y1 = a.top + a.height / 2, x2 = b.left + b.width / 2, y2 = b.top + b.height / 2, mx = (x1 + x2) / 2;
     const cmap = { '1': '#2563eb', '2': '#059669', '3': '#d97706', '4': '#7c3aed' };
     const path = document.createElementNS(SVG_NS, 'path');
     path.setAttribute('d', `M ${x1} ${y1} C ${mx} ${y1}, ${mx} ${y2}, ${x2} ${y2}`);
-    path.setAttribute('fill', 'none');
-    path.setAttribute('stroke', cmap[fromEl.dataset.color] || '#2563eb');
-    path.setAttribute('stroke-width', '2');
-    path.setAttribute('stroke-dasharray', '4 3');
-    path.setAttribute('opacity', '0.78');
+    path.setAttribute('fill', 'none'); path.setAttribute('stroke', cmap[fromEl.dataset.color] || '#2563eb');
+    path.setAttribute('stroke-width', '2'); path.setAttribute('stroke-dasharray', '4 3'); path.setAttribute('opacity', '0.78');
     svgLayer.appendChild(path);
   };
-
   const setActiveRef = (refId, originEl) => {
     const peers = Array.from(document.querySelectorAll(`[data-ref="${CSS.escape(refId)}"]`));
     const scopes = new Set();
-    peers.forEach((el) => {
-      el.classList.add('is-active');
-      const sc = el.closest('[data-ref-scope]');
-      if (sc) scopes.add(sc);
-    });
+    peers.forEach((el) => { el.classList.add('is-active'); const sc = el.closest('[data-ref-scope]'); if (sc) scopes.add(sc); });
     scopes.forEach((sc) => sc.classList.add('is-dimming'));
     clearLines();
     if (originEl) peers.filter((el) => el !== originEl).forEach((peer) => drawConnector(originEl, peer));
@@ -2963,7 +2784,6 @@
     document.querySelectorAll('[data-ref-scope].is-dimming').forEach((sc) => sc.classList.remove('is-dimming'));
     clearLines();
   };
-
   document.querySelectorAll('[data-ref]').forEach((el) => {
     const refId = el.dataset.ref;
     el.addEventListener('mouseenter', () => setActiveRef(refId, el));
@@ -2975,33 +2795,19 @@
       const peers = Array.from(document.querySelectorAll(`[data-ref="${CSS.escape(refId)}"]`)).filter((p) => p !== el);
       if (peers.length === 0) return;
       const target = peers.find((p) => p.dataset.refRole !== el.dataset.refRole) || peers[0];
-      if (!isInViewport(target) && returnBtn) {
-        savedScrollY = window.scrollY;
-        returnBtn.classList.add('is-visible');
-      }
+      if (!isInViewport(target) && returnBtn) { savedScrollY = window.scrollY; returnBtn.classList.add('is-visible'); }
       target.scrollIntoView({ behavior: 'smooth', block: 'center' });
       if (target.dataset.node) selectProbe('node', target.dataset.node);
     });
   });
-
   if (returnBtn) {
-    returnBtn.addEventListener('click', () => {
-      if (savedScrollY !== null) {
-        window.scrollTo({ top: savedScrollY, behavior: 'smooth' });
-        savedScrollY = null;
-      }
-      returnBtn.classList.remove('is-visible');
-    });
+    returnBtn.addEventListener('click', () => { if (savedScrollY !== null) { window.scrollTo({ top: savedScrollY, behavior: 'smooth' }); savedScrollY = null; } returnBtn.classList.remove('is-visible'); });
   }
-
   const tocLinks = Array.from(document.querySelectorAll('.toc a[href^="#"]'));
   const sections = tocLinks.map((a) => document.querySelector(a.getAttribute('href'))).filter(Boolean);
   if (sections.length > 0 && 'IntersectionObserver' in window) {
     const observer = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        if (!entry.isIntersecting) return;
-        tocLinks.forEach((a) => a.classList.toggle('is-current', a.getAttribute('href') === `#${entry.target.id}`));
-      });
+      entries.forEach((entry) => { if (!entry.isIntersecting) return; tocLinks.forEach((a) => a.classList.toggle('is-current', a.getAttribute('href') === `#${entry.target.id}`)); });
     }, { rootMargin: '-15% 0px -70% 0px' });
     sections.forEach((sec) => observer.observe(sec));
   }
