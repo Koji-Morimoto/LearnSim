@@ -1,0 +1,126 @@
+{
+  "env": {
+    "app_name": "Isaac-Sim Python",
+    "app_version": "6.2.0",
+    "useFabricSceneDelegate": true,
+    "resetOnStop_default": true
+  },
+  "tests": {
+    "T1_default_usd_play": {
+      "settings": {
+        "updateToUsd": true,
+        "omni_physx_fabric": false,
+        "suppressReadback": false
+      },
+      "usd_z_before": 5.0,
+      "usd_z_after": 3.96995,
+      "fabric_z_before": 5.0,
+      "fabric_z_after": 3.96995,
+      "tensor_z_after": 3.96995,
+      "tensor_err": null,
+      "usd_notice_events_25_steps": 28,
+      "usd_moved": true,
+      "fabric_moved": true
+    },
+    "T2_fabric_mode_play": {
+      "settings": {
+        "updateToUsd": false,
+        "fabricEnabled": true,
+        "omni_physx_fabric": true
+      },
+      "usd_z_before": 5.0,
+      "usd_z_after": 5.0,
+      "fabric_z_before": 5.0,
+      "fabric_z_after": 3.81462,
+      "tensor_z_after": 3.81462,
+      "usd_notice_events_25_steps": 0,
+      "usd_z_after_save_to_usd": 3.81462,
+      "usd_notice_events_on_save_to_usd": 7,
+      "usd_frozen_during_play": true,
+      "fabric_moved": true,
+      "save_to_usd_synced": true
+    },
+    "T3_isolated_physx_play": {
+      "settings": {
+        "updateToUsd": false,
+        "fabricEnabled": false
+      },
+      "usd_z_before": 5.0,
+      "usd_z_after": 5.0,
+      "fabric_z_before": 5.0,
+      "fabric_z_after": 5.0,
+      "tensor_z_after": 3.96995,
+      "tensor_err": null,
+      "usd_frozen": true,
+      "fabric_frozen": true,
+      "tensor_moved": true
+    },
+    "T4_gpu_suppress_readback_vs_updateToUsd": {
+      "settings": {
+        "gpuDynamics": true,
+        "suppressReadback": true,
+        "updateToUsd": true,
+        "fabricEnabled": false
+      },
+      "usd_z_before": 5.0,
+      "usd_z_after": 5.0,
+      "fabric_z_after": 5.0,
+      "tensor_gpu_z_after": 3.81462,
+      "tensor_err": null,
+      "usd_notice_events_25_steps": 0,
+      "readback_blocked_usd_write": true,
+      "tensor_gpu_moved": true
+    },
+    "T5_timeline_pause_and_resetOnStop": {
+      "z_at_pause": 4.31058,
+      "z_after_pause_12_updates": 4.31058,
+      "pause_held_pose": true,
+      "z_after_stop_resetOnStop_False": 4.31058,
+      "stop_kept_pose_when_reset_false": true,
+      "z_before_stop_resetOnStop_True": 4.31058,
+      "z_after_stop_resetOnStop_True": 5.0,
+      "stop_restored_initial_when_reset_true": true
+    },
+    "T6_usd_to_fabric_delayed_sync": {
+      "idle_10_frames_usd_notices": 0,
+      "usd_notices_on_single_edit": 1,
+      "fabric_z_immediately_after_usd_edit_before_sync": 5.0,
+      "fabric_z_after_SynchronizeToFabric": 9.0,
+      "delayed_sync_confirmed": true
+    },
+    "T7_render_gate_step": {
+      "steps": 30,
+      "elapsed_ms_render_False": 12.58,
+      "elapsed_ms_render_True": 165.47,
+      "tensor_z_after_30_render_False": 3.5612,
+      "fabric_z_after_30_render_False": 3.5612,
+      "tensor_z_after_60_render_True": -0.32192,
+      "fabric_z_after_60_render_True": -0.32192,
+      "physics_advanced_without_render": true
+    },
+    "T8_timesampled_usd_to_fabric": {
+      "fabric_z_at_t0": 1.0,
+      "fabric_z_at_t0_5s": 6.0,
+      "usd_notices_during_time_scrub": 0,
+      "timesample_updated_fabric_without_usd_edit": true
+    },
+    "T9_gpu_fabric_interop_with_suppress_readback": {
+      "settings": {
+        "gpuDynamics": true,
+        "suppressReadback": true,
+        "fabricEnabled": true,
+        "fabricUseGPUInterop": true,
+        "updateToUsd": false
+      },
+      "usd_z_before": 5.0,
+      "usd_z_after": 5.0,
+      "fabric_z_after": 3.81462,
+      "tensor_gpu_z_after": 3.81462,
+      "tensor_err": null,
+      "usd_notice_events_25_steps": 0,
+      "usd_frozen": true,
+      "fabric_moved_under_suppress_readback": true,
+      "tensor_gpu_moved": true
+    }
+  }
+}
