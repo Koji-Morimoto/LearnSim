@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Isaac Sim 1 コマ検証ハンズオン（Hands-on）</title>
+<style>
+:root {
+  --bg: #ffffff;
+  --surface: #f8fafc;
+  --surface-2: #f1f5f9;
+  --text: #1e293b;
+  --text-strong: #0f172a;
+  --muted: #64748b;
+  --border: #cbd5e1;
+  --border-light: #e2e8f0;
+
+  --c1: #2563eb; --c1-bg: #dbeafe; /* 青 */
+  --c2: #059669; --c2-bg: #d1fae5; /* 緑 */
+  --c3: #d97706; --c3-bg: #fef3c7; /* 橙 */
+  --c4: #7c3aed; --c4-bg: #ede9fe; /* 紫 */
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  font-family: "Segoe UI", "Hiragino Kaku Gothic ProN", "Yu Gothic UI", Meiryo, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.75;
+}
+
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(255, 255, 255, 0.94);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--border-light);
+  padding: 0.65rem 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+.topbar-title {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  font-weight: 700;
+  color: var(--text-strong);
+  font-size: 0.96rem;
+}
+.doc-type-pill {
+  display: inline-block;
+  padding: 0.12rem 0.6rem;
+  border-radius: 999px;
+  background: var(--c2-bg);
+  color: var(--c2);
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+.nav-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.35rem 0.85rem;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text-strong);
+  text-decoration: none;
+  font-size: 0.84rem;
+  font-weight: 600;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+.nav-btn:hover { background: var(--c1-bg); border-color: var(--c1); color: var(--c1); }
+
+.page-layout {
+  max-width: 1360px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 240px minmax(0, 1fr);
+  gap: 2.2rem;
+  padding: 2rem 1.5rem 5rem;
+}
+@media (max-width: 1020px) {
+  .page-layout { grid-template-columns: 1fr; }
+  .toc-rail { display: none; }
+}
+
+.toc-rail {
+  position: sticky;
+  top: 4.4rem;
+  align-self: start;
+  max-height: calc(100vh - 5.5rem);
+  overflow-y: auto;
+}
+.toc-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+  margin: 0 0 0.6rem;
+}
+.toc ul { list-style: none; margin: 0; padding: 0; }
+.toc li { margin: 0.18rem 0; }
+.toc a {
+  display: block;
+  padding: 0.3rem 0.65rem;
+  border-left: 2px solid var(--border-light);
+  color: var(--muted);
+  text-decoration: none;
+  font-size: 0.84rem;
+  line-height: 1.4;
+  transition: color 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+}
+.toc a:hover { color: var(--text-strong); border-left-color: var(--border); }
+.toc a.is-current {
+  color: var(--c2);
+  border-left-color: var(--c2);
+  background: var(--c2-bg);
+  font-weight: 700;
+  border-radius: 0 6px 6px 0;
+}
+
+.prose { max-width: 68ch; line-height: 1.78; color: var(--text); }
+.hero { margin-bottom: 2.2rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--border-light); }
+.hero h1 { margin: 0 0 0.65rem; font-size: 1.88rem; line-height: 1.3; color: var(--text-strong); }
+.hero-lead { max-width: 68ch; color: var(--muted); font-size: 1rem; margin: 0; }
+
+section { scroll-margin-top: 4.5rem; }
+h2 {
+  margin-top: 3rem;
+  margin-bottom: 0.7rem;
+  font-size: 1.4rem;
+  color: var(--text-strong);
+  padding-bottom: 0.35rem;
+  border-bottom: 2px solid var(--border-light);
+}
+h3 { margin-top: 1.8rem; margin-bottom: 0.45rem; font-size: 1.06rem; color: var(--text-strong); }
+p { margin-top: 0; margin-bottom: 1rem; }
+
+.ref-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.4em;
+  height: 1.4em;
+  padding: 0 0.3em;
+  border-radius: 999px;
+  font-size: 0.8em;
+  font-weight: 700;
+  color: #fff;
+  background: var(--c1);
+  cursor: pointer;
+  vertical-align: 0.06em;
+  margin-right: 0.2em;
+  user-select: none;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
+}
+.ref-badge[data-color="1"] { background: var(--c1); }
+.ref-badge[data-color="2"] { background: var(--c2); }
+.ref-badge[data-color="3"] { background: var(--c3); }
+.ref-badge[data-color="4"] { background: var(--c4); }
+
+.ui-chip {
+  display: inline-block;
+  padding: 0.05em 0.48em;
+  border-radius: 6px;
+  border: 1px solid #94a3b8;
+  background: #f1f5f9;
+  font-weight: 600;
+  font-size: 0.9em;
+  color: #0f172a;
+}
+.code-chip {
+  display: inline-block;
+  padding: 0.04em 0.38em;
+  border-radius: 4px;
+  border: 1px solid #cbd5e1;
+  background: #f8fafc;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.88em;
+  color: #0f172a;
+}
+
+[data-ref-scope].is-dimming [data-ref]:not(.is-active),
+[data-ref-scope].is-dimming .dim-candidate:not(.is-active) {
+  opacity: 0.28;
+  transition: opacity 0.15s ease;
+}
+[data-ref].is-active {
+  outline: 2px solid var(--c1);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.2);
+}
+[data-ref][data-color="2"].is-active { outline-color: var(--c2); box-shadow: 0 0 0 4px rgba(5, 150, 105, 0.22); }
+[data-ref][data-color="3"].is-active { outline-color: var(--c3); box-shadow: 0 0 0 4px rgba(217, 119, 6, 0.22); }
+[data-ref][data-color="4"].is-active { outline-color: var(--c4); box-shadow: 0 0 0 4px rgba(124, 58, 237, 0.22); }
+
+@keyframes ref-pulse {
+  0%   { box-shadow: 0 0 0 0 rgba(5, 150, 105, 0.55); }
+  100% { box-shadow: 0 0 0 12px rgba(5, 150, 105, 0); }
+}
+.is-pulsing { animation: ref-pulse 0.8s ease-out 1; }
+
+.code-block {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.83rem;
+  background: #0f172a;
+  color: #e2e8f0;
+  border-radius: 10px;
+  padding: 0.75rem 0;
+  overflow-x: auto;
+  margin: 0.8rem 0 1.2rem;
+}
+.code-line {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.14rem 1rem;
+  white-space: pre;
+}
+.code-line.is-muted { opacity: 0.45; }
+.code-line.is-focus[data-color="1"] { background: rgba(37, 99, 235, 0.26); border-left: 3px solid var(--c1); }
+.code-line.is-focus[data-color="2"] { background: rgba(5, 150, 105, 0.26); border-left: 3px solid var(--c2); }
+.code-line.is-focus[data-color="3"] { background: rgba(217, 119, 6, 0.26); border-left: 3px solid var(--c3); }
+.code-line.is-focus[data-color="4"] { background: rgba(124, 58, 237, 0.26); border-left: 3px solid var(--c4); }
+
+.output-panel {
+  background: #0b1220;
+  color: #e2e8f0;
+  border-radius: 10px;
+  border: 1px solid #334155;
+  padding: 0.8rem 0;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.81rem;
+  overflow-x: auto;
+  margin: 0.8rem 0 1.2rem;
+}
+.output-caption {
+  padding: 0 1rem 0.55rem;
+  margin-bottom: 0.45rem;
+  border-bottom: 1px solid #1e293b;
+  font-family: "Segoe UI", "Yu Gothic UI", sans-serif;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #94a3b8;
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+.out-line { padding: 0.12rem 1rem; white-space: pre; display: flex; align-items: center; gap: 0.5rem; }
+.out-line.diff-del { background: rgba(220, 38, 38, 0.24); border-left: 3px solid #f87171; color: #fecaca; }
+.out-line.diff-add { background: rgba(22, 163, 74, 0.24); border-left: 3px solid #4ade80; color: #bbf7d0; }
+.out-line.diff-same { opacity: 0.6; }
+
+.table-wrap { overflow-x: auto; margin: 0.9rem 0 1.5rem; border: 1px solid var(--border-light); border-radius: 10px; }
+table.ergo-table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+table.ergo-table thead th {
+  position: sticky;
+  top: 0;
+  background: var(--surface);
+  border-bottom: 2px solid var(--border);
+  text-align: left;
+  padding: 0.6rem 0.8rem;
+  color: var(--text-strong);
+}
+table.ergo-table tbody tr { transition: background 0.12s ease; }
+table.ergo-table tbody tr:hover { background: #ecfdf5; }
+table.ergo-table td { padding: 0.55rem 0.8rem; border-bottom: 1px solid var(--border-light); }
+table.ergo-table td.num, table.ergo-table th.num { text-align: right; font-variant-numeric: tabular-nums; }
+
+.check-box {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--c2);
+  border-radius: 0 10px 10px 0;
+  padding: 0.8rem 1rem;
+  margin: 0.9rem 0 1.4rem;
+  max-width: 68ch;
+  font-size: 0.92rem;
+}
+.check-box ul { margin: 0.4rem 0 0; padding-left: 1.2rem; }
+.check-box li { margin: 0.25rem 0; }
+
+.split-view {
+  display: grid;
+  grid-template-columns: minmax(0, 56ch) minmax(360px, 1fr);
+  gap: 1.6rem;
+  align-items: start;
+  margin: 1rem 0 1.8rem;
+}
+.split-visual { position: sticky; top: 4.5rem; }
+@media (max-width: 1120px) {
+  .split-view { grid-template-columns: 1fr; }
+  .split-visual { position: static; }
+}
+
+.cmd-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 0.9rem 1.1rem;
+  margin: 0.9rem 0 1.3rem;
+}
+.cmd-label { font-size: 0.82rem; font-weight: 700; color: var(--text-strong); margin-bottom: 0.35rem; }
+
+#ref-return-btn {
+  position: fixed;
+  right: 1.25rem;
+  bottom: 1.25rem;
+  z-index: 9999;
+  display: none;
+  padding: 0.55rem 0.95rem;
+  border-radius: 999px;
+  border: 1px solid #1e293b;
+  background: #0f172a;
+  color: #fff;
+  font-size: 0.84rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.25);
+}
+#ref-return-btn.is-visible { display: inline-flex; align-items: center; gap: 0.4rem; }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-title">
+    <span class="doc-type-pill">ハンズオン（Hands-on）</span>
+    <span>Isaac Sim 1 コマ検証ハンズオン</span>
+  </div>
+  <nav>
+    <a class="nav-btn" href="explanation_backend_architecture.html">← 原理の解説ページへ戻る</a>
+  </nav>
+</header>
+
+<div class="page-layout">
+  <aside class="toc-rail">
+    <p class="toc-label">実験ステップ</p>
+    <nav class="toc">
+      <ul>
+        <li><a href="#sec-setup">準備と起動コマンド</a></li>
+        <li><a href="#sec-exp1">実験 1：USD vs Fabric のズレ</a></li>
+        <li><a href="#sec-exp2">実験 2：1F 遅れ &amp; 2 update 遅れ</a></li>
+        <li><a href="#sec-exp3">実験 3：Newton 0F &amp; auto 同期</a></li>
+        <li><a href="#sec-exp4">実験 4：GPU 非同期と同期時間</a></li>
+      </ul>
+    </nav>
+  </aside>
+
+  <main>
+    <div class="hero">
+      <h1>Isaac Sim 1 コマ検証ハンズオン</h1>
+      <p class="hero-lead">
+        同梱スクリプト <span class="code-chip">verify_backend_lag_step_by_step.py</span> を手元の Isaac Sim 6.2.0 で動かし、<strong><span class="ui-chip">Enter</span> キーで 1 コマずつ止めながら</strong>、<span class="code-chip">Viewport</span> の絵とコンソールの数値（USD Stage / Fabric / PhysX / Newton）を直接見比べる実習ガイドです。背景原理の詳細は <a href="explanation_backend_architecture.html">解説ページ</a> を参照してください。
+      </p>
+    </div>
+
+    <!-- =================================================================== -->
+    <!-- 準備と起動コマンド -->
+    <!-- =================================================================== -->
+    <section id="sec-setup">
+      <h2>準備と起動コマンド</h2>
+      <div class="prose">
+        <p>
+          スクリプトは <span class="code-chip">C:\isaacsim-6.2.0\tools\myext\sim_app_launcher.py</span> 経由で必須設定（HUD FPS 表示・自作拡張有効化・UTF-8 コンソール）と <span class="code-chip">omni.physx.fabric</span>・<span class="code-chip">myext.robot.geometric_newton</span> を自動ロードします。
+        </p>
+      </div>
+
+      <div class="cmd-card" data-ref-scope data-ref-group="launch-cmds">
+        <div class="cmd-label">実行モード別のコマンド（PowerShell / コマンドプロンプト）</div>
+        <div class="code-block" id="cmd-list" style="margin-bottom:0.6rem;">
+          <div class="code-line is-focus" data-ref="cmd-gui" data-color="1" data-ref-role="target" tabindex="0"><span class="ref-badge" data-color="1">1</span>.\run_verify.bat</div>
+          <div class="code-line is-focus" data-ref="cmd-one" data-color="2" data-ref-role="target" tabindex="0"><span class="ref-badge" data-color="2">2</span>.\run_verify.bat --exp 2</div>
+          <div class="code-line is-focus" data-ref="cmd-auto" data-color="3" data-ref-role="target" tabindex="0"><span class="ref-badge" data-color="3">3</span>.\run_verify.bat --headless --auto</div>
+        </div>
+        <div class="prose" style="max-width:none; font-size:0.88rem; margin:0;">
+          <p style="margin-bottom:0;">
+            <span class="ref-badge" data-ref="cmd-gui" data-color="1" data-ref-role="source" tabindex="0">1</span><span class="code-chip" data-exact-target="cmd-list">.\run_verify.bat</span>（既定）：GUI を開き、各コマで <span class="ui-chip">Enter</span> 待ちしながら Viewport とコンソールを見比べます。
+            <span class="ref-badge" data-ref="cmd-one" data-color="2" data-ref-role="source" tabindex="0">2</span><span class="code-chip" data-exact-target="cmd-list">--exp 2</span>：実験 1〜4 のうち指定番号だけ実行します。
+            <span class="ref-badge" data-ref="cmd-auto" data-color="3" data-ref-role="source" tabindex="0">3</span><span class="code-chip" data-exact-target="cmd-list">--headless --auto</span>：画面なし・自動進行で全アサーションを一括確認します。
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- =================================================================== -->
+    <!-- 実験 1 -->
+    <!-- =================================================================== -->
+    <section id="sec-exp1">
+      <h2>実験 1：USD Stage と Fabric のズレを目撃する</h2>
+
+      <div class="split-view" data-ref-scope data-ref-group="exp1-group">
+        <div class="prose">
+          <p>
+            <span class="code-chip">.\run_verify.bat --exp 1</span> を実行します。同じ 1 つの Prim に対して <span class="code-chip">USD Stage</span> と <span class="code-chip">Fabric</span> が別々の値を持つ瞬間を 2 パターン確認します。
+          </p>
+          <p>
+            <span class="ref-badge" data-ref="e1-a" data-color="1" data-ref-role="source" tabindex="0">1</span>
+            <strong>実験 1-A（動的剛体の重力落下）</strong>：<span class="code-chip">omni.physx.fabric</span> 有効状態で <span class="ui-chip">Play</span> を押すと、Viewport 上の青い箱 <span class="code-chip" data-exact-target="exp1-out">/World/DynamicCube</span> は重力で落下して <span class="code-chip">Fabric Z</span> が <span class="code-chip" data-exact-target="exp1-out">0.8705</span> m まで下がりますが、<span class="code-chip">USD Stage Z</span> は初期値 <span class="code-chip" data-exact-target="exp1-out">1.5000</span> m のまま 1 ミリも動きません。
+          </p>
+          <p>
+            <span class="ref-badge" data-ref="e1-b" data-color="2" data-ref-role="source" tabindex="0">2</span>
+            <strong>実験 1-B（ロボットの Fabric のみ更新）</strong>：<span class="code-chip">write_target="fabric"</span> で <span class="code-chip">set_dof_positions(q_hit)</span> を呼んだ直後、<span class="code-chip" data-exact-target="exp1-out">wrist_1_link</span> は <span class="code-chip">Fabric</span> と <span class="code-chip">USD Stage</span> の間で <span class="code-chip" data-exact-target="exp1-out">1.5602 m</span> もズレた状態になります。
+          </p>
+
+          <div class="check-box">
+            <strong>自分の目で確認するチェックポイント</strong>
+            <ul>
+              <li>実験 1-A の停止時に Viewport の青い箱が下がっているのに、コンソールの USD Stage Z が 1.5000 のままであること。</li>
+              <li>実験 1-B で 1 回 <span class="code-chip">app.update()</span> して Viewport のロボットが動いた後も、USD Stage の値は旧姿勢のまま残ること。</li>
+            </ul>
+          </div>
+          <p style="font-size:0.86rem; color:var(--muted);">
+            原理の詳細：<a href="explanation_backend_architecture.html#sec-layer1">解説ページ 第 1 層（Source of Truth と Fabric）</a>
+          </p>
+        </div>
+
+        <div class="split-visual">
+          <div class="output-panel" id="exp1-out">
+            <div class="output-caption">
+              <span>実機計測出力（Isaac Sim 6.2.0 / RTX 3060）</span>
+              <span>--exp 1</span>
+            </div>
+            <div class="out-line diff-same">[1-A] Play=ON 中の動的剛体 (/World/DynamicCube) の重力落下:</div>
+            <div class="out-line diff-same">  コマ        | USD Stage Z [m] | Fabric Z [m] | 差 (USD - Fabric)</div>
+            <div class="out-line diff-same">  Play 直後   |          1.5000 |       1.4591 |            0.0409</div>
+            <div class="out-line diff-same">  +5 update   |          1.5000 |       1.3201 |            0.1799</div>
+            <div class="out-line diff-add" data-ref="e1-a" data-color="1" data-ref-role="target" tabindex="0"><span class="ref-badge" data-color="1">1</span>+15 update  |          1.5000 |       0.8705 |            0.6295</div>
+            <div class="out-line diff-same"> </div>
+            <div class="out-line diff-same">[1-B] write_target='fabric' で set_dof_positions(q_hit) 直後:</div>
+            <div class="out-line diff-del">  USD Stage wrist_1_link : [-0.0, 0.1742, 1.365]</div>
+            <div class="out-line diff-add" data-ref="e1-b" data-color="2" data-ref-role="target" tabindex="0"><span class="ref-badge" data-color="2">2</span>Fabric    wrist_1_link : [0.9939, 0.5482, 0.2219]  (差: 1.5602 m)</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =================================================================== -->
+    <!-- 実験 2 -->
+    <!-- =================================================================== -->
+    <section id="sec-exp2">
+      <h2>実験 2：overlap_shape（1F 遅れ）と ContactReport（2 update 遅れ）</h2>
+
+      <div class="split-view" data-ref-scope data-ref-group="exp2-group">
+        <div class="prose">
+          <p>
+            <span class="code-chip">.\run_verify.bat --exp 2</span> を実行します。同じロボットを 1 コマずつ進めて、PhysX の 2 種類の遅延と「初回だけでなく毎回遅れること」を自分の目で確認します。
+          </p>
+          <p>
+            <span class="ref-badge" data-ref="e2-f0" data-color="3" data-ref-role="source" tabindex="0">1</span>
+            <strong>2-A Frame 0（<span class="code-chip">app.update()</span> 前）</strong>：<span class="code-chip">Fabric</span> だけ自己干渉姿勢 <span class="code-chip">q_self</span> へ更新した直後、PhysX <span class="code-chip" data-exact-target="exp2-out">overlap_shape</span> は動いていない根元相手の <span class="code-chip" data-exact-target="exp2-out">2/5 組</span> しか見つけられず、両方大きく動いた <span class="code-chip">upper_arm_link</span> 対 <span class="code-chip">wrist_1..3</span> の 3 組を見逃します。
+          </p>
+          <p>
+            <span class="ref-badge" data-ref="e2-f1" data-color="2" data-ref-role="source" tabindex="0">2</span>
+            <strong>2-A Frame +1（<span class="code-chip">app.update()</span> 1 回後）と再ジャンプ</strong>：<span class="code-chip">app.update()</span> を 1 回呼んで BVH が更新されると <span class="code-chip" data-exact-target="exp2-out">5/5 組</span> すべて検出されます。さらに元の姿勢へ戻して 2 回目のジャンプを行っても再び <span class="code-chip" data-exact-target="exp2-out">Frame 0 = 2/5 組</span> となり、初回限定ではない定常 1 フレーム遅延であることを確認できます。
+          </p>
+          <p>
+            <span class="ref-badge" data-ref="e2-cr1" data-color="4" data-ref-role="source" tabindex="0">3</span>
+            <strong>2-B Frame +1（kinematic ContactReport）</strong>：Viewport 上ではロボットが赤い障害物にめり込んで見えるのに、1 回目の衝突検出は移動前位置で走ったため <span class="code-chip" data-exact-target="exp2-out">ContactReport penetrating : []</span>（空）になります。
+          </p>
+          <p>
+            <span class="ref-badge" data-ref="e2-cr2" data-color="1" data-ref-role="source" tabindex="0">4</span>
+            <strong>2-B Frame +2（<span class="code-chip">app.update()</span> 2 回目）</strong>：2 回目の更新でようやく <span class="code-chip" data-exact-target="exp2-out">['forearm_link', 'wrist_1_link', 'wrist_2_link', 'wrist_3_link']</span> が届きます。
+          </p>
+
+          <p style="font-size:0.86rem; color:var(--muted);">
+            原理の詳細：<a href="explanation_backend_architecture.html#sec-layer3">解説ページ 第 3 層（1F / 2 update / 0F 遅延の因果）</a>
+          </p>
+        </div>
+
+        <div class="split-visual">
+          <div class="output-panel" id="exp2-out">
+            <div class="output-caption">
+              <span>実機計測出力（Isaac Sim 6.2.0 / RTX 3060）</span>
+              <span>--exp 2</span>
+            </div>
+            <div class="out-line diff-same">[2-A] Play=ON × Fabric のみ更新 (q_safe -> q_self):</div>
+            <div class="out-line diff-del" data-ref="e2-f0" data-color="3" data-ref-role="target" tabindex="0"><span class="ref-badge" data-color="3">1</span>Frame 0  PhysX overlap_shape : 2/5 組 -> [('base_link','forearm_link'), ('forearm_link','shoulder_link')]</div>
+            <div class="out-line diff-add">  Frame 0  Newton check        : 5/5 組 (全組即検出)</div>
+            <div class="out-line diff-add" data-ref="e2-f1" data-color="2" data-ref-role="target" tabindex="0"><span class="ref-badge" data-color="2">2</span>Frame +1 PhysX overlap_shape : 5/5 組  /  再ジャンプ 2回目も Frame 0 = 2/5 組 -> Frame +1 = 5/5 組</div>
+            <div class="out-line diff-same"> </div>
+            <div class="out-line diff-same">[2-B] Play=ON × collision_mode='kinematic' ContactReport:</div>
+            <div class="out-line diff-del">  Frame 0  (update 0回) ContactReport penetrating : []</div>
+            <div class="out-line diff-del" data-ref="e2-cr1" data-color="4" data-ref-role="target" tabindex="0"><span class="ref-badge" data-color="4">3</span>Frame +1 (update 1回) ContactReport penetrating : []  ← 画面はめり込み済みだがまだ空!</div>
+            <div class="out-line diff-add" data-ref="e2-cr2" data-color="1" data-ref-role="target" tabindex="0"><span class="ref-badge" data-color="1">4</span>Frame +2 (update 2回) ContactReport penetrating : ['forearm_link', 'wrist_1_link', 'wrist_2_link', 'wrist_3_link']</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =================================================================== -->
+    <!-- 実験 3 -->
+    <!-- =================================================================== -->
+    <section id="sec-exp3">
+      <h2>実験 3：Newton の 0 フレーム遅延 &amp; use_fabric="auto" の切り分け</h2>
+
+      <div class="split-view" data-ref-scope data-ref-group="exp3-group">
+        <div class="prose">
+          <p>
+            <span class="code-chip">.\run_verify.bat --exp 3</span> を実行します。Newton が <span class="code-chip">flush_to_usd()</span> も <span class="code-chip">app.update()</span> も挟まずに 0 フレーム遅延で距離まで返すことと、障害物同期の <span class="code-chip">use_fabric="auto"</span> の意味を確かめます。
+          </p>
+          <p>
+            <span class="ref-badge" data-ref="e3-a" data-color="2" data-ref-role="source" tabindex="0">1</span>
+            <strong>実験 3-A（Newton Frame 0 自己干渉）</strong>：<span class="code-chip">write_target="fabric"</span> のまま <span class="code-chip">app.update()</span> 前に 5/5 組すべてと負の <span class="code-chip" data-exact-target="exp3-out">separation</span>（最大めり込み <span class="code-chip" data-exact-target="exp3-out">-0.02783 m</span>）が返ります。
+          </p>
+          <p>
+            <span class="ref-badge" data-ref="e3-b" data-color="3" data-ref-role="source" tabindex="0">2</span>
+            <strong>実験 3-B（静的障害物を USD で動かした直後）</strong>：Play=ON 中に静的障害物 <span class="code-chip" data-exact-target="exp3-out">/World/MovingObstacle</span> を <span class="code-chip">xformOp</span> で手先へ動かした直後（<span class="code-chip">app.update()</span> 前）は Fabric が古いため、<span class="code-chip" data-exact-target="exp3-out">use_fabric=True</span> は <span class="code-chip" data-exact-target="exp3-out">0 件</span> と見逃します。
+          </p>
+          <p>
+            <span class="ref-badge" data-ref="e3-c" data-color="1" data-ref-role="source" tabindex="0">3</span>
+            同じ瞬間でも <span class="code-chip" data-exact-target="exp3-out">use_fabric='auto'</span> は「静的障害物は USD Stage から読む」と自動判別するため、<span class="code-chip" data-exact-target="exp3-out">3 件</span>（最深 <span class="code-chip" data-exact-target="exp3-out">-0.12007</span> m）を 0 フレーム遅延で検出します。
+          </p>
+        </div>
+
+        <div class="split-visual">
+          <div class="output-panel" id="exp3-out">
+            <div class="output-caption">
+              <span>実機計測出力（Isaac Sim 6.2.0 / RTX 3060）</span>
+              <span>--exp 3</span>
+            </div>
+            <div class="out-line diff-same">[3-A] Newton Frame 0 自己干渉（flush_to_usd なし・update 前）:</div>
+            <div class="out-line diff-add">  - base_link        &lt;-&gt; forearm_link     | separation = -0.01429 m</div>
+            <div class="out-line diff-add">  - forearm_link     &lt;-&gt; shoulder_link    | separation = -0.02039 m</div>
+            <div class="out-line diff-add">  - upper_arm_link   &lt;-&gt; wrist_1_link     | separation = -0.01813 m</div>
+            <div class="out-line diff-add">  - upper_arm_link   &lt;-&gt; wrist_2_link     | separation = -0.00515 m</div>
+            <div class="out-line diff-add" data-ref="e3-a" data-color="2" data-ref-role="target" tabindex="0"><span class="ref-badge" data-color="2">1</span>- upper_arm_link   &lt;-&gt; wrist_3_link     | separation = -0.02783 m</div>
+            <div class="out-line diff-same"> </div>
+            <div class="out-line diff-same">[3-B] /World/MovingObstacle を USD で移動した直後（update 前）:</div>
+            <div class="out-line diff-del" data-ref="e3-b" data-color="3" data-ref-role="target" tabindex="0"><span class="ref-badge" data-color="3">2</span>use_fabric=True  (古い Fabric を読む) : 0 件 -> []</div>
+            <div class="out-line diff-add" data-ref="e3-c" data-color="1" data-ref-role="target" tabindex="0"><span class="ref-badge" data-color="1">3</span>use_fabric='auto' (静的は USD を読む) : 3 件 -> [('wrist_1_link', -0.05021), ('wrist_2_link', -0.0714), ('wrist_3_link', -0.12007)]</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =================================================================== -->
+    <!-- 実験 4 -->
+    <!-- =================================================================== -->
+    <section id="sec-exp4">
+      <h2>実験 4：GPU 非同期実行（wp.launch）と wp.synchronize_device() の実測</h2>
+
+      <div class="split-view" data-ref-scope data-ref-group="exp4-group">
+        <div class="prose">
+          <p>
+            <span class="code-chip">.\run_verify.bat --exp 4</span> を実行します。GPU 上で 100 万要素 × 400 反復の計算カーネルを投げ、Python へ制御が返るまでの時間と、実際に GPU が計算し終えるまでの時間をストップウォッチで分離して測定します。
+          </p>
+          <p>
+            <span class="ref-badge" data-ref="e4-l" data-color="3" data-ref-role="source" tabindex="0">1</span>
+            <span class="code-chip" data-exact-target="exp4-out">wp.launch()</span> 自体は GPU キューへ命令を積むだけなので <span class="code-chip" data-exact-target="exp4-out">0.053 ms</span> で即座に Python へ戻ります（この瞬間、GPU はまだ計算途中）。
+          </p>
+          <p>
+            <span class="ref-badge" data-ref="e4-s" data-color="1" data-ref-role="source" tabindex="0">2</span>
+            直後の <span class="code-chip" data-exact-target="exp4-out">wp.synchronize_device()</span> で実際に GPU 計算が終わるまで <span class="code-chip" data-exact-target="exp4-out">3.171 ms</span>（約 60 倍）待機します。この差こそが、<span class="code-chip">GeometricGpuFabricWriter</span> で同期を外すと書きかけの <span class="code-chip">Fabric</span> を <span class="code-chip">Hydra</span> が読んでしまう直接の証拠です。
+          </p>
+
+          <p style="font-size:0.86rem; color:var(--muted);">
+            原理の詳細：<a href="explanation_backend_architecture.html#sec-layer1">解説ページ 第 1 層（wp.synchronize_device の役割）</a>
+          </p>
+        </div>
+
+        <div class="split-visual">
+          <div class="output-panel" id="exp4-out">
+            <div class="output-caption">
+              <span>実機計測出力（Isaac Sim 6.2.0 / RTX 3060）</span>
+              <span>--exp 4</span>
+            </div>
+            <div class="out-line diff-same">  Warp device: cuda:0</div>
+            <div class="out-line diff-del" data-ref="e4-l" data-color="3" data-ref-role="target" tabindex="0"><span class="ref-badge" data-color="3">1</span>wp.launch() が Python へ戻るまでの時間 (非同期キュー投入のみ) :    0.053 ms</div>
+            <div class="out-line diff-add" data-ref="e4-s" data-color="1" data-ref-role="target" tabindex="0"><span class="ref-badge" data-color="1">2</span>直後の wp.synchronize_device() が完了を待った実計算時間       :    3.171 ms</div>
+          </div>
+
+          <div class="table-wrap" style="margin-top:0.8rem;">
+            <table class="ergo-table">
+              <thead>
+                <tr>
+                  <th>計測区間</th>
+                  <th class="num">実測時間 [ms]</th>
+                  <th>GPU の状態</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><span class="code-chip">wp.launch()</span> 返却時</td>
+                  <td class="num">0.053</td>
+                  <td>計算中（書き込み未完了）</td>
+                </tr>
+                <tr>
+                  <td><span class="code-chip">wp.synchronize_device()</span> 完了時</td>
+                  <td class="num">3.171</td>
+                  <td>全スレッド書き込み完了</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<svg id="ref-connector-layer" style="position:fixed;inset:0;width:100vw;height:100vh;pointer-events:none;z-index:9990;"></svg>
+<button id="ref-return-btn" type="button">↩ 元の位置へ戻る</button>
+
+<script>
+(() => {
+  const svgLayer = document.getElementById('ref-connector-layer');
+  const returnBtn = document.getElementById('ref-return-btn');
+  let savedScrollY = null;
+
+  const isInViewport = (el) => {
+    const r = el.getBoundingClientRect();
+    return r.width > 0 && r.height > 0 &&
+           r.top >= 0 && r.bottom <= window.innerHeight &&
+           r.left >= 0 && r.right <= window.innerWidth;
+  };
+  const clearLines = () => { if (svgLayer) svgLayer.innerHTML = ''; };
+
+  const drawConnector = (fromEl, toEl) => {
+    if (!svgLayer || !isInViewport(fromEl) || !isInViewport(toEl)) return;
+    const a = fromEl.getBoundingClientRect();
+    const b = toEl.getBoundingClientRect();
+    const x1 = a.left + a.width / 2, y1 = a.top + a.height / 2;
+    const x2 = b.left + b.width / 2, y2 = b.top + b.height / 2;
+    const mx = (x1 + x2) / 2;
+    const color = getComputedStyle(fromEl).backgroundColor || '#059669';
+    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    path.setAttribute('d', `M ${x1} ${y1} C ${mx} ${y1}, ${mx} ${y2}, ${x2} ${y2}`);
+    path.setAttribute('fill', 'none');
+    path.setAttribute('stroke', color === 'rgba(0, 0, 0, 0)' ? '#059669' : color);
+    path.setAttribute('stroke-width', '2');
+    path.setAttribute('stroke-dasharray', '4 3');
+    path.setAttribute('opacity', '0.72');
+    svgLayer.appendChild(path);
+  };
+
+  const setActive = (refId, originEl) => {
+    const peers = Array.from(document.querySelectorAll(`[data-ref="${CSS.escape(refId)}"]`));
+    const scopes = new Set();
+    peers.forEach((el) => {
+      el.classList.add('is-active');
+      const sc = el.closest('[data-ref-scope]');
+      if (sc) scopes.add(sc);
+    });
+    scopes.forEach((sc) => sc.classList.add('is-dimming'));
+    clearLines();
+    if (originEl) {
+      peers.filter((el) => el !== originEl).forEach((peer) => drawConnector(originEl, peer));
+    }
+  };
+
+  const clearActive = () => {
+    document.querySelectorAll('[data-ref].is-active').forEach((el) => el.classList.remove('is-active'));
+    document.querySelectorAll('[data-ref-scope].is-dimming').forEach((sc) => sc.classList.remove('is-dimming'));
+    clearLines();
+  };
+
+  document.querySelectorAll('[data-ref]').forEach((el) => {
+    const refId = el.dataset.ref;
+    el.addEventListener('mouseenter', () => setActive(refId, el));
+    el.addEventListener('mouseleave', clearActive);
+    el.addEventListener('focus', () => setActive(refId, el));
+    el.addEventListener('blur', clearActive);
+    el.addEventListener('click', () => {
+      const peers = Array.from(document.querySelectorAll(`[data-ref="${CSS.escape(refId)}"]`)).filter((p) => p !== el);
+      if (peers.length === 0) return;
+      const target = peers.find((p) => p.dataset.refRole !== el.dataset.refRole) || peers[0];
+      if (!isInViewport(target) && returnBtn) {
+        savedScrollY = window.scrollY;
+        returnBtn.classList.add('is-visible');
+      }
+      target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      target.classList.remove('is-pulsing');
+      void target.offsetWidth;
+      target.classList.add('is-pulsing');
+    });
+  });
+
+  if (returnBtn) {
+    returnBtn.addEventListener('click', () => {
+      if (savedScrollY !== null) {
+        window.scrollTo({ top: savedScrollY, behavior: 'smooth' });
+        savedScrollY = null;
+      }
+      returnBtn.classList.remove('is-visible');
+    });
+  }
+
+  const tocLinks = Array.from(document.querySelectorAll('.toc a[href^="#"]'));
+  const sections = tocLinks.map((a) => document.querySelector(a.getAttribute('href'))).filter(Boolean);
+  if (sections.length > 0) {
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        const id = entry.target.id;
+        tocLinks.forEach((a) => a.classList.toggle('is-current', a.getAttribute('href') === `#${id}`));
+      });
+    }, { rootMargin: '-15% 0px -75% 0px' });
+    sections.forEach((sec) => observer.observe(sec));
+  }
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,1281 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Isaac Sim バックエンド原理と干渉遅延の仕組み（解説）</title>
+<style>
+:root {
+  --bg: #ffffff;
+  --surface: #f8fafc;
+  --surface-2: #f1f5f9;
+  --text: #1e293b;
+  --text-strong: #0f172a;
+  --muted: #64748b;
+  --border: #cbd5e1;
+  --border-light: #e2e8f0;
+
+  /* 1視野の標準4色（ポップアウト用） */
+  --c1: #2563eb; --c1-bg: #dbeafe; /* 青 */
+  --c2: #059669; --c2-bg: #d1fae5; /* 緑 */
+  --c3: #d97706; --c3-bg: #fef3c7; /* 橙 */
+  --c4: #7c3aed; --c4-bg: #ede9fe; /* 紫 */
+  /* 本質的複雑性の例外（data-allow-dense="true"）時のみ追加使用 */
+  --c5: #db2777; --c5-bg: #fce7f3; /* 桃 */
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  font-family: "Segoe UI", "Hiragino Kaku Gothic ProN", "Yu Gothic UI", Meiryo, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.75;
+}
+
+/* トップバー */
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(255, 255, 255, 0.94);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--border-light);
+  padding: 0.65rem 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+.topbar-title {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  font-weight: 700;
+  color: var(--text-strong);
+  font-size: 0.96rem;
+}
+.doc-type-pill {
+  display: inline-block;
+  padding: 0.12rem 0.6rem;
+  border-radius: 999px;
+  background: var(--c1-bg);
+  color: var(--c1);
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+.topbar-nav {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+.nav-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.35rem 0.85rem;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text-strong);
+  text-decoration: none;
+  font-size: 0.84rem;
+  font-weight: 600;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+.nav-btn:hover { background: var(--c1-bg); border-color: var(--c1); color: var(--c1); }
+.nav-btn.primary { background: var(--c1); border-color: var(--c1); color: #fff; }
+.nav-btn.primary:hover { background: #1d4ed8; color: #fff; }
+
+/* 全体レイアウト（左追従目次 + 本文） */
+.page-layout {
+  max-width: 1380px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 240px minmax(0, 1fr);
+  gap: 2.2rem;
+  padding: 2rem 1.5rem 5rem;
+}
+@media (max-width: 1020px) {
+  .page-layout { grid-template-columns: 1fr; }
+  .toc-rail { display: none; }
+}
+
+.toc-rail {
+  position: sticky;
+  top: 4.4rem;
+  align-self: start;
+  max-height: calc(100vh - 5.5rem);
+  overflow-y: auto;
+  padding-right: 0.5rem;
+}
+.toc-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+  margin: 0 0 0.6rem;
+}
+.toc ul { list-style: none; margin: 0; padding: 0; }
+.toc li { margin: 0.18rem 0; }
+.toc a {
+  display: block;
+  padding: 0.3rem 0.65rem;
+  border-left: 2px solid var(--border-light);
+  color: var(--muted);
+  text-decoration: none;
+  font-size: 0.84rem;
+  line-height: 1.4;
+  transition: color 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+}
+.toc a:hover { color: var(--text-strong); border-left-color: var(--border); }
+.toc a.is-current {
+  color: var(--c1);
+  border-left-color: var(--c1);
+  background: var(--c1-bg);
+  font-weight: 700;
+  border-radius: 0 6px 6px 0;
+}
+
+/* スキャン最適化: 行幅制限と非対称余白 */
+.prose { max-width: 68ch; line-height: 1.78; color: var(--text); }
+.hero { margin-bottom: 2.2rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--border-light); }
+.hero h1 { margin: 0 0 0.65rem; font-size: 1.9rem; line-height: 1.3; color: var(--text-strong); }
+.hero-lead { max-width: 68ch; color: var(--muted); font-size: 1rem; margin: 0; }
+
+section { scroll-margin-top: 4.5rem; }
+h2 {
+  margin-top: 3rem;
+  margin-bottom: 0.7rem;
+  font-size: 1.42rem;
+  color: var(--text-strong);
+  padding-bottom: 0.35rem;
+  border-bottom: 2px solid var(--border-light);
+}
+h3 {
+  margin-top: 1.9rem;
+  margin-bottom: 0.45rem;
+  font-size: 1.08rem;
+  color: var(--text-strong);
+}
+p { margin-top: 0; margin-bottom: 1rem; }
+
+/* 色＋番号バッジ */
+.ref-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.4em;
+  height: 1.4em;
+  padding: 0 0.3em;
+  border-radius: 999px;
+  font-size: 0.8em;
+  font-weight: 700;
+  color: #fff;
+  background: var(--c1);
+  cursor: pointer;
+  vertical-align: 0.06em;
+  margin-right: 0.2em;
+  user-select: none;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
+}
+.ref-badge[data-color="1"] { background: var(--c1); }
+.ref-badge[data-color="2"] { background: var(--c2); }
+.ref-badge[data-color="3"] { background: var(--c3); }
+.ref-badge[data-color="4"] { background: var(--c4); }
+.ref-badge[data-color="5"] { background: var(--c5); }
+
+/* 情報種別ごとの固定スタイル */
+.ui-chip {
+  display: inline-block;
+  padding: 0.05em 0.48em;
+  border-radius: 6px;
+  border: 1px solid #94a3b8;
+  background: #f1f5f9;
+  font-weight: 600;
+  font-size: 0.9em;
+  color: #0f172a;
+}
+.code-chip {
+  display: inline-block;
+  padding: 0.04em 0.38em;
+  border-radius: 4px;
+  border: 1px solid #cbd5e1;
+  background: #f8fafc;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.88em;
+  color: #0f172a;
+}
+
+/* スポットライト（ホバー時の周辺ディミング） */
+[data-ref-scope].is-dimming [data-ref]:not(.is-active),
+[data-ref-scope].is-dimming .dim-candidate:not(.is-active) {
+  opacity: 0.28;
+  transition: opacity 0.15s ease;
+}
+[data-ref].is-active {
+  outline: 2px solid var(--c1);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.2);
+}
+[data-ref][data-color="2"].is-active { outline-color: var(--c2); box-shadow: 0 0 0 4px rgba(5, 150, 105, 0.22); }
+[data-ref][data-color="3"].is-active { outline-color: var(--c3); box-shadow: 0 0 0 4px rgba(217, 119, 6, 0.22); }
+[data-ref][data-color="4"].is-active { outline-color: var(--c4); box-shadow: 0 0 0 4px rgba(124, 58, 237, 0.22); }
+[data-ref][data-color="5"].is-active { outline-color: var(--c5); box-shadow: 0 0 0 4px rgba(219, 39, 119, 0.22); }
+
+@keyframes ref-pulse {
+  0%   { box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.55); }
+  100% { box-shadow: 0 0 0 12px rgba(37, 99, 235, 0); }
+}
+.is-pulsing { animation: ref-pulse 0.8s ease-out 1; }
+
+/* 2カラム＋図の追従 */
+.split-view {
+  display: grid;
+  grid-template-columns: minmax(0, 62ch) minmax(340px, 1fr);
+  gap: 1.8rem;
+  align-items: start;
+  margin: 1.2rem 0 1.8rem;
+}
+.split-visual { position: sticky; top: 4.5rem; }
+@media (max-width: 1120px) {
+  .split-view { grid-template-columns: 1fr; }
+  .split-visual { position: static; }
+}
+
+/* 図パネル */
+.diagram-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.1rem 1.2rem;
+  margin: 1rem 0 1.4rem;
+}
+.diagram-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.85rem;
+  flex-wrap: wrap;
+}
+.diagram-title { font-weight: 700; font-size: 0.94rem; color: var(--text-strong); }
+.diagram-hint { font-size: 0.78rem; color: var(--muted); }
+
+/* 視覚ノードカード */
+.node-box {
+  background: #fff;
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  padding: 0.75rem 0.9rem;
+  transition: opacity 0.15s ease, box-shadow 0.15s ease;
+}
+.node-box[data-color="1"] { border-top: 4px solid var(--c1); }
+.node-box[data-color="2"] { border-top: 4px solid var(--c2); }
+.node-box[data-color="3"] { border-top: 4px solid var(--c3); }
+.node-box[data-color="4"] { border-top: 4px solid var(--c4); }
+.node-box[data-color="5"] { border-top: 4px solid var(--c5); }
+.node-head { display: flex; align-items: center; gap: 0.4rem; font-weight: 700; font-size: 0.9rem; color: var(--text-strong); margin-bottom: 0.25rem; }
+.node-sub { font-size: 0.81rem; color: var(--muted); line-height: 1.5; }
+
+/* Prerequisite 階層図 */
+.prereq-stack { display: flex; flex-direction: column; gap: 0.55rem; }
+.prereq-arrow { text-align: center; font-size: 0.8rem; color: var(--muted); font-weight: 600; }
+
+/* Bucket SoA 図 */
+.bucket-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 0.85rem; }
+.soa-row {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.78rem;
+  margin-top: 0.35rem;
+}
+.soa-name { min-width: 7.5rem; color: var(--muted); }
+.soa-cells { display: flex; gap: 2px; flex: 1; }
+.soa-cell {
+  flex: 1;
+  text-align: center;
+  padding: 0.16rem 0.25rem;
+  border-radius: 4px;
+  background: var(--surface-2);
+  border: 1px solid var(--border-light);
+  color: var(--text-strong);
+}
+
+/* 配線グリッド */
+.wiring-svg { width: 100%; height: auto; display: block; }
+
+/* タブ切替（Play=OFF vs Play=ON） */
+.tab-bar { display: inline-flex; gap: 0.35rem; background: var(--surface-2); padding: 0.25rem; border-radius: 9px; border: 1px solid var(--border-light); }
+.tab-btn {
+  border: none;
+  background: transparent;
+  padding: 0.35rem 0.85rem;
+  border-radius: 7px;
+  font-size: 0.84rem;
+  font-weight: 700;
+  color: var(--muted);
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.tab-btn.is-selected { background: #fff; color: var(--c1); box-shadow: 0 1px 4px rgba(15, 23, 42, 0.1); }
+.tab-panel { display: none; }
+.tab-panel.is-selected { display: block; }
+
+/* シーケンスレーン */
+.seq-frame {
+  border: 1.5px dashed var(--border);
+  border-radius: 10px;
+  padding: 0.85rem 1rem;
+  margin-bottom: 0.85rem;
+  background: #fff;
+}
+.seq-frame-title {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--text-strong);
+  margin-bottom: 0.55rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+.seq-step {
+  display: grid;
+  grid-template-columns: auto 130px 1fr;
+  gap: 0.65rem;
+  align-items: center;
+  padding: 0.42rem 0.6rem;
+  border-radius: 7px;
+  margin-bottom: 0.35rem;
+  background: var(--surface);
+  border: 1px solid var(--border-light);
+  font-size: 0.84rem;
+}
+@media (max-width: 680px) {
+  .seq-step { grid-template-columns: auto 1fr; }
+}
+.seq-actor {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--text-strong);
+}
+.seq-step.is-skipped { opacity: 0.5; background: #fafafa; border-style: dashed; }
+
+/* 遅延ブロック比較（3列） */
+.lag-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.9rem; margin: 1.1rem 0 1.6rem; }
+@media (max-width: 960px) { .lag-grid { grid-template-columns: 1fr; } }
+.lag-col {
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: 12px;
+  padding: 0.9rem;
+}
+.lag-col[data-color="3"] { border-top: 4px solid var(--c3); }
+.lag-col[data-color="4"] { border-top: 4px solid var(--c4); }
+.lag-col[data-color="2"] { border-top: 4px solid var(--c2); }
+.lag-col h4 { margin: 0 0 0.55rem; font-size: 0.94rem; color: var(--text-strong); display: flex; align-items: center; gap: 0.4rem; }
+.frame-box {
+  background: #fff;
+  border: 1px solid var(--border-light);
+  border-radius: 8px;
+  padding: 0.55rem 0.65rem;
+  margin-bottom: 0.5rem;
+  font-size: 0.82rem;
+}
+.frame-tag {
+  display: inline-block;
+  font-size: 0.73rem;
+  font-weight: 700;
+  padding: 0.05rem 0.45rem;
+  border-radius: 4px;
+  background: var(--surface-2);
+  color: var(--text-strong);
+  margin-bottom: 0.3rem;
+}
+.diff-del { background: #fee2e2; border-left: 3px solid #dc2626; color: #7f1d1d; padding: 0.25rem 0.45rem; border-radius: 4px; margin-top: 0.3rem; font-size: 0.8rem; }
+.diff-add { background: #dcfce7; border-left: 3px solid #16a34a; color: #14532d; padding: 0.25rem 0.45rem; border-radius: 4px; margin-top: 0.3rem; font-size: 0.8rem; }
+
+/* コードブロック（行番号参照禁止） */
+.code-block {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.83rem;
+  background: #0f172a;
+  color: #e2e8f0;
+  border-radius: 10px;
+  padding: 0.75rem 0;
+  overflow-x: auto;
+  margin: 0.9rem 0 1.2rem;
+}
+.code-line {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.14rem 1rem;
+  white-space: pre;
+}
+.code-line.is-muted { opacity: 0.42; }
+.code-line.is-focus[data-color="1"] { background: rgba(37, 99, 235, 0.26); border-left: 3px solid var(--c1); }
+.code-line.is-focus[data-color="2"] { background: rgba(5, 150, 105, 0.26); border-left: 3px solid var(--c2); }
+.code-line.is-focus[data-color="3"] { background: rgba(217, 119, 6, 0.26); border-left: 3px solid var(--c3); }
+.code-line.is-focus[data-color="4"] { background: rgba(124, 58, 237, 0.26); border-left: 3px solid var(--c4); }
+
+/* 表のスキャン最適化 */
+.table-wrap { overflow-x: auto; margin: 1rem 0 1.6rem; border: 1px solid var(--border-light); border-radius: 10px; }
+table.ergo-table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+table.ergo-table thead th {
+  position: sticky;
+  top: 0;
+  background: var(--surface);
+  border-bottom: 2px solid var(--border);
+  text-align: left;
+  padding: 0.65rem 0.8rem;
+  color: var(--text-strong);
+}
+table.ergo-table tbody tr { transition: background 0.12s ease; }
+table.ergo-table tbody tr:hover { background: #eff6ff; }
+table.ergo-table td { padding: 0.6rem 0.8rem; border-bottom: 1px solid var(--border-light); vertical-align: top; }
+table.ergo-table td.num, table.ergo-table th.num { text-align: right; font-variant-numeric: tabular-nums; }
+
+/* コールアウト */
+.callout {
+  border-left: 4px solid var(--c1);
+  background: var(--surface);
+  border-radius: 0 10px 10px 0;
+  padding: 0.85rem 1.05rem;
+  margin: 1.1rem 0 1.4rem;
+  max-width: 68ch;
+  font-size: 0.93rem;
+}
+.callout.warn { border-left-color: var(--c3); background: #fffbeb; }
+.callout.good { border-left-color: var(--c2); background: #ecfdf5; }
+.callout strong { color: var(--text-strong); }
+
+/* インライン用語プレビュー */
+.term-inline {
+  position: relative;
+  border-bottom: 1px dashed var(--muted);
+  cursor: help;
+  font-weight: 600;
+  color: var(--text-strong);
+}
+.term-card {
+  position: absolute;
+  left: 0;
+  bottom: calc(100% + 6px);
+  width: min(34ch, 82vw);
+  padding: 0.55rem 0.75rem;
+  border-radius: 8px;
+  background: #0f172a;
+  color: #f8fafc;
+  font-size: 0.8rem;
+  font-weight: 400;
+  line-height: 1.5;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.25);
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(4px);
+  transition: opacity 0.15s ease, transform 0.15s ease;
+  z-index: 9980;
+}
+.term-inline:hover .term-card, .term-inline:focus .term-card { opacity: 1; transform: translateY(0); }
+
+/* 出典リスト */
+.source-list { list-style: none; padding: 0; margin: 0.8rem 0 1.4rem; display: flex; flex-direction: column; gap: 0.55rem; max-width: 78ch; }
+.source-list li {
+  background: var(--surface);
+  border: 1px solid var(--border-light);
+  border-radius: 8px;
+  padding: 0.65rem 0.9rem;
+  font-size: 0.87rem;
+}
+.source-tag {
+  display: inline-block;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.08rem 0.45rem;
+  border-radius: 4px;
+  margin-right: 0.45rem;
+  vertical-align: 0.06em;
+}
+.source-tag.official { background: var(--c1-bg); color: var(--c1); }
+.source-tag.web { background: var(--c2-bg); color: var(--c2); }
+.source-tag.empirical { background: var(--c3-bg); color: var(--c3); }
+
+/* 戻るボタン */
+#ref-return-btn {
+  position: fixed;
+  right: 1.25rem;
+  bottom: 1.25rem;
+  z-index: 9999;
+  display: none;
+  padding: 0.55rem 0.95rem;
+  border-radius: 999px;
+  border: 1px solid #1e293b;
+  background: #0f172a;
+  color: #fff;
+  font-size: 0.84rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.25);
+}
+#ref-return-btn.is-visible { display: inline-flex; align-items: center; gap: 0.4rem; }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-title">
+    <span class="doc-type-pill">解説（Explanation）</span>
+    <span>Isaac Sim バックエンド原理と干渉遅延の仕組み</span>
+  </div>
+  <nav class="topbar-nav">
+    <a class="nav-btn primary" href="handson_verify_lag.html">ハンズオン検証ガイドへ →</a>
+  </nav>
+</header>
+
+<div class="page-layout">
+  <aside class="toc-rail">
+    <p class="toc-label">目次（前提 → 結論）</p>
+    <nav class="toc">
+      <ul>
+        <li><a href="#sec-prereq">0. 前提の依存マップ</a></li>
+        <li><a href="#sec-layer1">1. メモリ構造と Fabric・同期</a></li>
+        <li><a href="#sec-layer2">2. 描画配線とフレーム境界</a></li>
+        <li><a href="#sec-layer3">3. 1F / 2F / 0F 遅延の因果</a></li>
+        <li><a href="#sec-layer4">4. CPU-BVH vs Newton GPU</a></li>
+        <li><a href="#sec-ext">5. 拡張機能の 1 フレーム動作</a></li>
+        <li><a href="#sec-sources">6. 公式出典と実測の切り分け</a></li>
+      </ul>
+    </nav>
+  </aside>
+
+  <main>
+    <div class="hero">
+      <h1>Isaac Sim バックエンド原理と干渉遅延の仕組み</h1>
+      <p class="hero-lead">
+        「<span class="code-chip">Viewport</span> に映っている姿は真の状態なのか」「なぜ <span class="code-chip">overlap_shape</span> は 1 フレーム、<span class="code-chip">ContactReport</span> は 2 フレーム遅れるのか」「なぜ <span class="code-chip">Newton</span> は 0 フレーム遅延なのか」を、下層のメモリ構造から順番に積み上げて解説します。自分の手元で 1 コマずつ確かめる手順は <a href="handson_verify_lag.html">ハンズオン検証ガイド</a> に分離しています。
+      </p>
+    </div>
+
+    <!-- =================================================================== -->
+    <!-- 0. 前提マップ -->
+    <!-- =================================================================== -->
+    <section id="sec-prereq">
+      <h2>0. まず押さえる 4 層の前提マップ（Prerequisite）</h2>
+      <div class="split-view" data-ref-scope data-ref-group="prereq-map">
+        <div class="prose">
+          <p>
+            Isaac Sim の干渉遅延は、結果だけ読むと魔法のように見えます。しかし原因はたった 4 層の前提が下から積み上がっているだけです。
+          </p>
+          <p>
+            <span class="ref-badge" data-ref="pre-1" data-color="1" data-ref-role="source" tabindex="0">1</span>
+            <strong>第 1 層（データ置き場とメモリ）</strong>：Isaac Sim には単一の Source of Truth がなく、姿勢は <span class="code-chip" data-exact-target="prereq-diagram">USD Stage</span>・<span class="code-chip" data-exact-target="prereq-diagram">Fabric</span>・<span class="code-chip" data-exact-target="prereq-diagram">PhysX 内部ワールド</span>・<span class="code-chip" data-exact-target="prereq-diagram">Newton 空間</span> に分裂しています。
+          </p>
+          <p>
+            <span class="ref-badge" data-ref="pre-2" data-color="2" data-ref-role="source" tabindex="0">2</span>
+            <strong>第 2 層（フレーム境界と同期）</strong>：<span class="code-chip" data-exact-target="prereq-diagram">Fabric</span> への書き込みは即時通知されず、<span class="code-chip" data-exact-target="prereq-diagram">app.update()</span> のフレーム境界で初めて各エンジンへ同期されます。
+          </p>
+          <p>
+            <span class="ref-badge" data-ref="pre-3" data-color="3" data-ref-role="source" tabindex="0">3</span>
+            <strong>第 3 層（計算順序の差）</strong>：PhysX の物理ステップは「接触検知 → 位置更新」の順ですが、幾何モードの Newton は「位置確定 → 接触検知」の順で 1 回で完結します。
+          </p>
+          <p>
+            <span class="ref-badge" data-ref="pre-4" data-color="4" data-ref-role="source" tabindex="0">4</span>
+            <strong>第 4 層（空間構造と CPU/GPU）</strong>：PhysX の Scene Query 用 <span class="code-chip" data-exact-target="prereq-diagram">BVH</span> はフレームをまたいで常駐する CPU 構造であり、Newton は呼び出しのたびに GPU 上で最新配列から即座に判定します。
+          </p>
+        </div>
+
+        <div class="split-visual">
+          <div class="diagram-card" id="prereq-diagram">
+            <div class="diagram-header">
+              <span class="diagram-title">前提の依存スタック（下層 → 上層）</span>
+              <span class="diagram-hint">バッジにホバー／クリックで連動</span>
+            </div>
+            <div class="prereq-stack">
+              <div class="node-box dim-candidate" data-ref="pre-4" data-color="4" data-ref-role="target" tabindex="0">
+                <div class="node-head"><span class="ref-badge" data-color="4">4</span>CPU 常駐 BVH vs GPU 即時評価</div>
+                <div class="node-sub">Scene Query の CPU 実行と Newton CollisionPipeline の構造差</div>
+              </div>
+              <div class="prereq-arrow">▲ 上の結論は下の順序構造から生まれる</div>
+              <div class="node-box dim-candidate" data-ref="pre-3" data-color="3" data-ref-role="target" tabindex="0">
+                <div class="node-head"><span class="ref-badge" data-color="3">3</span>「接触 → 位置」vs「位置 → 接触」</div>
+                <div class="node-sub">overlap_shape 1F 遅れ・ContactReport 2 update 遅れ・Newton 0F の正体</div>
+              </div>
+              <div class="prereq-arrow">▲ 順序のズレはフレーム境界をまたぐ同期で顕在化する</div>
+              <div class="node-box dim-candidate" data-ref="pre-2" data-color="2" data-ref-role="target" tabindex="0">
+                <div class="node-head"><span class="ref-badge" data-color="2">2</span>app.update() と Play=OFF / Play=ON の境界</div>
+                <div class="node-sub">Sync In / Sync Out・IFabricHierarchy・Hydra 描画・DebugDraw の経路</div>
+              </div>
+              <div class="prereq-arrow">▲ すべての出発点は「姿勢が複数コピーに分裂している」こと</div>
+              <div class="node-box dim-candidate" data-ref="pre-1" data-color="1" data-ref-role="target" tabindex="0">
+                <div class="node-head"><span class="ref-badge" data-color="1">1</span>RAM / VRAM と 4 つの姿勢置き場</div>
+                <div class="node-sub">USD Stage・Fabric（Bucket/SoA）・PhysX 内部ワールド・Newton 空間</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =================================================================== -->
+    <!-- 1. 第 1 層：メモリ構造・Fabric・IFabricHierarchy・wp.synchronize -->
+    <!-- =================================================================== -->
+    <section id="sec-layer1">
+      <h2>1. 第 1 層：RAM / VRAM と Fabric・IFabricHierarchy・GPU 同期</h2>
+
+      <div class="prose">
+        <h3>1.1 単一の Source of Truth は存在しない</h3>
+        <p>
+          Isaac Sim では、同じ 1 つの Prim（例：<span class="code-chip">/World/UR10e/wrist_1_link</span>）の姿勢がメモリ上の複数箇所に別々のコピーとして存在します。<span class="code-chip">Viewport</span> に映っている絵は「真の状態」ではなく、直前の描画フェーズで <span class="code-chip">Hydra</span> が <span class="code-chip">Fabric</span> を撮影して描いたモニター画面にすぎません。
+        </p>
+      </div>
+
+      <div class="table-wrap">
+        <table class="ergo-table">
+          <thead>
+            <tr>
+              <th>姿勢の置き場</th>
+              <th>物理メモリ</th>
+              <th>本来の役割</th>
+              <th>主な書き込み元</th>
+              <th>主な読み取り先</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>USD Stage</strong>（<span class="code-chip">pxr.Usd</span>）</td>
+              <td>RAM（CPU）</td>
+              <td>設計図・レイヤー合成・ファイル保存のマスタ</td>
+              <td>ユーザー操作、<span class="code-chip">xformOp.Set()</span>、<span class="code-chip">flush_to_usd()</span></td>
+              <td><span class="code-chip">XformCache</span>、<span class="code-chip">Usd.Notice</span> 監視者</td>
+            </tr>
+            <tr>
+              <td><strong>Fabric</strong>（<span class="code-chip">usdrt</span>）</td>
+              <td>RAM / VRAM 2 面キャッシュ</td>
+              <td>実行中のリアルタイム中継ボード（描画・高速通信）</td>
+              <td>USD→Fabric 同期、PhysX <span class="code-chip">Sync Out</span>、<span class="code-chip">GeometricFabricWriter</span> / <span class="code-chip">GeometricGpuFabricWriter</span></td>
+              <td><strong>Hydra（Viewport）</strong>、PhysX <span class="code-chip">Sync In</span>、<span class="code-chip">sync_environment()</span></td>
+            </tr>
+            <tr>
+              <td><strong>PhysX 内部ワールド</strong>（<span class="code-chip">PxScene</span> + <span class="code-chip">BVH</span>）</td>
+              <td>CPU RAM（力学は GPU 選択可）</td>
+              <td>PhysX の力学計算と Scene Query 用空間索引</td>
+              <td><span class="code-chip">force_load_physics_from_usd()</span>、<span class="code-chip">Usd.Notice</span>、PhysX ステップ</td>
+              <td>PhysX ソルバ、<span class="code-chip">overlap_shape</span> の相手側、<span class="code-chip">ContactReport</span></td>
+            </tr>
+            <tr>
+              <td><strong>Newton 空間</strong>（<span class="code-chip">GeometricScene</span>）</td>
+              <td>VRAM（Warp 配列、CPU も可）</td>
+              <td>拡張機能専用の幾何計算・衝突判定ワールド</td>
+              <td><span class="code-chip">newton.eval_fk()</span>、<span class="code-chip">sync_environment()</span></td>
+              <td><span class="code-chip">CollisionPipeline.collide()</span>、<span class="code-chip">eval_rigid_contact_kinematics()</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout good">
+        <strong>なぜ Fabric を更新するのか（Newton や PhysX だけでは画面が動かない理由）：</strong>
+        <span class="code-chip">Newton 空間</span> の配列は純粋な計算メモリであり、画面には映りません。<span class="code-chip">Viewport</span> を動かすには、レンダラ（<span class="code-chip">Hydra</span>）が読む先である <span class="code-chip">Fabric</span>（または <span class="code-chip">USD Stage</span> 経由）へ姿勢を書き込む必要があります。
+      </div>
+
+      <div class="split-view" data-ref-scope data-ref-group="fabric-internals">
+        <div class="prose">
+          <h3>1.2 属性がバラバラな Prim を SoA で管理する Bucket 構造</h3>
+          <p>
+            <span class="ref-badge" data-ref="fab-1" data-color="1" data-ref-role="source" tabindex="0">1</span>
+            <span class="code-chip" data-exact-target="fabric-diagram">Fabric</span> は全 Prim を 1 本の配列へ混ぜるのではなく、<strong>持っている属性とタグの集合が完全に一致する Prim 同士</strong> を同じ
+            <span class="term-inline" tabindex="0">Bucket<span class="term-card" role="tooltip">同一の属性・タグ構成を持つ Prim 群をまとめた表（ECS の Archetype 相当）。属性ごとに連続配列（SoA）で保持する。</span></span>
+            にまとめ、内部の索引テーブルで <span class="code-chip" data-exact-target="fabric-diagram">Path -> (Bucket ID, idx)</span> を追跡します。属性を 1 つ追加・削除すると Prim は別の Bucket へ引っ越すため、古い配列ポインタは陳腐化します。
+          </p>
+
+          <h3>1.3 RAM と VRAM の 2 面キャッシュ（valid ビット管理）</h3>
+          <p>
+            <span class="ref-badge" data-ref="fab-2" data-color="2" data-ref-role="source" tabindex="0">2</span>
+            「CPU / GPU 共有」とは物理的に 1 つのメモリを共有する意味ではありません。<span class="code-chip" data-exact-target="fabric-diagram">Fabric</span> は各属性配列ごとに <strong>RAM 側バッファ</strong> と <strong>VRAM 側バッファ</strong> を遅延確保し、<span class="code-chip" data-exact-target="fabric-diagram">cpuValid</span> / <span class="code-chip" data-exact-target="fabric-diagram">gpuValid</span> の有効ビットでどちらが最新かを管理します。CPU から書けば RAM 側が最新になり GPU 読み取り時に自動転送され、逆に GPU カーネル（<span class="code-chip">wp.fabricarray</span>）で VRAM 側へ直接書けば <span class="code-chip">Hydra</span> が CPU 往復なしでそのまま読めます。
+          </p>
+
+          <h3>1.4 IFabricHierarchy と「タグ付け時に localMatrix を消す」理由</h3>
+          <p>
+            <span class="ref-badge" data-ref="fab-3" data-color="3" data-ref-role="source" tabindex="0">3</span>
+            <span class="code-chip" data-exact-target="fabric-diagram">IFabricHierarchy</span> は、親子階層をたどって親からの相対行列 <span class="code-chip" data-exact-target="fabric-diagram">omni:fabric:localMatrix</span> からワールド絶対行列 <span class="code-chip" data-exact-target="fabric-diagram">omni:fabric:worldMatrix</span> を一括展開するエンジンです。両属性とも RAM / VRAM どちらにも乗れ、Kit は毎回の <span class="code-chip">app.update()</span> 描画直前に <span class="code-chip" data-exact-target="fabric-diagram">updateWorldXforms()</span> を自動実行します。
+          </p>
+          <p>
+            <span class="code-chip">GeometricGpuFabricWriter</span> は Newton が計算済みの <span class="code-chip" data-exact-target="fabric-diagram">omni:fabric:worldMatrix</span> を GPU から直接書くため、初期化時に対象リンクへ Newton ボディ番号のタグ属性を付けると同時に <span class="code-chip" data-exact-target="fabric-diagram">omni:fabric:localMatrix</span> を削除し、<span class="code-chip" data-exact-target="fabric-diagram">IFabricHierarchy</span> が古いローカル行列で上書き・逆算しないように切り離しています。
+          </p>
+
+          <h3>1.5 wp.synchronize_device() が無いと起きること</h3>
+          <p>
+            <span class="ref-badge" data-ref="fab-4" data-color="4" data-ref-role="source" tabindex="0">4</span>
+            Warp の <span class="code-chip" data-exact-target="fabric-diagram">wp.launch()</span> は CPU から GPU キューへ注文書を投げるだけの <strong>非同期実行</strong> です。<span class="code-chip" data-exact-target="fabric-diagram">wp.synchronize_device()</span> で GPU 書き込み完了を待たずに戻ると、GPU がリンク姿勢を半分しか書き換えていない途中状態の <span class="code-chip" data-exact-target="fabric-diagram">omni:fabric:worldMatrix</span> を <span class="code-chip">Hydra</span> や後続処理が読み、特定のリンクだけ旧位置に残ってロボットが千切れるデータ競合が起きます。
+          </p>
+        </div>
+
+        <div class="split-visual">
+          <div class="diagram-card" id="fabric-diagram">
+            <div class="diagram-header">
+              <span class="diagram-title">Fabric 内部構造・2 面キャッシュ・GPU 同期</span>
+            </div>
+            <div class="bucket-grid">
+              <div class="node-box dim-candidate" data-ref="fab-1" data-color="1" data-ref-role="target" tabindex="0">
+                <div class="node-head"><span class="ref-badge" data-color="1">1</span>Bucket（属性一致 SoA）</div>
+                <div class="node-sub">索引: Path -&gt; (Bucket ID, idx)</div>
+                <div class="soa-row"><span class="soa-name">localMatrix</span><div class="soa-cells"><span class="soa-cell">L0</span><span class="soa-cell">L1</span><span class="soa-cell">L2</span></div></div>
+                <div class="soa-row"><span class="soa-name">worldMatrix</span><div class="soa-cells"><span class="soa-cell">W0</span><span class="soa-cell">W1</span><span class="soa-cell">W2</span></div></div>
+                <div class="soa-row"><span class="soa-name">geom:idx</span><div class="soa-cells"><span class="soa-cell">0</span><span class="soa-cell">1</span><span class="soa-cell">2</span></div></div>
+              </div>
+
+              <div class="node-box dim-candidate" data-ref="fab-2" data-color="2" data-ref-role="target" tabindex="0">
+                <div class="node-head"><span class="ref-badge" data-color="2">2</span>RAM / VRAM 2 面キャッシュ</div>
+                <div class="node-sub">
+                  Fabric は配列ごとに 2 面を遅延確保：<br>
+                  ・RAM 側（cpuValid=true/false）<br>
+                  ・VRAM 側（gpuValid=true/false）<br>
+                  反対側が読んだ瞬間だけ自動コピー。
+                </div>
+              </div>
+
+              <div class="node-box dim-candidate" data-ref="fab-3" data-color="3" data-ref-role="target" tabindex="0">
+                <div class="node-head"><span class="ref-badge" data-color="3">3</span>IFabricHierarchy</div>
+                <div class="node-sub">
+                  毎描画直前に updateWorldXforms() が実行され、omni:fabric:localMatrix から omni:fabric:worldMatrix を展開。<br>
+                  GPU 直接書込時は localMatrix を除去して上書きを防止。
+                </div>
+              </div>
+
+              <div class="node-box dim-candidate" data-ref="fab-4" data-color="4" data-ref-role="target" tabindex="0">
+                <div class="node-head"><span class="ref-badge" data-color="4">4</span>GPU 非同期と同期バリア</div>
+                <div class="node-sub">
+                  wp.launch() = キュー投入のみ即返却<br>
+                  wp.synchronize_device() = 全リンクの VRAM 書込完了まで CPU を停止して待機（描画競合を防止）。
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =================================================================== -->
+    <!-- 2. 第 2 層：描画配線と Play=OFF / Play=ON フレーム境界 -->
+    <!-- =================================================================== -->
+    <section id="sec-layer2">
+      <h2>2. 第 2 層：描画配線・DebugDraw とフレーム境界（Play=OFF / Play=ON）</h2>
+
+      <div class="prose">
+        <h3>2.1 Viewport の基本経路は PhysX を通らない</h3>
+        <p>
+          <span class="code-chip">Viewport</span> へ絵を出す基本経路は <span class="code-chip" data-exact-target="wiring-panel">USD Stage</span> → <span class="code-chip" data-exact-target="wiring-panel">Fabric</span> → <span class="code-chip" data-exact-target="wiring-panel">Hydra (FSD)</span> → <span class="code-chip" data-exact-target="wiring-panel">Viewport</span> であり、<span class="code-chip" data-exact-target="wiring-panel">PhysX</span> は必須経路ではありません。<span class="code-chip">Timeline</span> の <span class="ui-chip">Stop</span> / <span class="ui-chip">Play</span> は物理とアニメーションの時間進行スイッチであり、GPU の電源スイッチではないため、<span class="ui-chip">Stop</span> 中でも描画と GPU 計算（Warp / Newton）は常時動作します。
+        </p>
+      </div>
+
+      <div class="diagram-card" id="wiring-panel" data-ref-scope data-ref-group="wiring-group" data-allow-dense="true">
+        <div class="diagram-header">
+          <span class="diagram-title">Isaac Sim 全体のデータ配線図（5 サブシステム俯瞰）</span>
+          <span class="diagram-hint">本質的複雑性のため 5 要素を同時表示・ホバーで周辺ディミング</span>
+        </div>
+        <div class="bucket-grid" style="grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));">
+          <div class="node-box dim-candidate" data-ref="wire-usd" data-color="1" data-ref-role="target" tabindex="0">
+            <div class="node-head"><span class="ref-badge" data-color="1">1</span>USD Stage</div>
+            <div class="node-sub">変更時に Usd.Notice で Fabric の localMatrix へ同期。omni.physx.fabric 有効時は Play 中の PhysX 結果が書き戻されない（無効時は updateToUsd=true で書き戻される）。</div>
+          </div>
+          <div class="node-box dim-candidate" data-ref="wire-fab" data-color="2" data-ref-role="target" tabindex="0">
+            <div class="node-head"><span class="ref-badge" data-color="2">2</span>Fabric</div>
+            <div class="node-sub">write_target="fabric" で直接書込。Hydra が毎フレーム読むランタイム正本。</div>
+          </div>
+          <div class="node-box dim-candidate" data-ref="wire-px" data-color="3" data-ref-role="target" tabindex="0">
+            <div class="node-head"><span class="ref-badge" data-color="3">3</span>PhysX</div>
+            <div class="node-sub">Play 中の app.update() 時だけ Fabric と Sync In / Sync Out でやり取りする横入りプラグイン。</div>
+          </div>
+          <div class="node-box dim-candidate" data-ref="wire-dd" data-color="4" data-ref-role="target" tabindex="0">
+            <div class="node-head"><span class="ref-badge" data-color="4">4</span>DebugDraw</div>
+            <div class="node-sub">USD Stage にも Fabric にも Prim を作らず、RTX レンダラのオーバーレイ描画リストへ直接座標を積む。</div>
+          </div>
+          <div class="node-box dim-candidate" data-ref="wire-hyd" data-color="5" data-ref-role="target" tabindex="0">
+            <div class="node-head"><span class="ref-badge" data-color="5">5</span>Hydra (FSD) → Viewport</div>
+            <div class="node-sub">app.update() の描画フェーズで Fabric の worldMatrix と DebugDraw を合成して 1 枚描く。</div>
+          </div>
+        </div>
+        <div class="prose" style="margin-top:0.85rem; max-width:none;">
+          <p style="margin-bottom:0.2rem; font-size:0.87rem;">
+            <span class="ref-badge" data-ref="wire-usd" data-color="1" data-ref-role="source" tabindex="0">1</span>設計図（USD）と
+            <span class="ref-badge" data-ref="wire-fab" data-color="2" data-ref-role="source" tabindex="0">2</span>中継ボード（Fabric）を起点に、
+            <span class="ref-badge" data-ref="wire-px" data-color="3" data-ref-role="source" tabindex="0">3</span>PhysX は Play 中だけ接続され、
+            <span class="ref-badge" data-ref="wire-dd" data-color="4" data-ref-role="source" tabindex="0">4</span>DebugDraw は別レーンで
+            <span class="ref-badge" data-ref="wire-hyd" data-color="5" data-ref-role="source" tabindex="0">5</span>Hydra / Viewport へ合流します。
+          </p>
+        </div>
+      </div>
+
+      <div class="prose">
+        <h3>2.2 Play=OFF vs Play=ON の 1 フレーム区切り（USD Stage 込み）</h3>
+        <p>
+          GUI アプリでは Kit 本体が暗黙に <span class="code-chip">app.update()</span> を毎秒何十回も回し続け、スタンドアロン（<span class="code-chip">SimulationApp</span>）では Python が <span class="code-chip">app.update()</span> を明示的に呼んだときだけ 1 フレーム進みます。タブで <span class="ui-chip">Play=OFF（Stop）</span> と <span class="ui-chip">Play=ON</span> の 1 フレーム内部を切り替えて比較できます。
+        </p>
+      </div>
+
+      <div class="diagram-card" data-ref-scope data-ref-group="frame-seq">
+        <div class="diagram-header">
+          <span class="diagram-title">1 フレーム（app.update() 境界）の実行シーケンス</span>
+          <div class="tab-bar" role="tablist">
+            <button type="button" class="tab-btn is-selected" data-tab-target="panel-playon">Play=ON の 1 フレーム</button>
+            <button type="button" class="tab-btn" data-tab-target="panel-playoff">Play=OFF（Stop）の 1 フレーム</button>
+          </div>
+        </div>
+
+        <div id="panel-playon" class="tab-panel is-selected">
+          <div class="seq-frame">
+            <div class="seq-frame-title">
+              <span>Frame 0（Python 実行中・まだ app.update() を呼んでいない）</span>
+              <span class="code-chip">write_target="fabric"</span>
+            </div>
+            <div class="seq-step dim-candidate" data-ref="seq-w" data-color="1" data-ref-role="target" tabindex="0">
+              <span class="ref-badge" data-color="1">1</span>
+              <span class="seq-actor">Python → Fabric</span>
+              <span>新姿勢 T_new を Fabric へ直接書込。<strong>USD Stage は初期姿勢のまま、PhysX へも通知は飛ばない（BVH は T_old のまま）</strong>。</span>
+            </div>
+          </div>
+
+          <div class="seq-frame">
+            <div class="seq-frame-title">
+              <span>Frame 1（1 回目の app.update() 内部 — フレーム境界をまたぐ）</span>
+              <span class="code-chip">Timeline = Play</span>
+            </div>
+            <div class="seq-step dim-candidate" data-ref="seq-in" data-color="2" data-ref-role="target" tabindex="0">
+              <span class="ref-badge" data-color="2">2</span>
+              <span class="seq-actor">Fabric → PhysX</span>
+              <span><strong>[Sync In]</strong> ここで初めて外部変更された Fabric 姿勢 T_new を PhysX へ取り込む（Fabric → PhysX はフレーム境界を 1 回またぐ）。</span>
+            </div>
+            <div class="seq-step dim-candidate" data-ref="seq-sim" data-color="3" data-ref-role="target" tabindex="0">
+              <span class="ref-badge" data-color="3">3</span>
+              <span class="seq-actor">PhysX ステップ</span>
+              <span><strong>① ステップ開始時の姿勢で衝突検出（Contact） → ② 位置更新＋CPU BVH 更新</strong> → [Sync Out] 動的剛体の姿勢を Fabric へ書出（USD へは書かない）→ [Contact Report] ① の結果を配信。</span>
+            </div>
+            <div class="seq-step dim-candidate" data-ref="seq-ren" data-color="4" data-ref-role="target" tabindex="0">
+              <span class="ref-badge" data-color="4">4</span>
+              <span class="seq-actor">Fabric → Hydra</span>
+              <span><span class="code-chip">IFabricHierarchy.updateWorldXforms()</span> で worldMatrix を確定し、Hydra が Fabric＋DebugDraw を合成して Viewport へ 1 枚描画。</span>
+            </div>
+          </div>
+        </div>
+
+        <div id="panel-playoff" class="tab-panel">
+          <div class="seq-frame">
+            <div class="seq-frame-title">
+              <span>Frame 0（Python 実行中・まだ app.update() を呼んでいない）</span>
+              <span class="code-chip">Timeline = Stop</span>
+            </div>
+            <div class="seq-step">
+              <span class="ref-badge" data-color="1">1</span>
+              <span class="seq-actor">USD / Fabric</span>
+              <span><span class="code-chip">write_target="usd"</span> なら USD Stage 書込 → <span class="code-chip">Usd.Notice</span> で Fabric へ即時同期。<span class="code-chip">write_target="fabric"</span> なら Fabric だけ直接更新（USD Stage は古いまま）。</span>
+            </div>
+          </div>
+
+          <div class="seq-frame">
+            <div class="seq-frame-title">
+              <span>Frame 1（app.update() 内部 — PhysX ステップは丸ごとスキップ）</span>
+              <span class="code-chip">Timeline = Stop</span>
+            </div>
+            <div class="seq-step is-skipped">
+              <span class="ref-badge" data-color="3">×</span>
+              <span class="seq-actor">PhysX (停止)</span>
+              <span>Sync In・simulate・Sync Out・Contact Report は一切走らない（裏の物理負荷がゼロ）。</span>
+            </div>
+            <div class="seq-step">
+              <span class="ref-badge" data-color="4">4</span>
+              <span class="seq-actor">Fabric → Hydra</span>
+              <span><span class="code-chip">IFabricHierarchy.updateWorldXforms()</span> → Hydra が Fabric＋DebugDraw を読んで Viewport に 1 枚描画（GPU 計算も通常通り利用可能）。</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="prose" style="margin-top:0.75rem; max-width:none; font-size:0.88rem;">
+          <p style="margin-bottom:0;">
+            キーポイント：
+            <span class="ref-badge" data-ref="seq-w" data-color="1" data-ref-role="source" tabindex="0">1</span>Frame 0 の Fabric 書込は PhysX に届かず、
+            <span class="ref-badge" data-ref="seq-in" data-color="2" data-ref-role="source" tabindex="0">2</span>Frame 1 先頭の Sync In で初めて取り込まれ、
+            <span class="ref-badge" data-ref="seq-sim" data-color="3" data-ref-role="source" tabindex="0">3</span>PhysX の「① 接触 → ② 位置」を経て、
+            <span class="ref-badge" data-ref="seq-ren" data-color="4" data-ref-role="source" tabindex="0">4</span>最後に Hydra が Viewport へ描きます。
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- =================================================================== -->
+    <!-- 3. 第 3 層：1F / 2F / 0F 遅延の因果と定常遅延 -->
+    <!-- =================================================================== -->
+    <section id="sec-layer3">
+      <h2>3. 第 3 層：なぜ 1F 遅れ・2 update 遅れ・0F 遅延に分かれるのか</h2>
+
+      <div class="prose">
+        <h3>3.1 物理エンジンが「接触 → 位置」の順にならざるを得ない理由</h3>
+        <p>
+          力学シミュレーションの目的は「床や壁を突き抜けさせずに反力で止めること」です。先に現在位置で接触拘束（壁の条件）を見つけないと、ソルバが「壁を突き抜けない速度」を連立して解けません。そのため PhysX の 1 ステップは構造上 <strong>① ステップ開始時の姿勢で接触検知 → ② 力・反力・Kinematic 目標で位置更新</strong> という順序になります。
+        </p>
+        <p>
+          対して幾何モード（<span class="code-chip">myext.robot.geometric_newton</span>）は反力による押し返しを捨て、<strong>① <span class="code-chip">eval_fk()</span> で位置確定 → ② その直後に <span class="code-chip">CollisionPipeline.collide()</span> で接触検知</strong> という「位置 → 接触」の順序を Frame 0 の 1 呼び出し内で完結させます。
+        </p>
+      </div>
+
+      <div class="lag-grid" data-ref-scope data-ref-group="lag-compare">
+        <div class="lag-col dim-candidate" data-ref="lag-ov" data-color="3" data-ref-role="target" tabindex="0">
+          <h4><span class="ref-badge" data-color="3">1</span>PhysX overlap_shape（1F 遅れ）</h4>
+          <div class="frame-box">
+            <span class="frame-tag">Frame 0（app.update() 前）</span>
+            <div>引数 <span class="code-chip">primA</span> ＝ 今の Fabric（T_new）<br>相手 <span class="code-chip">primB</span> ＝ PhysX BVH（T_old）</div>
+            <div class="diff-del">両方動いたリンク同士は T_new vs T_old ですれ違い失敗（UR10e で 2/5 組のみ）</div>
+          </div>
+          <div class="frame-box">
+            <span class="frame-tag">Frame 1（app.update() 1 回後）</span>
+            <div>Sync In で Fabric の T_new を取込 → BVH 更新完了</div>
+            <div class="diff-add">T_new vs T_new になり 5/5 組ヒット（1 フレーム遅れ）</div>
+          </div>
+        </div>
+
+        <div class="lag-col dim-candidate" data-ref="lag-cr" data-color="4" data-ref-role="target" tabindex="0">
+          <h4><span class="ref-badge" data-color="4">2</span>PhysX ContactReport（2 update 遅れ）</h4>
+          <div class="frame-box">
+            <span class="frame-tag">Frame 0（app.update() 前）</span>
+            <div>PhysX ステップ 0 回</div>
+            <div class="diff-del">ContactReport ＝ 空</div>
+          </div>
+          <div class="frame-box">
+            <span class="frame-tag">Frame 1（app.update() 1 回目）</span>
+            <div>
+              <span class="term-inline" tabindex="0">setKinematicTarget<span class="term-card" role="tooltip">PhysX の Kinematic 剛体へ「このステップの終端に到達すべき目標姿勢」を渡す API。ステップ開始時点ではまだ移動前位置にいる。</span></span>(T_new) 設定<br>
+              ① 接触検知：<strong>移動前 T_old</strong> で判定<br>
+              ② 位置更新：終端で T_new へ到達
+            </div>
+            <div class="diff-del">① の結果配信 → まだ空！</div>
+          </div>
+          <div class="frame-box">
+            <span class="frame-tag">Frame 2（app.update() 2 回目）</span>
+            <div>① 接触検知：到達済み T_new で判定</div>
+            <div class="diff-add">ここで初めて CONTACT_FOUND（2 update 遅れ）</div>
+          </div>
+        </div>
+
+        <div class="lag-col dim-candidate" data-ref="lag-nw" data-color="2" data-ref-role="target" tabindex="0">
+          <h4><span class="ref-badge" data-color="2">3</span>Newton（0 フレーム遅延）</h4>
+          <div class="frame-box">
+            <span class="frame-tag">Frame 0（1 回の Python 呼び出し内）</span>
+            <div>
+              ① 位置確定：最新 q → <span class="code-chip">eval_fk()</span> で <span class="code-chip">state.body_q</span> を T_new へ更新<br>
+              ② 接触検知：直後の行で T_new 同士を <span class="code-chip">collide()</span> 判定
+            </div>
+            <div class="diff-add">app.update() も flush_to_usd() も不要で 5/5 組＋めり込み深さ（[m]）を即取得</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="prose">
+        <p>
+          3 方式の要点：
+          <span class="ref-badge" data-ref="lag-ov" data-color="3" data-ref-role="source" tabindex="0">1</span><span class="code-chip">overlap_shape</span> は引数と BVH の参照元が食い違うため 1 フレーム遅れ、
+          <span class="ref-badge" data-ref="lag-cr" data-color="4" data-ref-role="source" tabindex="0">2</span><span class="code-chip">ContactReport</span> は「移動するフレーム」と「到達後に接触検知するフレーム」が分断されるため 2 update 遅れ、
+          <span class="ref-badge" data-ref="lag-nw" data-color="2" data-ref-role="source" tabindex="0">3</span><span class="code-chip">Newton</span> はフレーム境界をまたがず「位置 → 接触」を直列実行するため 0 フレーム遅延になります。
+        </p>
+
+        <h3>3.2 遅延は「初回だけ」ではなく、姿勢を変えるたび毎フレーム定常的に続く</h3>
+        <p>
+          関節角度を毎フレーム q_0 → q_1 → q_2 → q_3 と更新し続けると、Frame k 時点で <span class="code-chip">overlap_shape</span>（Fabric のみ）の相手 BVH は常に q_{k-1}（1 遅れ）、<span class="code-chip">ContactReport</span> は常に q_{k-2}（2 遅れ）になります。テストコードが <span class="ui-chip">Stop</span> → <span class="ui-chip">Play</span> 直後に 2〜3 回 <span class="code-chip">app.update()</span> を回すのは遅延を消すためではなく、Timeline の Frame Integrity 遷移と初期シーン構築を完了させるウォームアップのためです。
+        </p>
+
+        <h3>3.3 剛体タイプ（Static / Kinematic / Dynamic）ごとの扱いの違い</h3>
+      </div>
+
+      <div class="table-wrap">
+        <table class="ergo-table">
+          <thead>
+            <tr>
+              <th>USD 設定（種類）</th>
+              <th>PhysX 内部クラス</th>
+              <th>姿勢の決定者</th>
+              <th>格納先 BVH と主な制約</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Static Collider</strong>（<span class="code-chip">CollisionAPI</span> のみ、または <span class="code-chip">rigidBodyEnabled=False</span>）</td>
+              <td><span class="code-chip">PxRigidStatic</span></td>
+              <td>ユーザー（USD / Fabric）</td>
+              <td>静的用 BVH（Static Pruner）。重力で動かず、Static 同士の ContactReport は出ない。</td>
+            </tr>
+            <tr>
+              <td><strong>Kinematic RigidBody</strong>（<span class="code-chip">kinematicEnabled=True</span>）</td>
+              <td><span class="code-chip">PxRigidDynamic</span>（<span class="code-chip">eKINEMATIC</span>）</td>
+              <td>ユーザー（<span class="code-chip">setKinematicTarget</span>）</td>
+              <td>動的用 BVH（Dynamic Pruner）。ContactReport を出せるが 2 update 遅れ、Stop 中は位置同期されない。</td>
+            </tr>
+            <tr>
+              <td><strong>Dynamic RigidBody</strong>（<span class="code-chip">kinematicEnabled=False</span>）</td>
+              <td><span class="code-chip">PxRigidDynamic</span></td>
+              <td><strong>PhysX ソルバ</strong></td>
+              <td>動的用 BVH（Dynamic Pruner）。毎ステップ PhysX が計算結果を <span class="code-chip">Fabric</span> へ書き出す（Sync Out）。</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- =================================================================== -->
+    <!-- 4. 第 4 層：CPU 常駐 BVH vs Newton GPU 即時評価 -->
+    <!-- =================================================================== -->
+    <section id="sec-layer4">
+      <h2>4. 第 4 層：overlap_shape が CPU 計算である意味と、Newton の空間構造</h2>
+
+      <div class="prose">
+        <p>
+          NVIDIA PhysX 5 公式仕様として、<strong>たとえ物理力学本体を GPU ダイナミクス（<span class="code-chip">enableGPUDynamics=True</span>）で動かしていても、Scene Query（<span class="code-chip">overlap_shape</span> / <span class="code-chip">raycast</span> / <span class="code-chip">sweep</span>）とその空間索引 BVH（Static / Dynamic AABB Tree）は CPU（RAM）側に存在し、Broad / Mid / Narrow の全フェーズが CPU で実行されます</strong>。GPU ダイナミクス有効時はステップ終了時（<span class="code-chip">fetchResults()</span>）に最新姿勢が GPU → CPU へ同期（DtoH）されて CPU 側 BVH が更新されます。
+        </p>
+      </div>
+
+      <div class="table-wrap">
+        <table class="ergo-table">
+          <thead>
+            <tr>
+              <th>比較軸</th>
+              <th>PhysX（<span class="code-chip">overlap_shape</span>）</th>
+              <th>Newton（<span class="code-chip">CollisionPipeline</span>）</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>空間構造の持ち方</td>
+              <td>フレームをまたいで常駐する <strong>CPU 上の AABB Tree（BVH）</strong></td>
+              <td><strong>フレームをまたぐ常駐 BVH を持たない</strong>（呼び出しのたびに最新 <span class="code-chip">state.body_q</span> から計算）</td>
+            </tr>
+            <tr>
+              <td>Broadphase の実体</td>
+              <td>CPU 上の Static / Dynamic Pruner を探索</td>
+              <td>512 形状以下は <span class="code-chip">explicit</span>（候補ペア表を GPU 全並列判定）、512 超は <span class="code-chip">sap</span>（GPU 上で毎回 AABB ソート）</td>
+            </tr>
+            <tr>
+              <td>計算デバイス</td>
+              <td>Broad / Mid / Narrow すべて <strong>CPU</strong></td>
+              <td><span class="code-chip">eval_fk</span> → Broad → Narrow（GJK/MPR）→ 距離算出まで <strong>GPU（Warp）完結</strong></td>
+            </tr>
+            <tr>
+              <td>返却情報</td>
+              <td>ヒットした Prim パス一覧のみ（めり込み深さなし）</td>
+              <td>符号付き距離 <span class="code-chip">separation</span>（負＝めり込み、正＝クリアランス）、接触点、法線</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- =================================================================== -->
+    <!-- 5. 拡張機能の 1 描画フレームの実態と Play=OFF の性能 -->
+    <!-- =================================================================== -->
+    <section id="sec-ext">
+      <h2>5. myext.robot.geometric_newton の 1 描画フレームと Play=OFF 性能</h2>
+
+      <div class="prose">
+        <p>
+          <span class="code-chip">myext.robot.geometric_newton</span> では、1 描画フレーム（<span class="code-chip">app.update()</span> 1 周期）の中で姿勢更新・干渉判定・画面反映までを 0 フレームズレで完結させます。また、既定の <span class="code-chip">collision_backend="newton"</span> では <span class="ui-chip">Play=OFF</span> でも <span class="ui-chip">Play=ON</span> でも PhysX を使わないため <span class="code-chip">force_load_physics_from_usd()</span> は 0 回であり、裏で物理ステップが走らない <span class="ui-chip">Play=OFF</span> の方が全体負荷は軽くなります（PhysX バックエンド明示時でもリロードは初回と構造変化時のみ）。
+        </p>
+      </div>
+
+      <div data-ref-scope data-ref-group="ext-flow">
+        <div class="code-block" id="ext-loop-code">
+          <div class="code-line is-focus" data-ref="ef-1" data-color="1" data-ref-role="target" tabindex="0"><span class="ref-badge" data-color="1">1</span>robot.set_dof_positions(q)          # NumPy(単体)または GPU eval_fk → Fabric へ即時書込</div>
+          <div class="code-line is-focus" data-ref="ef-2" data-color="2" data-ref-role="target" tabindex="0"><span class="ref-badge" data-color="2">2</span>pairs = robot.check_collisions()    # GPU Newton 空間で eval_fk → collide → 距離を 0F 確定</div>
+          <div class="code-line is-focus" data-ref="ef-3" data-color="3" data-ref-role="target" tabindex="0"><span class="ref-badge" data-color="3">3</span>robot.scene.sync_environment()      # use_fabric="auto": 動的剛体は Fabric、静的/Stop は USD</div>
+          <div class="code-line is-focus" data-ref="ef-4" data-color="4" data-ref-role="target" tabindex="0"><span class="ref-badge" data-color="4">4</span>app.update()                        # Hydra が最新 Fabric と DebugDraw を Viewport へ 1 枚描画</div>
+        </div>
+        <div class="prose">
+          <p>
+            <span class="ref-badge" data-ref="ef-1" data-color="1" data-ref-role="source" tabindex="0">1</span><span class="code-chip" data-exact-target="ext-loop-code">robot.set_dof_positions(q)</span> で描画用 <span class="code-chip">Fabric</span> を更新し（GPU 直結構成では <span class="code-chip">wp.synchronize_device()</span> で完了保証）、
+            <span class="ref-badge" data-ref="ef-2" data-color="2" data-ref-role="source" tabindex="0">2</span><span class="code-chip" data-exact-target="ext-loop-code">robot.check_collisions()</span> が同じフレーム内で干渉とめり込み深さを確定します。
+            <span class="ref-badge" data-ref="ef-3" data-color="3" data-ref-role="source" tabindex="0">3</span>環境障害物は <span class="code-chip" data-exact-target="ext-loop-code">use_fabric="auto"</span> が「Play 中の動的剛体＝Fabric、静的障害物と Stop 中＝USD Stage」と自動で読み分けるため、どちらの障害物も 0 フレーム遅延で追従します。
+            <span class="ref-badge" data-ref="ef-4" data-color="4" data-ref-role="source" tabindex="0">4</span>最後に <span class="code-chip" data-exact-target="ext-loop-code">app.update()</span> が 1 回回ると、最新の姿勢と可視化がそのまま 1 枚の絵として描画されます。
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- =================================================================== -->
+    <!-- 6. 公式出典と実測の切り分け -->
+    <!-- =================================================================== -->
+    <section id="sec-sources">
+      <h2>6. 公式出典と実機検証の切り分け</h2>
+      <div class="prose">
+        <p>
+          Isaac Sim 6.2.0 のインストールフォルダ内（<span class="code-chip">extscache/</span>）には、Web 公開ドキュメント（<span class="code-chip">docs.omniverse.nvidia.com</span> 等）の生成元である NVIDIA 公式の <span class="code-chip">.rst</span> / <span class="code-chip">.md</span> ソースがそのまま同梱されています。
+        </p>
+      </div>
+
+      <ul class="source-list">
+        <li>
+          <span class="source-tag official">同梱公式 Doc</span><span class="source-tag web">Web 公式</span>
+          <strong>Fabric Bucket 構造・RAM/VRAM 2 面キャッシュ（cpuValid / gpuValid）</strong>：<br>
+          <span class="code-chip">usdrt.scenegraph-7.6.3.../docs/omni.fabric/docs/fabric_overview.rst</span>・<span class="code-chip">usd_fabric_usdrt.rst</span> ／
+          <a href="https://docs.omniverse.nvidia.com/kit/docs/usdrt/latest/index.html" target="_blank" rel="noopener">Omniverse USDRT / Fabric Documentation</a>
+        </li>
+        <li>
+          <span class="source-tag official">同梱公式 Doc</span>
+          <strong>IFabricHierarchy（localMatrix / worldMatrix 展開と直接書込時の逆算挙動）</strong>：<br>
+          <span class="code-chip">usdrt.scenegraph-7.6.3.../docs/fabricsd/fabric_hierarchy.rst</span>・<span class="code-chip">include/usdrt/hierarchy/IFabricHierarchy.h</span>
+        </li>
+        <li>
+          <span class="source-tag official">同梱公式 Doc</span>
+          <strong>Fabric Scene Delegate（USD → Fabric → Hydra → Viewport 経路）</strong>：<br>
+          <span class="code-chip">usdrt.scenegraph-7.6.3.../docs/fabricsd/overview.md</span>・<span class="code-chip">exts/isaacsim.physics.newton/.../impl/fabric.py</span>
+        </li>
+        <li>
+          <span class="source-tag official">同梱公式 Doc</span>
+          <strong>Timeline のフレーム離散化・Frame Integrity・PhysX Fabric 出力</strong>：<br>
+          <span class="code-chip">omni.timeline-1.1.2.../docs/Overview.md</span>・<span class="code-chip">TIME_STEPPING.md</span>・<span class="code-chip">omni.physx.ui-110.4.4.../docs/dev_guide/sim_management.rst</span>
+        </li>
+        <li>
+          <span class="source-tag web">Web 公式</span><span class="source-tag official">同梱公式 Doc</span>
+          <strong>PhysX 5（simulate / fetchResults・setKinematicTarget・CPU Scene Queries / AABB Tree・Contact Reports）</strong>：<br>
+          <a href="https://nvidia-omniverse.github.io/PhysX/physx/5.4.1/docs/" target="_blank" rel="noopener">NVIDIA PhysX 5.4.1 SDK Documentation</a> ／
+          <span class="code-chip">omni.physx-110.4.4.../docs/dev_guide/scene_queries.rst</span>・<span class="code-chip">contact_reports.rst</span>
+        </li>
+        <li>
+          <span class="source-tag web">Web 公式</span><span class="source-tag official">同梱公式ソース</span>
+          <strong>Warp 非同期実行・wp.synchronize_device()・wp.fabricarray および Newton eval_fk / CollisionPipeline</strong>：<br>
+          <a href="https://nvidia.github.io/warp" target="_blank" rel="noopener">NVIDIA Warp Documentation</a>・<a href="https://newton-physics.github.io/newton/1.6.1/guide/overview.html" target="_blank" rel="noopener">Newton 1.6.1 Documentation</a> ／
+          <span class="code-chip">omni.warp.core-1.17.0/warp/_src/context.py</span>・<span class="code-chip">fabric.py</span>・<span class="code-chip">newton/_src/sim/collide.py</span>
+        </li>
+        <li>
+          <span class="source-tag empirical">実機検証</span>
+          <strong>Isaac Sim 6.2.0 での具体的なフレーム遅延数（overlap_shape 2/5→5/5、ContactReport 0→0→ヒット）</strong>：<br>
+          公式仕様の組み合わせから導かれる現象であり、同梱スクリプト <span class="code-chip">verify_backend_lag_step_by_step.py</span> により手元で再現・確認できます。
+        </li>
+      </ul>
+
+      <div class="callout">
+        <strong>次のステップ：自分の目と手で 1 コマずつ確かめる</strong><br>
+        <a href="handson_verify_lag.html">ハンズオン検証ガイド（handson_verify_lag.html）</a> に進み、同梱の <span class="code-chip">verify_backend_lag_step_by_step.py</span> を実行して、Frame 0・Frame 1・Frame 2 の数値と Viewport のズレを直接確認してください。
+      </div>
+    </section>
+  </main>
+</div>
+
+<svg id="ref-connector-layer" style="position:fixed;inset:0;width:100vw;height:100vh;pointer-events:none;z-index:9990;"></svg>
+<button id="ref-return-btn" type="button">↩ 元の位置へ戻る</button>
+
+<script>
+(() => {
+  // 1. 双方向ホバー・スポットライト・SVG一時結線・クリックジャンプ＆戻るボタン
+  const svgLayer = document.getElementById('ref-connector-layer');
+  const returnBtn = document.getElementById('ref-return-btn');
+  let savedScrollY = null;
+
+  const isInViewport = (el) => {
+    const r = el.getBoundingClientRect();
+    return r.width > 0 && r.height > 0 &&
+           r.top >= 0 && r.bottom <= window.innerHeight &&
+           r.left >= 0 && r.right <= window.innerWidth;
+  };
+  const clearLines = () => { if (svgLayer) svgLayer.innerHTML = ''; };
+
+  const drawConnector = (fromEl, toEl) => {
+    if (!svgLayer || !isInViewport(fromEl) || !isInViewport(toEl)) return;
+    const a = fromEl.getBoundingClientRect();
+    const b = toEl.getBoundingClientRect();
+    const x1 = a.left + a.width / 2, y1 = a.top + a.height / 2;
+    const x2 = b.left + b.width / 2, y2 = b.top + b.height / 2;
+    const mx = (x1 + x2) / 2;
+    const color = getComputedStyle(fromEl).backgroundColor || '#2563eb';
+    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    path.setAttribute('d', `M ${x1} ${y1} C ${mx} ${y1}, ${mx} ${y2}, ${x2} ${y2}`);
+    path.setAttribute('fill', 'none');
+    path.setAttribute('stroke', color === 'rgba(0, 0, 0, 0)' ? '#2563eb' : color);
+    path.setAttribute('stroke-width', '2');
+    path.setAttribute('stroke-dasharray', '4 3');
+    path.setAttribute('opacity', '0.72');
+    svgLayer.appendChild(path);
+  };
+
+  const setActive = (refId, originEl) => {
+    const peers = Array.from(document.querySelectorAll(`[data-ref="${CSS.escape(refId)}"]`));
+    const scopes = new Set();
+    peers.forEach((el) => {
+      el.classList.add('is-active');
+      const sc = el.closest('[data-ref-scope]');
+      if (sc) scopes.add(sc);
+    });
+    scopes.forEach((sc) => sc.classList.add('is-dimming'));
+    clearLines();
+    if (originEl) {
+      peers.filter((el) => el !== originEl).forEach((peer) => drawConnector(originEl, peer));
+    }
+  };
+
+  const clearActive = () => {
+    document.querySelectorAll('[data-ref].is-active').forEach((el) => el.classList.remove('is-active'));
+    document.querySelectorAll('[data-ref-scope].is-dimming').forEach((sc) => sc.classList.remove('is-dimming'));
+    clearLines();
+  };
+
+  document.querySelectorAll('[data-ref]').forEach((el) => {
+    const refId = el.dataset.ref;
+    el.addEventListener('mouseenter', () => setActive(refId, el));
+    el.addEventListener('mouseleave', clearActive);
+    el.addEventListener('focus', () => setActive(refId, el));
+    el.addEventListener('blur', clearActive);
+    el.addEventListener('click', () => {
+      const peers = Array.from(document.querySelectorAll(`[data-ref="${CSS.escape(refId)}"]`)).filter((p) => p !== el);
+      if (peers.length === 0) return;
+      const target = peers.find((p) => p.dataset.refRole !== el.dataset.refRole) || peers[0];
+      if (!isInViewport(target) && returnBtn) {
+        savedScrollY = window.scrollY;
+        returnBtn.classList.add('is-visible');
+      }
+      target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      target.classList.remove('is-pulsing');
+      void target.offsetWidth;
+      target.classList.add('is-pulsing');
+    });
+  });
+
+  if (returnBtn) {
+    returnBtn.addEventListener('click', () => {
+      if (savedScrollY !== null) {
+        window.scrollTo({ top: savedScrollY, behavior: 'smooth' });
+        savedScrollY = null;
+      }
+      returnBtn.classList.remove('is-visible');
+    });
+  }
+
+  // 2. Play=ON / Play=OFF タブ切替
+  document.querySelectorAll('.tab-btn').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const targetId = btn.dataset.tabTarget;
+      const card = btn.closest('.diagram-card');
+      if (!card) return;
+      card.querySelectorAll('.tab-btn').forEach((b) => b.classList.toggle('is-selected', b === btn));
+      card.querySelectorAll('.tab-panel').forEach((p) => p.classList.toggle('is-selected', p.id === targetId));
+    });
+  });
+
+  // 3. 追従目次 ScrollSpy
+  const tocLinks = Array.from(document.querySelectorAll('.toc a[href^="#"]'));
+  const sections = tocLinks.map((a) => document.querySelector(a.getAttribute('href'))).filter(Boolean);
+  if (sections.length > 0) {
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        const id = entry.target.id;
+        tocLinks.forEach((a) => a.classList.toggle('is-current', a.getAttribute('href') === `#${id}`));
+      });
+    }, { rootMargin: '-15% 0px -75% 0px' });
+    sections.forEach((sec) => observer.observe(sec));
+  }
+})();
+</script>
+</body>
+</html>
