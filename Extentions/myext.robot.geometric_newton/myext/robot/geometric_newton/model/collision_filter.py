@@ -43,6 +43,13 @@ class GeometricCollisionFilter:
         self._pairs: dict[frozenset[str], str] = {}
         self._patterns: list[tuple[str, str, str]] = []
         self._rules: list[tuple[PairRule, str]] = []
+        # 変更世代カウンタ (`GeometricScene` / `GeometricRobotView` が Broad Phase 再焼き込み要否を O(1) 判定するため)
+        self._version: int = 0
+
+    @property
+    def version(self) -> int:
+        """ルールが追加・削除・クリアされるたびにインクリメントされる変更世代番号。"""
+        return self._version
 
     # ==========================================================================
     # 生成・複製・結合 (attach 用)
@@ -85,19 +92,27 @@ class GeometricCollisionFilter:
         """名指しペア `(link_a, link_b)` を無視対象に追加する (同一ペアが既にあれば `reason` を上書き)。"""
         if link_a == link_b:
             raise ValueError("同じリンク同士の組は足せない")
-        self._pairs[frozenset((link_a, link_b))] = reason
+        key = frozenset((link_a, link_b))
+        if self._pairs.get(key) != reason:
+            self._pairs[key] = reason
+            self._version += 1
 
     def remove_pair(self, link_a: str, link_b: str) -> bool:
         """名指しペアを削除する。存在して削除できたら `True`。"""
-        return self._pairs.pop(frozenset((link_a, link_b)), None) is not None
+        removed = self._pairs.pop(frozenset((link_a, link_b)), None) is not None
+        if removed:
+            self._version += 1
+        return removed
 
     def add_pattern(self, pattern_a: str, pattern_b: str, reason: str = "user") -> None:
         """`fnmatch` パターン組 `(pattern_a, pattern_b)` を無視対象に追加する (評価時は順不同)。"""
         self._patterns.append((pattern_a, pattern_b, reason))
+        self._version += 1
 
     def add_rule(self, rule: PairRule, reason: str = "user") -> None:
         """述語関数 `rule(link_a, link_b) -> bool` を追加する (評価時は `(a, b)` と `(b, a)` の両順で判定)。"""
         self._rules.append((rule, reason))
+        self._version += 1
 
     def remove_by_reason(self, reason: str) -> int:
         """`reason` タグが一致するルール (ペア・パターン・関数のすべて) を一括削除し、削除件数を返す。"""
@@ -105,12 +120,17 @@ class GeometricCollisionFilter:
         self._pairs = {p: r for p, r in self._pairs.items() if r != reason}
         self._patterns = [p for p in self._patterns if p[2] != reason]
         self._rules = [r for r in self._rules if r[1] != reason]
-        return before - (len(self._pairs) + len(self._patterns) + len(self._rules))
+        removed = before - (len(self._pairs) + len(self._patterns) + len(self._rules))
+        if removed > 0:
+            self._version += 1
+        return removed
 
     def clear(self) -> None:
-        self._pairs.clear()
-        self._patterns.clear()
-        self._rules.clear()
+        if self._pairs or self._patterns or self._rules:
+            self._pairs.clear()
+            self._patterns.clear()
+            self._rules.clear()
+            self._version += 1
 
     # ==========================================================================
     # 評価・照会

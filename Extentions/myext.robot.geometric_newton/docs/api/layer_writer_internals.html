@@ -316,6 +316,7 @@ table.ergo-table td.num, table.ergo-table th.num { text-align: right; font-varia
     <a class="nav-btn" href="../index.html">ポータル</a>
     <a class="nav-btn" href="../explanation_architecture.html">アーキテクチャ解説</a>
     <a class="nav-btn" href="../howto_recipes.html">レシピ集</a>
+    <a class="nav-btn" href="../benchmarks_findings.html">実測知見</a>
     <a class="nav-btn is-active" href="index.html">API リファレンス</a>
   </nav>
 </header>
@@ -352,7 +353,7 @@ table.ergo-table td.num, table.ergo-table th.num { text-align: right; font-varia
 
   <article class="api-card" id="layer-options"><div class="api-head"><span class="api-name">GeometricLayerOptions / GeometricLayerReport / authoring / is_authoring</span><span class="perf-pill perf-cold">Sublayer 設定・コンテキスト</span></div><div class="sig-box">@dataclass(frozen=True)
 class GeometricLayerOptions:
-    collision_mode: Literal["static", "kinematic"] = "static"
+    collision_mode: Literal["none", "static", "kinematic"] = "none"
     layer_target: Literal["session", "root"] = "session"
     report_contacts: bool = True
     contact_threshold: float = 0.0
@@ -362,11 +363,12 @@ class GeometricLayerOptions:
     def from_settings(cls) -&gt; GeometricLayerOptions
 
 with authoring(): ...   # 本拡張による書込中フラグを立てて USD 変更監視との再帰を防ぐ
-is_authoring() -&gt; bool</div><div class="prose"><p>幾何 Sublayer で上書きする PhysX 属性の方針を定義します。</p></div><div class="table-wrap"><table class="ergo-table"><thead><tr><th>引数 / フィールド</th><th>型</th><th>既定値</th><th>意味・形状・単位・制約</th></tr></thead><tbody><tr><td><span class='code-chip'>collision_mode</span></td><td><span class='code-chip'>"static" | "kinematic"</span></td><td><span class='code-chip'>"static"</span></td><td>幾何モード時にロボットリンクへ上書きする PhysX 剛体・コライダー設定。<br>・<span class='code-chip'>"static"</span>（既定）: <span class='code-chip'>physics:rigidBodyEnabled=False</span>（PhysX 静的コライダー、Newton バックエンドと相性最良）<br>・<span class='code-chip'>"kinematic"</span>: <span class='code-chip'>physics:kinematicEnabled=True</span>（PhysX Contact Report 利用時に必要）</td></tr>
+is_authoring() -&gt; bool
+is_collision_enabled_ignoring_geometric_layer(prim: Usd.Prim) -&gt; bool</div><div class="prose"><p>幾何 Sublayer で上書きする PhysX 属性の方針を定義します。</p></div><div class="table-wrap"><table class="ergo-table"><thead><tr><th>引数 / フィールド</th><th>型</th><th>既定値</th><th>意味・形状・単位・制約</th></tr></thead><tbody><tr><td><span class='code-chip'>collision_mode</span></td><td><span class='code-chip'>"none" | "static" | "kinematic"</span></td><td><span class='code-chip'>"none"</span></td><td>幾何モード時にロボットリンクへ上書きする PhysX 剛体・コライダー設定です。<br>・<span class='code-chip'>"none"</span>（既定）: <span class='code-chip'>physics:rigidBodyEnabled=False</span> に加えてロボット配下の全 <span class='code-chip'>CollisionAPI</span> へ <span class='code-chip'>physics:collisionEnabled=False</span> を上書きし、PhysX コライダー生成を完全にゼロにします（instanceable な <span class='code-chip'>collisions</span> も Session Sublayer 上のみ一時展開して無効化し、<span class='code-chip'>remove()</span> で完全復元します）。Newton 側は <span class='code-chip'>is_collision_enabled_ignoring_geometric_layer()</span> により元のコライダーをそのまま読み取ります。<br>・<span class='code-chip'>"static"</span>: <span class='code-chip'>physics:rigidBodyEnabled=False</span>（PhysX 静的コライダーを残す。<span class='code-chip'>collision_backend="physx"</span> 利用時に指定）<br>・<span class='code-chip'>"kinematic"</span>: <span class='code-chip'>physics:kinematicEnabled=True</span>（PhysX Contact Report 利用時に必要）</td></tr>
 <tr><td><span class='code-chip'>layer_target</span></td><td><span class='code-chip'>"session" | "root"</span></td><td><span class='code-chip'>"session"</span></td><td><span class='code-chip'>"session"</span>: 元ファイルを汚さないメモリ内 Session Layer。<span class='code-chip'>"root"</span>: ステージ保存時にファイルへ残したい場合のみ使用。</td></tr>
 <tr><td><span class='code-chip'>report_contacts</span></td><td><span class='code-chip'>bool</span></td><td><span class='code-chip'>True</span></td><td><span class='code-chip'>collision_mode="kinematic"</span> 時に <span class='code-chip'>PhysxContactReportAPI</span> を自動付与するか。</td></tr>
 <tr><td><span class='code-chip'>contact_threshold</span></td><td><span class='code-chip'>float</span></td><td><span class='code-chip'>0.0</span></td><td>PhysX Contact Report の報告しきい値 [N]。</td></tr>
-<tr><td><span class='code-chip'>root_layer_file</span></td><td><span class='code-chip'>str | None</span></td><td><span class='code-chip'>None</span></td><td><span class='code-chip'>layer_target="root"</span> 時の外部ファイルパス指定。</td></tr></tbody></table></div><div class="api-meta-grid"><div class="api-meta-box"><strong>副作用・前提・落とし穴</strong><strong>Sublayer が上書きする主な 5 種の USD 属性：</strong>1) <span class='code-chip'>physxArticulation:articulationEnabled = False</span>（Articulation 無効化）、2) <span class='code-chip'>physics:jointEnabled = False</span>（Joint 拘束無効化）、3) <span class='code-chip'>physics:rigidBodyEnabled</span> / <span class='code-chip'>physics:kinematicEnabled</span>（モード別剛体切替）、4) <span class='code-chip'>physics:collisionEnabled</span>、5) 必要時の <span class='code-chip'>xformOp:transform:geometric</span>（<span class='code-chip'>write_target="usd"</span> / <span class='code-chip'>"both"</span> または <span class='code-chip'>flush_to_usd()</span> 時）。</div></div></article>
+<tr><td><span class='code-chip'>root_layer_file</span></td><td><span class='code-chip'>str | None</span></td><td><span class='code-chip'>None</span></td><td><span class='code-chip'>layer_target="root"</span> 時の外部ファイルパス指定。</td></tr></tbody></table></div><div class="api-meta-grid"><div class="api-meta-box"><strong>副作用・前提・落とし穴</strong><strong>1) Sublayer が上書きする主な USD 属性：</strong><span class='code-chip'>physxArticulation:articulationEnabled = False</span>、<span class='code-chip'>physics:jointEnabled = False</span>、<span class='code-chip'>physics:rigidBodyEnabled</span> / <span class='code-chip'>physics:kinematicEnabled</span>、<span class='code-chip'>collision_mode="none"</span> 時の <span class='code-chip'>physics:collisionEnabled = False</span>（必要時は <span class='code-chip'>instanceable = False</span>）、および <span class='code-chip'>xformOp:transform:geometric</span>。<br><strong>2) GUI の Sublayer ミュートと <span class='code-chip'>layer.remove()</span> の違い：</strong>Stop 中に GUI の Layers パネルで無名 Sublayer をミュートするだけでも USD 上は 100% 元の Articulation へ戻ります。<span class='code-chip'>layer.remove()</span> はそれに加えて Play 中の停止・Sublayer パスの削除・<span class='code-chip'>release_physics_objects()</span>・リスナー通知を一括で行います。</div></div></article>
 
   <article class="api-card" id="layer-methods"><div class="api-head"><span class="api-name">GeometricLayer 全プロパティ・メソッド</span><span class="perf-pill perf-cold">Sublayer 操作</span></div><div class="sig-box">layer = GeometricLayer(stage: Usd.Stage, options: GeometricLayerOptions | None = None)
 # プロパティ: stage, options, report, sdf_layer
@@ -484,8 +486,8 @@ layer.add_listener(cb) / layer.remove_listener(cb)</div><div class="prose"><p>�
     </li>
     <li>
       <span class="source-tag empirical">実機検証</span>
-      <strong>Isaac Sim 6.2.0（RTX 3060）での全テスト・U 字凹メッシュ実測</strong>：<br>
-      <span class="code-chip">tests_pure/</span>（73 本全通過）・<span class="code-chip">tests_kit/run_kit_tests.py</span>（34 本全通過）・U 字水密メッシュ対実測（<span class="code-chip">convex_meshes=True</span>: 溝誤検知 1 件 / 5 cm 貫通時 −0.45 m / 2.35 ms 対 <span class="code-chip">convex_meshes=False</span>: 溝非接触 0 件 / 5 cm 貫通時 −0.0500 m / 2.39 ms）。
+      <strong>Isaac Sim 6.2.0（RTX 3060）での全テスト・Red → Green 実測（5 組＋U 字凹メッシュ）</strong>：<br>
+      <span class="code-chip">tests_pure/</span>（77 本全通過）・<span class="code-chip">tests_kit/run_kit_tests.py</span>（34 本全通過）・<span class="code-chip">tests_red_green/BENCHMARKS_AND_FINDINGS.md</span>（ちらつき防止・Broad Phase 登録・<span class="code-chip">collision_mode="none"</span>・Fabric 書込・54 DOF <span class="code-chip">batch_update()</span>・U 字凹メッシュの実測ログ）。
     </li>
   </ul>
 </section>

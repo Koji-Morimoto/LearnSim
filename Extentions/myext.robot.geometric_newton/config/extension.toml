@@ -27,12 +27,14 @@ name = "myext.robot.geometric_newton"
 exts."myext.robot.geometric_newton".layer_target = "session"
 # layer_target = "root" のときの Sublayer のファイルパス(.usda)
 exts."myext.robot.geometric_newton".root_layer_file = ""
-# リンクのコリジョンの残し方。"static" = 静的コライダー(Play しなくても干渉を調べられる)、"kinematic" = kinematic 剛体(Play 中に Contact Report が使える)
-exts."myext.robot.geometric_newton".collision_mode = "static"
+# リンクの PhysX コリジョンの扱い。"none" = PhysX 干渉立体を完全無効化(既定・Newton 利用時の最軽量)、"static" = PhysX 静的コライダー、"kinematic" = PhysX kinematic 剛体(Contact Report 用)
+exts."myext.robot.geometric_newton".collision_mode = "none"
 # リンクの姿勢の書き込み先。"fabric" = Fabric(Newton バックエンドなら USD フラッシュ不要で 0 フレーム遅延)、"usd" = 毎回 USD、"both" = 毎回両方
 exts."myext.robot.geometric_newton".write_target = "fabric"
 # 回転関節の値の既定の単位。"rad" か "deg"(直動関節はいつも長さ)
 exts."myext.robot.geometric_newton".angle_unit = "rad"
+# 関節リミット超過時の既定ポリシー。"clip" = 境界でクランプ(超過不可・既定)、"reject" = 指令全体を拒否して前姿勢維持、"warn" = 警告+クランプ、"error" = ValueError、"ignore" = 無視
+exts."myext.robot.geometric_newton".limit_policy = "clip"
 # 干渉チェックのバックエンド。"newton" = 自前 GeometricScene (0 フレーム遅延・めり込み量・クリアランス対応)、"physx" = PhysX overlap_shape
 exts."myext.robot.geometric_newton".collision_backend = "newton"
 # 順運動学のバックエンド。"auto" = 単体小型は numpy・バッチ/大規模は Newton GPU、"numpy" = 常に numpy、"newton" = 常に Newton eval_fk
@@ -44,5 +46,7 @@ exts."myext.robot.geometric_newton".newton_device = "auto"
 exts."myext.robot.geometric_newton".convex_meshes = true
 # USD に IsaacRobotAPI が付いている場合、生成・再構築時に GeometricRobotComponent を自動生成するか (既定 true)
 exts."myext.robot.geometric_newton".auto_components = true
+# VariantSet 経由でぶら下がる子 IsaacRobotAPI を独立コンポーネントにせず親コンポーネントへ取り込むか (既定 false = 従来どおり分離)
+exts."myext.robot.geometric_newton".merge_variant_components = false
 # デバッグ用: Newton 内部コライダー形状 (通常=シアン・干渉中=赤) と接触点 (オレンジ) を DebugDraw で可視化するか (既定 false = 負荷ゼロ)
 exts."myext.robot.geometric_newton".debug_draw_colliders = false

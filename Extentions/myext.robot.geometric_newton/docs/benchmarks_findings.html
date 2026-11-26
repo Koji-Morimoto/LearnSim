@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>実測ベンチマーク・Red → Green 検証知見 — myext.robot.geometric_newton</title>
+<style>
+:root {
+  --bg: #ffffff;
+  --surface: #f8fafc;
+  --surface-2: #f1f5f9;
+  --text: #1e293b;
+  --text-strong: #0f172a;
+  --muted: #64748b;
+  --border: #cbd5e1;
+  --border-light: #e2e8f0;
+  --c1: #2563eb; --c1-bg: #dbeafe;
+  --c2: #059669; --c2-bg: #d1fae5;
+  --c3: #d97706; --c3-bg: #fef3c7;
+  --c4: #7c3aed; --c4-bg: #ede9fe;
+  --red: #dc2626; --red-bg: #fee2e2;
+  --slate: #94a3b8;
+}
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  font-family: "Segoe UI", "Hiragino Kaku Gothic ProN", "Yu Gothic UI", Meiryo, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.78;
+}
+.topbar {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(255,255,255,0.95);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--border-light);
+  padding: 0.6rem 1.4rem;
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 0.8rem; flex-wrap: wrap;
+}
+.topbar-title {
+  display: flex; align-items: center; gap: 0.6rem;
+  font-weight: 700; color: var(--text-strong); font-size: 0.94rem;
+}
+.doc-type-pill {
+  display: inline-block; padding: 0.12rem 0.6rem; border-radius: 999px;
+  font-size: 0.76rem; font-weight: 700;
+  background: var(--c3-bg); color: #92400e;
+}
+.topbar-nav { display: flex; align-items: center; gap: 0.45rem; flex-wrap: wrap; }
+.nav-btn {
+  display: inline-flex; align-items: center; gap: 0.3rem;
+  padding: 0.32rem 0.72rem; border-radius: 7px;
+  border: 1px solid var(--border); background: var(--surface);
+  color: var(--text-strong); text-decoration: none;
+  font-size: 0.81rem; font-weight: 600;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+.nav-btn:hover { background: var(--c1-bg); border-color: var(--c1); color: var(--c1); }
+.nav-btn.is-active { background: var(--c1); border-color: var(--c1); color: #fff; }
+
+.page-layout {
+  max-width: 1440px; margin: 0 auto;
+  display: grid; grid-template-columns: 260px minmax(0, 1fr);
+  gap: 2.2rem; padding: 1.8rem 1.5rem 5rem;
+}
+@media (max-width: 1060px) {
+  .page-layout { grid-template-columns: 1fr; }
+  .toc-rail { display: none; }
+}
+.toc-rail {
+  position: sticky; top: 4.6rem; align-self: start;
+  max-height: calc(100vh - 5.6rem); overflow-y: auto; padding-right: 0.4rem;
+}
+.toc-label {
+  font-size: 0.74rem; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.06em; color: var(--muted); margin: 0 0 0.55rem;
+}
+.toc ul { list-style: none; margin: 0; padding: 0; }
+.toc li { margin: 0.14rem 0; }
+.toc a {
+  display: block; padding: 0.28rem 0.6rem;
+  border-left: 2px solid var(--border-light);
+  color: var(--muted); text-decoration: none;
+  font-size: 0.81rem; line-height: 1.4;
+  transition: color 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+}
+.toc a:hover { color: var(--text-strong); border-left-color: var(--border); }
+.toc a.is-current {
+  color: var(--c1); border-left-color: var(--c1);
+  background: var(--c1-bg); font-weight: 700; border-radius: 0 6px 6px 0;
+}
+
+.prose { max-width: 68ch; line-height: 1.82; color: var(--text); }
+.prose ul, .prose ol { padding-left: 1.35rem; margin: 0.35rem 0 1.05rem; }
+.prose li { margin-bottom: 0.45rem; }
+.hero { margin-bottom: 2rem; padding-bottom: 1.35rem; border-bottom: 1px solid var(--border-light); }
+.hero h1 { margin: 0 0 0.6rem; font-size: 1.85rem; line-height: 1.3; color: var(--text-strong); }
+.hero-lead { max-width: 68ch; color: var(--muted); font-size: 0.98rem; margin: 0; }
+
+section { scroll-margin-top: 5rem; }
+h2 {
+  margin-top: 3.1rem; margin-bottom: 0.7rem; font-size: 1.38rem;
+  color: var(--text-strong); padding-bottom: 0.35rem;
+  border-bottom: 2px solid var(--border-light);
+}
+h3 { margin-top: 1.8rem; margin-bottom: 0.45rem; font-size: 1.06rem; color: var(--text-strong); }
+p { margin-top: 0; margin-bottom: 1rem; }
+
+.code-chip {
+  display: inline-block; padding: 0.04em 0.36em; border-radius: 4px;
+  border: 1px solid #cbd5e1; background: #f8fafc;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.86em; color: #0f172a;
+}
+.ref-badge {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 1.42em; height: 1.42em; padding: 0 0.32em; border-radius: 999px;
+  font-size: 0.78em; font-weight: 700; color: #fff; background: var(--c1);
+  cursor: pointer; vertical-align: 0.06em; margin-right: 0.22em; user-select: none;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
+}
+.ref-badge[data-color="1"] { background: var(--c1); }
+.ref-badge[data-color="2"] { background: var(--c2); }
+.ref-badge[data-color="3"] { background: var(--c3); }
+.ref-badge[data-color="4"] { background: var(--red); }
+
+[data-ref-scope].is-dimming [data-ref]:not(.is-active),
+[data-ref-scope].is-dimming .dim-candidate:not(.is-active) {
+  opacity: 0.26; transition: opacity 0.15s ease;
+}
+[data-ref].is-active {
+  outline: 2px solid var(--c1); outline-offset: 2px;
+  box-shadow: 0 0 0 4px rgba(37,99,235,0.2);
+}
+svg g[data-ref] { cursor: pointer; transition: opacity 0.15s ease, filter 0.15s ease; }
+svg g[data-ref].is-active { outline: none; box-shadow: none; filter: drop-shadow(0 0 5px rgba(37,99,235,0.45)); }
+@keyframes ref-pulse {
+  0% { box-shadow: 0 0 0 0 rgba(37,99,235,0.55); }
+  100% { box-shadow: 0 0 0 12px rgba(37,99,235,0); }
+}
+.is-pulsing { animation: ref-pulse 0.8s ease-out 1; }
+
+.kpi-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 0.85rem; margin: 1.2rem 0 1.8rem;
+}
+.kpi-card {
+  background: var(--surface); border: 1.5px solid var(--border-light);
+  border-radius: 10px; padding: 0.85rem 1rem;
+  border-top: 4px solid var(--c2);
+}
+.kpi-label { font-size: 0.78rem; font-weight: 700; color: var(--muted); }
+.kpi-val {
+  font-size: 1.45rem; font-weight: 800; color: var(--text-strong);
+  font-variant-numeric: tabular-nums; margin: 0.18rem 0;
+}
+.kpi-sub { font-size: 0.8rem; color: var(--muted); line-height: 1.45; }
+
+.chart-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 12px; padding: 1.05rem 1.2rem; margin: 1rem 0 1.45rem;
+}
+.chart-header {
+  display: flex; align-items: baseline; justify-content: space-between;
+  gap: 0.8rem; flex-wrap: wrap; margin-bottom: 0.65rem;
+}
+.chart-title { font-weight: 700; font-size: 0.98rem; color: var(--text-strong); }
+.chart-meta { font-size: 0.78rem; color: var(--muted); }
+.svg-wrap {
+  width: 100%; overflow-x: auto; background: #fff;
+  border: 1px solid var(--border-light); border-radius: 9px; padding: 0.65rem;
+}
+.chart-svg {
+  display: block; width: 100%; min-width: 680px; height: auto;
+  font-family: "Segoe UI", "Hiragino Kaku Gothic ProN", "Yu Gothic UI", Meiryo, sans-serif;
+}
+
+.callout {
+  border-left: 4px solid var(--c1); background: var(--surface);
+  border-radius: 0 10px 10px 0; padding: 0.85rem 1.05rem;
+  margin: 0.9rem 0 1.35rem; max-width: 68ch; font-size: 0.9rem; line-height: 1.72;
+}
+.callout.good { border-left-color: var(--c2); background: #ecfdf5; }
+.callout.warn { border-left-color: var(--c3); background: #fffbeb; }
+
+.table-wrap { overflow-x: auto; margin: 0.85rem 0 1.35rem; border: 1px solid var(--border-light); border-radius: 10px; }
+table.ergo-table { width: 100%; border-collapse: collapse; font-size: 0.86rem; }
+table.ergo-table thead th {
+  position: sticky; top: 0; background: var(--surface);
+  border-bottom: 2px solid var(--border); text-align: left;
+  padding: 0.58rem 0.75rem; color: var(--text-strong); font-weight: 700;
+}
+table.ergo-table tbody tr:hover { background: #eff6ff; }
+table.ergo-table td { padding: 0.52rem 0.75rem; border-bottom: 1px solid var(--border-light); vertical-align: top; line-height: 1.58; }
+table.ergo-table tbody tr:last-child td { border-bottom: none; }
+table.ergo-table td.num, table.ergo-table th.num { text-align: right; font-variant-numeric: tabular-nums; }
+
+.source-list { list-style: none; padding: 0; margin: 0.75rem 0 1.3rem; display: flex; flex-direction: column; gap: 0.55rem; }
+.source-list li {
+  background: var(--surface); border: 1px solid var(--border-light);
+  border-radius: 8px; padding: 0.62rem 0.9rem; font-size: 0.85rem; line-height: 1.58;
+}
+.source-tag {
+  display: inline-block; font-size: 0.71rem; font-weight: 700;
+  padding: 0.08rem 0.44rem; border-radius: 999px; margin-right: 0.4rem;
+}
+.source-tag.empirical { background: var(--c3-bg); color: #92400e; }
+.source-tag.paper { background: var(--c4-bg); color: var(--c4); }
+
+#ref-return-btn {
+  position: fixed; right: 1.25rem; bottom: 1.25rem; z-index: 9999;
+  display: none; padding: 0.52rem 0.92rem; border-radius: 999px;
+  border: 1px solid var(--c1); background: var(--c1); color: #fff;
+  font-size: 0.83rem; font-weight: 700; cursor: pointer;
+  box-shadow: 0 8px 20px rgba(37,99,235,0.3);
+}
+#ref-return-btn.is-visible { display: inline-flex; align-items: center; gap: 0.35rem; }
+</style>
+</head>
+<body>
+<header class="topbar">
+  <div class="topbar-title">
+    <span class="doc-type-pill">実測知見 / Benchmarks</span>
+    <span>myext.robot.geometric_newton</span>
+  </div>
+  <nav class="topbar-nav" aria-label="ドキュメント種別">
+    <a class="nav-btn" href="index.html">ポータル</a>
+    <a class="nav-btn" href="explanation_architecture.html">アーキテクチャ解説</a>
+    <a class="nav-btn" href="howto_recipes.html">レシピ集</a>
+    <a class="nav-btn is-active" href="benchmarks_findings.html">実測知見</a>
+    <a class="nav-btn" href="api/index.html">API リファレンス</a>
+  </nav>
+</header>
+
+<div class="page-layout">
+  <aside class="toc-rail" aria-label="ページ内目次">
+    <p class="toc-label">目次</p>
+    <nav class="toc">
+      <ul>
+        <li><a href="#sec-env">検証環境とサマリー</a></li>
+        <li><a href="#sec-p01">01. Fabric 1F 戻り防止（折れ線）</a></li>
+        <li><a href="#sec-p02">02. Broad Phase 除外登録（時間内訳）</a></li>
+        <li><a href="#sec-p03">03. collision_mode="none"（比較バー）</a></li>
+        <li><a href="#sec-p04">04. Fabric vs USD 書込（時間内訳）</a></li>
+        <li><a href="#sec-p05">05. 54 DOF 部位別 batch_update（横棒）</a></li>
+        <li><a href="#sec-p06">06. Variant 再構築内訳・凹メッシュ</a></li>
+        <li><a href="#sec-scripts">WinMerge 比較スクリプト一覧</a></li>
+        <li><a href="#sec-sources">実測ログ・可視化研究出典</a></li>
+      </ul>
+    </nav>
+  </aside>
+  <main>
+    <div class="hero">
+      <h1>実測ベンチマーク・Red → Green 検証知見</h1>
+      <p class="hero-lead">Isaac Sim 6.2.0 実機で Red（問題・劣化の再現）と Green（対策後の改善）を計測した結果を、大小比較・時間内訳・フレーム推移が直感的に読み取れるインライン SVG グラフでまとめています。</p>
+    </div>
+
+<section id="sec-env">
+  <h2>検証環境と主要サマリー</h2>
+  <div class="prose">
+    <p>
+      すべての実測値は <strong>Windows 11 Pro / Intel Core i7-13700K / NVIDIA GeForce RTX 3060 (12 GiB) / Isaac Sim 6.2.0 / Newton 1.6.1 / Warp 1.17.0</strong> の実機で取得しています。各検証は切替フラグ 1 行だけが異なる <span class="code-chip">*_Red.py</span> と <span class="code-chip">*_Green.py</span> のペアとして <span class="code-chip">tests_red_green/</span> に保存してあり、WinMerge で差分を確認しながらいつでも再実行できます。
+    </p>
+  </div>
+  <div class="kpi-grid">
+    <div class="kpi-card">
+      <div class="kpi-label">01. Fabric 1 フレーム戻り誤差</div>
+      <div class="kpi-val">1.48 m → 0.000 m</div>
+      <div class="kpi-sub">frame +0〜+4 の全フレームで誤差ゼロを達成</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">02. Narrow Phase の無駄接触</div>
+      <div class="kpi-val">42 件 → 0 件</div>
+      <div class="kpi-sub">Broad Phase 除外登録で −0.521 ms/iter（−19.2%）</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">03. PhysX ロボットコライダー数</div>
+      <div class="kpi-val">7 個 → 0 個</div>
+      <div class="kpi-sub">Newton 側は 7 個すべて認識し環境 3 件を検知</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">04. 毎フレーム姿勢書込速度</div>
+      <div class="kpi-val">2.23 倍高速</div>
+      <div class="kpi-sub">USD 0.847 ms → Fabric 0.380 ms（USD 書込 0 回）</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">05. 54 DOF 部位別 batch_update</div>
+      <div class="kpi-val">5.13 倍高速</div>
+      <div class="kpi-sub">2.70 ms → 0.63 ms（一括配列との差は +0.067 ms）</div>
+    </div>
+  </div>
+</section>
+
+<section id="sec-p01">
+  <h2>01. USD 書込直後の Fabric 1 フレーム戻り（ちらつき）防止</h2>
+  <div class="chart-card" id="chart-p01" data-ref-scope data-ref-group="p01">
+    <div class="chart-header">
+      <span class="chart-title">_usd_sync_pending の追加により、frame +1 に残っていた 1.32 m のちらつきを全フレーム 0.000 m へ解消</span>
+      <span class="chart-meta">折れ線グラフ（フレーム推移） / UR10e Case A: flush_to_usd() 直後に Fabric 移動</span>
+    </div>
+    <div class="svg-wrap">
+      <svg class="chart-svg" viewBox="0 0 820 275" role="img" aria-label="フレームごとの Fabric 姿勢誤差推移グラフ">
+        <!-- グリッド・軸 -->
+        <line x1="80" y1="30" x2="80" y2="215" stroke="#94a3b8" stroke-width="1.2"/>
+        <line x1="80" y1="215" x2="620" y2="215" stroke="#94a3b8" stroke-width="1.2"/>
+        <!-- Y 目盛: 0.0m=215, 0.5m=157, 1.0m=99, 1.5m=41 (116px / 1.0m) -->
+        <line x1="80" y1="157" x2="620" y2="157" stroke="#e2e8f0" stroke-dasharray="3 3"/>
+        <line x1="80" y1="99" x2="620" y2="99" stroke="#e2e8f0" stroke-dasharray="3 3"/>
+        <line x1="80" y1="41" x2="620" y2="41" stroke="#e2e8f0" stroke-dasharray="3 3"/>
+        <text x="72" y="219" font-size="11" text-anchor="end" fill="#475569">0.0 m</text>
+        <text x="72" y="161" font-size="11" text-anchor="end" fill="#475569">0.5 m</text>
+        <text x="72" y="103" font-size="11" text-anchor="end" fill="#475569">1.0 m</text>
+        <text x="72" y="45" font-size="11" text-anchor="end" fill="#475569">1.5 m</text>
+        <!-- X 軸目盛: f0=100, f1=225, f2=350, f3=475, f4=600 -->
+        <text x="100" y="236" font-size="11.5" text-anchor="middle" fill="#334155">frame +0</text>
+        <text x="225" y="236" font-size="11.5" text-anchor="middle" font-weight="700" fill="#0f172a">frame +1</text>
+        <text x="350" y="236" font-size="11.5" text-anchor="middle" fill="#334155">frame +2</text>
+        <text x="475" y="236" font-size="11.5" text-anchor="middle" fill="#334155">frame +3</text>
+        <text x="600" y="236" font-size="11.5" text-anchor="middle" fill="#334155">frame +4</text>
+        <text x="350" y="258" font-size="11" text-anchor="middle" fill="#64748b">app.update() の経過フレーム数（手先位置の誤差 [m]）</text>
+
+        <!-- Red: ガードなし (f0=0, f1..4=1.323m -> y=61.5) -->
+        <g class="dim-candidate" data-ref="p01-red" data-color="4" data-ref-role="target" tabindex="0">
+          <polyline points="100,215 225,61.5 350,61.5 475,61.5 600,61.5" fill="none" stroke="#dc2626" stroke-width="3"/>
+          <circle cx="100" cy="215" r="4.5" fill="#dc2626"/>
+          <circle cx="225" cy="61.5" r="5" fill="#dc2626"/>
+          <circle cx="350" cy="61.5" r="4.5" fill="#dc2626"/>
+          <circle cx="475" cy="61.5" r="4.5" fill="#dc2626"/>
+          <circle cx="600" cy="61.5" r="4.5" fill="#dc2626"/>
+          <text x="612" y="59" font-size="11.5" font-weight="700" fill="#dc2626">Red: ガード無効</text>
+          <text x="612" y="75" font-size="10.5" fill="#991b1b">1.323 m に固着（復帰不能）</text>
+        </g>
+
+        <!-- 旧実装: _repush_frames のみ (f0=0, f1=1.323m -> y=61.5, f2..4=0 -> y=211) -->
+        <g class="dim-candidate" data-ref="p01-old" data-color="3" data-ref-role="target" tabindex="0">
+          <polyline points="100,215 225,61.5 350,209 475,209 600,209" fill="none" stroke="#d97706" stroke-width="2.6" stroke-dasharray="7 4"/>
+          <rect x="220" y="56.5" width="10" height="10" fill="#d97706"/>
+          <rect x="345" y="204" width="9" height="9" fill="#d97706"/>
+          <text x="236" y="47" font-size="10.8" font-weight="700" fill="#b45309">旧実装: frame +1 のみ 1.323 m ちらつき</text>
+          <text x="612" y="196" font-size="11" font-weight="700" fill="#b45309">修正前 (_repush のみ)</text>
+          <text x="612" y="210" font-size="10.2" fill="#92400e">frame +2 で 0 m へ復帰</text>
+        </g>
+
+        <!-- Green: _usd_sync_pending + _repush_frames (全フレーム 0.000m) -->
+        <g class="dim-candidate" data-ref="p01-green" data-color="2" data-ref-role="target" tabindex="0">
+          <polyline points="100,215 225,215 350,215 475,215 600,215" fill="none" stroke="#059669" stroke-width="3.4"/>
+          <circle cx="100" cy="215" r="4.5" fill="#059669"/>
+          <circle cx="225" cy="215" r="5.5" fill="#059669"/>
+          <circle cx="350" cy="215" r="4.5" fill="#059669"/>
+          <circle cx="475" cy="215" r="4.5" fill="#059669"/>
+          <circle cx="600" cy="215" r="4.5" fill="#059669"/>
+          <text x="612" y="229" font-size="11.5" font-weight="700" fill="#059669">Green: 修正後（既定）</text>
+          <text x="612" y="244" font-size="10.5" fill="#065f46">全フレーム 0.000 m</text>
+        </g>
+      </svg>
+    </div>
+    <div class="prose" style="max-width:none; margin-top:0.7rem; font-size:0.88rem;">
+      <p style="margin-bottom:0;">
+        <span class="ref-badge" data-ref="p01-red" data-color="4" data-ref-role="source" tabindex="0">1</span>ガードを無効にした <span class="code-chip" data-exact-target="chart-p01">Red: ガード無効</span> は USD→Fabric 同期により旧姿勢へ戻ったまま固着します（Case B <span class="code-chip">set_variant</span> は 1.323 m、Case C <span class="code-chip">layer.apply</span> は 1.478 m）。
+        <span class="ref-badge" data-ref="p01-old" data-color="3" data-ref-role="source" tabindex="0">2</span>実測により <span class="code-chip" data-exact-target="chart-p01">修正前 (_repush のみ)</span> では <span class="code-chip">frame +1</span> に 1 フレームのちらつきが残っていたことが判明しました。
+        <span class="ref-badge" data-ref="p01-green" data-color="2" data-ref-role="source" tabindex="0">3</span><span class="code-chip">_usd_sync_pending</span> を導入した <span class="code-chip" data-exact-target="chart-p01">Green: 修正後（既定）</span> では、定常フレームの USD 非書込を維持したまま全フレームで誤差 0.000 m を達成しています。
+      </p>
+    </div>
+  </div>
+</section>
+
+<section id="sec-p02">
+  <h2>02. Newton Broad Phase への collision_filter 事前登録（時間内訳と接触数）</h2>
+  <div class="chart-card" id="chart-p02">
+    <div class="chart-header">
+      <span class="chart-title">Broad Phase 登録により Narrow Phase の無駄な接触計算（0.521 ms / 42 接触）を 100% 削減</span>
+      <span class="chart-meta">積み上げ横棒グラフ（時間配分）＋接触数バー / UR10e + Robotiq_2F_85（200 反復平均）</span>
+    </div>
+    <div class="svg-wrap">
+      <svg class="chart-svg" viewBox="0 0 820 265" role="img" aria-label="Broad Phase フィルタ登録有無の時間配分と接触数の比較グラフ">
+        <!-- 上段: 時間内訳 (0..3.0 ms -> x=210..690, 160px/ms) -->
+        <text x="20" y="24" font-size="12" font-weight="700" fill="#0f172a">A. 1 反復あたりの処理時間の内訳 [ms]（0 基準）</text>
+        <line x1="210" y1="36" x2="210" y2="128" stroke="#94a3b8" stroke-width="1.2"/>
+        <line x1="370" y1="36" x2="370" y2="128" stroke="#e2e8f0" stroke-dasharray="3 3"/>
+        <line x1="530" y1="36" x2="530" y2="128" stroke="#e2e8f0" stroke-dasharray="3 3"/>
+        <line x1="690" y1="36" x2="690" y2="128" stroke="#e2e8f0" stroke-dasharray="3 3"/>
+        <text x="210" y="143" font-size="10.5" text-anchor="middle" fill="#64748b">0.0 ms</text>
+        <text x="370" y="143" font-size="10.5" text-anchor="middle" fill="#64748b">1.0 ms</text>
+        <text x="530" y="143" font-size="10.5" text-anchor="middle" fill="#64748b">2.0 ms</text>
+        <text x="690" y="143" font-size="10.5" text-anchor="middle" fill="#64748b">3.0 ms</text>
+
+        <!-- Red bar: 2.188ms fixed (350.1px) + 0.521ms wasted narrow (83.4px) = 2.709ms (433.4px) -->
+        <text x="200" y="65" font-size="11.5" font-weight="700" text-anchor="end" fill="#991b1b">Red: 未登録 (False)</text>
+        <rect x="210" y="46" width="350.1" height="28" rx="4" fill="#cbd5e1"/>
+        <text x="385" y="64" font-size="10.5" font-weight="600" text-anchor="middle" fill="#334155">固定費（Fabric + GPU 起動/同期）2.188 ms</text>
+        <rect x="560.1" y="46" width="83.4" height="28" rx="4" fill="#dc2626"/>
+        <text x="601.8" y="64" font-size="10" font-weight="700" text-anchor="middle" fill="#fff">+0.521</text>
+        <text x="652" y="64" font-size="11.5" font-weight="700" fill="#dc2626">計 2.709 ms</text>
+
+        <!-- Green bar: 2.188ms fixed (350.1px) + 0ms wasted -->
+        <text x="200" y="109" font-size="11.5" font-weight="700" text-anchor="end" fill="#065f46">Green: 登録済み (既定)</text>
+        <rect x="210" y="90" width="350.1" height="28" rx="4" fill="#059669"/>
+        <text x="385" y="108" font-size="10.5" font-weight="700" text-anchor="middle" fill="#fff">固定費のみ 2.188 ms（無駄 Narrow Phase 0 ms）</text>
+        <text x="568" y="108" font-size="11.5" font-weight="700" fill="#059669">計 2.188 ms（−19.2%）</text>
+
+        <!-- 下段: Narrow Phase 生接触数 (0..50 -> x=210..610, 8px/contact) -->
+        <text x="20" y="176" font-size="12" font-weight="700" fill="#0f172a">B. Narrow Phase が計算した無駄な生接触数（rigid_contact_count）</text>
+        <line x1="210" y1="186" x2="210" y2="246" stroke="#94a3b8" stroke-width="1.2"/>
+        <text x="200" y="207" font-size="11.5" font-weight="700" text-anchor="end" fill="#991b1b">Red: 未登録 (False)</text>
+        <rect x="210" y="191" width="336" height="22" rx="4" fill="#dc2626"/>
+        <text x="554" y="206" font-size="11.5" font-weight="700" fill="#dc2626">42 接触（Broad 候補 151 組 → 後処理で全廃棄）</text>
+
+        <text x="200" y="238" font-size="11.5" font-weight="700" text-anchor="end" fill="#065f46">Green: 登録済み (既定)</text>
+        <rect x="210" y="222" width="4" height="22" rx="2" fill="#059669"/>
+        <text x="224" y="237" font-size="11.5" font-weight="700" fill="#059669">0 接触（Broad 候補 130 組・登録除外ペア 21 組）</text>
+      </svg>
+    </div>
+    <div class="callout">
+      <strong>なぜ単体 1 台では約 20% 短縮にとどまり、バッチや凹メッシュで桁違いに効くのか：</strong>
+      時間配分バーが示す通り、単体 1 台・単純凸包では固定費（Fabric 書込と CUDA 起動／CPU-GPU 同期の 2.188 ms）が大半を占めるため、Narrow Phase の無駄計算（0.521 ms）を丸ごと消した効果が全体の 19.2% に見えます。一方、<span class="code-chip">convex_meshes=False</span> の高密度凹メッシュや <span class="code-chip">BatchedNewtonScene</span>（例: 1024 台並列）では固定費が薄まり、未登録では 42 接触 × 1024 台 ＝ 43,008 件/step の無駄接触が Narrow Phase と接触バッファを圧迫するため、Broad Phase 除外が不可欠になります。
+    </div>
+  </div>
+</section>
+
+<section id="sec-p03">
+  <h2>03. Session Sublayer の collision_mode="none" vs "static"</h2>
+  <div class="chart-card" id="chart-p03">
+    <div class="chart-header">
+      <span class="chart-title">collision_mode="none" で PhysX のロボットコライダーを 7 → 0 個へ削減しつつ、Newton 検知は完全維持</span>
+      <span class="chart-meta">ペア横棒グラフ / UR10e（instanceable collisions を含む）＋環境障害物 /World/Obs</span>
+    </div>
+    <div class="svg-wrap">
+      <svg class="chart-svg" viewBox="0 0 820 200" role="img" aria-label="collision_mode static と none のコライダー数と検知数比較">
+        <!-- スケール: 0..10 個 -> x=250..650 (40px/個) -->
+        <line x1="250" y1="22" x2="250" y2="176" stroke="#94a3b8" stroke-width="1.2"/>
+        <text x="250" y="192" font-size="10.5" text-anchor="middle" fill="#64748b">0</text>
+        <text x="450" y="192" font-size="10.5" text-anchor="middle" fill="#64748b">5</text>
+        <text x="650" y="192" font-size="10.5" text-anchor="middle" fill="#64748b">10</text>
+
+        <!-- グループ 1: PhysX 保持ロボットコライダー数 -->
+        <text x="240" y="45" font-size="11.5" font-weight="700" text-anchor="end" fill="#0f172a">PhysX 保持コライダー数</text>
+        <rect x="250" y="28" width="280" height="17" rx="3" fill="#dc2626"/>
+        <text x="538" y="41" font-size="11" font-weight="700" fill="#dc2626">7 個（Red: collision_mode="static"）</text>
+        <rect x="250" y="49" width="4" height="17" rx="2" fill="#059669"/>
+        <text x="262" y="62" font-size="11" font-weight="700" fill="#059669">0 個（Green: collision_mode="none" 既定）</text>
+
+        <!-- グループ 2: Newton が認識するロボットコライダー数 -->
+        <text x="240" y="102" font-size="11.5" font-weight="700" text-anchor="end" fill="#0f172a">Newton 認識コライダー数</text>
+        <rect x="250" y="85" width="280" height="15" rx="3" fill="#94a3b8"/>
+        <text x="538" y="97" font-size="10.8" fill="#475569">7 個（static）</text>
+        <rect x="250" y="103" width="280" height="15" rx="3" fill="#2563eb"/>
+        <text x="538" y="115" font-size="10.8" font-weight="700" fill="#2563eb">7 個（none — 元定義をそのまま読取）</text>
+
+        <!-- グループ 3: Newton 環境干渉検知数 -->
+        <text x="240" y="154" font-size="11.5" font-weight="700" text-anchor="end" fill="#0f172a">Newton 環境干渉検知数</text>
+        <rect x="250" y="137" width="120" height="15" rx="3" fill="#94a3b8"/>
+        <text x="378" y="149" font-size="10.8" fill="#475569">3 件（static）</text>
+        <rect x="250" y="155" width="120" height="15" rx="3" fill="#2563eb"/>
+        <text x="378" y="167" font-size="10.8" font-weight="700" fill="#2563eb">3 件（none — 完全一致）</text>
+      </svg>
+    </div>
+  </div>
+</section>
+
+<section id="sec-p04">
+  <h2>04. 毎フレーム書込先 write_target="usd" vs "fabric"（時間配分）</h2>
+  <div class="chart-card" id="chart-p04">
+    <div class="chart-header">
+      <span class="chart-title">write_target="fabric" は set_dof_positions() を 2.23 倍高速化し、USD 書込回数を 120 → 0 回へ削減</span>
+      <span class="chart-meta">積み上げ横棒グラフ（1 フレーム時間配分） / UR10e + Robotiq_2F_85（120 フレーム平均）</span>
+    </div>
+    <div class="svg-wrap">
+      <svg class="chart-svg" viewBox="0 0 820 155" role="img" aria-label="write_target usd と fabric の 1 フレーム時間配分比較">
+        <!-- スケール: 0..6.0 ms -> x=200..740 (90px/ms) -->
+        <line x1="200" y1="18" x2="200" y2="118" stroke="#94a3b8" stroke-width="1.2"/>
+        <line x1="380" y1="18" x2="380" y2="118" stroke="#e2e8f0" stroke-dasharray="3 3"/>
+        <line x1="560" y1="18" x2="560" y2="118" stroke="#e2e8f0" stroke-dasharray="3 3"/>
+        <line x1="740" y1="18" x2="740" y2="118" stroke="#e2e8f0" stroke-dasharray="3 3"/>
+        <text x="200" y="135" font-size="10.5" text-anchor="middle" fill="#64748b">0.0 ms</text>
+        <text x="380" y="135" font-size="10.5" text-anchor="middle" fill="#64748b">2.0 ms</text>
+        <text x="560" y="135" font-size="10.5" text-anchor="middle" fill="#64748b">4.0 ms</text>
+        <text x="740" y="135" font-size="10.5" text-anchor="middle" fill="#64748b">6.0 ms</text>
+
+        <!-- Red: usd (set=0.847ms -> 76.2px, update=4.725ms -> 425.3px, total=5.573ms -> 501.6px) -->
+        <text x="190" y="47" font-size="11.5" font-weight="700" text-anchor="end" fill="#991b1b">Red: write_target="usd"</text>
+        <text x="190" y="61" font-size="9.8" text-anchor="end" fill="#991b1b">USD 書込 120 回 / 120f</text>
+        <rect x="200" y="30" width="76.2" height="30" rx="4" fill="#dc2626"/>
+        <text x="238" y="49" font-size="9.8" font-weight="700" text-anchor="middle" fill="#fff">0.847</text>
+        <rect x="276.2" y="30" width="425.3" height="30" rx="4" fill="#cbd5e1"/>
+        <text x="488" y="49" font-size="10.5" font-weight="600" text-anchor="middle" fill="#334155">app.update() 4.725 ms</text>
+        <text x="709" y="49" font-size="11" font-weight="700" fill="#dc2626">計 5.573 ms</text>
+
+        <!-- Green: fabric (set=0.380ms -> 34.2px, update=4.686ms -> 421.7px, total=5.066ms -> 455.9px) -->
+        <text x="190" y="95" font-size="11.5" font-weight="700" text-anchor="end" fill="#065f46">Green: write_target="fabric"</text>
+        <text x="190" y="109" font-size="9.8" text-anchor="end" fill="#065f46">USD 書込 0 回 / 120f（既定）</text>
+        <rect x="200" y="78" width="34.2" height="30" rx="4" fill="#059669"/>
+        <rect x="234.2" y="78" width="421.7" height="30" rx="4" fill="#cbd5e1"/>
+        <text x="445" y="97" font-size="10.5" font-weight="600" text-anchor="middle" fill="#334155">app.update() 4.686 ms（set_dof は左端 0.380 ms: 2.23x 高速）</text>
+        <text x="664" y="97" font-size="11" font-weight="700" fill="#059669">計 5.066 ms</text>
+      </svg>
+    </div>
+  </div>
+</section>
+
+<section id="sec-p05">
+  <h2>05. 54 DOF 4 アームロボットの書き込み方式別速度比較</h2>
+  <div class="chart-card" id="chart-p05">
+    <div class="chart-header">
+      <span class="chart-title">with robot.batch_update(): なら部位別でも一括配列と +0.067 ms 差、付け忘れは 5.13 倍悪化</span>
+      <span class="chart-meta">ソート済み横棒グラフ（0 基準＋ベースライン破線） / multi_arm 54 DOF・59 リンク（300 反復平均）</span>
+    </div>
+    <div class="svg-wrap">
+      <svg class="chart-svg" viewBox="0 0 820 235" role="img" aria-label="54 DOF 4 アームロボットでの書き込み方式別処理時間比較">
+        <!-- スケール: 0..3.0 ms -> x=270..720 (150px/ms) -->
+        <line x1="270" y1="20" x2="270" y2="198" stroke="#94a3b8" stroke-width="1.2"/>
+        <line x1="420" y1="20" x2="420" y2="198" stroke="#e2e8f0" stroke-dasharray="3 3"/>
+        <line x1="570" y1="20" x2="570" y2="198" stroke="#e2e8f0" stroke-dasharray="3 3"/>
+        <line x1="720" y1="20" x2="720" y2="198" stroke="#e2e8f0" stroke-dasharray="3 3"/>
+        <!-- ベースライン参照線 0.560ms -> x=270 + 84 = 354 -->
+        <line x1="354" y1="20" x2="354" y2="198" stroke="#2563eb" stroke-width="1.3" stroke-dasharray="4 3"/>
+        <text x="270" y="216" font-size="10.5" text-anchor="middle" fill="#64748b">0.0 ms</text>
+        <text x="420" y="216" font-size="10.5" text-anchor="middle" fill="#64748b">1.0 ms</text>
+        <text x="570" y="216" font-size="10.5" text-anchor="middle" fill="#64748b">2.0 ms</text>
+        <text x="720" y="216" font-size="10.5" text-anchor="middle" fill="#64748b">3.0 ms</text>
+
+        <!-- Bar 1: Flat array 0.543ms avg (81.5px) -->
+        <text x="260" y="42" font-size="11.2" font-weight="700" text-anchor="end" fill="#1e40af">一括フラット配列 (54 DOF × 1 回)</text>
+        <rect x="270" y="26" width="84" height="22" rx="4" fill="#2563eb"/>
+        <text x="362" y="41" font-size="11" font-weight="700" fill="#1e40af">0.53〜0.56 ms（基準 1.00x / push 1 回）</text>
+
+        <!-- Bar 2: 54-key dict 0.550ms (82.5px) -->
+        <text x="260" y="76" font-size="11.2" text-anchor="end" fill="#334155">参考: 54 キー辞書 (1 回渡し)</text>
+        <rect x="270" y="60" width="82.5" height="22" rx="4" fill="#94a3b8"/>
+        <text x="361" y="75" font-size="11" fill="#475569">0.55 ms（push 1 回）</text>
+
+        <!-- Bar 3: 5 Binders + batch_update 0.615ms (92.3px) -->
+        <text x="260" y="110" font-size="11.2" font-weight="700" text-anchor="end" fill="#065f46">Green: batch_update ＋ 5 Binder</text>
+        <rect x="270" y="94" width="92.3" height="22" rx="4" fill="#059669"/>
+        <text x="370" y="109" font-size="11" font-weight="700" fill="#059669">0.615 ms（+0.055 ms / push 1 回 / 異軸数安全）</text>
+
+        <!-- Bar 4: 5 Components + batch_update 0.627ms (94.1px) -->
+        <text x="260" y="144" font-size="11.2" font-weight="700" text-anchor="end" fill="#065f46">Green: batch_update ＋ 5 Component</text>
+        <rect x="270" y="128" width="94.1" height="22" rx="4" fill="#10b981"/>
+        <text x="372" y="143" font-size="11" font-weight="700" fill="#059669">0.627 ms（+0.067 ms / push 1 回）</text>
+
+        <!-- Bar 5: Red 5 Components WITHOUT batch_update 2.700ms (405px) -->
+        <text x="260" y="178" font-size="11.2" font-weight="700" text-anchor="end" fill="#991b1b">Red: batch_update なし × 5 部位</text>
+        <rect x="270" y="162" width="405" height="22" rx="4" fill="#dc2626"/>
+        <text x="683" y="177" font-size="11" font-weight="700" fill="#dc2626">2.700 ms（5.13x 悪化 / push 5 回）</text>
+      </svg>
+    </div>
+    <div class="callout good">
+      <strong>設計上の結論：</strong>
+      並列 4 アームではロボット全体の <span class="code-chip">dof_names</span> が幅優先（階層順）で入り組みますが、<span class="code-chip">with robot.batch_update():</span> の中で <span class="code-chip">GeometricRobotComponent</span> または <span class="code-chip">GeometricDofBinder</span> を使えば、一括配列との差は 60 fps 予算（16.67 ms）の 0.4% 未満（+0.055〜0.067 ms）に収まります。ダミー軸（<span class="code-chip">lower==upper</span>）でモデルや IK を汚す必要はありません。
+    </div>
+  </div>
+</section>
+
+<section id="sec-p06">
+  <h2>06. VariantSet 再構築の時間内訳と U 字凹メッシュ精度</h2>
+  <div class="chart-card" id="chart-p06">
+    <div class="chart-header">
+      <span class="chart-title">54 DOF ロボットの VariantSet 再構築（計 22.23 ms）は USD 読取（53%）と初期姿勢書込（33%）が大半</span>
+      <span class="chart-meta">積み上げ横棒グラフ（Kit 実測 last_rebuild_timings）＋ 凹メッシュ精度比較</span>
+    </div>
+    <div class="svg-wrap">
+      <svg class="chart-svg" viewBox="0 0 820 230" role="img" aria-label="VariantSet 再構築時間内訳と凹メッシュ誤差比較">
+        <!-- 上段: 22.227 ms を x=40..760 (720px -> 32.39 px/ms) にマッピング -->
+        <text x="20" y="24" font-size="12" font-weight="700" fill="#0f172a">A. VariantSet 切替時の自動再構築時間内訳（合計 22.23 ms / multi_arm 54 DOF）</text>
+        <!-- read_usd: 11.855ms (384.0px): joints_usd 5.612(181.8) + traverse 2.038(66.0) + comp 1.552(50.3) + tree/other 2.653(85.9) -->
+        <rect x="40" y="38" width="181.8" height="34" rx="4" fill="#2563eb"/>
+        <text x="130.9" y="59" font-size="10.2" font-weight="700" text-anchor="middle" fill="#fff">joints_usd 5.61 ms</text>
+        <rect x="223.8" y="38" width="200.2" height="34" rx="4" fill="#60a5fa"/>
+        <text x="323.9" y="59" font-size="10.2" font-weight="700" text-anchor="middle" fill="#0f172a">他 USD 読取 6.24 ms</text>
+        <!-- setup: 1.453ms (47.1px) -->
+        <rect x="426.0" y="38" width="47.1" height="34" rx="4" fill="#a78bfa"/>
+        <text x="449.5" y="59" font-size="9.2" font-weight="700" text-anchor="middle" fill="#fff">1.45</text>
+        <!-- layer: 1.608ms (52.1px) -->
+        <rect x="475.1" y="38" width="52.1" height="34" rx="4" fill="#f59e0b"/>
+        <text x="501.1" y="59" font-size="9.2" font-weight="700" text-anchor="middle" fill="#fff">1.61</text>
+        <!-- write: 7.310ms (236.8px) -->
+        <rect x="529.2" y="38" width="236.8" height="34" rx="4" fill="#059669"/>
+        <text x="647.6" y="59" font-size="10.5" font-weight="700" text-anchor="middle" fill="#fff">write (USD+Fabric) 7.31 ms</text>
+        <text x="40" y="90" font-size="10.5" fill="#475569">内訳: read_usd 計 11.86 ms（53.3%） ／ setup 1.45 ms（6.5%） ／ layer 1.61 ms（7.2%） ／ write 7.31 ms（32.9%）</text>
+
+        <!-- 下段: U 字水密凹メッシュ 5cm 貫通時の符号付き距離（真値 = -0.0500 m） -->
+        <text x="20" y="128" font-size="12" font-weight="700" fill="#0f172a">B. U 字凹メッシュ対 5 cm 貫通時のめり込み推定量（真値 0.0500 m / CUDA）</text>
+        <!-- スケール: 0..0.50 m -> x=240..690 (900px/m) -->
+        <line x1="240" y1="140" x2="240" y2="206" stroke="#94a3b8" stroke-width="1.2"/>
+        <!-- 真値線 0.05m -> x=240+45=285 -->
+        <line x1="285" y1="140" x2="285" y2="206" stroke="#059669" stroke-width="1.5" stroke-dasharray="4 3"/>
+        <text x="230" y="160" font-size="11.2" font-weight="700" text-anchor="end" fill="#991b1b">convex_meshes=True (凸包)</text>
+        <rect x="240" y="145" width="405" height="20" rx="4" fill="#dc2626"/>
+        <text x="653" y="159" font-size="11" font-weight="700" fill="#dc2626">−0.4500 m（溝を塞ぐ過大評価 / 2.35 ms）</text>
+
+        <text x="230" y="192" font-size="11.2" font-weight="700" text-anchor="end" fill="#065f46">convex_meshes=False (生メッシュ)</text>
+        <rect x="240" y="177" width="45" height="20" rx="4" fill="#059669"/>
+        <text x="293" y="191" font-size="11" font-weight="700" fill="#059669">−0.0500 m（真値との誤差 4 nm / 2.39 ms）</text>
+      </svg>
+    </div>
+  </div>
+</section>
+
+<section id="sec-scripts">
+  <h2>WinMerge 比較用 Red / Green スクリプト一覧（個別逆引き表）</h2>
+  <div class="prose">
+    <p>正確なファイル名・差分行・再現コマンドの逆引きには表を使用します。各組の Red と Green を WinMerge で開くと、1 行の切替フラグ差分だけを直接確認できます。</p>
+  </div>
+  <div class="table-wrap">
+    <table class="ergo-table">
+      <thead>
+        <tr><th>#</th><th>Red / Green スクリプト（<span class="code-chip">tests_red_green/</span>）</th><th>WinMerge の差分ポイント</th><th>主な検証内容</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="num">01</td><td><span class="code-chip">01_fabric_repush_flicker_Red.py</span><br><span class="code-chip">01_fabric_repush_flicker_Green.py</span></td><td><span class="code-chip">ENABLE_REPUSH_GUARD</span>（False / True）</td><td>USD 書込直後の Fabric 移動で起きる 1F 戻りの再現と解消</td></tr>
+        <tr><td class="num">02</td><td><span class="code-chip">02_newton_broadphase_filter_Red.py</span><br><span class="code-chip">02_newton_broadphase_filter_Green.py</span></td><td><span class="code-chip">BAKE_FILTER_IN_BROADPHASE</span>（False / True）</td><td>Broad Phase 除外登録による Narrow Phase 無駄接触の削減</td></tr>
+        <tr><td class="num">03</td><td><span class="code-chip">03_collision_mode_none_vs_static_Red.py</span><br><span class="code-chip">03_collision_mode_none_vs_static_Green.py</span></td><td><span class="code-chip">COLLISION_MODE</span>（"static" / "none"）</td><td>PhysX ロボットコライダー 0 個化と Newton 検知の両立</td></tr>
+        <tr><td class="num">04</td><td><span class="code-chip">04_write_target_usd_vs_fabric_Red.py</span><br><span class="code-chip">04_write_target_usd_vs_fabric_Green.py</span></td><td><span class="code-chip">WRITE_TARGET</span>（"usd" / "fabric"）</td><td>毎フレーム USD 書込と Fabric のみ書込の速度・書込回数差</td></tr>
+        <tr><td class="num">05</td><td><span class="code-chip">05_batch_update_components_Red.py</span><br><span class="code-chip">05_batch_update_components_Green.py</span></td><td><span class="code-chip">USE_BATCH_UPDATE</span>（False / True）</td><td>54 DOF 4 アームでの一括配列 vs 部位別更新（Binder 込み）</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section id="sec-sources">
+  <h2>実測ログ・可視化設計の学術出典</h2>
+  <ul class="source-list">
+    <li>
+      <span class="source-tag empirical">実測ログ</span>
+      <strong>テキスト版ベンチマークログ・実行コマンド</strong>：<span class="code-chip">tests_red_green/BENCHMARKS_AND_FINDINGS.md</span>・<span class="code-chip">tests_kit/last_run.json</span>
+    </li>
+    <li>
+      <span class="source-tag paper">視覚認知研究</span>
+      <strong>Cleveland &amp; McGill (1984)</strong> — <em>Graphical Perception: Theory, Experimentation, and Application to the Development of Graphical Methods</em>（JASA 79(387), 531–554）：共通軸上の位置＞長さ＞角度＞面積＞色の精度序列。
+      <a href="https://doi.org/10.1080/01621459.1984.10478080" target="_blank" rel="noopener">DOI: 10.1080/01621459.1984.10478080</a>
+    </li>
+    <li>
+      <span class="source-tag paper">視覚認知研究</span>
+      <strong>Heer &amp; Bostock (2010)</strong> — <em>Crowdsourcing Graphical Perception</em>（ACM CHI 2010）：Cleveland &amp; McGill 序列の大規模追試および矩形面積・グリッド間隔の検証。
+      <a href="https://doi.org/10.1145/1753326.1753357" target="_blank" rel="noopener">DOI: 10.1145/1753326.1753357</a>
+    </li>
+    <li>
+      <span class="source-tag paper">視覚認知研究</span>
+      <strong>Healey &amp; Enns (2012)</strong> — <em>Attention and Visual Memory in Visualization and Computer Graphics</em>（IEEE TVCG 18(7), 1170–1188）：前注意処理（200〜250 ms 並列知覚）とワーキングメモリ制約。
+      <a href="https://doi.org/10.1109/TVCG.2011.127" target="_blank" rel="noopener">DOI: 10.1109/TVCG.2011.127</a>
+    </li>
+    <li>
+      <span class="source-tag paper">視覚認知研究</span>
+      <strong>Franconeri, Padilla, Shah, Zacks, &amp; Hullman (2021)</strong> — <em>The Science of Visual Data Communication: What Works</em>（PSPI 22(3), 110–161）：直接ラベル・0 基準軸・認知負荷最小化の実証レビュー。
+      <a href="https://doi.org/10.1177/15291006211051956" target="_blank" rel="noopener">DOI: 10.1177/15291006211051956</a>
+    </li>
+  </ul>
+</section>
+
+  </main>
+</div>
+<svg id="ref-connector-layer" style="position:fixed;inset:0;width:100vw;height:100vh;pointer-events:none;z-index:9990;"></svg>
+<button id="ref-return-btn" type="button">↩ 元の位置へ戻る</button>
+<script>
+(() => {
+  const svgLayer = document.getElementById('ref-connector-layer');
+  const returnBtn = document.getElementById('ref-return-btn');
+  let savedScrollY = null;
+  const colorMap = { '1': '#2563eb', '2': '#059669', '3': '#d97706', '4': '#dc2626' };
+  const isInViewport = (el) => {
+    const r = el.getBoundingClientRect();
+    return r.width > 0 && r.height > 0 && r.top >= 0 && r.bottom <= window.innerHeight && r.left >= 0 && r.right <= window.innerWidth;
+  };
+  const clearLines = () => { if (svgLayer) svgLayer.innerHTML = ''; };
+  const drawConnector = (fromEl, toEl) => {
+    if (!svgLayer || !isInViewport(fromEl) || !isInViewport(toEl)) return;
+    const a = fromEl.getBoundingClientRect(), b = toEl.getBoundingClientRect();
+    const x1 = a.left + a.width / 2, y1 = a.top + a.height / 2;
+    const x2 = b.left + b.width / 2, y2 = b.top + b.height / 2;
+    const mx = (x1 + x2) / 2;
+    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    path.setAttribute('d', `M ${x1} ${y1} C ${mx} ${y1}, ${mx} ${y2}, ${x2} ${y2}`);
+    path.setAttribute('fill', 'none');
+    path.setAttribute('stroke', colorMap[fromEl.dataset.color] || '#2563eb');
+    path.setAttribute('stroke-width', '2');
+    path.setAttribute('stroke-dasharray', '4 3');
+    path.setAttribute('opacity', '0.72');
+    svgLayer.appendChild(path);
+  };
+  const setActive = (refId, originEl) => {
+    const peers = Array.from(document.querySelectorAll(`[data-ref="${CSS.escape(refId)}"]`));
+    const scopes = new Set();
+    peers.forEach((el) => { el.classList.add('is-active'); const sc = el.closest('[data-ref-scope]'); if (sc) scopes.add(sc); });
+    scopes.forEach((sc) => sc.classList.add('is-dimming'));
+    clearLines();
+    if (originEl) peers.filter((el) => el !== originEl).forEach((peer) => drawConnector(originEl, peer));
+  };
+  const clearActive = () => {
+    document.querySelectorAll('[data-ref].is-active').forEach((el) => el.classList.remove('is-active'));
+    document.querySelectorAll('[data-ref-scope].is-dimming').forEach((sc) => sc.classList.remove('is-dimming'));
+    clearLines();
+  };
+  document.querySelectorAll('[data-ref]').forEach((el) => {
+    const refId = el.dataset.ref;
+    el.addEventListener('mouseenter', () => setActive(refId, el));
+    el.addEventListener('mouseleave', clearActive);
+    el.addEventListener('focus', () => setActive(refId, el));
+    el.addEventListener('blur', clearActive);
+    el.addEventListener('click', () => {
+      const peers = Array.from(document.querySelectorAll(`[data-ref="${CSS.escape(refId)}"]`)).filter((p) => p !== el);
+      if (peers.length === 0) return;
+      const target = peers.find((p) => p.dataset.refRole !== el.dataset.refRole) || peers[0];
+      if (!isInViewport(target) && returnBtn) { savedScrollY = window.scrollY; returnBtn.classList.add('is-visible'); }
+      target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      target.classList.remove('is-pulsing'); void target.offsetWidth; target.classList.add('is-pulsing');
+    });
+  });
+  if (returnBtn) {
+    returnBtn.addEventListener('click', () => {
+      if (savedScrollY !== null) { window.scrollTo({ top: savedScrollY, behavior: 'smooth' }); savedScrollY = null; }
+      returnBtn.classList.remove('is-visible');
+    });
+  }
+  const tocLinks = Array.from(document.querySelectorAll('.toc a[href^="#"]'));
+  const sections = tocLinks.map((a) => document.querySelector(a.getAttribute('href'))).filter(Boolean);
+  if (sections.length > 0) {
+    const obs = new IntersectionObserver((entries) => {
+      entries.forEach((e) => {
+        if (!e.isIntersecting) return;
+        tocLinks.forEach((a) => a.classList.toggle('is-current', a.getAttribute('href') === `#${e.target.id}`));
+      });
+    }, { rootMargin: '-14% 0px -75% 0px' });
+    sections.forEach((s) => obs.observe(s));
+  }
+})();
+</script>
+</body>
+</html>

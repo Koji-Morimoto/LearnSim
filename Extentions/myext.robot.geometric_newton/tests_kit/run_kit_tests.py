@@ -415,8 +415,15 @@ def test_layer_apply_remove_restores_everything():
     assert UsdPhysics.RigidBodyAPI(link).GetRigidBodyEnabledAttr().Get() is False
     assert stage.GetPrimAtPath(f"{ROBOT}/root_joint").GetAttribute("physxArticulation:articulationEnabled").Get() is False
     assert UsdPhysics.Joint(stage.GetPrimAtPath(f"{ROBOT}/joints/elbow_joint")).GetJointEnabledAttr().Get() is False
-    # コリジョンは残っている(CollisionAPI にも形状にも触っていない)
-    assert not any("collision" in name.lower() for name in names), names
+    # 既定の collision_mode="none" では PhysX コライダーを Session Sublayer 上で無効化しつつ、
+    # Newton 側には元のコライダーが見える (`layer.remove()` で完全復元される)
+    assert "physics:collisionEnabled" in names, names
+    assert sum(len(v) for v in robot.collider_paths.values()) > 0
+    try:
+        robot.check_collisions("within", backend="physx")
+        raise AssertionError('collision_mode="none" なのに backend="physx" が例外を出さなかった')
+    except RuntimeError:
+        pass
     robot.set_dof_positions(np.full(robot.num_dofs, 0.3))
     robot.flush_to_usd()
     # 幾何モード中に Play しても、ロボットは落ちない・動かない(箱は落ちる)
@@ -695,7 +702,7 @@ def dual_arm(stage, **kwargs) -> GeometricRobot:
 @harness.test
 def test_collision_scopes_on_combined_robot():
     stage = harness.new_stage()
-    robot = dual_arm(stage)
+    robot = dual_arm(stage, layer_options=GeometricLayerOptions(collision_mode="static"))
     harness.update(2)
     assert robot.component_names == ["cart", "left", "right"]
     left, right = robot.get_component("left"), robot.get_component("right")
@@ -870,7 +877,12 @@ def test_view_matches_articulation_shapes_and_single_robots():
     for i, path in enumerate(paths):
         add_ur10e(stage, path, position=(0.0, 1.5 * i, 0.0))
     for target in ("fabric", "usd"):
-        view = GeometricRobotView.from_articulations(stage, paths, write_target=target)
+        view = GeometricRobotView.from_articulations(
+            stage,
+            paths,
+            write_target=target,
+            layer_options=GeometricLayerOptions(collision_mode="static"),
+        )
         assert len(view) == 4 and view.num_dofs == 6 and len(stage.GetSessionLayer().subLayerPaths) == 1
         q = rng.uniform(-1, 1, size=(4, 6)).astype(np.float32)
         view.set_dof_positions(q)

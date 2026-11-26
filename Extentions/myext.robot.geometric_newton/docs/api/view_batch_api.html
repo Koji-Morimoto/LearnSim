@@ -316,6 +316,7 @@ table.ergo-table td.num, table.ergo-table th.num { text-align: right; font-varia
     <a class="nav-btn" href="../index.html">ポータル</a>
     <a class="nav-btn" href="../explanation_architecture.html">アーキテクチャ解説</a>
     <a class="nav-btn" href="../howto_recipes.html">レシピ集</a>
+    <a class="nav-btn" href="../benchmarks_findings.html">実測知見</a>
     <a class="nav-btn is-active" href="index.html">API リファレンス</a>
   </nav>
 </header>
@@ -378,12 +379,14 @@ GeometricRobotView.from_articulations(
     newton_device: str | None = None,
     convex_meshes: bool | None = None,
     auto_components: bool | None = None,
+    merge_variant_components: bool | None = None,
     environment_roots: Sequence[str] | None = None,
     use_cuda_graph: bool = True,
     use_gpu_fabric_writer: bool = False,
 ) -&gt; GeometricRobotView</div><div class="prose"><p>複数ロボットを 1 枚の共有 <span class='code-chip'>GeometricLayer</span> と 1 つの <span class='code-chip'>BatchedNewtonScene</span> で束ねて管理するビューを生成します。</p></div><div class="table-wrap"><table class="ergo-table"><thead><tr><th>引数 / フィールド</th><th>型</th><th>既定値</th><th>意味・形状・単位・制約</th></tr></thead><tbody><tr><td><span class='code-chip'>sources / robots</span></td><td><span class='code-chip'>長さ N の列</span></td><td><span class='code-chip'>必須</span></td><td>全ロボットが同一の運動学構造を持つこと（異構造は <span class='code-chip'>ValueError</span>）。直接 <span class='code-chip'>GeometricRobotView(robots)</span> を呼ぶ場合は、<strong>全ロボットが同一の <span class='code-chip'>GeometricLayer</span> インスタンスを共有</strong>していなければならない（異なると <span class='code-chip'>ValueError</span>）。</td></tr>
 <tr><td><span class='code-chip'>convex_meshes</span></td><td><span class='code-chip'>bool | None</span></td><td><span class='code-chip'>None (既定 True)</span></td><td><span class='code-chip'>BatchedNewtonScene</span> へ渡すメッシュ近似設定。<span class='code-chip'>False</span> で生三角メッシュ判定。</td></tr>
-<tr><td><span class='code-chip'>auto_components</span></td><td><span class='code-chip'>bool | None</span></td><td><span class='code-chip'>None (既定 True)</span></td><td><span class='code-chip'>from_articulations()</span> 時に各ロボットで <span class='code-chip'>IsaacRobotAPI</span> からコンポーネント自動生成するか。</td></tr>
+<tr><td><span class='code-chip'>auto_components</span></td><td><span class='code-chip'>bool | None</span></td><td><span class='code-chip'>None (既定 True)</span></td><td><span class='code-chip'>from_articulations()</span> 時に各ロボットで <span class='code-chip'>IsaacRobotAPI</span> からコンポーネントを自動生成するか。</td></tr>
+<tr><td><span class='code-chip'>merge_variant_components</span></td><td><span class='code-chip'>bool | None</span></td><td><span class='code-chip'>None (既定 False)</span></td><td><span class='code-chip'>True</span> のとき、VariantSet 経由で接続された子 <span class='code-chip'>IsaacRobotAPI</span> を独立コンポーネントにせず親コンポーネントへ統合します。</td></tr>
 <tr><td><span class='code-chip'>environment_roots</span></td><td><span class='code-chip'>Sequence[str] | None</span></td><td><span class='code-chip'>None</span></td><td><strong>全ロボット共通の障害物（Newton の <span class='code-chip'>world=-1</span>）</strong>としてまとめて登録するルート Prim パス列（ロボットごとの個別環境ではない）。<span class='code-chip'>None</span> のとき <span class='code-chip'>/World</span>（なければ <span class='code-chip'>/</span>）を自動探索。</td></tr>
 <tr><td><span class='code-chip'>use_cuda_graph</span></td><td><span class='code-chip'>bool</span></td><td><span class='code-chip'>True</span></td><td><span class='code-chip'>BatchedNewtonScene</span> の FK / 衝突カーネル群を CUDA Graph キャプチャして起動オーバーヘッドを最小化する。</td></tr>
 <tr><td><span class='code-chip'>use_gpu_fabric_writer</span></td><td><span class='code-chip'>bool</span></td><td><span class='code-chip'>False</span></td><td><span class='code-chip'>True</span> かつ Newton FK 使用中・<span class='code-chip'>write_target="fabric"</span> のとき、GPU 上の <span class='code-chip'>body_q</span> を CPU 経由せず直接 Fabric GPU バッファへ書き込む。</td></tr></tbody></table></div><div class="api-meta-grid"><div class="api-meta-box"><strong>戻り値 / 型</strong><span class='code-chip'>GeometricRobotView</span> インスタンス（<span class='code-chip'>len(view)</span> は台数 <span class='code-chip'>N</span>）。</div></div><div class="code-ex">from myext.robot.geometric_newton import GeometricRobotView
@@ -534,8 +537,8 @@ hits_per_env = view.check_collisions_batch(scope="all")</div></article>
     </li>
     <li>
       <span class="source-tag empirical">実機検証</span>
-      <strong>Isaac Sim 6.2.0（RTX 3060）での全テスト・U 字凹メッシュ実測</strong>：<br>
-      <span class="code-chip">tests_pure/</span>（73 本全通過）・<span class="code-chip">tests_kit/run_kit_tests.py</span>（34 本全通過）・U 字水密メッシュ対実測（<span class="code-chip">convex_meshes=True</span>: 溝誤検知 1 件 / 5 cm 貫通時 −0.45 m / 2.35 ms 対 <span class="code-chip">convex_meshes=False</span>: 溝非接触 0 件 / 5 cm 貫通時 −0.0500 m / 2.39 ms）。
+      <strong>Isaac Sim 6.2.0（RTX 3060）での全テスト・Red → Green 実測（5 組＋U 字凹メッシュ）</strong>：<br>
+      <span class="code-chip">tests_pure/</span>（77 本全通過）・<span class="code-chip">tests_kit/run_kit_tests.py</span>（34 本全通過）・<span class="code-chip">tests_red_green/BENCHMARKS_AND_FINDINGS.md</span>（ちらつき防止・Broad Phase 登録・<span class="code-chip">collision_mode="none"</span>・Fabric 書込・54 DOF <span class="code-chip">batch_update()</span>・U 字凹メッシュの実測ログ）。
     </li>
   </ul>
 </section>

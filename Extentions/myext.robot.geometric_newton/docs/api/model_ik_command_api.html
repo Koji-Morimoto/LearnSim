@@ -316,6 +316,7 @@ table.ergo-table td.num, table.ergo-table th.num { text-align: right; font-varia
     <a class="nav-btn" href="../index.html">ポータル</a>
     <a class="nav-btn" href="../explanation_architecture.html">アーキテクチャ解説</a>
     <a class="nav-btn" href="../howto_recipes.html">レシピ集</a>
+    <a class="nav-btn" href="../benchmarks_findings.html">実測知見</a>
     <a class="nav-btn is-active" href="index.html">API リファレンス</a>
   </nav>
 </header>
@@ -435,6 +436,7 @@ class UsdArticulationSource:
     root_prim_path: str | Sequence[str]
     components: dict[str, str | Sequence[str]] | None = None
     auto_components: bool = True
+    merge_variant_components: bool = False
     extra_joint_paths: Sequence[str] = ()
     ignore_joint_paths: Sequence[str] = ()
     dof_order: Sequence[str] | None = None
@@ -445,6 +447,7 @@ class UsdArticulationSource:
 read_articulation(stage: Usd.Stage, source: UsdArticulationSource | str) -&gt; tuple[GeometricRobotModel, UsdRobotInfo]</div><div class="prose"><p>USD Stage 上の Articulation（<span class='code-chip'>UsdPhysics.Joint</span>・<span class='code-chip'>PhysxMimicJointAPI</span>・<span class='code-chip'>PhysicsFilteredPairsAPI</span>・<span class='code-chip'>IsaacRobotAPI</span>）を読み取り、<span class='code-chip'>GeometricRobotModel</span> と付帯情報 <span class='code-chip'>UsdRobotInfo</span> を返します。</p></div><div class="table-wrap"><table class="ergo-table"><thead><tr><th>引数 / フィールド</th><th>型</th><th>既定値</th><th>意味・形状・単位・制約</th></tr></thead><tbody><tr><td><span class='code-chip'>root_prim_path</span></td><td><span class='code-chip'>str | Sequence[str]</span></td><td><span class='code-chip'>必須</span></td><td>単一または複数ルート Prim パス。</td></tr>
 <tr><td><span class='code-chip'>components</span></td><td><span class='code-chip'>dict[str, str | Sequence[str]] | None</span></td><td><span class='code-chip'>None</span></td><td>明示的なコンポーネント定義（例: <span class='code-chip'>{"arm": "/World/Bot/arm*"}</span>）。指定すると自動検出より優先される。パターンの照合規約は<strong>「その Prim 自身」「その配下の全 Prim」「<span class='code-chip'>fnmatch</span> のワイルドカード一致」</strong>のいずれか。</td></tr>
 <tr><td><span class='code-chip'>auto_components</span></td><td><span class='code-chip'>bool</span></td><td><span class='code-chip'>True</span></td><td><span class='code-chip'>components=None</span> のとき、USD 配下の <span class='code-chip'>IsaacRobotAPI</span>（<span class='code-chip'>isaac:physics:robotLinks</span> / 入れ子サブロボット Prim / <span class='code-chip'>isaac:namespace</span>）から自動的にコンポーネント辞書を構築する。</td></tr>
+<tr><td><span class='code-chip'>merge_variant_components</span></td><td><span class='code-chip'>bool</span></td><td><span class='code-chip'>False</span></td><td><span class='code-chip'>True</span> のとき、VariantSet 経由で接続された子 <span class='code-chip'>IsaacRobotAPI</span> を独立コンポーネントにせず、最も近い親 <span class='code-chip'>IsaacRobotAPI</span> コンポーネントへ統合します。</td></tr>
 <tr><td><span class='code-chip'>extra_joint_paths / ignore_joint_paths</span></td><td><span class='code-chip'>Sequence[str]</span></td><td><span class='code-chip'>()</span></td><td>ルート外にある追加ジョイントの取り込み、または特定ジョイントの除外。</td></tr>
 <tr><td><span class='code-chip'>dof_order</span></td><td><span class='code-chip'>Sequence[str] | None</span></td><td><span class='code-chip'>None</span></td><td>DOF 配列の並び順を明示固定したい場合に指定。</td></tr>
 <tr><td><span class='code-chip'>unsupported_joints</span></td><td><span class='code-chip'>"error" | "fixed" | "ignore"</span></td><td><span class='code-chip'>"error"</span></td><td>Spherical / D6 等の未対応ジョイント遭遇時のポリシー（<span class='code-chip'>"error"</span> は <span class='code-chip'>NotImplementedError</span>）。</td></tr>
@@ -596,8 +599,8 @@ create_ik_solver(name: str, chain: KinematicChain, config: IKSolverConfig | None
     </li>
     <li>
       <span class="source-tag empirical">実機検証</span>
-      <strong>Isaac Sim 6.2.0（RTX 3060）での全テスト・U 字凹メッシュ実測</strong>：<br>
-      <span class="code-chip">tests_pure/</span>（73 本全通過）・<span class="code-chip">tests_kit/run_kit_tests.py</span>（34 本全通過）・U 字水密メッシュ対実測（<span class="code-chip">convex_meshes=True</span>: 溝誤検知 1 件 / 5 cm 貫通時 −0.45 m / 2.35 ms 対 <span class="code-chip">convex_meshes=False</span>: 溝非接触 0 件 / 5 cm 貫通時 −0.0500 m / 2.39 ms）。
+      <strong>Isaac Sim 6.2.0（RTX 3060）での全テスト・Red → Green 実測（5 組＋U 字凹メッシュ）</strong>：<br>
+      <span class="code-chip">tests_pure/</span>（77 本全通過）・<span class="code-chip">tests_kit/run_kit_tests.py</span>（34 本全通過）・<span class="code-chip">tests_red_green/BENCHMARKS_AND_FINDINGS.md</span>（ちらつき防止・Broad Phase 登録・<span class="code-chip">collision_mode="none"</span>・Fabric 書込・54 DOF <span class="code-chip">batch_update()</span>・U 字凹メッシュの実測ログ）。
     </li>
   </ul>
 </section>

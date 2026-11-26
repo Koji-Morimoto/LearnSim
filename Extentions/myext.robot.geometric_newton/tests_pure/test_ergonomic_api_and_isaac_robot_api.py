@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 import os
 import sys
 import unittest
@@ -19,7 +20,12 @@ from test_usd_reader_and_collider_sublayer import _build_synthetic_multi_arm_sta
 
 from pxr import Gf, Sdf, Usd, UsdGeom, UsdPhysics
 
-from myext.robot.geometric_newton import GeometricRobot, GeometricScene, UsdArticulationSource
+from myext.robot.geometric_newton import (
+    GeometricLayerOptions,
+    GeometricRobot,
+    GeometricScene,
+    UsdArticulationSource,
+)
 
 
 def _add_isaac_robot_api(prim: Usd.Prim, *, namespace: str = "", link_targets: list[str] | None = None) -> None:
@@ -141,11 +147,14 @@ class TestIsaacRobotApiAndErgonomicApis(unittest.TestCase):
             with self.assertRaises(KeyError):
                 robot.set_dof_positions({"no_such_joint": 0.0})
 
-            # describe() が主要項目を含むこと
+            # describe() が RFC 8259 準拠 JSON で主要項目を含むこと
             desc = robot.describe()
-            self.assertIn("GeometricRobot", desc)
-            self.assertIn("arm1", desc)
-            self.assertIn("mimic <-", desc)
+            parsed = json.loads(desc)
+            self.assertEqual(parsed["summary"]["num_dofs"], robot.num_dofs)
+            self.assertIn("arm1", parsed["components"])
+            self.assertTrue(any(d["mimic"] is not None for d in parsed["dofs"]))
+            self.assertEqual(parsed["config"]["collision_mode"], "none")
+            self.assertEqual(parsed, robot.describe_dict())
         finally:
             robot.close()
 
@@ -226,6 +235,279 @@ class TestIsaacRobotApiAndErgonomicApis(unittest.TestCase):
             s, e = GeometricScene._build_local_wireframe(spec)
             self.assertEqual(s.shape, e.shape)
             self.assertGreaterEqual(len(s), min_edges)
+
+    def test_broad_phase_filter_baking_and_dynamic_update(self) -> None:
+        """既定の GeometricScene で collision_filter が Newton Broad Phase へ反映され、
+        動的変更 (add_pair / remove_pair) と touching_pairs() 診断が両立することを検証する。"""
+        stage = Usd.Stage.CreateInMemory()
+        UsdGeom.SetStageUpAxis(stage, UsdGeom.Tokens.z)
+        UsdGeom.Xform.Define(stage, "/World")
+
+        # 3 リンク直列 (L0 - L1 - L2): 全部同じ原点に半径 0.2 の球を置いて全組が重なる状態を作る
+        for name in ("L0", "L1", "L2"):
+            lf = UsdGeom.Xform.Define(stage, f"/World/Bot/{name}")
+            if name == "L0":
+                UsdPhysics.ArticulationRootAPI.Apply(lf.GetPrim())
+            UsdPhysics.RigidBodyAPI.Apply(lf.GetPrim())
+            sp = UsdGeom.Sphere.Define(stage, f"/World/Bot/{name}/col")
+            sp.CreateRadiusAttr(0.2)
+            UsdPhysics.CollisionAPI.Apply(sp.GetPrim())
+        for jname, parent, child in (("j01", "L0", "L1"), ("j12", "L1", "L2")):
+            j = UsdPhysics.RevoluteJoint.Define(stage, f"/World/Bot/{jname}")
+            j.CreateAxisAttr("Z")
+            j.CreateBody0Rel().SetTargets([f"/World/Bot/{parent}"])
+            j.CreateBody1Rel().SetTargets([f"/World/Bot/{child}"])
+
+        robot = GeometricRobot.from_articulation(stage, "/World/Bot", write_target="usd", newton_device="cpu")
+        try:
+            # 1) 初期状態: 隣接 (L0,L1) と (L1,L2) は Newton Broad Phase の除外リストへ登録済み
+            #    非隣接 (L0,L2) だけが Broad Phase 候補 (shape_pairs_filtered) に残り、1 件ヒットする
+            hits = robot.check_collisions("within")
+            self.assertEqual([p.names for p in hits], [("L0", "L2")])
+            sc = robot.scene
+            self.assertEqual(sc.newton_model.shape_collision_filter_pairs_array().shape[0], 2)
+            self.assertEqual(sc._pipeline.shape_pairs_filtered.shape[0], 1)
+
+            # 2) 非隣接 (L0,L2) を add_pair で除外 -> Broad Phase 候補ペア自体が 0 件になる (Narrow Phase 0 回)
+            robot.collision_filter.add_pair("L0", "L2", reason="always_touch")
+            hits_after_add = robot.check_collisions("within")
+            self.assertEqual(hits_after_add, [])
+            self.assertEqual(sc.newton_model.shape_collision_filter_pairs_array().shape[0], 3)
+            self.assertEqual(sc._pipeline.shape_pairs_filtered.shape[0], 0)
+
+            # 3) それでも診断用 touching_pairs() は全 3 組の重なりを検出できる
+            touching = robot.touching_pairs()
+            self.assertEqual({p.names for p in touching}, {("L0", "L1"), ("L1", "L2"), ("L0", "L2")})
+
+            # 4) 隣接ペア (L0,L1) の除外を remove_pair で外すと、Broad Phase に戻って検出される
+            self.assertTrue(robot.collision_filter.remove_pair("L0", "L1"))
+            hits_after_remove = robot.check_collisions("within")
+            self.assertEqual([p.names for p in hits_after_remove], [("L0", "L1")])
+            self.assertEqual(sc._pipeline.shape_pairs_filtered.shape[0], 1)
+        finally:
+            robot.close()
+
+    def test_collision_mode_none_disables_physx_but_newton_still_detects(self) -> None:
+        """既定 collision_mode='none' で USD 上は physics:collisionEnabled=False になるが、
+        Newton は元コライダーを検出し、ユーザーが明示無効化したコライダーは無視すること。"""
+        stage = Usd.Stage.CreateInMemory()
+        UsdGeom.SetStageUpAxis(stage, UsdGeom.Tokens.z)
+        UsdGeom.Xform.Define(stage, "/World")
+
+        for name in ("L0", "L1"):
+            lf = UsdGeom.Xform.Define(stage, f"/World/Bot/{name}")
+            if name == "L0":
+                UsdPhysics.ArticulationRootAPI.Apply(lf.GetPrim())
+            UsdPhysics.RigidBodyAPI.Apply(lf.GetPrim())
+            sp = UsdGeom.Sphere.Define(stage, f"/World/Bot/{name}/col")
+            sp.CreateRadiusAttr(0.2)
+            UsdPhysics.CollisionAPI.Apply(sp.GetPrim())
+        j = UsdPhysics.RevoluteJoint.Define(stage, "/World/Bot/j01")
+        j.CreateAxisAttr("Z")
+        j.CreateBody0Rel().SetTargets(["/World/Bot/L0"])
+        j.CreateBody1Rel().SetTargets(["/World/Bot/L1"])
+        # 障害物 (環境)
+        obs = UsdGeom.Sphere.Define(stage, "/World/Obs")
+        obs.CreateRadiusAttr(0.2)
+        UsdPhysics.CollisionAPI.Apply(obs.GetPrim())
+
+        robot = GeometricRobot.from_articulation(stage, "/World/Bot", write_target="usd", newton_device="cpu")
+        try:
+            self.assertEqual(robot.layer.options.collision_mode, "none")
+            # USD 上ではロボットのコライダーは physics:collisionEnabled=False (PhysX コライダー生成ゼロ)
+            col0 = stage.GetPrimAtPath("/World/Bot/L0/col")
+            self.assertIs(UsdPhysics.CollisionAPI(col0).GetCollisionEnabledAttr().Get(), False)
+            # 環境コライダーは触っていない
+            self.assertIsNot(UsdPhysics.CollisionAPI(obs.GetPrim()).GetCollisionEnabledAttr().Get(), False)
+            # それでも Newton はロボットのコライダーを認識し、環境干渉を検出する
+            self.assertEqual(robot.collider_paths["L0"], ["/World/Bot/L0/col"])
+            self.assertTrue(robot.is_in_collision("environment"))
+            # PhysX バックエンドは明示エラーになる
+            with self.assertRaises(RuntimeError):
+                robot.check_collisions("environment", backend="physx")
+            # ユーザーが Root Layer 側で明示的に collisionEnabled=False にすれば Newton も無視する
+            UsdPhysics.CollisionAPI(col0).CreateCollisionEnabledAttr().Set(False)
+            self.assertEqual(robot.collider_paths["L0"], [])
+        finally:
+            robot.close()
+        # layer.remove() 後は L1 の collisionEnabled は元の状態に戻る
+        col1 = stage.GetPrimAtPath("/World/Bot/L1/col")
+        self.assertIsNot(UsdPhysics.CollisionAPI(col1).GetCollisionEnabledAttr().Get(), False)
+
+    def test_limit_policy_reject_and_violation_link_query(self) -> None:
+        """limit_policy='clip' / 'reject' と get_limit_violations / get_limit_violation_links の動作検証。"""
+        stage = Usd.Stage.CreateInMemory()
+        UsdGeom.SetStageUpAxis(stage, UsdGeom.Tokens.z)
+        UsdGeom.Xform.Define(stage, "/World")
+        for name in ("base", "link1", "link2"):
+            lf = UsdGeom.Xform.Define(stage, f"/World/Bot/{name}")
+            if name == "base":
+                UsdPhysics.ArticulationRootAPI.Apply(lf.GetPrim())
+            UsdPhysics.RigidBodyAPI.Apply(lf.GetPrim())
+        for jname, parent, child, lo, hi in (
+            ("j1", "base", "link1", -45.0, 45.0),
+            ("j2", "link1", "link2", -30.0, 60.0),
+        ):
+            j = UsdPhysics.RevoluteJoint.Define(stage, f"/World/Bot/{jname}")
+            j.CreateAxisAttr("Z")
+            j.CreateLowerLimitAttr(lo)
+            j.CreateUpperLimitAttr(hi)
+            j.CreateBody0Rel().SetTargets([f"/World/Bot/{parent}"])
+            j.CreateBody1Rel().SetTargets([f"/World/Bot/{child}"])
+
+        robot = GeometricRobot.from_articulation(stage, "/World/Bot", write_target="usd", angle_unit="deg", limit_policy="clip")
+        try:
+            # 安全範囲内 -> 違反なし
+            robot.set_dof_positions([10.0, 20.0])
+            self.assertFalse(robot.is_at_limit())
+            self.assertEqual(robot.get_limit_violations(), [])
+            self.assertEqual(robot.get_limit_violation_links(), {})
+
+            # clip モード: 上限超過 -> 上限値に切り詰められ、超過情報 + child_link を取得できる
+            robot.set_dof_positions([80.0, -10.0])
+            np.testing.assert_allclose(robot.get_dof_positions(), [45.0, -10.0], atol=1e-6)
+            self.assertTrue(robot.is_at_limit())
+            viols = robot.get_limit_violations()
+            self.assertEqual(len(viols), 1)
+            self.assertEqual(viols[0].dof_name, "j1")
+            self.assertEqual(viols[0].child_link, "link1")
+            self.assertEqual(viols[0].child_link_path, "/World/Bot/link1")
+            self.assertEqual(viols[0].side, "upper")
+            self.assertTrue(viols[0].exceeded)
+            self.assertAlmostEqual(viols[0].requested_value, 80.0, places=5)
+            self.assertAlmostEqual(viols[0].actual_value, 45.0, places=5)
+            self.assertEqual(robot.get_limit_violation_links(), {"link1": "upper"})
+
+            # ちょうど上限にセット: include_at_limit=True で検出、False なら除外
+            robot.set_dof_positions([45.0, 0.0])
+            self.assertEqual(len(robot.get_limit_violations(include_at_limit=True)), 1)
+            self.assertFalse(robot.get_limit_violations(include_at_limit=True)[0].exceeded)
+            self.assertEqual(robot.get_limit_violations(include_at_limit=False), [])
+
+            # reject モードへ切替: 範囲外指令を拒否し、直前姿勢 [10, 20] を維持する
+            robot.set_dof_positions([10.0, 20.0])
+            robot.limit_policy = "reject"
+            robot.set_dof_positions([10.0, -90.0])
+            np.testing.assert_allclose(robot.get_dof_positions(), [10.0, 20.0], atol=1e-6)
+            viols_rej = robot.get_limit_violations(include_at_limit=False)
+            self.assertEqual(len(viols_rej), 1)
+            self.assertEqual(viols_rej[0].dof_name, "j2")
+            self.assertEqual(viols_rej[0].child_link, "link2")
+            self.assertEqual(viols_rej[0].side, "lower")
+            self.assertTrue(viols_rej[0].exceeded)
+            self.assertAlmostEqual(viols_rej[0].requested_value, -90.0, places=5)
+            self.assertAlmostEqual(viols_rej[0].actual_value, 20.0, places=5)
+            self.assertEqual(robot.get_limit_violation_links(include_at_limit=False), {"link2": "lower"})
+        finally:
+            robot.close()
+
+    def test_merge_variant_components_and_dof_binder_across_variant_switch(self) -> None:
+        """VariantSet にぶら下がる子 IsaacRobotAPI の親統合切替 + 異軸数 Variant 切替での
+        ignore_unknown / bind_dofs() + is_render_ready を検証する。"""
+        stage = Usd.Stage.CreateInMemory()
+        UsdGeom.SetStageUpAxis(stage, UsdGeom.Tokens.z)
+        UsdGeom.Xform.Define(stage, "/World")
+
+        root = UsdGeom.Xform.Define(stage, "/World/Arm").GetPrim()
+        UsdPhysics.ArticulationRootAPI.Apply(root)
+        _add_isaac_robot_api(root)
+
+        base = UsdGeom.Xform.Define(stage, "/World/Arm/base").GetPrim()
+        UsdPhysics.RigidBodyAPI.Apply(base)
+        link1 = UsdGeom.Xform.Define(stage, "/World/Arm/link1").GetPrim()
+        UsdPhysics.RigidBodyAPI.Apply(link1)
+        j1 = UsdPhysics.RevoluteJoint.Define(stage, "/World/Arm/j1")
+        j1.CreateAxisAttr("Z")
+        j1.CreateBody0Rel().SetTargets(["/World/Arm/base"])
+        j1.CreateBody1Rel().SetTargets(["/World/Arm/link1"])
+
+        # VariantSet "Tool" を /World/Arm/link1/tool に定義:
+        #   - "TwoFinger": 2 DOF (grip_l, grip_r) の子 IsaacRobotAPI コンポーネント
+        #   - "Suction": 0 DOF (固定ノズルのみ) の子 IsaacRobotAPI コンポーネント
+        tool_prim = UsdGeom.Xform.Define(stage, "/World/Arm/link1/tool").GetPrim()
+        vset = tool_prim.GetVariantSets().AddVariantSet("Tool")
+        vset.AddVariant("TwoFinger")
+        vset.AddVariant("Suction")
+
+        vset.SetVariantSelection("TwoFinger")
+        with vset.GetVariantEditContext():
+            groot = UsdGeom.Xform.Define(stage, "/World/Arm/link1/tool/gripper").GetPrim()
+            _add_isaac_robot_api(groot)
+            UsdPhysics.RigidBodyAPI.Apply(groot)
+            mj = UsdPhysics.FixedJoint.Define(stage, "/World/Arm/link1/tool/mount")
+            mj.CreateBody0Rel().SetTargets(["/World/Arm/link1"])
+            mj.CreateBody1Rel().SetTargets(["/World/Arm/link1/tool/gripper"])
+            for fname in ("fl", "fr"):
+                fp = UsdGeom.Xform.Define(stage, f"/World/Arm/link1/tool/gripper/{fname}").GetPrim()
+                UsdPhysics.RigidBodyAPI.Apply(fp)
+                fj = UsdPhysics.PrismaticJoint.Define(stage, f"/World/Arm/link1/tool/gripper/grip_{fname}")
+                fj.CreateAxisAttr("X")
+                fj.CreateBody0Rel().SetTargets(["/World/Arm/link1/tool/gripper"])
+                fj.CreateBody1Rel().SetTargets([f"/World/Arm/link1/tool/gripper/{fname}"])
+
+        vset.SetVariantSelection("Suction")
+        with vset.GetVariantEditContext():
+            sroot = UsdGeom.Xform.Define(stage, "/World/Arm/link1/tool/suction").GetPrim()
+            _add_isaac_robot_api(sroot)
+            UsdPhysics.RigidBodyAPI.Apply(sroot)
+            mj2 = UsdPhysics.FixedJoint.Define(stage, "/World/Arm/link1/tool/mount_s")
+            mj2.CreateBody0Rel().SetTargets(["/World/Arm/link1"])
+            mj2.CreateBody1Rel().SetTargets(["/World/Arm/link1/tool/suction"])
+
+        vset.SetVariantSelection("TwoFinger")
+
+        # 1) merge_variant_components=False (既定): Arm と gripper が別 Component
+        r_sep = GeometricRobot.from_articulation(stage, "/World/Arm", write_target="usd", merge_variant_components=False)
+        try:
+            self.assertEqual(set(r_sep.component_names), {"Arm", "gripper"})
+            self.assertEqual(r_sep.get_component("Arm").dof_names, ["j1"])
+            self.assertEqual(set(r_sep.get_component("gripper").dof_names), {"grip_fl", "grip_fr"})
+        finally:
+            r_sep.close()
+
+        # 2) merge_variant_components=True: VariantSet 配下の gripper が親 Arm に統合される
+        r_merged = GeometricRobot.from_articulation(
+            stage, "/World/Arm", write_target="usd", angle_unit="deg", merge_variant_components=True
+        )
+        try:
+            self.assertEqual(r_merged.component_names, ["Arm"])
+            self.assertEqual(set(r_merged.get_component("Arm").dof_names), {"j1", "grip_fl", "grip_fr"})
+
+            # 3) Variant 間で軸数が変わるロボットに対し、binder と ignore_unknown=True で安全に書き込める
+            binder = r_merged.bind_dofs(["j1", "grip_fl", "grip_fr"], ignore_unknown=True)
+            self.assertEqual(binder.active_names, ("j1", "grip_fl", "grip_fr"))
+            self.assertEqual(binder.missing_names, ())
+            binder.set_positions([15.0, 0.02, -0.02])
+            self.assertAlmostEqual(r_merged.get_dof_positions_dict()["j1"], 15.0, places=5)
+            self.assertAlmostEqual(r_merged.get_dof_positions_dict()["grip_fl"], 0.02, places=5)
+
+            # Suction (1 DOF: j1 のみ) へ切替
+            r_merged.set_variant("Tool", "Suction")
+            self.assertEqual(r_merged.dof_names, ["j1"])
+            self.assertEqual(r_merged.component_names, ["Arm"])
+            # 切替直後は _repush_frames > 0 のため is_render_ready は False、pending_render_sync_frames > 0
+            self.assertGreater(r_merged.pending_render_sync_frames, 0)
+            self.assertFalse(r_merged.is_render_ready)
+
+            # 同じ 3 要素配列を binder へそのまま渡してもエラーにならず、存在する j1 だけ更新される
+            binder.set_positions([30.0, 0.04, -0.04])
+            self.assertEqual(binder.active_names, ("j1",))
+            self.assertEqual(binder.missing_names, ("grip_fl", "grip_fr"))
+            self.assertAlmostEqual(r_merged.get_dof_positions_dict()["j1"], 30.0, places=5)
+            got_vec = binder.get_positions(fill_value=-999.0)
+            self.assertAlmostEqual(got_vec[0], 30.0, places=5)
+            self.assertEqual(got_vec[1], -999.0)
+            self.assertEqual(got_vec[2], -999.0)
+
+            # set_dof_positions の ignore_unknown=True (辞書 / dof_names / Component)
+            r_merged.set_dof_positions({"j1": 40.0, "grip_fl": 0.05}, ignore_unknown=True)
+            self.assertAlmostEqual(r_merged.get_dof_positions_dict()["j1"], 40.0, places=5)
+            r_merged.set_dof_positions([45.0, 0.05], dof_names=["j1", "grip_fl"], ignore_unknown=True)
+            self.assertAlmostEqual(r_merged.get_dof_positions_dict()["j1"], 45.0, places=5)
+            r_merged.get_component("Arm").set_dof_positions({"j1": 50.0, "grip_fl": 0.05}, ignore_unknown=True)
+            self.assertAlmostEqual(r_merged.get_dof_positions_dict()["j1"], 50.0, places=5)
+        finally:
+            r_merged.close()
 
 
 if __name__ == "__main__":

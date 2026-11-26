@@ -14,7 +14,10 @@
 | 動的環境コライダーの追従 | USD 反映・再同期が必要 | `sync_environment()` / `set_obstacle_pose()` によるモデル再構築なし・0 フレーム遅延のその場更新 |
 | カスタムコライダー Sublayer 切替 | 手動再読込が必要 | `attach_collider_layer()` / `set_collider_layer_enabled()` / `detach_collider_layer()` と `Usd.Notice.ObjectsChanged` 自動検知で 0 フレーム遅延切替 |
 | 複数台並列評価 | NumPy バッチ順運動学 + CPU Fabric 書き込み | `BatchedNewtonScene`（multi-world + CUDA Graph）+ `GeometricGpuFabricWriter`（GPU 直接 Fabric 書き込み） |
-| 後方互換性 | — | `collision_backend="physx"` / `fk_backend="numpy"` で従来挙動へ切替可能 |
+| PhysX コライダーの既定扱い | `collision_mode="static"`（PhysX に静的コライダーが残る） | **`collision_mode="none"`（既定）**で PhysX ロボットコライダーを完全無効化し、Newton のみで判定（`layer.remove()` で完全復元） |
+| 除外ペアの Broad Phase 反映 | Python 側での後処理 | `robot.collision_filter` 全体を Newton Broad Phase へ自動登録し、Narrow Phase の無駄計算をゼロ化 |
+| 軸リミット・Variant 異軸数対応 | クランプのみ | `limit_policy="clip"` / `"reject"`＋超過リンク取得、`describe()` の JSON 出力、`merge_variant_components`、`ignore_unknown` / `bind_dofs()` |
+| 後方互換性 | — | `collision_backend="physx"`（`collision_mode="static"` 併用） / `fk_backend="numpy"` で従来挙動へ切替可能 |
 
 ## クイックスタート
 
@@ -78,27 +81,31 @@ asyncio.ensure_future(quickstart())
 | `demo/demo_04_dh_mdh_screw_ik_dual_arm.py` | DH / 修正 DH / スクリュー軸 / URDF + 双腕 `attach()` + IK | `from_dh`, `from_mdh`, `from_screw`, `from_urdf`, `attach()`, `get_component`, `create_ik_solver`, `solve_ik`, `set_active_dofs` |
 | `demo/demo_05_gpu_batch_view.py` | 16 台 UR10e の GPU バッチ FK・干渉・GPU 直接 Fabric | `GeometricRobotView.from_articulations`, `BatchedNewtonScene` (`use_cuda_graph=True`), `use_gpu_fabric_writer=True`, `check_collisions_batch`, `compute_clearances_batch` |
 | `demo/demo_06_variant_deg_converter.py` | VariantSet 切替・角度単位 `"deg"`・`CommandConverter` | `set_variant`, `get_variant_choices`, `add_structure_listener`, `angle_unit="deg"`, `LinearCommandConverter(..., when=...)`, `apply_command`, `read_command` |
+| `demo/demo_all_api_inspector.py` | 任意ロボットの全公開 API 実機確認・デバッガ検査 | `--usd` / `--prim` で任意ロボットを受け取り、`[1, 2, 3, ...]` [deg] を設定して全 API 結果をフラット変数へ格納・一覧出力 |
 
-従来のデモおよびテスト実行コマンド一覧です。
+従来のデモ、Red → Green 実測比較スクリプト、およびテスト実行コマンドの一覧です。
 
 | 用途 | コマンド |
 |---|---|
 | `Play=ON` × Newton 簡易デモ（単独起動） | `C:\isaacsim-6.2.0\tools\myext\run_sim.bat demo\demo_playon_newton.py`（`--headless --frames 120` 可） |
 | IK + Articulation 切替デモ（従来互換） | `try_geometric_robot_newton.bat` または `C:\isaacsim-6.2.0\tools\myext\run_sim.bat demo\demo_geometric_robot.py` |
 | Script Editor 簡易デモ（従来互換） | `demo\demo_script_editor.py` を Script Editor に貼って実行 |
+| 任意ロボット全 API インスペクタ | `C:\isaacsim-6.2.0\tools\myext\run_sim.bat demo\demo_all_api_inspector.py --headless` |
+| Red → Green 実測知見ログ（5 組比較） | [../tests_red_green/BENCHMARKS_AND_FINDINGS.md](../tests_red_green/BENCHMARKS_AND_FINDINGS.md)（WinMerge 比較用 `*_Red.py` / `*_Green.py`） |
 | 全テスト実行（pure + Kit） | `powershell -ExecutionPolicy Bypass -File run_tests.ps1` |
 | pure テストのみ実行 | `powershell -ExecutionPolicy Bypass -File run_tests.ps1 -Pure` |
 | Kit テスト（Newton 項目のみ） | `powershell -ExecutionPolicy Bypass -File run_tests.ps1 -Kit -Only newton` |
 
 ## ドキュメント案内（HTML 自己完結スイート推奨）
 
-ブラウザでそのまま開ける自己完結 HTML ドキュメント（全 9 ページ、公式ドキュメント出典・検索フィルタ・相互ハイライト図解付き）を推奨エントリポイントとして用意しています。
+ブラウザでそのまま開ける自己完結 HTML ドキュメント（全 10 ページ、公式ドキュメント出典・検索フィルタ・相互ハイライト図解・SVG グラフ付き）を推奨エントリポイントとして用意しています。
 
 | ドキュメント | 類型 | 読む対象・内容 |
 |---|---|---|
-| [index.html](index.html) | ポータル | 全ドキュメントへの入口、クイックスタート、目的別ガイド、主要機能一覧 |
-| [explanation_architecture.html](explanation_architecture.html) | 解説（Explanation） | コード編集者向け。モジュール依存関係、データフロー図、座標系・四元数・行列規約、`convex_meshes` / `Show by Type` / `VariantSet` の背景、機能別の編集箇所ガイド |
-| [howto_recipes.html](howto_recipes.html) | ハウツー / レシピ（How-to） | 実装者向け。`Play=ON` 0 フレーム遅延駆動、`IsaacRobotAPI` 自動コンポーネント＋`batch_update()`、`convex_meshes=False` 凹メッシュ、DebugDraw コライダー可視化、`GeometricScene`、`GeometricRobotView` GPU バッチ、カスタムコライダー Sublayer 切替、DH/MDH/URDF/IK/VariantSet のレシピ集 |
-| [api/index.html](api/index.html) | リファレンス（Reference） | API 目次・逆引き表・性能ティアガイド・`config/extension.toml` 全 11 設定キー・型エイリアス一覧。個別仕様書：[robot_api.html](api/robot_api.html) / [collision_newton_api.html](api/collision_newton_api.html) / [view_batch_api.html](api/view_batch_api.html) / [model_ik_command_api.html](api/model_ik_command_api.html) / [layer_writer_internals.html](api/layer_writer_internals.html) |
+| [index.html](index.html) | ポータル | 全ドキュメントへの入口、クイックスタート、目的別ガイド、実測ベンチマーク一覧 |
+| [benchmarks_findings.html](benchmarks_findings.html) | 実測知見（HTML / SVG グラフ） | Isaac Sim 6.2.0 での Red → Green 検証 5 組、時間内訳バー、Variant 再構築内訳、凹メッシュ精度をインライン SVG グラフで視覚化 |
+| [explanation_architecture.html](explanation_architecture.html) | 解説（Explanation） | コード編集者向け。4 層モジュール依存関係（`model/`・`usd/`・`collision/`・`runtime/`）、データフロー図、座標系・四元数・行列規約、`collision_mode="none"`・Broad Phase 除外登録・`_usd_sync_pending` ちらつき防止の実測知見、機能別の編集箇所ガイド |
+| [howto_recipes.html](howto_recipes.html) | ハウツー / レシピ（How-to） | 実装者向け。`Play=ON` 0 フレーム遅延駆動、`IsaacRobotAPI` 自動コンポーネント＋`batch_update()`、`convex_meshes=False` 凹メッシュ、DebugDraw コライダー可視化、`GeometricScene`、`GeometricRobotView` GPU バッチ、カスタムコライダー Sublayer 切替、軸リミット超過リンク取得・異軸数 Variant 対応（`bind_dofs()`）までの全 12 レシピ |
+| [api/index.html](api/index.html) | リファレンス（Reference） | API 目次・逆引き表・性能ティアガイド・`config/extension.toml` 全 13 設定キー・型エイリアス一覧。個別仕様書：[robot_api.html](api/robot_api.html) / [collision_newton_api.html](api/collision_newton_api.html) / [view_batch_api.html](api/view_batch_api.html) / [model_ik_command_api.html](api/model_ik_command_api.html) / [layer_writer_internals.html](api/layer_writer_internals.html) |
 
 従来の Markdown 版（[old/explanation_architecture.md](old/explanation_architecture.md)・[old/howto_recipes.md](old/howto_recipes.md)・[old/reference_api.md](old/reference_api.md)）も参照用に残していますが、最新の完全仕様は HTML 版を参照してください。

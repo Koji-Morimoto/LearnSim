@@ -316,6 +316,7 @@ table.ergo-table td.num, table.ergo-table th.num { text-align: right; font-varia
     <a class="nav-btn is-active" href="index.html">ポータル</a>
     <a class="nav-btn" href="explanation_architecture.html">アーキテクチャ解説</a>
     <a class="nav-btn" href="howto_recipes.html">レシピ集</a>
+    <a class="nav-btn" href="benchmarks_findings.html">実測知見</a>
     <a class="nav-btn" href="api/index.html">API リファレンス</a>
   </nav>
 </header>
@@ -360,8 +361,12 @@ table.ergo-table td.num, table.ergo-table th.num { text-align: right; font-varia
       <p>モジュール依存図・エンドツーエンドデータフロー図（SVG）、座標/四元数/行列規約、設計判断（Why）、公式出典と編集早見表。</p>
     </a>
     <a class="nav-card" href="howto_recipes.html">
-      <h3>ハウツー / レシピ集（全 11 レシピ）</h3>
-      <p>Script Editor へそのまま貼って動かせる実用コード集。Play=ON 0F 遅延、共有シーン、GPU バッチ、IsaacRobotAPI 自動 Component・batch_update・DebugDraw 可視化、毎フレーム駆動まで収録。</p>
+      <h3>ハウツー / レシピ集（全 12 レシピ）</h3>
+      <p>Script Editor へそのまま貼って動かせる実用コード集です。Play=ON 0F 遅延、共有シーン、GPU バッチ、IsaacRobotAPI 自動 Component・batch_update・DebugDraw 可視化、毎フレーム駆動、軸リミット超過リンク取得と異軸数 Variant 対応（bind_dofs）まで収録しています。</p>
+    </a>
+    <a class="nav-card" href="benchmarks_findings.html">
+      <h3>実測ベンチマーク・Red → Green 知見（SVG グラフ）</h3>
+      <p>Fabric 1F 戻り防止、Broad Phase 除外の時間配分、collision_mode="none"、Fabric vs USD、54 DOF 部位別 batch_update、Variant 再構築内訳、凹メッシュ精度をインライン SVG グラフで視覚化しています。</p>
     </a>
   </div>
 </section>
@@ -370,15 +375,16 @@ table.ergo-table td.num, table.ergo-table th.num { text-align: right; font-varia
   <h2>最短クイックスタート（パフォーマンス最優先の基本形）</h2>
   <div class="prose">
     <p>
-      既存 USD ロボットへ <span class="code-chip">IsaacRobotAPI</span> が付与されていれば、<span class="code-chip">from_articulation()</span> を呼ぶだけで構成要素（<span class="code-chip">GeometricRobotComponent</span>）が自動生成されます。毎フレームのホットループでは事前取得した Component へ NumPy 配列を渡し、複数アーム更新は <span class="code-chip">batch_update()</span> で 1 回に集約します。
+      既存 USD ロボットへ <span class="code-chip">IsaacRobotAPI</span> が付与されていれば、<span class="code-chip">from_articulation()</span> を呼ぶだけで構成要素（<span class="code-chip">GeometricRobotComponent</span>）が自動生成されます。毎フレームのホットループでは事前取得した Component へ NumPy 配列を渡し、複数アームの更新は <span class="code-chip">batch_update()</span> で 1 回に集約します。
     </p>
   </div>
   <div class="code-ex">from myext.robot.geometric_newton import GeometricRobot
 
-# 既定値: write_target="fabric", collision_backend="newton",
-#         convex_meshes=True, auto_components=True, debug_draw_colliders=False
+# 既定値: collision_mode="none", write_target="fabric", collision_backend="newton",
+#         limit_policy="clip", convex_meshes=True, auto_components=True,
+#         merge_variant_components=False, debug_draw_colliders=False
 robot = GeometricRobot.from_articulation(stage, "/World/Robot")
-print(robot.describe())  # 構成要素・全 DOF 番号/名前/mimic/VariantSet を一覧確認
+print(robot.describe())  # 構成要素・全 DOF・mimic・VariantSet を整形 JSON で確認
 
 # 事前バインドした Component を使って高速に部分更新（multi-arm の例）
 arm0 = robot.get_component("arm0")
@@ -390,23 +396,34 @@ with robot.batch_update():
 # USD フラッシュ不要・0 フレーム遅延で干渉とめり込み深さ（m / metersPerUnit=1 専用）を取得
 pairs = robot.check_collisions()
 
+# リミット到達・超過している子リンクを取得（着色・警告表示に利用）
+limit_links = robot.get_limit_violation_links()
+
 # デバッグ時だけ Newton 内部コライダー形状 (シアン / 干渉=赤 / 接触点=オレンジ) を可視化
 robot.debug_draw_colliders = True</div>
 </section>
 
 <section id="sec-bench">
-  <h2>実機テスト・ベンチマーク実績（Isaac Sim 6.2.0 / RTX 3060）</h2>
+  <h2>実機テスト・Red → Green 実測ベンチマーク（Isaac Sim 6.2.0 / RTX 3060）</h2>
+  <div class="prose">
+    <p>
+      主要な最適化・不具合対策については、Isaac Sim 6.2.0 実機で Red（問題・劣化の再現）と Green（解消・改善）をそれぞれ計測し、WinMerge で最小差分を比較できるペアを <span class="code-chip">tests_red_green/</span> と <span class="code-chip">tests_red_green/BENCHMARKS_AND_FINDINGS.md</span> に記録しています。
+    </p>
+  </div>
   <div class="table-wrap">
     <table class="ergo-table">
       <thead>
         <tr><th>項目</th><th>構成・条件</th><th class="num">実測値</th><th>備考</th></tr>
       </thead>
       <tbody>
-        <tr><td>純粋テストスイート（<span class="code-chip">tests_pure/</span>）</td><td>NumPy モデル + OpenUSD + Newton</td><td class="num">73 / 73 PASS</td><td>IsaacRobotAPI 自動 Component・batch_update・U 字生メッシュ検証込み</td></tr>
-        <tr><td>Kit 統合テスト（<span class="code-chip">tests_kit/</span>）</td><td>Isaac Sim 6.2.0 headless / Play=ON</td><td class="num">34 / 34 PASS</td><td>PhysX Articulation 姿勢・mimic・Variant 切替・GPU Fabric 一致検証</td></tr>
-        <tr><td>姿勢書込（1 リンクあたり）</td><td><span class="code-chip">GeometricUsdWriter</span>（<span class="code-chip">Sdf.ChangeBlock</span>）</td><td class="num">約 12 µs</td><td>59 リンクで約 0.7 ms</td></tr>
-        <tr><td>Fabric 一括書込</td><td><span class="code-chip">GeometricFabricWriter</span> / <span class="code-chip">GeometricGpuFabricWriter</span></td><td class="num">0.13 / 0.09 ms</td><td>USD へ書き戻さず Viewport へ即時反映</td></tr>
-        <tr><td>U 字凹メッシュ対（水密 28 三角形）</td><td><span class="code-chip">convex_meshes=True</span> vs <span class="code-chip">False</span>（CUDA）</td><td class="num">2.35 / 2.39 ms</td><td><span class="code-chip">False</span> で溝誤検知 0 件・5 cm 貫通時 −0.0500 m（誤差 4 nm）</td></tr>
+        <tr><td>純粋テストスイート（<span class="code-chip">tests_pure/</span>）</td><td>NumPy モデル + OpenUSD + Newton</td><td class="num">77 / 77 PASS</td><td><span class="code-chip">collision_mode="none"</span>・Broad Phase 登録・<span class="code-chip">merge_variant_components</span>・<span class="code-chip">limit_policy="reject"</span>・<span class="code-chip">bind_dofs()</span> を網羅</td></tr>
+        <tr><td>Kit 統合テスト（<span class="code-chip">tests_kit/</span>）</td><td>Isaac Sim 6.2.0 headless / Play=ON</td><td class="num">34 / 34 PASS</td><td>PhysX Articulation 姿勢・mimic・Variant 切替・GPU Fabric の一致を検証</td></tr>
+        <tr><td>USD 書込直後の Fabric 1F 戻り防止（Pair 01）</td><td><span class="code-chip">flush_to_usd</span> / <span class="code-chip">set_variant</span> / <span class="code-chip">apply</span> 直後</td><td class="num">1.32〜1.48 m → 0.000000 m</td><td><span class="code-chip">_usd_sync_pending</span> と <span class="code-chip">_repush_frames</span> により frame +0〜+4 の全フレームで誤差 0 m</td></tr>
+        <tr><td>Newton Broad Phase フィルタ登録（Pair 02）</td><td>UR10e + 2F-85（17 リンク・200 反復平均）</td><td class="num">42 → 0 接触 / 2.71 → 2.19 ms</td><td>常時除外ペアを Broad Phase で弾き、Narrow Phase の無駄接触をゼロ化（約 20% 短縮）</td></tr>
+        <tr><td>PhysX コライダー無効化（Pair 03）</td><td><span class="code-chip">collision_mode="static"</span> vs <span class="code-chip">"none"</span></td><td class="num">PhysX 7 → 0 個</td><td>PhysX 側のロボットコライダーを 0 個にしつつ、Newton 側は 7 個すべて認識・正常検知</td></tr>
+        <tr><td>毎フレーム書込先比較（Pair 04）</td><td><span class="code-chip">write_target="usd"</span> vs <span class="code-chip">"fabric"</span>（120f）</td><td class="num">0.847 → 0.380 ms/f</td><td><span class="code-chip">"fabric"</span> は USD 書込 0 回/120f で 2.23 倍高速</td></tr>
+        <tr><td>54 DOF 4 アームの部位別更新（Pair 05）</td><td>5 部位を <span class="code-chip">batch_update()</span> なし vs あり</td><td class="num">2.70 → 0.63 ms/f（Binder 0.61 ms）</td><td>一括 54 DOF 配列（0.53〜0.56 ms）との差はわずか +0.06 ms。付け忘れ比 5.13 倍高速</td></tr>
+        <tr><td>U 字凹メッシュ対（水密 28 三角形）</td><td><span class="code-chip">convex_meshes=True</span> vs <span class="code-chip">False</span>（CUDA）</td><td class="num">2.35 / 2.39 ms</td><td><span class="code-chip">False</span> で溝の誤検知 0 件、5 cm 貫通時の距離は −0.0500 m（誤差 4 nm）</td></tr>
       </tbody>
     </table>
   </div>
@@ -445,8 +462,8 @@ robot.debug_draw_colliders = True</div>
     </li>
     <li>
       <span class="source-tag empirical">実機検証</span>
-      <strong>Isaac Sim 6.2.0（RTX 3060）での全テスト・U 字凹メッシュ実測</strong>：<br>
-      <span class="code-chip">tests_pure/</span>（73 本全通過）・<span class="code-chip">tests_kit/run_kit_tests.py</span>（34 本全通過）・U 字水密メッシュ対実測（<span class="code-chip">convex_meshes=True</span>: 溝誤検知 1 件 / 5 cm 貫通時 −0.45 m / 2.35 ms 対 <span class="code-chip">convex_meshes=False</span>: 溝非接触 0 件 / 5 cm 貫通時 −0.0500 m / 2.39 ms）。
+      <strong>Isaac Sim 6.2.0（RTX 3060）での全テスト・Red → Green 実測（5 組＋U 字凹メッシュ）</strong>：<br>
+      <span class="code-chip">tests_pure/</span>（77 本全通過）・<span class="code-chip">tests_kit/run_kit_tests.py</span>（34 本全通過）・<span class="code-chip">demo/demo_all_api_inspector.py</span>（全 API 実機検証）・<span class="code-chip">tests_red_green/BENCHMARKS_AND_FINDINGS.md</span>（ちらつき防止・Broad Phase 登録・<span class="code-chip">collision_mode="none"</span>・Fabric 書込・54 DOF <span class="code-chip">batch_update()</span>・U 字凹メッシュの実測ログ）。
     </li>
   </ul>
 </section>

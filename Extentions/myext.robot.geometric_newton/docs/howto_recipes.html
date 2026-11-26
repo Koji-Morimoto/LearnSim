@@ -316,6 +316,7 @@ table.ergo-table td.num, table.ergo-table th.num { text-align: right; font-varia
     <a class="nav-btn" href="index.html">ポータル</a>
     <a class="nav-btn" href="explanation_architecture.html">アーキテクチャ解説</a>
     <a class="nav-btn is-active" href="howto_recipes.html">レシピ集</a>
+    <a class="nav-btn" href="benchmarks_findings.html">実測知見</a>
     <a class="nav-btn" href="api/index.html">API リファレンス</a>
   </nav>
 </header>
@@ -337,13 +338,14 @@ table.ergo-table td.num, table.ergo-table th.num { text-align: right; font-varia
         <li><a href="#recipe-9">レシピ 9：既存 `myext.robot.geometric` からの移行手順と PhysX バックエンドへの切替</a></li>
         <li><a href="#recipe-10">レシピ 10：IsaacRobotAPI 自動 Component・batch_update・生メッシュ・DebugDraw 可視化</a></li>
         <li><a href="#recipe-11">レシピ 11：毎フレーム駆動（async ループ版 / 更新イベント購読版）</a></li>
+        <li><a href="#recipe-12">レシピ 12：軸リミット超過リンク取得と異軸数 VariantSet の安全・高速駆動</a></li>
         <li><a href="#sec-sources">公式出典・実機検証</a></li>
       </ul>
     </nav>
   </aside>
   <main>
     <div class="hero">
-      <h1>ハウツー / レシピ集（全 11 レシピ）</h1>
+      <h1>ハウツー / レシピ集（全 12 レシピ）</h1>
       <p class="hero-lead">Isaac Sim 6.2.0 の Script Editor へそのまま貼って動かせる目的別レシピ集です（<span class='code-chip'>metersPerUnit=1</span> のステージ専用）。詳細な引数仕様は <a href='api/index.html'>API リファレンス</a> を参照してください。</p>
     </div>
     <section id="recipe-1"><h2>レシピ 1：既存 Articulation を `Play=ON` で 0 フレーム遅延・Fabric 駆動する</h2><div class="prose"><p><span class="code-chip">Play=ON</span> のまま周囲の PhysX 動的剛体（<span class="code-chip">/World/DynamicBox</span>）を重力で落下させつつ、UR10e は <span class="code-chip">GeometricLayer</span> で物理を無効化して Fabric 駆動し、同一フレーム（Frame 0）で自己干渉 5 組を検出します。</p></div><div class="code-ex">import asyncio
@@ -831,21 +833,25 @@ async def main():
     shutil.rmtree(tmp_dir, ignore_errors=True)
 
 
-asyncio.ensure_future(main())</div></section><section id="recipe-9"><h2>レシピ 9：既存 `myext.robot.geometric` からの移行手順と PhysX バックエンドへの切替</h2><div class="prose"><p>既存の <span class="code-chip">myext.robot.geometric</span> 向けコードを <span class="code-chip">myext.robot.geometric_newton</span> へ移す手順です。</p></div><h3>移行チェックリスト</h3><div class="prose"><p>1. <strong>import パスと拡張機能 ID の置換</strong>：<br>   - 拡張機能有効化：<span class="code-chip">"myext.robot.geometric"</span> → <span class="code-chip">"myext.robot.geometric_newton"</span><br>   - Python import：<span class="code-chip">from myext.robot.geometric import ...</span> → <span class="code-chip">from myext.robot.geometric_newton import ...</span><br>   - Kit 起動引数設定プレフィックス：<span class="code-chip">--/exts/myext.robot.geometric/...</span> → <span class="code-chip">--/exts/myext.robot.geometric_newton/...</span><br>2. <strong>既定の干渉判定バックエンドの違いを確認</strong>：<br>   - <span class="code-chip">myext.robot.geometric_newton</span> は <span class="code-chip">collision_backend="newton"</span> が既定です。<span class="code-chip">check_collisions()</span> は <span class="code-chip">flush_to_usd()</span> を呼ばないため、USD 側に最新姿勢を書きたい処理がある場合は明示的に <span class="code-chip">robot.flush_to_usd()</span> を呼びます。<br>   - <span class="code-chip">GeometricCollisionPair</span> の既存フィールド（<span class="code-chip">link_a</span>, <span class="code-chip">link_b</span>, <span class="code-chip">path_a</span>, <span class="code-chip">path_b</span>, <span class="code-chip">kind</span>, <span class="code-chip">component_a</span>, <span class="code-chip">component_b</span>, <span class="code-chip">robot_a</span>, <span class="code-chip">robot_b</span>, <span class="code-chip">.names</span>）はすべて互換のまま、<span class="code-chip">separation</span>, <span class="code-chip">point_a</span>, <span class="code-chip">point_b</span>, <span class="code-chip">normal</span> が追加されています。</p></div><h3>PhysX バックエンド（従来挙動）へ切り替える場合</h3><div class="code-ex"># 方法 A: コンストラクタでロボット単位に指定
+asyncio.ensure_future(main())</div></section><section id="recipe-9"><h2>レシピ 9：既存 `myext.robot.geometric` からの移行手順と PhysX バックエンドへの切替</h2><div class="prose"><p>既存の <span class="code-chip">myext.robot.geometric</span> 向けコードを <span class="code-chip">myext.robot.geometric_newton</span> へ移す手順です。</p></div><h3>移行チェックリスト</h3><div class="prose"><p>1. <strong>import パスと拡張機能 ID の置換</strong>：<br>   - 拡張機能有効化：<span class="code-chip">"myext.robot.geometric"</span> → <span class="code-chip">"myext.robot.geometric_newton"</span><br>   - Python import：<span class="code-chip">from myext.robot.geometric import ...</span> → <span class="code-chip">from myext.robot.geometric_newton import ...</span><br>   - Kit 起動引数設定プレフィックス：<span class="code-chip">--/exts/myext.robot.geometric/...</span> → <span class="code-chip">--/exts/myext.robot.geometric_newton/...</span><br>2. <strong>既定の干渉判定バックエンドの違いを確認</strong>：<br>   - <span class="code-chip">myext.robot.geometric_newton</span> は <span class="code-chip">collision_backend="newton"</span> が既定です。<span class="code-chip">check_collisions()</span> は <span class="code-chip">flush_to_usd()</span> を呼ばないため、USD 側に最新姿勢を書きたい処理がある場合は明示的に <span class="code-chip">robot.flush_to_usd()</span> を呼びます。<br>   - <span class="code-chip">GeometricCollisionPair</span> の既存フィールド（<span class="code-chip">link_a</span>, <span class="code-chip">link_b</span>, <span class="code-chip">path_a</span>, <span class="code-chip">path_b</span>, <span class="code-chip">kind</span>, <span class="code-chip">component_a</span>, <span class="code-chip">component_b</span>, <span class="code-chip">robot_a</span>, <span class="code-chip">robot_b</span>, <span class="code-chip">.names</span>）はすべて互換のまま、<span class="code-chip">separation</span>, <span class="code-chip">point_a</span>, <span class="code-chip">point_b</span>, <span class="code-chip">normal</span> が追加されています。</p></div><h3>PhysX バックエンド（従来挙動）へ切り替える場合</h3><div class="prose"><p>既定の <span class="code-chip">collision_mode="none"</span> では PhysX コライダーを完全に無効化しているため、<span class="code-chip">collision_backend="physx"</span> を使う場合は <span class="code-chip">GeometricLayerOptions(collision_mode="static")</span>（または <span class="code-chip">"kinematic"</span>）を併せて指定します。</p></div><div class="code-ex">from myext.robot.geometric_newton import GeometricLayerOptions, GeometricRobot
+
+# 方法 A: コンストラクタでロボット単位に指定
 robot = GeometricRobot.from_articulation(
     stage,
     "/World/UR10e",
+    layer_options=GeometricLayerOptions(collision_mode="static"),
     collision_backend="physx",
     fk_backend="numpy",
 )
 
-# 方法 B: 呼び出し単位で一時的に PhysX を使う
+# 方法 B: 呼び出し単位で一時的に PhysX を使う（collision_mode="static" 以上が必要）
 physx_pairs = robot.check_collisions("all", backend="physx")
 
 # 方法 C: 実行時にプロパティで切り替え
 robot.collision_backend = "physx"
 
 # 方法 D: 起動引数で全ロボットの既定値を変更
+# --/exts/myext.robot.geometric_newton/collision_mode=static
 # --/exts/myext.robot.geometric_newton/collision_backend=physx
 # --/exts/myext.robot.geometric_newton/fk_backend=numpy</div></section>
 <section id="recipe-10">
@@ -953,6 +959,54 @@ def on_update(_event):
 sub = app.get_update_event_stream().create_subscription_to_pop(on_update, name="my_geometric_drive")</div>
 </section>
 
+<section id="recipe-12">
+  <h2>レシピ 12：軸リミット超過リンク取得と異軸数 VariantSet の安全・高速駆動</h2>
+  <div class="prose">
+    <p>
+      関節可動範囲を超えられないモード（<span class="code-chip">limit_policy="clip"</span> / <span class="code-chip">"reject"</span>）で超過軸の子リンクを取得して着色処理へ渡す手順と、VariantSet 切替で先端の軸数が変わっても毎フレーム同じ固定長配列のまま高速に駆動できる <span class="code-chip">robot.bind_dofs()</span>・<span class="code-chip">merge_variant_components=True</span> の実践例です。
+    </p>
+  </div>
+  <div class="code-ex">import json
+from myext.robot.geometric_newton import GeometricRobot
+
+# 1. VariantSet 配下の子 IsaacRobotAPI を親コンポーネントへ統合し、角度単位を度にする
+robot = GeometricRobot.from_articulation(
+    stage,
+    "/World/ArmWithToolVariant",
+    angle_unit="deg",
+    limit_policy="clip",
+    merge_variant_components=True,
+)
+
+# 2. describe() は RFC 8259 準拠の整形 JSON を返す（そのままエディタや json.loads で閲覧可能）
+spec_json = robot.describe(indent=2)
+spec_dict = json.loads(spec_json)
+
+# 3. 軸リミット超過時のリンク取得（clip / reject どちらも対応）
+robot.limit_policy = "reject"  # 1 軸でも範囲外なら指令全体を拒否して直前姿勢を維持
+robot.set_dof_positions({"shoulder_pan_joint": 999.0}, unit="deg")
+violations = robot.get_limit_violations(include_at_limit=False, unit="deg")
+links_to_color = robot.get_limit_violation_links(include_at_limit=False)
+for v in violations:
+    print(f"超過軸={v.dof_name}, 子リンク={v.child_link} ({v.child_link_path}), side={v.side}")
+
+# 4. 異軸数 VariantSet を跨ぐ毎フレーム高速駆動: 全 Variant の候補軸名を 1 回だけバインドする
+all_tool_dofs = ["j1", "j2", "j3", "j4", "j5", "j6", "grip_fl", "grip_fr"]
+binder = robot.bind_dofs(all_tool_dofs, ignore_unknown=True)
+
+# 毎フレームは固定長 8 要素の配列を渡すだけで、現 Variant に存在する軸だけが NumPy 速度で更新される
+binder.set_positions([10.0, -20.0, 30.0, 0.0, 15.0, 0.0, 0.02, -0.02])
+
+# 0 DOF の先端 Variant（例: 吸着ノズル）へ切り替えても、同じコードのまま例外なく継続できる
+robot.set_variant("Tool", "Suction")
+binder.set_positions([15.0, -25.0, 35.0, 0.0, 15.0, 0.0, 0.02, -0.02])  # grip_fl / grip_fr は自動スキップ
+print("有効軸:", binder.active_names, "スキップ軸:", binder.missing_names)
+print("Viewport 描画同期完了:", robot.is_render_ready, "残りフレーム:", robot.pending_render_sync_frames)
+
+# 5. 低頻度・テスト用途なら辞書や dof_names= へ ignore_unknown=True を渡すだけでもよい
+robot.set_dof_positions({"j1": 20.0, "grip_fl": 0.03}, ignore_unknown=True)</div>
+</section>
+
 <section id="sec-sources">
   <h2>公式出典・同梱ソース・実機検証の切り分け</h2>
   <ul class="source-list">
@@ -986,8 +1040,8 @@ sub = app.get_update_event_stream().create_subscription_to_pop(on_update, name="
     </li>
     <li>
       <span class="source-tag empirical">実機検証</span>
-      <strong>Isaac Sim 6.2.0（RTX 3060）での全テスト・U 字凹メッシュ実測</strong>：<br>
-      <span class="code-chip">tests_pure/</span>（73 本全通過）・<span class="code-chip">tests_kit/run_kit_tests.py</span>（34 本全通過）・U 字水密メッシュ対実測（<span class="code-chip">convex_meshes=True</span>: 溝誤検知 1 件 / 5 cm 貫通時 −0.45 m / 2.35 ms 対 <span class="code-chip">convex_meshes=False</span>: 溝非接触 0 件 / 5 cm 貫通時 −0.0500 m / 2.39 ms）。
+      <strong>Isaac Sim 6.2.0（RTX 3060）での全テスト・Red → Green 実測（5 組＋U 字凹メッシュ）</strong>：<br>
+      <span class="code-chip">tests_pure/</span>（77 本全通過）・<span class="code-chip">tests_kit/run_kit_tests.py</span>（34 本全通過）・<span class="code-chip">tests_red_green/BENCHMARKS_AND_FINDINGS.md</span>（ちらつき防止・Broad Phase 登録・<span class="code-chip">collision_mode="none"</span>・Fabric 書込・54 DOF <span class="code-chip">batch_update()</span>・U 字凹メッシュの実測ログ）。
     </li>
   </ul>
 </section>

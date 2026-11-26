@@ -316,6 +316,7 @@ table.ergo-table td.num, table.ergo-table th.num { text-align: right; font-varia
     <a class="nav-btn" href="index.html">ポータル</a>
     <a class="nav-btn is-active" href="explanation_architecture.html">アーキテクチャ解説</a>
     <a class="nav-btn" href="howto_recipes.html">レシピ集</a>
+    <a class="nav-btn" href="benchmarks_findings.html">実測知見</a>
     <a class="nav-btn" href="api/index.html">API リファレンス</a>
   </nav>
 </header>
@@ -338,20 +339,20 @@ table.ergo-table td.num, table.ergo-table th.num { text-align: right; font-varia
   <main>
     <div class="hero">
       <h1>アーキテクチャ解説・コード編集ガイド</h1>
-      <p class="hero-lead">内部の 2 層構造、数値規約、なぜ非公式の幾何＋Newton 経路をこう設計しているのか（Why）、公式ドキュメント・同梱ソース出典を自己完結で解説します。</p>
+      <p class="hero-lead">内部の 4 層アーキテクチャ（一方向依存）、数値規約、なぜ非公式の幾何＋Newton 経路をこの構成にしているのか（Why）、実測に基づく Red → Green 知見、および公式ドキュメント・同梱ソース出典を自己完結で解説します。</p>
     </div>
     
 <section id="sec-deps">
-  <h2>1. モジュール依存関係（2 層アーキテクチャ）</h2>
+  <h2>1. モジュール依存関係（4 層・一方向アーキテクチャ）</h2>
   <div class="prose">
     <p>
-      <span class="code-chip">myext.robot.geometric_newton</span> は、Isaac Sim に一切依存しない <strong>Pure Python + NumPy 層（<span class="code-chip">model/</span>）</strong> と、OpenUSD・Fabric・Newton・PhysX に接続する <strong>統合層（トップレベル）</strong> の 2 層で構成されています。<span class="code-chip">__init__.py</span> は <span class="code-chip">model/</span> 配下を即時公開し、USD / Kit / Newton 依存クラスは <span class="code-chip">__getattr__</span> で遅延 import しています。
+      <span class="code-chip">myext.robot.geometric_newton</span> は、依存関係が上位から下位へ一方向（<span class="code-chip">runtime/</span> → <span class="code-chip">collision/</span> → <span class="code-chip">usd/</span> → <span class="code-chip">model/</span>）となる <strong>4 層パッケージ構成</strong> で整理されています。<span class="code-chip">__init__.py</span> は Isaac Sim に一切依存しない <span class="code-chip">model/</span> 配下を即時公開し、USD・Kit・Newton へ依存する各層のシンボルは <span class="code-chip">__getattr__</span> で遅延 import しています。旧ルートモジュール（<span class="code-chip">robot.py</span>・<span class="code-chip">newton_backend.py</span>・<span class="code-chip">usd_reader.py</span> 等）は後方互換 re-export シムとして維持しています。
     </p>
   </div>
 
   <div class="diagram-card" id="dep-svg-card" data-ref-scope data-ref-group="arch-deps">
     <div class="diagram-header">
-      <span class="diagram-title">モジュール 2 層構造図（ホバー／クリックで連動）</span>
+      <span class="diagram-title">モジュール 4 層構造図（ホバー／クリックで連動）</span>
       <span class="diagram-hint">色＋番号バッジで対応先を強調</span>
     </div>
     <div class="svg-wrap">
@@ -361,8 +362,8 @@ table.ergo-table td.num, table.ergo-table th.num { text-align: right; font-varia
         </defs>
         <g class="dim-candidate" data-ref="dep-pure" data-color="1" data-ref-role="target" tabindex="0">
           <rect x="16" y="16" width="420" height="306" rx="10" fill="#eff6ff" stroke="#2563eb" stroke-width="1.6"/>
-          <rect x="26" y="24" width="230" height="24" rx="5" fill="#2563eb"/>
-          <text x="36" y="40" font-size="12" font-weight="700" fill="#fff">1. Pure NumPy 層 (model/)</text>
+          <rect x="26" y="24" width="250" height="24" rx="5" fill="#2563eb"/>
+          <text x="36" y="40" font-size="12" font-weight="700" fill="#fff">1. Layer 0: Pure NumPy 層 (model/)</text>
           <rect x="34" y="64" width="175" height="44" rx="6" fill="#fff" stroke="#2563eb"/><text x="121" y="83" font-size="11.5" font-weight="700" text-anchor="middle" fill="#0f172a">transforms.py</text><text x="121" y="99" font-size="10" text-anchor="middle" fill="#64748b">同次変換・四元数 (w,x,y,z)</text>
           <rect x="236" y="64" width="182" height="44" rx="6" fill="#fff" stroke="#2563eb"/><text x="327" y="83" font-size="11.5" font-weight="700" text-anchor="middle" fill="#0f172a">spec.py</text><text x="327" y="99" font-size="10" text-anchor="middle" fill="#64748b">GeometricRobotModel・mimic</text>
           <line x1="209" y1="86" x2="234" y2="86" stroke="#475569" stroke-width="1.6" marker-end="url(#ar-dep)"/>
@@ -370,41 +371,43 @@ table.ergo-table td.num, table.ergo-table th.num { text-align: right; font-varia
           <rect x="34" y="130" width="175" height="44" rx="6" fill="#fff" stroke="#2563eb"/><text x="121" y="149" font-size="11.5" font-weight="700" text-anchor="middle" fill="#0f172a">sources.py / urdf.py</text><text x="121" y="165" font-size="10" text-anchor="middle" fill="#64748b">DH / MDH / Screw / URDF</text>
           <rect x="236" y="130" width="182" height="44" rx="6" fill="#fff" stroke="#2563eb"/><text x="327" y="149" font-size="11.5" font-weight="700" text-anchor="middle" fill="#0f172a">chain.py / ik.py</text><text x="327" y="165" font-size="10" text-anchor="middle" fill="#64748b">KinematicChain・Jacobian/IKPy</text>
 
-          <rect x="34" y="196" width="175" height="44" rx="6" fill="#fff" stroke="#2563eb"/><text x="121" y="215" font-size="11.5" font-weight="700" text-anchor="middle" fill="#0f172a">collision_filter.py</text><text x="121" y="231" font-size="10" text-anchor="middle" fill="#64748b">ペア・パターン・JSON フィルタ</text>
+          <rect x="34" y="196" width="175" height="44" rx="6" fill="#fff" stroke="#2563eb"/><text x="121" y="215" font-size="11.5" font-weight="700" text-anchor="middle" fill="#0f172a">collision_filter.py</text><text x="121" y="231" font-size="10" text-anchor="middle" fill="#64748b">ペア・パターン・version 管理</text>
           <rect x="236" y="196" width="182" height="44" rx="6" fill="#fff" stroke="#2563eb"/><text x="327" y="215" font-size="11.5" font-weight="700" text-anchor="middle" fill="#0f172a">command.py</text><text x="327" y="231" font-size="10" text-anchor="middle" fill="#64748b">外部指令コンバータ (Linear/Interp)</text>
           <text x="34" y="274" font-size="10.5" fill="#1e3a8a">Kit / USD 不在環境でも単体テスト可能</text>
         </g>
 
         <g class="dim-candidate" data-ref="dep-usd" data-color="2" data-ref-role="target" tabindex="0">
-          <rect x="466" y="16" width="438" height="142" rx="10" fill="#ecfdf5" stroke="#059669" stroke-width="1.6"/>
-          <rect x="476" y="24" width="290" height="24" rx="5" fill="#059669"/>
-          <text x="486" y="40" font-size="12" font-weight="700" fill="#fff">2. USD / Sublayer / Writer 層</text>
-          <rect x="484" y="60" width="192" height="40" rx="6" fill="#fff" stroke="#059669"/><text x="580" y="78" font-size="11" font-weight="700" text-anchor="middle" fill="#0f172a">usd_reader.py / builder.py</text><text x="580" y="93" font-size="9.8" text-anchor="middle" fill="#64748b">Articulation・IsaacRobotAPI 自動検出</text>
-          <rect x="692" y="60" width="196" height="40" rx="6" fill="#fff" stroke="#059669"/><text x="790" y="78" font-size="11" font-weight="700" text-anchor="middle" fill="#0f172a">layer.py / writer.py</text><text x="790" y="93" font-size="9.8" text-anchor="middle" fill="#64748b">Sublayer・USD / Fabric / GPU 書込</text>
-          <text x="484" y="128" font-size="10.5" fill="#065f46">元のロボット USD を一切汚さず Session Sublayer へ隔離</text>
+          <rect x="466" y="16" width="438" height="114" rx="10" fill="#ecfdf5" stroke="#059669" stroke-width="1.6"/>
+          <rect x="476" y="24" width="320" height="24" rx="5" fill="#059669"/>
+          <text x="486" y="40" font-size="12" font-weight="700" fill="#fff">2. Layer 1: USD / Fabric 入出力層 (usd/)</text>
+          <rect x="484" y="56" width="192" height="38" rx="6" fill="#fff" stroke="#059669"/><text x="580" y="73" font-size="11" font-weight="700" text-anchor="middle" fill="#0f172a">usd/reader.py / builder.py</text><text x="580" y="88" font-size="9.6" text-anchor="middle" fill="#64748b">Articulation・IsaacRobotAPI 自動検出</text>
+          <rect x="692" y="56" width="196" height="38" rx="6" fill="#fff" stroke="#059669"/><text x="790" y="73" font-size="11" font-weight="700" text-anchor="middle" fill="#0f172a">usd/layer.py / writer.py</text><text x="790" y="88" font-size="9.6" text-anchor="middle" fill="#64748b">Sublayer (none 既定)・Fabric/GPU 書込</text>
+          <text x="484" y="116" font-size="10.2" fill="#065f46">元のロボット USD を一切汚さず Session Sublayer へ隔離</text>
         </g>
 
         <g class="dim-candidate" data-ref="dep-nw" data-color="3" data-ref-role="target" tabindex="0">
-          <rect x="466" y="170" width="438" height="72" rx="10" fill="#fffbeb" stroke="#d97706" stroke-width="1.6"/>
-          <rect x="476" y="178" width="290" height="22" rx="5" fill="#d97706"/>
-          <text x="486" y="193" font-size="11.5" font-weight="700" fill="#fff">3. Newton / PhysX 干渉判定層</text>
-          <text x="484" y="224" font-size="10.8" font-weight="600" fill="#92400e">newton_backend.py (GeometricScene・BatchedNewtonScene・DebugDraw) / collision.py</text>
+          <rect x="466" y="142" width="438" height="84" rx="10" fill="#fffbeb" stroke="#d97706" stroke-width="1.6"/>
+          <rect x="476" y="150" width="335" height="22" rx="5" fill="#d97706"/>
+          <text x="486" y="165" font-size="11.5" font-weight="700" fill="#fff">3. Layer 2: 干渉・Newton エンジン層 (collision/)</text>
+          <text x="484" y="191" font-size="10.4" font-weight="600" fill="#92400e">collision/types.py・physx.py・newton_shapes.py</text>
+          <text x="484" y="211" font-size="10.4" font-weight="600" fill="#92400e">collision/newton_scene.py (GeometricScene)・newton_batched.py (BatchedNewtonScene)</text>
         </g>
 
         <g class="dim-candidate" data-ref="dep-api" data-color="4" data-ref-role="target" tabindex="0">
-          <rect x="466" y="254" width="438" height="68" rx="10" fill="#f5f3ff" stroke="#7c3aed" stroke-width="1.6"/>
-          <rect x="476" y="262" width="320" height="22" rx="5" fill="#7c3aed"/>
-          <text x="486" y="277" font-size="11.5" font-weight="700" fill="#fff">4. ユーザー公開ファサード (robot.py / robot_view.py)</text>
-          <text x="484" y="306" font-size="10.8" font-weight="600" fill="#4c1d95">GeometricRobot・GeometricRobotComponent・GeometricRobotView</text>
+          <rect x="466" y="238" width="438" height="84" rx="10" fill="#f5f3ff" stroke="#7c3aed" stroke-width="1.6"/>
+          <rect x="476" y="246" width="350" height="22" rx="5" fill="#7c3aed"/>
+          <text x="486" y="261" font-size="11.5" font-weight="700" fill="#fff">4. Layer 3: ユーザー向けランタイム層 (runtime/)</text>
+          <text x="484" y="287" font-size="10.4" font-weight="600" fill="#4c1d95">runtime/handles.py (Component・Joint・Link・LimitViolation・DofBinder)</text>
+          <text x="484" y="307" font-size="10.4" font-weight="600" fill="#4c1d95">runtime/robot.py (GeometricRobot)・runtime/robot_view.py (GeometricRobotView)</text>
         </g>
       </svg>
     </div>
     <div class="prose" style="max-width:none; margin-top:0.7rem; font-size:0.88rem;">
       <p style="margin-bottom:0;">
         <span class="ref-badge" data-ref="dep-pure" data-color="1" data-ref-role="source" tabindex="0">1</span><span class="code-chip" data-exact-target="dep-svg-card">model/</span> が数学・運動学の正本を担い、
-        <span class="ref-badge" data-ref="dep-usd" data-color="2" data-ref-role="source" tabindex="0">2</span><span class="code-chip" data-exact-target="dep-svg-card">usd_reader.py</span>・<span class="code-chip" data-exact-target="dep-svg-card">layer.py</span>・<span class="code-chip" data-exact-target="dep-svg-card">writer.py</span> が USD/Fabric 境界を吸収し、
-        <span class="ref-badge" data-ref="dep-nw" data-color="3" data-ref-role="source" tabindex="0">3</span><span class="code-chip" data-exact-target="dep-svg-card">newton_backend.py</span> が 0F 遅延衝突と DebugDraw を実行し、
-        <span class="ref-badge" data-ref="dep-api" data-color="4" data-ref-role="source" tabindex="0">4</span><span class="code-chip" data-exact-target="dep-svg-card">GeometricRobot</span> / <span class="code-chip" data-exact-target="dep-svg-card">GeometricRobotView</span> が利用者の入口に全設定を露出します。
+        <span class="ref-badge" data-ref="dep-usd" data-color="2" data-ref-role="source" tabindex="0">2</span><span class="code-chip" data-exact-target="dep-svg-card">usd/</span> が USD と Fabric の境界を吸収し、
+        <span class="ref-badge" data-ref="dep-nw" data-color="3" data-ref-role="source" tabindex="0">3</span><span class="code-chip" data-exact-target="dep-svg-card">collision/</span> が 0 フレーム遅延衝突・Broad Phase 除外・DebugDraw を実行し、
+        <span class="ref-badge" data-ref="dep-api" data-color="4" data-ref-role="source" tabindex="0">4</span><span class="code-chip" data-exact-target="dep-svg-card">runtime/</span>（<span class="code-chip" data-exact-target="dep-svg-card">GeometricRobot</span> / <span class="code-chip" data-exact-target="dep-svg-card">GeometricRobotView</span>）が利用者の入口へ全設定を露出します。
       </p>
     </div>
   </div>
@@ -504,32 +507,32 @@ table.ergo-table td.num, table.ergo-table th.num { text-align: right; font-varia
       <li><strong>任意 <span class="code-chip">dof_order</span> と Variant 再構築</strong>：<span class="code-chip">dof_to_newton_q</span> 置換テーブルだけで整合を維持。</li>
     </ol>
 
-    <h3>4.2 なぜ VariantSet 切替時だけ USD（Sublayer）へ 1 回書き戻すのか</h3>
+    <h3>4.2 なぜ USD 書込直後の 1 フレーム戻りを _usd_sync_pending と _repush_frames で防ぐのか</h3>
     <p>
-      公式 Doc（<span class="code-chip">fsd_vs_omnihydra.md</span>）の通り、<span class="code-chip">Fabric</span> は合成後（post-composition）キャッシュであり、<span class="code-chip">VariantSet</span> のような合成前変更は <span class="code-chip">USD Stage</span>（Session Layer）に書く必要があります。Variant 切替時に USD Resync が走ると、USDRT Population が次の描画直前に USD の Transform で Fabric を上書きするため、書き戻さないと 1 フレーム初期位置へ戻るちらつきが起きます。そのため <span class="code-chip">_rebuild()</span> 時だけ現在姿勢を Sublayer へ 1 回書き戻し、さらに 3 フレーム間 <span class="code-chip">_repush_frames</span> で Fabric へ再送しています（通常フレームでは USD 非書込）。
+      公式 Doc（<span class="code-chip">fsd_vs_omnihydra.md</span>）の通り、<span class="code-chip">Fabric</span> は合成後（post-composition）キャッシュであり、<span class="code-chip">VariantSet</span> のような合成前変更は <span class="code-chip">USD Stage</span>（Session Layer）へ書く必要があります。<span class="code-chip">flush_to_usd()</span>・<span class="code-chip">set_variant()</span>・<span class="code-chip">layer.apply()</span> で USD Sublayer へ姿勢を書いた直後に <span class="code-chip">write_target="fabric"</span> で別の姿勢へ動かすと、次の <span class="code-chip">app.update()</span> で走る USD→Fabric 同期が Fabric 側の新姿勢を旧 USD 値で上書きしてしまいます（実測 Pair 01 の Red では 1.32〜1.48 m の戻りを確認）。本拡張では、USD 同期が予定されている同フレーム内だけ <span class="code-chip">_usd_sync_pending</span> により最新姿勢を USD Sublayer 側にも追随させ、さらに <span class="code-chip">_repush_frames</span> で再送することで、定常フレームの USD 書込 0 回を保ったまま frame +0〜+4 の全フレームで誤差 <span class="code-chip">0.000000 m</span> を実現しています。
     </p>
 
     <h3>4.3 なぜ convex_meshes=True（既定）と False（生三角形メッシュ）を切り替えられるのか</h3>
     <p>
-      <span class="code-chip">convex_meshes=True</span> はすべての <span class="code-chip">UsdGeom.Mesh</span> を <span class="code-chip">compute_convex_hull()</span> で単一凸包（<span class="code-chip">GeoType.CONVEX_MESH</span>）へ変換し、GJK/MPR で高速判定します（凹みの溝は埋まる）。<span class="code-chip">convex_meshes=False</span> は STL 等の元の三角形メッシュ（<span class="code-chip">GeoType.MESH</span>）をそのまま登録します。実機（RTX 3060）で水密 U 字メッシュ対を計測した結果、<span class="code-chip">True</span> では溝の中を誤検知（5 cm 貫通時も −0.45 m）したのに対し、<span class="code-chip">False</span> では溝の中を非接触（0 件）、5 cm 貫通時 −0.0500 m と厳密一致しました。ただし生メッシュ同士の符号判定（<span class="code-chip">mesh_query_point_sign</span>）は <strong>閉じた水密メッシュ（内部の重複面なし）</strong> を前提とし、高ポリゴン STL 同士では計算時間が増えます。
+      <span class="code-chip">convex_meshes=True</span> はすべての <span class="code-chip">UsdGeom.Mesh</span> を <span class="code-chip">compute_convex_hull()</span> で単一凸包（<span class="code-chip">GeoType.CONVEX_MESH</span>）へ変換し、GJK/MPR で高速に判定します（凹みの溝は埋まります）。<span class="code-chip">convex_meshes=False</span> は STL などの元の三角形メッシュ（<span class="code-chip">GeoType.MESH</span>）をそのまま登録します。実機（RTX 3060）で水密 U 字メッシュ対を計測した結果、<span class="code-chip">True</span> では溝の中を誤検知（5 cm 貫通時も −0.45 m）したのに対し、<span class="code-chip">False</span> では溝の中を非接触（0 件）、5 cm 貫通時 −0.0500 m と厳密に一致しました。ただし生メッシュ同士の符号判定（<span class="code-chip">mesh_query_point_sign</span>）は <strong>閉じた水密メッシュ（内部の重複面がない形状）</strong> を前提とし、高ポリゴン STL 同士では計算時間が増えます。
     </p>
 
-    <h3>4.4 なぜ Show by Type > Physics > Colliders のピンク表示が Fabric 駆動で動かないのか</h3>
+    <h3>4.4 なぜ collision_mode="none" を既定にし、DebugDraw を備えるのか</h3>
     <p>
-      <span class="code-chip">write_target="fabric"</span>（既定）は高速化のため USD の <span class="code-chip">xformOp</span> を書き換えません。一方、Isaac Sim の <span class="ui-chip">Show by Type &gt; Physics &gt; Colliders</span>（<span class="code-chip">omni.physx.ui</span>）は同梱公式 Doc（<span class="code-chip">collision_debug_vis.rst</span>）の通り UsdPhysics のコライダー表示であり、Static Collider（ピンク）は USD 側の初期姿勢に留まります。そのためデバッグ時に Newton 内部の実形状を 0F 遅延で確認できるよう、USD へ書き戻さない <span class="code-chip">debug_draw_colliders=True</span>（通常＝<span class="swatch sw-cyan"><span class="swatch-dot"></span>シアン</span>、干渉中＝<span class="swatch sw-red"><span class="swatch-dot"></span>赤</span>、接触点・めり込み線分＝<span class="swatch sw-orange"><span class="swatch-dot"></span>オレンジ</span>）を用意しています（OFF 時は負荷ゼロ）。
+      既定の <span class="code-chip">collision_backend="newton"</span> を使う場合、PhysX 側の Static / Kinematic コライダーは不要です。<span class="code-chip">collision_mode="none"</span>（既定）では、<span class="code-chip">GeometricLayer</span> が Session Sublayer 上でロボット配下の全 <span class="code-chip">UsdPhysics.CollisionAPI</span> に <span class="code-chip">physics:collisionEnabled=False</span> を上書きします（UR10e のように <span class="code-chip">collisions</span> が instanceable な場合も Session Sublayer 上のみ一時展開して無効化し、<span class="code-chip">layer.remove()</span> または GUI の Sublayer ミュートで元の状態へ 100% 復元します）。Newton 側は <span class="code-chip">is_collision_enabled_ignoring_geometric_layer()</span> により <span class="code-chip">LAYER_MARKER</span> 付き Sublayer の上書きだけを無視して元のコライダーを読み取ります。また、<span class="code-chip">write_target="fabric"</span>（既定）では Isaac Sim の <span class="ui-chip">Show by Type &gt; Physics &gt; Colliders</span> が追従しないため、デバッグ時に Newton 内部の実形状を 0F 遅延で確認できる <span class="code-chip">debug_draw_colliders=True</span>（通常＝<span class="swatch sw-cyan"><span class="swatch-dot"></span>シアン</span>、干渉中＝<span class="swatch sw-red"><span class="swatch-dot"></span>赤</span>、接触点・めり込み線分＝<span class="swatch sw-orange"><span class="swatch-dot"></span>オレンジ</span>）を用意しています（OFF 時は負荷ゼロ）。
     </p>
 
-    <h3>4.5 なぜ IsaacRobotAPI から GeometricRobotComponent を自動生成するのか</h3>
+    <h3>4.5 なぜ IsaacRobotAPI 自動 Component・batch_update()・GeometricDofBinder を使うのか</h3>
     <p>
-      54 DOF のマルチアームロボットを 1 本の配列インデックスで管理すると、軸対応の把握や Variant 切替時の番号ズレが破綻します。Isaac Sim の <span class="code-chip">IsaacRobotAPI</span>（<span class="code-chip">RobotSchema.usda</span>）にはサブロボット構成と <span class="code-chip">isaac:physics:robotLinks</span> が定義されているため、<span class="code-chip">auto_components=True</span>（既定）で初期化時に各サブロボットの <span class="code-chip">GeometricRobotComponent</span> を自動生成し、内部の NumPy 整数配列 <span class="code-chip">dof_indices</span> をキャッシュすることで <strong>書きやすさと最速ホットパスを両立</strong> しています。
+      並列 4 アーム（54 DOF）のような複合ロボットでは、ロボット全体の <span class="code-chip">dof_names</span> が幅優先（階層順）で入り組むため、長い 1 本の配列を組み立てる負担が大きくなります。Isaac Sim の <span class="code-chip">IsaacRobotAPI</span>（<span class="code-chip">RobotSchema.usda</span>）から <span class="code-chip">auto_components=True</span>（既定）で部位ごとの <span class="code-chip">GeometricRobotComponent</span> を自動生成し（VariantSet 配下の子を親へ統合したい場合は <span class="code-chip">merge_variant_components=True</span>）、<span class="code-chip">with robot.batch_update():</span> の中で部位ごとにセットすれば、54 DOF 実測（Pair 05）で一括配列（0.53〜0.56 ms）との差はわずか +0.067 ms（<span class="code-chip">batch_update()</span> なしの 2.70 ms 比で 5.13 倍高速）に収まります。さらに VariantSet 切替で先端の軸数が変わる場合は、ダミー軸でモデルや IK を汚さずに <span class="code-chip">robot.bind_dofs(..., ignore_unknown=True)</span> を使うことで 0.615 ms/frame のまま安全に駆動できます。
     </p>
 
-    <h3>4.6 builder.rigid_gap=0.0・sync_environment(use_fabric="auto")・GPU Fabric・GeometricLayer</h3>
+    <h3>4.6 Broad Phase 除外焼き込み・broad_phase 方式・rigid_gap・GPU Fabric</h3>
     <ul>
-      <li><strong><span class="code-chip">rigid_gap = 0.0</span> と実行時 <span class="code-chip">shape_gap</span> 切替</strong>：Newton 既定 0.1 m を 0 へ落とし、クリアランス計測時のみ <span class="code-chip">0.5 * d + 1e-4</span> へ書き換えて再構築なしで任意距離を計測します。干渉とクリアランス両方が必要なら <span class="code-chip">compute_clearances()</span> 1 回で両方分類する方が約 2 倍高速です。</li>
-      <li><strong><span class="code-chip">sync_environment(use_fabric="auto")</span></strong>：Play 中の動的剛体障害物は Fabric、静的障害物と Stop 中は USD <span class="code-chip">XformCache</span> から自動読み分けます。</li>
-      <li><strong><span class="code-chip">GeometricGpuFabricWriter</span></strong>：毎フレーム <span class="code-chip">SelectPrims</span> をフレッシュ取得し、タグ付け時に <span class="code-chip">omni:fabric:localMatrix</span> を除去して <span class="code-chip">IFabricHierarchy</span> の上書きを防ぎ、末尾で <span class="code-chip">wp.synchronize_device()</span> で描画競合を防ぎます。</li>
-      <li><strong><span class="code-chip">GeometricLayer</span></strong>：Session Layer 先頭の匿名 Sublayer に 5 属性のみ上書きするため、元 USD を一切汚染せず <span class="code-chip">layer.remove()</span> で完全復帰します。</li>
+      <li><strong><span class="code-chip">robot.collision_filter</span> の Newton Broad Phase 登録</strong>：<span class="code-chip">GeometricScene</span>（既定 <span class="code-chip">bake_adjacent_filter=True</span>, <span class="code-chip">bake_collision_filter=True</span>）と <span class="code-chip">BatchedNewtonScene</span> は、隣接ペアだけでなく <span class="code-chip">ignore_touching_pairs()</span> や <span class="code-chip">add_pair()</span> を含む全除外ペアを <span class="code-chip">builder.add_shape_collision_filter_pair()</span> へ事前登録します（フィルタ変更は <span class="code-chip">collision_filter.version</span> で自動追従）。実測 Pair 02 では Narrow Phase の無駄な接触数が 42 件から 0 件へ削減されました。<span class="code-chip">broad_phase</span> は既定 <span class="code-chip">"auto"</span> で、小〜中規模は事前有効ペア表のみを判定する <span class="code-chip">"explicit"</span>（除外ペアは AABB 判定すら 0 回）、大規模シーンは <span class="code-chip">"sap"</span>（Sweep and Prune）を自動選択します。</li>
+      <li><strong><span class="code-chip">rigid_gap = 0.0</span> と実行時 <span class="code-chip">shape_gap</span> 切替</strong>：Newton 既定 0.1 m を 0 へ落とし、クリアランス計測時のみ <span class="code-chip">0.5 * d + 1e-4</span> へ書き換えて再構築なしで任意距離を計測します。干渉とクリアランスの両方が必要なら <span class="code-chip">compute_clearances()</span> を 1 回呼んで分類する方が約 2 倍高速です。</li>
+      <li><strong><span class="code-chip">sync_environment(use_fabric="auto")</span></strong>：Play 中の動的剛体障害物は Fabric から、静的障害物と Stop 中は USD <span class="code-chip">XformCache</span> から自動で読み分けます。</li>
+      <li><strong><span class="code-chip">GeometricGpuFabricWriter</span></strong>：毎フレーム <span class="code-chip">SelectPrims</span> をフレッシュ取得し、タグ付け時に <span class="code-chip">omni:fabric:localMatrix</span> を除去して <span class="code-chip">IFabricHierarchy</span> の上書きを防ぎ、末尾で <span class="code-chip">wp.synchronize_device()</span> を呼んで描画競合を防ぎます。</li>
     </ul>
   </div>
 </section>
@@ -538,14 +541,17 @@ table.ergo-table td.num, table.ergo-table th.num { text-align: right; font-varia
   <h2>5. コード編集ガイド（変更目的別早見表）</h2>
   <div class="table-wrap">
     <table class="ergo-table">
-      <thead><tr><th>変更したい内容</th><th>対象ファイル</th><th>確認・編集箇所</th></tr></thead>
+      <thead><tr><th>変更したい内容</th><th>対象ファイル（4 層構成）</th><th>確認・編集箇所</th></tr></thead>
       <tbody>
-        <tr><td>USD コライダー形状変換・<span class="code-chip">convex_meshes</span>・<span class="code-chip">DebugDraw</span></td><td><span class="code-chip">newton_backend.py</span></td><td><span class="code-chip">_add_usd_collider_shape()</span>、<span class="code-chip">draw_colliders()</span></td></tr>
-        <tr><td><span class="code-chip">IsaacRobotAPI</span> 自動 Component・Joint/mimic 読取</td><td><span class="code-chip">usd_reader.py</span></td><td><span class="code-chip">_discover_isaac_robot_components()</span>、<span class="code-chip">read_articulation()</span></td></tr>
-        <tr><td>単体 API・<span class="code-chip">batch_update</span>・名前/辞書 DOF・Variant 再構築</td><td><span class="code-chip">robot.py</span></td><td><span class="code-chip">set_dof_positions()</span>、<span class="code-chip">batch_update()</span>、<span class="code-chip">_rebuild()</span></td></tr>
-        <tr><td>複数台バッチ FK・CUDA Graph・GPU Fabric</td><td><span class="code-chip">robot_view.py</span>・<span class="code-chip">writer.py</span></td><td><span class="code-chip">GeometricRobotView._push()</span>、<span class="code-chip">GeometricGpuFabricWriter</span></td></tr>
-        <tr><td>Sublayer 無効化属性（static / kinematic）</td><td><span class="code-chip">layer.py</span></td><td><span class="code-chip">GeometricLayer._author()</span>、<span class="code-chip">GeometricLayerOptions</span></td></tr>
-        <tr><td>既定設定キー追加・変更</td><td><span class="code-chip">config/extension.toml</span></td><td><span class="code-chip">exts."myext.robot.geometric_newton".*</span></td></tr>
+        <tr><td>USD コライダー形状変換・<span class="code-chip">convex_meshes</span></td><td><span class="code-chip">collision/newton_shapes.py</span></td><td><span class="code-chip">_add_usd_collider_shape()</span>、<span class="code-chip">_discover_stage_colliders()</span></td></tr>
+        <tr><td><span class="code-chip">GeometricScene</span>・Broad Phase 除外登録・<span class="code-chip">DebugDraw</span></td><td><span class="code-chip">collision/newton_scene.py</span></td><td><span class="code-chip">_finalize()</span>、<span class="code-chip">check_collisions()</span>、<span class="code-chip">draw_colliders()</span></td></tr>
+        <tr><td>バッチ GPU 衝突・CUDA Graph</td><td><span class="code-chip">collision/newton_batched.py</span></td><td><span class="code-chip">BatchedNewtonScene</span></td></tr>
+        <tr><td><span class="code-chip">IsaacRobotAPI</span> 自動 Component・<span class="code-chip">merge_variant_components</span>・Joint 読取</td><td><span class="code-chip">usd/reader.py</span></td><td><span class="code-chip">_discover_isaac_robot_components()</span>、<span class="code-chip">read_articulation()</span></td></tr>
+        <tr><td>単体 API・<span class="code-chip">batch_update</span>・リミット超過・<span class="code-chip">describe()</span> JSON・Variant 再構築</td><td><span class="code-chip">runtime/robot.py</span></td><td><span class="code-chip">set_dof_positions()</span>、<span class="code-chip">get_limit_violations()</span>、<span class="code-chip">describe_dict()</span>、<span class="code-chip">_rebuild()</span></td></tr>
+        <tr><td>Component・Joint/Link ハンドル・<span class="code-chip">GeometricDofBinder</span></td><td><span class="code-chip">runtime/handles.py</span></td><td><span class="code-chip">GeometricRobotComponent</span>、<span class="code-chip">GeometricDofBinder</span>、<span class="code-chip">GeometricLimitViolation</span></td></tr>
+        <tr><td>複数台バッチ View・GPU Fabric 書込</td><td><span class="code-chip">runtime/robot_view.py</span>・<span class="code-chip">usd/writer.py</span></td><td><span class="code-chip">GeometricRobotView._push()</span>、<span class="code-chip">GeometricGpuFabricWriter</span></td></tr>
+        <tr><td>Sublayer 無効化属性（<span class="code-chip">none</span> / <span class="code-chip">static</span> / <span class="code-chip">kinematic</span>）</td><td><span class="code-chip">usd/layer.py</span></td><td><span class="code-chip">GeometricLayer._author()</span>、<span class="code-chip">is_collision_enabled_ignoring_geometric_layer()</span></td></tr>
+        <tr><td>既定設定キーの追加・変更</td><td><span class="code-chip">config/extension.toml</span></td><td><span class="code-chip">exts."myext.robot.geometric_newton".*</span></td></tr>
       </tbody>
     </table>
   </div>
@@ -584,8 +590,8 @@ table.ergo-table td.num, table.ergo-table th.num { text-align: right; font-varia
     </li>
     <li>
       <span class="source-tag empirical">実機検証</span>
-      <strong>Isaac Sim 6.2.0（RTX 3060）での全テスト・U 字凹メッシュ実測</strong>：<br>
-      <span class="code-chip">tests_pure/</span>（73 本全通過）・<span class="code-chip">tests_kit/run_kit_tests.py</span>（34 本全通過）・U 字水密メッシュ対実測（<span class="code-chip">convex_meshes=True</span>: 溝誤検知 1 件 / 5 cm 貫通時 −0.45 m / 2.35 ms 対 <span class="code-chip">convex_meshes=False</span>: 溝非接触 0 件 / 5 cm 貫通時 −0.0500 m / 2.39 ms）。
+      <strong>Isaac Sim 6.2.0（RTX 3060）での全テスト・Red → Green 実測（5 組＋U 字凹メッシュ）</strong>：<br>
+      <span class="code-chip">tests_pure/</span>（77 本全通過）・<span class="code-chip">tests_kit/run_kit_tests.py</span>（34 本全通過）・<span class="code-chip">tests_red_green/BENCHMARKS_AND_FINDINGS.md</span>（ちらつき防止・Broad Phase 登録・<span class="code-chip">collision_mode="none"</span>・Fabric 書込・54 DOF <span class="code-chip">batch_update()</span>・U 字凹メッシュの実測ログ）。
     </li>
   </ul>
 </section>
