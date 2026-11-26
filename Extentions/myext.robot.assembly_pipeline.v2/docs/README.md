@@ -182,9 +182,9 @@ usda はどこでも **フォルダを含まないファイル名（拡張子 `.
 
 同じファイル名を 2 か所で作る（Windows の大文字小文字違いを含む）ことや、どこでも作っていない名前を `parent_usda` / `child_usda` に書くことはエラーになります。
 
-### エディタでの補完・リアルタイム検証（JSON Schema + Even Better TOML）
+### エディタでの補完・リアルタイム検証（JSON Schema + Even Better TOML）と生成スキル
 
-本拡張には `spec.py` / `kinds.py` から生成された JSON Schema（`schema\assembly_pipeline.schema.json`）と `.taplo.toml` を同梱しています。VS Code / Antigravity で **Even Better TOML**（`tamasfe.even-better-toml`）を入れておくと、キー補完・日本語ホバー説明・未知キーや型ミスの赤波線警告が編集時に自動で効きます。
+本拡張には `spec.py` / `kinds.py` から生成された JSON Schema（`schema\assembly_pipeline.schema.json`）と `.taplo.toml`、さらに自然言語の説明から TOML 仕様書を自動生成・検証するエージェントスキル（`skills\assembly-pipeline-toml\SKILL.md`）を同梱しています。VS Code / Antigravity で **Even Better TOML**（`tamasfe.even-better-toml`）を入れておくと、キー補完・日本語ホバー説明・未知キーや型ミスの赤波線警告が編集時に自動で効きます。
 
 新しく TOML ファイルを作るときは、1 行目に `schema/assembly_pipeline.schema.json` への相対パスを `#:schema` で記述してください（`examples\` 配下の全サンプルには設定済みです）。
 
@@ -520,6 +520,7 @@ myext.robot.assembly_pipeline.v2/
 │   ├── README.md                              # 本ドキュメント（概要・実行手順・TOML 手作業ガイド）
 │   └── SPECIFICATION.md                       # 内部仕様書（全用語集・ハッシュキャッシュ・結合 7 段階・R01〜R14 詳細）
 ├── schema/assembly_pipeline.schema.json       # TOML 補完・静的検証用 JSON Schema (Draft-07)
+├── skills/assembly-pipeline-toml/             # 自然言語から TOML を設計・生成・検証するエージェントスキル
 ├── examples/
 │   ├── README.md                              # 同梱サンプル TOML と実行手順ガイド
 │   ├── arm_gripper.toml / multi_arm.toml      # 基本・多段 VariantSet サンプル
