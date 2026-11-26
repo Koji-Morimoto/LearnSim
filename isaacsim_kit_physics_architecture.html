@@ -1,0 +1,1874 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Isaac Sim 6.2.0 アーキテクチャ解剖図鑑 — omni.kit・物理エンジン介入・全コンポーネント・DeformableBody 境界</title>
+<style>
+  :root {
+    --bg: #f8fafc;
+    --surface: #ffffff;
+    --surface-subtle: #f1f5f9;
+    --surface-dark: #0f172a;
+    --surface-panel: #111827;
+    --text: #1e293b;
+    --text-strong: #0f172a;
+    --muted: #64748b;
+    --border: #cbd5e1;
+    --border-light: #e2e8f0;
+
+    /* 標準4色パレット（前注意処理ポップアウト） */
+    --c1: #2563eb; --c1-bg: #dbeafe; --c1-border: #93c5fd; /* 青: フレームワーク / Kit / 時間制御 */
+    --c2: #059669; --c2-bg: #d1fae5; --c2-border: #6ee7b7; /* 緑: シーン状態 / USD & Fabric (USDRT) */
+    --c3: #d97706; --c3-bg: #fef3c7; --c3-border: #fcd34d; /* 橙: 物理抽象・ソルバー・Tensor 制御 */
+    --c4: #7c3aed; --c4-bg: #ede9fe; --c4-border: #c4b5fd; /* 紫: Hydra・RTX 描画・シェーダー・センサー */
+
+    /* 本質的複雑性の例外（data-allow-dense="true" の6層全体俯瞰図のみ追加使用） */
+    --c5: #db2777; --c5-bg: #fce7f3; --c5-border: #f9a8d4; /* 桃: ロボティクス・合成データ ドメイン層 */
+    --c6: #0891b2; --c6-bg: #cffafe; --c6-border: #67e8f9; /* 水: 最外層 アプリ起動・ROS 2・UI 層 */
+  }
+
+  * { box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Hiragino Sans", "Yu Gothic UI", "Meiryo", sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.75;
+  }
+
+  /* ヘッダー */
+  .page-header {
+    background: var(--surface-dark);
+    color: #f8fafc;
+    padding: 1.6rem 2rem 1.4rem;
+    border-bottom: 3px solid #1e293b;
+  }
+  .header-inner {
+    max-width: 1560px;
+    margin: 0 auto;
+  }
+  .header-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 0.55rem;
+  }
+  .h-tag {
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 0.16rem 0.6rem;
+    border-radius: 999px;
+    background: #1e293b;
+    border: 1px solid #38bdf8;
+    color: #7dd3fc;
+  }
+  .h-tag.doc-type {
+    border-color: #34d399;
+    color: #6ee7b7;
+  }
+  .page-header h1 {
+    margin: 0 0 0.45rem;
+    font-size: 1.5rem;
+    line-height: 1.35;
+    letter-spacing: -0.01em;
+  }
+  .header-lead {
+    margin: 0;
+    color: #cbd5e1;
+    font-size: 0.94rem;
+    max-width: 92ch;
+  }
+
+  /* 全体レイアウト（追従サイドバー目次 ＋ メインコンテンツ） */
+  .app-shell {
+    max-width: 1560px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 250px minmax(0, 1fr);
+    gap: 2rem;
+    padding: 1.75rem 1.5rem 4rem;
+    align-items: start;
+  }
+
+  /* 追従目次（ScrollSpy） */
+  .toc-rail {
+    position: sticky;
+    top: 1.25rem;
+    background: var(--surface);
+    border: 1px solid var(--border-light);
+    border-radius: 12px;
+    padding: 1rem 0.9rem;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05);
+  }
+  .toc-title {
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--muted);
+    margin: 0 0 0.65rem;
+    padding-bottom: 0.45rem;
+    border-bottom: 1px solid var(--border-light);
+  }
+  .toc ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+  .toc a {
+    display: block;
+    text-decoration: none;
+    color: var(--text);
+    font-size: 0.84rem;
+    line-height: 1.4;
+    padding: 0.42rem 0.6rem;
+    border-radius: 7px;
+    border-left: 3px solid transparent;
+    transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+  }
+  .toc a:hover {
+    background: var(--surface-subtle);
+  }
+  .toc a.is-current {
+    background: #eff6ff;
+    color: var(--c1);
+    font-weight: 700;
+    border-left-color: var(--c1);
+  }
+  .toc-hint {
+    margin-top: 0.9rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid var(--border-light);
+    font-size: 0.76rem;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+
+  /* セクションカード */
+  .doc-section {
+    background: var(--surface);
+    border: 1px solid var(--border-light);
+    border-radius: 14px;
+    padding: 1.75rem 2rem 2rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 1px 4px rgba(15, 23, 42, 0.04);
+  }
+  .section-kicker {
+    display: inline-block;
+    font-size: 0.76rem;
+    font-weight: 700;
+    color: var(--c1);
+    background: #eff6ff;
+    border: 1px solid #bfdbfe;
+    border-radius: 6px;
+    padding: 0.1rem 0.5rem;
+    margin-bottom: 0.35rem;
+  }
+
+  /* スキャン最適化: 行幅制限と非対称余白 */
+  .prose {
+    max-width: 68ch;
+    line-height: 1.78;
+    color: var(--text);
+  }
+  .doc-section > h2,
+  .prose h2 {
+    margin-top: 0.2rem;
+    margin-bottom: 0.65rem;
+    font-size: 1.35rem;
+    color: var(--text-strong);
+    line-height: 1.35;
+  }
+  .prose h3 {
+    margin-top: 1.85rem;
+    margin-bottom: 0.4rem;
+    font-size: 1.05rem;
+    color: var(--text-strong);
+  }
+  .prose p {
+    margin-top: 0;
+    margin-bottom: 1.0rem;
+  }
+  .prose ul {
+    margin-top: 0.25rem;
+    margin-bottom: 1.1rem;
+    padding-left: 1.3rem;
+  }
+  .prose li {
+    margin-bottom: 0.5rem;
+  }
+
+  /* 2カラム＋図の追従 */
+  .split-view {
+    display: grid;
+    grid-template-columns: minmax(0, 64ch) minmax(380px, 1fr);
+    gap: 2rem;
+    align-items: start;
+    margin-top: 1rem;
+  }
+  .split-visual {
+    position: sticky;
+    top: 1.25rem;
+  }
+
+  /* 色＋番号バッジ */
+  .ref-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 1.45em;
+    height: 1.45em;
+    padding: 0 0.32em;
+    border-radius: 999px;
+    font-size: 0.82em;
+    font-weight: 700;
+    color: #ffffff;
+    background: var(--c1);
+    cursor: pointer;
+    vertical-align: 0.06em;
+    user-select: none;
+    transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
+  }
+  .ref-badge:hover { transform: scale(1.08); }
+  .ref-badge[data-color="1"] { background: var(--c1); }
+  .ref-badge[data-color="2"] { background: var(--c2); }
+  .ref-badge[data-color="3"] { background: var(--c3); }
+  .ref-badge[data-color="4"] { background: var(--c4); }
+  .ref-badge[data-color="5"] { background: var(--c5); }
+  .ref-badge[data-color="6"] { background: var(--c6); }
+
+  /* 情報種別ごとの固定スタイル */
+  .ui-chip {
+    display: inline-block;
+    padding: 0.04em 0.45em;
+    border-radius: 6px;
+    border: 1px solid #94a3b8;
+    background: #f1f5f9;
+    font-weight: 600;
+    font-size: 0.9em;
+    color: #0f172a;
+  }
+  .code-chip {
+    display: inline-block;
+    padding: 0.04em 0.38em;
+    border-radius: 4px;
+    border: 1px solid #cbd5e1;
+    background: #f8fafc;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.88em;
+    color: #0f172a;
+  }
+
+  /* インライン用語プレビュー */
+  .term-inline {
+    position: relative;
+    border-bottom: 1px dashed #64748b;
+    cursor: help;
+    font-weight: 600;
+  }
+  .term-card {
+    position: absolute;
+    left: 0;
+    bottom: calc(100% + 6px);
+    width: min(34ch, 80vw);
+    padding: 0.6rem 0.8rem;
+    border-radius: 8px;
+    background: #0f172a;
+    color: #f8fafc;
+    font-size: 0.8rem;
+    font-weight: 400;
+    line-height: 1.55;
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.28);
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(4px);
+    transition: opacity 0.15s ease, transform 0.15s ease;
+    z-index: 9980;
+  }
+  .term-inline:hover .term-card,
+  .term-inline:focus .term-card {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* スポットライト（ホバー時の周辺ディミング） */
+  [data-ref-scope].is-dimming [data-ref]:not(.is-active),
+  [data-ref-scope].is-dimming .dim-candidate:not(.is-active) {
+    opacity: 0.28;
+    transition: opacity 0.15s ease;
+  }
+  [data-ref] {
+    transition: opacity 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
+  }
+  [data-ref].is-active {
+    outline: 2px solid var(--c1);
+    outline-offset: 2px;
+    box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.2);
+  }
+  [data-ref][data-color="2"].is-active {
+    outline-color: var(--c2);
+    box-shadow: 0 0 0 4px rgba(5, 150, 105, 0.22);
+  }
+  [data-ref][data-color="3"].is-active {
+    outline-color: var(--c3);
+    box-shadow: 0 0 0 4px rgba(217, 119, 6, 0.22);
+  }
+  [data-ref][data-color="4"].is-active {
+    outline-color: var(--c4);
+    box-shadow: 0 0 0 4px rgba(124, 58, 237, 0.22);
+  }
+  [data-ref][data-color="5"].is-active {
+    outline-color: var(--c5);
+    box-shadow: 0 0 0 4px rgba(219, 39, 119, 0.22);
+  }
+  [data-ref][data-color="6"].is-active {
+    outline-color: var(--c6);
+    box-shadow: 0 0 0 4px rgba(8, 145, 178, 0.22);
+  }
+
+  /* クリック到達時の短時間パルス（1回のみ・常時アニメーションなし） */
+  @keyframes ref-pulse {
+    0%   { box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.6); }
+    100% { box-shadow: 0 0 0 14px rgba(37, 99, 235, 0); }
+  }
+  .is-pulsing {
+    animation: ref-pulse 0.85s ease-out 1;
+  }
+
+  /* 図解ボックス共通 */
+  .diagram-frame {
+    background: #f8fafc;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.15rem;
+  }
+  .diagram-caption {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--muted);
+    margin-bottom: 0.75rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  /* View 1: 外側から内側への同心ネスト図（Onion / Concentric Ring Cards） */
+  .onion-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
+  }
+  .onion-ring {
+    border-radius: 10px;
+    padding: 0.75rem 0.95rem;
+    border: 2px solid var(--border);
+    background: #ffffff;
+    cursor: pointer;
+    position: relative;
+  }
+  .onion-ring[data-color="6"] { border-color: var(--c6-border); background: #f0fdfa; margin-left: 0; }
+  .onion-ring[data-color="5"] { border-color: var(--c5-border); background: #fdf2f8; margin-left: 0.7rem; }
+  .onion-ring[data-color="3"] { border-color: var(--c3-border); background: #fffbeb; margin-left: 1.4rem; }
+  .onion-ring[data-color="2"] { border-color: var(--c2-border); background: #ecfdf5; margin-left: 2.1rem; }
+  .onion-ring[data-color="4"] { border-color: var(--c4-border); background: #f5f3ff; margin-left: 2.8rem; }
+  .onion-ring[data-color="1"] { border-color: var(--c1-border); background: #eff6ff; margin-left: 3.5rem; }
+
+  .ring-head {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: var(--text-strong);
+    margin-bottom: 0.3rem;
+  }
+  .ring-depth {
+    font-size: 0.72rem;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    padding: 0.05rem 0.4rem;
+    border-radius: 4px;
+    background: rgba(15, 23, 42, 0.08);
+    color: #334155;
+  }
+  .ring-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+  }
+
+  /* View 2: コンポーネント＆介入フック図 */
+  .comp-arch-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+  }
+  .arch-box {
+    border-radius: 10px;
+    border: 2px solid var(--border);
+    background: #ffffff;
+    padding: 0.85rem 1rem;
+    cursor: pointer;
+  }
+  .arch-box.c1 { border-color: var(--c1); background: #eff6ff; }
+  .arch-box.c2 { border-color: var(--c2); background: #ecfdf5; }
+  .arch-box.c3 { border-color: var(--c3); background: #fffbeb; }
+  .arch-box.c4 { border-color: var(--c4); background: #f5f3ff; }
+
+  .arch-box-title {
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: var(--text-strong);
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    margin-bottom: 0.35rem;
+  }
+  .arch-subgrid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.6rem;
+    margin-top: 0.45rem;
+  }
+  .port-pill {
+    background: rgba(255, 255, 255, 0.88);
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    padding: 0.42rem 0.55rem;
+    font-size: 0.79rem;
+    line-height: 1.45;
+  }
+  .port-pill strong {
+    display: block;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.78rem;
+    color: var(--text-strong);
+  }
+  .hook-arrow-bar {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    font-size: 0.76rem;
+    font-weight: 700;
+    color: var(--muted);
+    padding: 0.1rem 0;
+  }
+
+  /* View 3: パッケージ・ディレクトリ俯瞰マップ（タブ切替フィルタ付） */
+  .filter-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+    margin: 1rem 0 1.1rem;
+  }
+  .filter-btn {
+    border: 1px solid var(--border);
+    background: var(--surface-subtle);
+    color: var(--text);
+    font-size: 0.83rem;
+    font-weight: 600;
+    padding: 0.4rem 0.8rem;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+  }
+  .filter-btn:hover { background: #e2e8f0; }
+  .filter-btn.is-selected {
+    background: var(--surface-dark);
+    color: #ffffff;
+    border-color: var(--surface-dark);
+  }
+
+  .pkg-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+    gap: 0.9rem;
+  }
+  .pkg-card {
+    border: 1px solid var(--border);
+    border-top-width: 4px;
+    border-radius: 10px;
+    background: #ffffff;
+    padding: 0.9rem 1rem;
+    transition: opacity 0.18s ease, transform 0.18s ease;
+  }
+  .pkg-card[data-cat="kernel"]  { border-top-color: var(--c1); }
+  .pkg-card[data-cat="data"]    { border-top-color: var(--c2); }
+  .pkg-card[data-cat="physics"] { border-top-color: var(--c3); }
+  .pkg-card[data-cat="render"]  { border-top-color: var(--c4); }
+  .pkg-card[data-cat="domain"]  { border-top-color: #db2777; }
+  .pkg-card.is-filtered-out {
+    display: none;
+  }
+  .pkg-dir {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.74rem;
+    color: var(--muted);
+    background: var(--surface-subtle);
+    padding: 0.12rem 0.45rem;
+    border-radius: 4px;
+    display: inline-block;
+    margin-bottom: 0.35rem;
+  }
+  .pkg-card h4 {
+    margin: 0 0 0.4rem;
+    font-size: 0.95rem;
+    color: var(--text-strong);
+  }
+  .pkg-card p {
+    margin: 0 0 0.55rem;
+    font-size: 0.83rem;
+    line-height: 1.55;
+    color: var(--text);
+  }
+  .pkg-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.3rem;
+  }
+
+  /* View 4: 1フレーム実行シーケンス図 */
+  .mode-switch-bar {
+    display: inline-flex;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 0.9rem;
+  }
+  .mode-btn {
+    border: none;
+    background: #ffffff;
+    color: var(--text);
+    padding: 0.42rem 0.85rem;
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    border-right: 1px solid var(--border);
+  }
+  .mode-btn:last-child { border-right: none; }
+  .mode-btn.is-selected {
+    background: var(--c1);
+    color: #ffffff;
+  }
+
+  .seq-board {
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: #ffffff;
+    overflow-x: auto;
+  }
+  .seq-lanes-head {
+    display: grid;
+    grid-template-columns: 160px repeat(6, minmax(120px, 1fr));
+    background: var(--surface-dark);
+    color: #f8fafc;
+    font-size: 0.76rem;
+    font-weight: 700;
+    border-bottom: 2px solid #334155;
+    min-width: 920px;
+  }
+  .seq-lanes-head > div {
+    padding: 0.6rem 0.5rem;
+    border-right: 1px solid #1e293b;
+    text-align: center;
+  }
+  .seq-phase-row {
+    display: grid;
+    grid-template-columns: 160px 1fr;
+    border-bottom: 1px solid var(--border-light);
+    min-width: 920px;
+    cursor: pointer;
+  }
+  .seq-phase-row:last-child { border-bottom: none; }
+  .seq-phase-label {
+    padding: 0.75rem 0.65rem;
+    font-size: 0.8rem;
+    font-weight: 700;
+    border-right: 2px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    justify-content: center;
+  }
+  .seq-phase-row[data-color="1"] .seq-phase-label { background: #eff6ff; color: #1e40af; }
+  .seq-phase-row[data-color="3"] .seq-phase-label { background: #fffbeb; color: #92400e; }
+  .seq-phase-row[data-color="2"] .seq-phase-label { background: #ecfdf5; color: #065f46; }
+  .seq-phase-row[data-color="4"] .seq-phase-label { background: #f5f3ff; color: #5b21b6; }
+
+  .seq-steps-grid {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(120px, 1fr));
+    padding: 0.65rem 0.5rem;
+    gap: 0.4rem;
+    align-items: center;
+  }
+  .seq-node {
+    padding: 0.45rem 0.55rem;
+    border-radius: 6px;
+    font-size: 0.76rem;
+    line-height: 1.4;
+    border: 1px solid var(--border);
+    background: var(--surface-subtle);
+  }
+  .seq-node.active-call {
+    background: #ffffff;
+    border-width: 2px;
+    font-weight: 600;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.06);
+  }
+  .seq-phase-row[data-color="1"] .seq-node.active-call { border-color: var(--c1); }
+  .seq-phase-row[data-color="3"] .seq-node.active-call { border-color: var(--c3); }
+  .seq-phase-row[data-color="2"] .seq-node.active-call { border-color: var(--c2); }
+  .seq-phase-row[data-color="4"] .seq-node.active-call { border-color: var(--c4); }
+
+  .seq-mode-note {
+    font-size: 0.82rem;
+    background: #eff6ff;
+    border-left: 4px solid var(--c1);
+    padding: 0.55rem 0.85rem;
+    border-radius: 0 6px 6px 0;
+    margin-bottom: 0.85rem;
+  }
+
+  /* View 5 & 6: CPU/GPU データ経路図・DeformableBody 境界図 */
+  .hw-split {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.85rem;
+  }
+  .hw-zone {
+    border-radius: 10px;
+    padding: 0.9rem;
+    border: 2px dashed var(--border);
+    background: #ffffff;
+  }
+  .hw-zone.gpu-zone {
+    border-style: solid;
+    border-color: #10b981;
+    background: #f0fdf4;
+  }
+  .hw-zone-title {
+    font-size: 0.8rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-bottom: 0.6rem;
+    color: var(--text-strong);
+  }
+  .flow-step-card {
+    background: #ffffff;
+    border: 1px solid var(--border);
+    border-left-width: 4px;
+    border-radius: 7px;
+    padding: 0.55rem 0.7rem;
+    margin-bottom: 0.55rem;
+    font-size: 0.81rem;
+    line-height: 1.45;
+    cursor: pointer;
+  }
+  .flow-step-card:last-child { margin-bottom: 0; }
+  .flow-step-card[data-color="1"] { border-left-color: var(--c1); }
+  .flow-step-card[data-color="2"] { border-left-color: var(--c2); }
+  .flow-step-card[data-color="3"] { border-left-color: var(--c3); }
+  .flow-step-card[data-color="4"] { border-left-color: var(--c4); }
+
+  /* コードブロック（行番号参照禁止・対象行ハイライト＋無関係行ディミング） */
+  .code-block {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.83rem;
+    background: #0f172a;
+    color: #e2e8f0;
+    border-radius: 10px;
+    padding: 0.8rem 0;
+    overflow-x: auto;
+    margin-top: 0.9rem;
+  }
+  .code-line {
+    display: flex;
+    align-items: baseline;
+    gap: 0.6rem;
+    padding: 0.16rem 1rem;
+    white-space: pre;
+  }
+  .code-line.is-muted { opacity: 0.45; }
+  .code-line.is-focus { cursor: pointer; }
+  .code-line.is-focus[data-color="1"] { background: rgba(37, 99, 235, 0.28); border-left: 3px solid var(--c1); }
+  .code-line.is-focus[data-color="2"] { background: rgba(5, 150, 105, 0.28); border-left: 3px solid var(--c2); }
+  .code-line.is-focus[data-color="3"] { background: rgba(217, 119, 6, 0.28); border-left: 3px solid var(--c3); }
+  .code-line.is-focus[data-color="4"] { background: rgba(124, 58, 237, 0.28); border-left: 3px solid var(--c4); }
+
+  /* 差分・要否ハイライト */
+  .tag-req {
+    display: inline-block;
+    padding: 0.1rem 0.45rem;
+    border-radius: 4px;
+    font-size: 0.76rem;
+    font-weight: 700;
+  }
+  .tag-req.yes { background: #fef3c7; color: #92400e; border: 1px solid #fcd34d; }
+  .tag-req.no  { background: #dcfce7; color: #166534; border: 1px solid #86efac; }
+  .tag-req.opt { background: #ede9fe; color: #5b21b6; border: 1px solid #c4b5fd; }
+
+  /* 表のスキャン最適化 */
+  .table-wrap {
+    overflow-x: auto;
+    margin-top: 1rem;
+    border: 1px solid var(--border-light);
+    border-radius: 10px;
+  }
+  table.ergo-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.86rem;
+  }
+  table.ergo-table thead th {
+    position: sticky;
+    top: 0;
+    background: var(--surface-subtle);
+    border-bottom: 2px solid var(--border);
+    text-align: left;
+    padding: 0.65rem 0.8rem;
+    color: var(--text-strong);
+    z-index: 2;
+  }
+  table.ergo-table tbody tr { transition: background 0.12s ease; }
+  table.ergo-table tbody tr:hover { background: #eff6ff; }
+  table.ergo-table td {
+    padding: 0.6rem 0.8rem;
+    border-bottom: 1px solid var(--border-light);
+    vertical-align: top;
+  }
+  table.ergo-table td.num,
+  table.ergo-table th.num {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* 結論コールアウト */
+  .answer-banner {
+    background: #f0fdf4;
+    border: 1px solid #86efac;
+    border-left: 5px solid var(--c2);
+    border-radius: 10px;
+    padding: 1rem 1.2rem;
+    margin: 0.8rem 0 1.2rem;
+    max-width: 78ch;
+  }
+  .answer-banner strong {
+    color: #065f46;
+  }
+
+  /* 元の位置へ戻るフローティングボタン */
+  #ref-return-btn {
+    position: fixed;
+    right: 1.25rem;
+    bottom: 1.25rem;
+    z-index: 9999;
+    display: none;
+    padding: 0.55rem 0.95rem;
+    border-radius: 999px;
+    border: 1px solid #1e293b;
+    background: #0f172a;
+    color: #ffffff;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 6px 18px rgba(15, 23, 42, 0.28);
+  }
+  #ref-return-btn.is-visible { display: inline-flex; align-items: center; gap: 0.4rem; }
+
+  @media (max-width: 1120px) {
+    .app-shell { grid-template-columns: 1fr; }
+    .toc-rail { position: static; }
+    .split-view { grid-template-columns: 1fr; }
+    .split-visual { position: static; }
+    .hw-split { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<svg id="ref-connector-layer" style="position:fixed;inset:0;width:100vw;height:100vh;pointer-events:none;z-index:9990;"></svg>
+<button id="ref-return-btn" type="button">↩ 元の位置へ戻る</button>
+
+<header class="page-header">
+  <div class="header-inner">
+    <div class="header-badges">
+      <span class="h-tag">Isaac Sim 6.2.0 (Kit SDK 110) 実機コード準拠</span>
+      <span class="h-tag doc-type">類型：④ 解説（Explanation）</span>
+    </div>
+    <h1>Isaac Sim 6.2.0 アーキテクチャ解剖図鑑：omni.kit・物理エンジン介入・全コンポーネント俯瞰</h1>
+    <p class="header-lead">
+      マイクロカーネルである <code>omni.kit</code> が何を提供し、物理エンジン（PhysX / Newton）や描画エンジン（RTX Renderer）がどの接点から介入するのかを、外側から内側へ向かう6つの視覚観点（同心レイヤー・介入コンポーネント・パッケージ地図・1フレーム実行シーケンス・CPU/GPU状態経路・カスタム DeformableBody 改修境界）で解き明かします。
+    </p>
+  </div>
+</header>
+
+<div class="app-shell">
+  <!-- 追従サイドバー目次 -->
+  <aside class="toc-rail" aria-label="目次">
+    <div class="toc-title">視点別ナビゲーション</div>
+    <nav class="toc">
+      <ul>
+        <li><a href="#sec-layers" class="is-current">1. 外側→内側 6層レイヤー全体像</a></li>
+        <li><a href="#sec-intervention">2. omni.kit の機能と物理介入フック</a></li>
+        <li><a href="#sec-packages">3. 全コンポーネント・パッケージ地図</a></li>
+        <li><a href="#sec-sequence">4. 1フレーム実行シーケンス図</a></li>
+        <li><a href="#sec-dataflow">5. USD と Fabric・Tensor の状態経路</a></li>
+        <li><a href="#sec-deformable">6. カスタム DeformableBody とシェーダー境界</a></li>
+      </ul>
+    </nav>
+    <div class="toc-hint">
+      <strong>操作ガイド：</strong><br>
+      色付き番号バッジ（<span class="ref-badge" data-color="1" style="cursor:default;">❶</span> など）にホバーすると本文と図の対応箇所が双方向スポットライト＆破線で結ばれ、クリックで対象位置へジャンプします。
+    </div>
+  </aside>
+
+  <main>
+    <!-- ================================================================
+         SECTION 1: 外側から内側への6層レイヤー全体像
+    ================================================================= -->
+    <section class="doc-section" id="sec-layers" data-ref-group="onion-layers" data-allow-dense="true">
+      <span class="section-kicker">View 1 / Concentric Layer Architecture</span>
+      <h2>1. 外側から内側への6層レイヤー全体像：Isaac Sim はどう積み上がっているか</h2>
+
+      <div class="split-view">
+        <div class="prose" data-ref-scope>
+          <p>
+            Isaac Sim を一体の巨大シミュレータとして見ると全体像を見失います。実態は、最内層のマイクロカーネルである <strong>Kit カーネル</strong> の周囲に、共有メモリ・専門エンジン・ロボティクス拡張が玉ねぎのように重なった<strong>6層のモジュラー構造</strong>です。外側から内側へ順番に役割を剥がしていくと、各コンポーネントの立ち位置が一目で整理できます。
+          </p>
+
+          <ul>
+            <li>
+              <span class="ref-badge" data-color="6" data-ref="layer-l5" data-ref-role="source">❶</span>
+              <strong>L5 最外層（アプリ起動・外部連携・UI 層）：</strong>
+              ユーザーが直接触れる入口です。<span class="code-chip" data-exact-target="onion-diagram">isaacsim.exp.full.kit</span> などの Experience 構成ファイル、Python スクリプトから起動する <span class="code-chip" data-exact-target="onion-diagram">SimulationApp</span>、ROS 2 通信を担う <span class="code-chip" data-exact-target="onion-diagram">isaacsim.ros2.bridge</span>、および <span class="code-chip" data-exact-target="onion-diagram">omni.ui</span> ベースの GUI ウィンドウ群が属します。
+            </li>
+            <li>
+              <span class="ref-badge" data-color="5" data-ref="layer-l4" data-ref-role="source">❷</span>
+              <strong>L4 ロボティクス・合成データ ドメイン層：</strong>
+              「ロボット」「関節」「センサー」「強化学習環境」といった意味論を与える層です。<span class="code-chip" data-exact-target="onion-diagram">SimulationManager</span>、プリム操作ラッパー <span class="code-chip" data-exact-target="onion-diagram">isaacsim.core.experimental.prims</span>、軌道生成 <span class="code-chip" data-exact-target="onion-diagram">isaacsim.robot_motion.cumotion</span>、合成データ生成 <span class="code-chip" data-exact-target="onion-diagram">omni.replicator.core</span>、ノード計算グラフ <span class="code-chip" data-exact-target="onion-diagram">omni.graph.core</span> が連携します。
+            </li>
+            <li>
+              <span class="ref-badge" data-color="3" data-ref="layer-l3" data-ref-role="source">❸</span>
+              <strong>L3 統一抽象・時間・イベント仲介層：</strong>
+              特定の物理エンジン実装への依存を断ち切る「防波堤」です。再生時刻を管理する <span class="code-chip" data-exact-target="onion-diagram">omni.timeline</span>、物理エンジン共通 VTable を定義する<strong>物理抽象インターフェース</strong> <span class="code-chip" data-exact-target="onion-diagram">omni.physics</span>、ステージ更新を中継する <span class="code-chip" data-exact-target="onion-diagram">omni.physics.stageupdate</span>、GPU 配列ビューを提供する <span class="code-chip" data-exact-target="onion-diagram">omni.physics.tensors</span> で構成されます。
+            </li>
+            <li>
+              <span class="ref-badge" data-color="2" data-ref="layer-l2" data-ref-role="source">❹</span>
+              <strong>L2 シーン表現・共有状態ハブ層（USD ＆ Fabric）：</strong>
+              全エンジンが共有する「単一の状態ハブ」です。アセット構造と物理スキーマを保持する<strong>永続シーングラフ（USD）</strong>（<span class="code-chip" data-exact-target="onion-diagram">omni.usd</span>）と、実行中の座標・頂点配列を GPU 上で高速中継する
+              <span class="term-inline" tabindex="0">実行時共有メモリ（Fabric / USDRT）<span class="term-card" role="tooltip">USD の木構造トラバーサルや CPU コピーを省き、GPU/CPU 上の連続配列（SoA: Structure of Arrays）として剛体姿勢やメッシュ頂点を保持するランタイムキャッシュ。</span></span>
+              （<span class="code-chip" data-exact-target="onion-diagram">usdrt.scenegraph</span>）の二階建てになっています。
+            </li>
+            <li>
+              <span class="ref-badge" data-color="4" data-ref="layer-l1" data-ref-role="source">❺</span>
+              <strong>L1 専門計算エンジン層（物理エンジン ＆ RTX 描画）：</strong>
+              重たい数値計算と GPU カーネルを実行する専門職です。物理側には <span class="code-chip" data-exact-target="onion-diagram">omni.physx</span>（PhysX 5）と <span class="code-chip" data-exact-target="onion-diagram">isaacsim.physics.newton</span>（Newton / Warp）が並立し、描画側には<strong>描画デリゲート（Hydra Scene Delegate）</strong>である <span class="code-chip" data-exact-target="onion-diagram">omni.hydra.usdrt_delegate</span> と<strong>レイトレーシング描画エンジン（RTX Renderer）</strong>である <span class="code-chip" data-exact-target="onion-diagram">omni.hydra.rtx</span> が対等にぶら下がります。
+            </li>
+            <li>
+              <span class="ref-badge" data-color="1" data-ref="layer-l0" data-ref-role="source">❻</span>
+              <strong>L0 最内層（Kit カーネル ＆ Carbonite 基盤）：</strong>
+              すべての土台となる C++ マイクロカーネルです。
+              <span class="term-inline" tabindex="0">Carbonite<span class="term-card" role="tooltip">NVIDIA Omniverse の最下層 C++ プラグインSDK。ロギング、設定辞書、イベントディスパッチャ、Fiber タスクスケジューラなど OS 抽象化とプラグイン動的ロードを提供する。</span></span>
+              プラグイン群（<span class="code-chip" data-exact-target="onion-diagram">carb.eventdispatcher</span>、<span class="code-chip" data-exact-target="onion-diagram">carb.settings</span>、<span class="code-chip" data-exact-target="onion-diagram">carb.tasking</span>）の上で、拡張機能ローダ <span class="code-chip" data-exact-target="onion-diagram">omni.ext</span> とアプリ実行ループ <span class="code-chip" data-exact-target="onion-diagram">omni.kit.app</span>（および Isaac 専用ループ <span class="code-chip" data-exact-target="onion-diagram">omni.kit.loop-isaac</span>）が心臓の鼓動を刻みます。
+            </li>
+          </ul>
+        </div>
+
+        <div class="split-visual">
+          <div class="diagram-frame" id="onion-diagram" data-ref-scope>
+            <div class="diagram-caption">
+              <span>外側から内側へ向かう6層ネスト構造（クリック／ホバー連動）</span>
+              <span>Outer → Inner</span>
+            </div>
+            <div class="onion-stack">
+              <div class="onion-ring" data-color="6" data-ref="layer-l5" data-ref-role="target">
+                <div class="ring-head">
+                  <span class="ref-badge" data-color="6">❶</span>
+                  <span>L5: アプリ起動・外部連携・UI 層</span>
+                  <span class="ring-depth">Outermost</span>
+                </div>
+                <div class="ring-chips">
+                  <span class="code-chip">isaacsim.exp.full.kit</span>
+                  <span class="code-chip">SimulationApp</span>
+                  <span class="code-chip">isaacsim.ros2.bridge</span>
+                  <span class="code-chip">omni.ui</span>
+                </div>
+              </div>
+
+              <div class="onion-ring" data-color="5" data-ref="layer-l4" data-ref-role="target">
+                <div class="ring-head">
+                  <span class="ref-badge" data-color="5">❷</span>
+                  <span>L4: ロボティクス・合成データ ドメイン層</span>
+                  <span class="ring-depth">Domain</span>
+                </div>
+                <div class="ring-chips">
+                  <span class="code-chip">SimulationManager</span>
+                  <span class="code-chip">isaacsim.core.experimental.prims</span>
+                  <span class="code-chip">isaacsim.robot_motion.cumotion</span>
+                  <span class="code-chip">omni.replicator.core</span>
+                  <span class="code-chip">omni.graph.core</span>
+                </div>
+              </div>
+
+              <div class="onion-ring" data-color="3" data-ref="layer-l3" data-ref-role="target">
+                <div class="ring-head">
+                  <span class="ref-badge" data-color="3">❸</span>
+                  <span>L3: 統一抽象・時間・イベント仲介層</span>
+                  <span class="ring-depth">Mediation</span>
+                </div>
+                <div class="ring-chips">
+                  <span class="code-chip">omni.timeline</span>
+                  <span class="code-chip">omni.physics</span>
+                  <span class="code-chip">omni.physics.stageupdate</span>
+                  <span class="code-chip">omni.physics.tensors</span>
+                </div>
+              </div>
+
+              <div class="onion-ring" data-color="2" data-ref="layer-l2" data-ref-role="target">
+                <div class="ring-head">
+                  <span class="ref-badge" data-color="2">❹</span>
+                  <span>L2: シーン表現・共有状態ハブ層</span>
+                  <span class="ring-depth">State Hub</span>
+                </div>
+                <div class="ring-chips">
+                  <span class="code-chip">omni.usd</span>
+                  <span class="code-chip">UsdPhysics.*</span>
+                  <span class="code-chip">usdrt.scenegraph</span>
+                  <span class="code-chip">omni.physx.fabric</span>
+                </div>
+              </div>
+
+              <div class="onion-ring" data-color="4" data-ref="layer-l1" data-ref-role="target">
+                <div class="ring-head">
+                  <span class="ref-badge" data-color="4">❺</span>
+                  <span>L1: 専門計算エンジン層（物理 ＆ 描画）</span>
+                  <span class="ring-depth">Engines</span>
+                </div>
+                <div class="ring-chips">
+                  <span class="code-chip">omni.physx</span>
+                  <span class="code-chip">isaacsim.physics.newton</span>
+                  <span class="code-chip">omni.hydra.usdrt_delegate</span>
+                  <span class="code-chip">omni.hydra.rtx</span>
+                </div>
+              </div>
+
+              <div class="onion-ring" data-color="1" data-ref="layer-l0" data-ref-role="target">
+                <div class="ring-head">
+                  <span class="ref-badge" data-color="1">❻</span>
+                  <span>L0: Kit カーネル ＆ Carbonite 基盤</span>
+                  <span class="ring-depth">Innermost Core</span>
+                </div>
+                <div class="ring-chips">
+                  <span class="code-chip">omni.kit.app</span>
+                  <span class="code-chip">omni.kit.loop-isaac</span>
+                  <span class="code-chip">omni.ext</span>
+                  <span class="code-chip">carb.eventdispatcher</span>
+                  <span class="code-chip">carb.settings</span>
+                  <span class="code-chip">carb.tasking</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================================================================
+         SECTION 2: omni.kit の機能と物理エンジンの介入メカニズム
+    ================================================================= -->
+    <section class="doc-section" id="sec-intervention" data-ref-group="kit-intervention">
+      <span class="section-kicker">View 2 / Component &amp; Intervention Hooks</span>
+      <h2>2. <code>omni.kit</code> フレームワークの役割と、物理エンジンが介入する4つの接点</h2>
+
+      <div class="split-view">
+        <div class="prose" data-ref-scope>
+          <p>
+            もっとも重要な設計上の事実は、<strong>Kit カーネル（<code>omni.kit.app</code>）自体は「剛体」も「重力」も「衝突」も一切知らない</strong>という点です。<code>omni.kit</code> は純粋なアプリケーション基盤として、(A) 拡張機能の依存解決とロード（<span class="code-chip" data-exact-target="comp-hook-diagram">omni.ext</span>）、(B) 1フレームごとの更新ループ駆動（<span class="code-chip" data-exact-target="comp-hook-diagram">preUpdate</span> / <span class="code-chip" data-exact-target="comp-hook-diagram">update</span> / <span class="code-chip" data-exact-target="comp-hook-diagram">postUpdate</span>）、(C) イベントバス（<span class="code-chip" data-exact-target="comp-hook-diagram">carb.eventdispatcher</span>）、(D) 階層設定ツリー（<span class="code-chip" data-exact-target="comp-hook-diagram">carb.settings</span>）の4機能だけを提供します。
+          </p>
+          <p>
+            では、物理エンジン（PhysX や Newton）はどうやって <code>omni.kit</code> のフレーム進行に割り込んでいるのでしょうか。介入は以下の4つの接点で行われます。
+          </p>
+
+          <ul>
+            <li>
+              <span class="ref-badge" data-color="1" data-ref="hook-loop" data-ref-role="source">❶</span>
+              <strong>接点1：RunLoop の刻み制御と Timeline 購読</strong><br>
+              Isaac Sim は標準ループを <span class="code-chip" data-exact-target="comp-hook-diagram">omni.kit.loop-isaac</span> に差し替え、実時間ではなく決定論的な固定 <code>dt</code> で <span class="code-chip" data-exact-target="comp-hook-diagram">update</span> イベントを発火させます。<span class="code-chip" data-exact-target="comp-hook-diagram">omni.timeline</span> がその刻みを受けて再生時刻を進め、<span class="code-chip" data-exact-target="comp-hook-diagram">omni.physics.stageupdate</span> がステージ更新コールバック（<span class="code-chip" data-exact-target="comp-hook-diagram">StageUpdateFns.on_update</span>）を呼び出します。
+            </li>
+            <li>
+              <span class="ref-badge" data-color="3" data-ref="hook-vtable" data-ref-role="source">❷</span>
+              <strong>接点2：<code>omni.physics</code> への関数テーブル（<code>Simulation</code>）登録</strong><br>
+              Isaac Sim 6.2.0 では PhysX（<span class="code-chip" data-exact-target="comp-hook-diagram">omni.physics.physx</span>）も Newton（<span class="code-chip" data-exact-target="comp-hook-diagram">isaacsim.physics.newton</span>）も、直接 Kit に刺さるのではなく<strong>物理抽象インターフェース</strong> <span class="code-chip" data-exact-target="comp-hook-diagram">IPhysics</span> に対して <span class="code-chip" data-exact-target="comp-hook-diagram">Simulation</span> 構造体（<span class="code-chip" data-exact-target="comp-hook-diagram">SimulationFns</span>・<span class="code-chip" data-exact-target="comp-hook-diagram">StageUpdateFns</span>・<span class="code-chip" data-exact-target="comp-hook-diagram">SceneQueryFns</span>）を登録します。これにより実行時でも <span class="code-chip">SimulationManager.switch_physics_engine("newton")</span> の1行でバックエンドを切り替えられます。
+            </li>
+            <li>
+              <span class="ref-badge" data-color="2" data-ref="hook-fabric" data-ref-role="source">❸</span>
+              <strong>接点3：USD からの初期パースと Fabric への結果書き戻し</strong><br>
+              再生開始時（<span class="code-chip" data-exact-target="comp-hook-diagram">StageUpdateFns.on_attach</span>）だけ永続シーングラフ（USD）の <span class="code-chip" data-exact-target="comp-hook-diagram">UsdPhysics.Scene</span> や衝突メッシュをパースして GPU バッファを確保します。毎ステップの計算結果（<span class="code-chip" data-exact-target="comp-hook-diagram">simulate</span> → <span class="code-chip" data-exact-target="comp-hook-diagram">fetch_results</span>）は遅い USD 通知を避け、GPU 上の<strong>実行時共有メモリ（Fabric / USDRT）</strong>へ直接書き出します。
+            </li>
+            <li>
+              <span class="ref-badge" data-color="4" data-ref="hook-render" data-ref-role="source">❹</span>
+              <strong>接点4：Tensor 直接介入と Hydra 描画への非同期引き渡し</strong><br>
+              強化学習やロボット制御は <span class="code-chip" data-exact-target="comp-hook-diagram">isaacsim.simulation.physics_pre_step</span> イベントで介入し、<span class="code-chip" data-exact-target="comp-hook-diagram">omni.physics.tensors</span> 経由で GPU ソルバー内の関節トルク・状態配列を直接読み書きします。一方、<strong>描画デリゲート（Hydra Scene Delegate）</strong>である <span class="code-chip" data-exact-target="comp-hook-diagram">omni.hydra.usdrt_delegate</span> は Fabric 上の更新属性だけを検知して <span class="code-chip" data-exact-target="comp-hook-diagram">omni.hydra.rtx</span> に渡すため、物理エンジンと描画エンジンは互いの内部コードを一切参照しません。
+            </li>
+          </ul>
+        </div>
+
+        <div class="split-visual">
+          <div class="diagram-frame" id="comp-hook-diagram" data-ref-scope>
+            <div class="diagram-caption">
+              <span>コンポーネント接続図：物理エンジンが Kit に介入する4接点</span>
+              <span>Port / Interface View</span>
+            </div>
+
+            <div class="comp-arch-grid">
+              <!-- Box 1: Kit Kernel & Loop -->
+              <div class="arch-box c1" data-color="1" data-ref="hook-loop" data-ref-role="target">
+                <div class="arch-box-title">
+                  <span class="ref-badge" data-color="1">❶</span>
+                  <span>Kit カーネル ＆ 時間駆動基盤（物理非依存）</span>
+                </div>
+                <div class="arch-subgrid">
+                  <div class="port-pill">
+                    <strong>omni.kit.app + omni.kit.loop-isaac</strong>
+                    固定 dt で <code>preUpdate</code> / <code>update</code> / <code>postUpdate</code> を発火
+                  </div>
+                  <div class="port-pill">
+                    <strong>omni.ext / carb.eventdispatcher / carb.settings</strong>
+                    拡張ロード・イベントバス・設定木を統括
+                  </div>
+                  <div class="port-pill">
+                    <strong>omni.timeline</strong>
+                    <code>update</code> を購読し再生時刻を進行
+                  </div>
+                  <div class="port-pill">
+                    <strong>omni.physics.stageupdate</strong>
+                    Timeline と連動し <code>StageUpdateFns.on_update</code> を呼出
+                  </div>
+                </div>
+              </div>
+
+              <div class="hook-arrow-bar">
+                <span>▼ イベント購読・on_update(current_time, dt) 委譲 ▼</span>
+              </div>
+
+              <!-- Box 2: Unified Physics Abstraction -->
+              <div class="arch-box c3" data-color="3" data-ref="hook-vtable" data-ref-role="target">
+                <div class="arch-box-title">
+                  <span class="ref-badge" data-color="3">❷</span>
+                  <span>物理抽象インターフェース ＆ 選択エンジン（VTable 差し替え）</span>
+                </div>
+                <div class="arch-subgrid">
+                  <div class="port-pill">
+                    <strong>omni.physics (IPhysics / Simulation)</strong>
+                    <code>SimulationFns</code>（<code>simulate</code> / <code>fetch_results</code>）・<code>StageUpdateFns</code>・<code>SceneQueryFns</code>
+                  </div>
+                  <div class="port-pill">
+                    <strong>Active Engine A: omni.physics.physx</strong>
+                    <code>omni.physx</code> + <code>omni.physx.gpu</code>（PhysX 5 CUDA ソルバー）
+                  </div>
+                  <div class="port-pill">
+                    <strong>Active Engine B: isaacsim.physics.newton</strong>
+                    Newton（XPBD / MuJoCo Warp + CUDA Graph）
+                  </div>
+                  <div class="port-pill">
+                    <strong>SimulationManager</strong>
+                    <code>StageUpdateFns.on_attach</code> 後の Warm-up とエンジン切替を管理
+                  </div>
+                </div>
+              </div>
+
+              <div class="hook-arrow-bar">
+                <span>▼ 初期パース(USD) ／ 毎フレーム GPU 姿勢・頂点同期(Fabric) ▼</span>
+              </div>
+
+              <!-- Box 3: USD & Fabric Hub -->
+              <div class="arch-box c2" data-color="2" data-ref="hook-fabric" data-ref-role="target">
+                <div class="arch-box-title">
+                  <span class="ref-badge" data-color="2">❸</span>
+                  <span>シーン状態ハブ：永続シーングラフ（USD）と Fabric</span>
+                </div>
+                <div class="arch-subgrid">
+                  <div class="port-pill">
+                    <strong>omni.usd (UsdPhysics.Scene / PhysxSchema)</strong>
+                    起動・アタッチ時に構成と衝突形状を供給
+                  </div>
+                  <div class="port-pill">
+                    <strong>usdrt.scenegraph / omni.physx.fabric</strong>
+                    VRAM 上で worldMatrix・points 属性をゼロコピー保持
+                  </div>
+                </div>
+              </div>
+
+              <div class="hook-arrow-bar">
+                <span>▼ Tensor 制御介入 ＆ Hydra 差分レンダリング ▼</span>
+              </div>
+
+              <!-- Box 4: Tensor & Hydra/RTX Consumers -->
+              <div class="arch-box c4" data-color="4" data-ref="hook-render" data-ref-role="target">
+                <div class="arch-box-title">
+                  <span class="ref-badge" data-color="4">❹</span>
+                  <span>並列コンシューマ：RL Tensor 介入 ＆ Hydra / RTX 描画</span>
+                </div>
+                <div class="arch-subgrid">
+                  <div class="port-pill">
+                    <strong>omni.physics.tensors</strong>
+                    <code>isaacsim.simulation.physics_pre_step</code> で関節駆動・外力を GPU 直書込
+                  </div>
+                  <div class="port-pill">
+                    <strong>omni.hydra.usdrt_delegate → omni.hydra.rtx</strong>
+                    Fabric の変更属性から BVH を更新しレイトレーシング描画
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================================================================
+         SECTION 3: Isaac Sim 6.2.0 全コンポーネント・パッケージ地図
+    ================================================================= -->
+    <section class="doc-section" id="sec-packages">
+      <span class="section-kicker">View 3 / Full Ecosystem Package &amp; Directory Map</span>
+      <h2>3. Isaac Sim 6.2.0 で登場する全コンポーネント・パッケージ俯瞰地図</h2>
+
+      <div class="prose">
+        <p>
+          ワークスペース（<code>c:\isaacsim-6.2.0</code>）を開いたときに並ぶディレクトリと拡張パッケージ群を、責務別の5系統に整理した全体地図です。実際のインストールツリーでは、Kit 標準の <code>omni.*</code> 拡張は <code>extscache/</code> 配下（約500パッケージ）に、Isaac Sim 固有の <code>isaacsim.*</code> 拡張は <code>exts/</code> 配下（約115パッケージ）に配置されており、<code>apps/*.kit</code> ファイルがどの拡張群を束ねて起動するかを決定します。
+        </p>
+      </div>
+
+      <div class="filter-bar" role="tablist" aria-label="パッケージ系統フィルタ">
+        <button type="button" class="filter-btn is-selected" data-filter="all">すべて表示（全15コンポーネント群）</button>
+        <button type="button" class="filter-btn" data-filter="kernel">Kit カーネル・時間・UI</button>
+        <button type="button" class="filter-btn" data-filter="data">USD・スキーマ・Fabric</button>
+        <button type="button" class="filter-btn" data-filter="physics">物理エンジン・Tensor・Warp</button>
+        <button type="button" class="filter-btn" data-filter="render">Hydra・RTX 描画・MDL</button>
+        <button type="button" class="filter-btn" data-filter="domain">ロボット・センサー・SDG・ROS 2</button>
+      </div>
+
+      <div class="pkg-grid" id="pkg-catalog-grid">
+        <!-- 1. Carbonite -->
+        <div class="pkg-card" data-cat="kernel">
+          <span class="pkg-dir">kit/kernel/plugins/</span>
+          <h4>Carbonite ネイティブプラグイン群</h4>
+          <p>OS 抽象化・メモリ・イベント配信・マルチスレッド Fiber ジョブを担う最下層 C++ DLL 群です。</p>
+          <div class="pkg-list">
+            <span class="code-chip">carb.eventdispatcher</span>
+            <span class="code-chip">carb.events</span>
+            <span class="code-chip">carb.settings</span>
+            <span class="code-chip">carb.dictionary</span>
+            <span class="code-chip">carb.tasking</span>
+            <span class="code-chip">carb.input</span>
+          </div>
+        </div>
+
+        <!-- 2. Kit App & Loop -->
+        <div class="pkg-card" data-cat="kernel">
+          <span class="pkg-dir">kit/kernel/ + exts/omni.kit.loop-isaac/</span>
+          <h4>Kit アプリ基盤 ＆ Isaac 専用 RunLoop</h4>
+          <p>拡張の依存グラフ解決と、<code>main</code> / <code>rendering_0</code> / <code>present</code> 各スレッドループの刻み制御を行います。</p>
+          <div class="pkg-list">
+            <span class="code-chip">omni.kit.app</span>
+            <span class="code-chip">omni.ext</span>
+            <span class="code-chip">omni.kit.loop-isaac</span>
+            <span class="code-chip">omni.timeline</span>
+            <span class="code-chip">omni.kit.async_engine</span>
+          </div>
+        </div>
+
+        <!-- 3. Kit UI & Viewport -->
+        <div class="pkg-card" data-cat="kernel">
+          <span class="pkg-dir">extscache/omni.ui-* , omni.kit.viewport.*</span>
+          <h4>GUI フレームワーク・ビューポート・操作系</h4>
+          <p>Dear ImGui 系バックエンドを持つ宣言的 UI と、3D ギズモ・プロパティインスペクタ・コマンド履歴（Undo/Redo）を提供します。</p>
+          <div class="pkg-list">
+            <span class="code-chip">omni.ui</span>
+            <span class="code-chip">omni.ui.scene</span>
+            <span class="code-chip">omni.kit.viewport.window</span>
+            <span class="code-chip">omni.kit.manipulator.prim.fabric</span>
+            <span class="code-chip">omni.kit.commands</span>
+          </div>
+        </div>
+
+        <!-- 4. OpenUSD & OmniClient -->
+        <div class="pkg-card" data-cat="data">
+          <span class="pkg-dir">extscache/omni.usd-* + kit/extscore/</span>
+          <h4>永続シーングラフ（USD）＆ アセット解決</h4>
+          <p>ステージのレイヤー合成（Composition Arcs）、非同期ロード、Nucleus / ローカル / HTTP URI 解決を管理します。</p>
+          <div class="pkg-list">
+            <span class="code-chip">pxr.Usd</span>
+            <span class="code-chip">omni.usd</span>
+            <span class="code-chip">omni.client.lib</span>
+            <span class="code-chip">omni.kit.usd.layers</span>
+          </div>
+        </div>
+
+        <!-- 5. USD Physics & Robot Schemas -->
+        <div class="pkg-card" data-cat="data">
+          <span class="pkg-dir">extscache/omni.usd.schema.* + exts/</span>
+          <h4>USD 物理・ロボット・センサー拡張スキーマ</h4>
+          <p>USD プリムに物理特性・ソルバー固有パラメータ・光学センサー仕様を付与するスキーマ定義群です。</p>
+          <div class="pkg-list">
+            <span class="code-chip">UsdPhysics</span>
+            <span class="code-chip">omni.usd.schema.physx</span>
+            <span class="code-chip">omni.usd.schema.newton</span>
+            <span class="code-chip">omni.usd.schema.mujoco</span>
+            <span class="code-chip">isaacsim.robot.schema</span>
+            <span class="code-chip">omni.usd.schema.omni_sensors</span>
+          </div>
+        </div>
+
+        <!-- 6. Fabric / USDRT -->
+        <div class="pkg-card" data-cat="data">
+          <span class="pkg-dir">extscache/usdrt.scenegraph-* , omni.fabric.*</span>
+          <h4>実行時共有メモリ（Fabric / USDRT）</h4>
+          <p>CPU/GPU 双方向に配置可能な SoA 形式の高速キャッシュで、物理ソルバー・Warp・Hydra 間のゼロコピー受け渡しを担います。</p>
+          <div class="pkg-list">
+            <span class="code-chip">usdrt.scenegraph</span>
+            <span class="code-chip">omni.fabric.commands</span>
+            <span class="code-chip">omni.physx.fabric</span>
+          </div>
+        </div>
+
+        <!-- 7. Unified Physics & Tensors -->
+        <div class="pkg-card" data-cat="physics">
+          <span class="pkg-dir">extscache/omni.physics-*</span>
+          <h4>物理抽象インターフェース ＆ 統一 Tensor API</h4>
+          <p>複数物理エンジンの登録・切替・ステージ更新フックと、PyTorch / Warp / NumPy 向けのバッチ状態配列ビューを提供します。</p>
+          <div class="pkg-list">
+            <span class="code-chip">omni.physics</span>
+            <span class="code-chip">omni.physics.stageupdate</span>
+            <span class="code-chip">omni.physics.tensors</span>
+            <span class="code-chip">isaacsim.core.simulation_manager</span>
+          </div>
+        </div>
+
+        <!-- 8. PhysX 5 Stack -->
+        <div class="pkg-card" data-cat="physics">
+          <span class="pkg-dir">extscache/omni.physx.*</span>
+          <h4>NVIDIA PhysX 5 バックエンド拡張群</h4>
+          <p>剛体・関節（Featherstone Articulation）・軟体（FEM / Surface Deformable）・車両・メッシュ Cooking・PVD デバッガを含みます。</p>
+          <div class="pkg-list">
+            <span class="code-chip">omni.physics.physx</span>
+            <span class="code-chip">omni.physx</span>
+            <span class="code-chip">omni.physx.gpu</span>
+            <span class="code-chip">omni.physx.cooking</span>
+            <span class="code-chip">omni.physx.tensors</span>
+            <span class="code-chip">omni.physx.pvd</span>
+          </div>
+        </div>
+
+        <!-- 9. Newton & Warp Stack -->
+        <div class="pkg-card" data-cat="physics">
+          <span class="pkg-dir">exts/isaacsim.physics.newton* + omni.warp.core</span>
+          <h4>Newton 物理バックエンド ＆ NVIDIA Warp</h4>
+          <p>Python で記述可能な GPU カーネル基盤 Warp と、その上で動く XPBD / MuJoCo Warp ソルバー＋CUDA Graph 高速化を提供します。</p>
+          <div class="pkg-list">
+            <span class="code-chip">isaacsim.physics.newton</span>
+            <span class="code-chip">isaacsim.physics.newton.tensors</span>
+            <span class="code-chip">isaacsim.pip.newton</span>
+            <span class="code-chip">omni.warp.core</span>
+          </div>
+        </div>
+
+        <!-- 10. Hydra Scene Delegates -->
+        <div class="pkg-card" data-cat="render">
+          <span class="pkg-dir">extscache/omni.hydra.*delegate*</span>
+          <h4>描画デリゲート（Hydra Scene Delegate）</h4>
+          <p>USD または Fabric の変更差分を監視し、レンダラー内部の Render Index プリミティブ（メッシュ・ライト・カメラ）へ変換します。</p>
+          <div class="pkg-list">
+            <span class="code-chip">omni.hydra.usdrt_delegate</span>
+            <span class="code-chip">omni.hydra.scene_delegate</span>
+            <span class="code-chip">omni.kit.hydra_texture</span>
+          </div>
+        </div>
+
+        <!-- 11. RTX Renderer & MDL -->
+        <div class="pkg-card" data-cat="render">
+          <span class="pkg-dir">extscache/omni.hydra.rtx-* , omni.mdl.*</span>
+          <h4>レイトレーシング描画エンジン（RTX）＆ MDL</h4>
+          <p>Vulkan / D3D12 上で BVH（TLAS / BLAS）を構築し、RT2（<code>RayTracedLighting</code>）・<code>PathTracing</code>・MDL 物理ベース材質評価を実行します。</p>
+          <div class="pkg-list">
+            <span class="code-chip">omni.hydra.rtx</span>
+            <span class="code-chip">omni.rtx.spg</span>
+            <span class="code-chip">omni.mdl.usd_converter</span>
+            <span class="code-chip">omni.kit.usd.mdl</span>
+          </div>
+        </div>
+
+        <!-- 12. OmniGraph -->
+        <div class="pkg-card" data-cat="domain">
+          <span class="pkg-dir">extscache/omni.graph.* + exts/isaacsim.core.nodes</span>
+          <h4>OmniGraph（計算・アクション実行グラフ）</h4>
+          <p>センサーパイプライン、コントローラ、ROS 2 パブリッシャなどを C++/Python ノードの有向グラフとして Fabric 上で駆動します。</p>
+          <div class="pkg-list">
+            <span class="code-chip">omni.graph.core</span>
+            <span class="code-chip">omni.graph.exec</span>
+            <span class="code-chip">omni.graph.action</span>
+            <span class="code-chip">isaacsim.core.nodes</span>
+          </div>
+        </div>
+
+        <!-- 13. Isaac Core Prims & Motion -->
+        <div class="pkg-card" data-cat="domain">
+          <span class="pkg-dir">exts/isaacsim.core.* , isaacsim.robot_motion.*</span>
+          <h4>ロボットプリム API・運動学・軌道計画</h4>
+          <p><code>RigidPrim</code>・<code>Articulation</code>・<code>DeformablePrim</code> などの高水準 API と、cuMotion / Lula による逆運動学・干渉回避計画を担います。</p>
+          <div class="pkg-list">
+            <span class="code-chip">isaacsim.core.experimental.prims</span>
+            <span class="code-chip">isaacsim.core.cloner</span>
+            <span class="code-chip">isaacsim.robot_motion.cumotion</span>
+            <span class="code-chip">isaacsim.asset.importer.urdf</span>
+            <span class="code-chip">isaacsim.asset.importer.mjcf</span>
+          </div>
+        </div>
+
+        <!-- 14. Sensors & Replicator SDG -->
+        <div class="pkg-card" data-cat="domain">
+          <span class="pkg-dir">exts/isaacsim.sensors.* , isaacsim.replicator.*</span>
+          <h4>物理／RTX センサー ＆ 合成データ生成（SDG）</h4>
+          <p>IMU・接触センサー（物理系）と、カメラ・LiDAR・Radar（RTX レイトレ系）、および Domain Randomization と教師ラベル書き出しを統合します。</p>
+          <div class="pkg-list">
+            <span class="code-chip">isaacsim.sensors.experimental.physics</span>
+            <span class="code-chip">isaacsim.sensors.experimental.rtx</span>
+            <span class="code-chip">omni.replicator.core</span>
+            <span class="code-chip">omni.syntheticdata</span>
+          </div>
+        </div>
+
+        <!-- 15. App Launch, ROS 2 & Streaming -->
+        <div class="pkg-card" data-cat="domain">
+          <span class="pkg-dir">apps/ + exts/isaacsim.simulation_app , ros2.*</span>
+          <h4>起動ランチャ・ROS 2 ブリッジ・配信</h4>
+          <p>ヘッドレス／GUI 起動制御、ROS 2 トピック／TF／Action 通信、WebRTC / RTSP 映像ストリーミングを担当します。</p>
+          <div class="pkg-list">
+            <span class="code-chip">isaacsim.simulation_app</span>
+            <span class="code-chip">isaacsim.ros2.bridge</span>
+            <span class="code-chip">isaacsim.streaming.rtsp</span>
+            <span class="code-chip">isaacsim.exp.full.kit</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================================================================
+         SECTION 4: 1フレーム（1 Tick）の時系列シーケンス図
+    ================================================================= -->
+    <section class="doc-section" id="sec-sequence" data-ref-group="frame-sequence">
+      <span class="section-kicker">View 4 / Single-Frame Execution Sequence</span>
+      <h2>4. 1フレーム（1 Tick）の中で何がどの順番で起きているか（シーケンス図）</h2>
+
+      <div class="prose" data-ref-scope style="max-width: 82ch; margin-bottom: 1rem;">
+        <p>
+          <code>SimulationApp.update()</code>（または GUI 起動時のメインループ 1 周）が呼ばれた瞬間から、物理が解かれ、RTX レイトレーシング画像やセンサー出力が得られるまでの時系列を4フェーズに分けたシーケンス図です。モード切替ボタンで「標準 Timeline 駆動」と「強化学習・手動 Tensor 制御」の注目ポイントを確認できます。
+        </p>
+        <ul>
+          <li>
+            <span class="ref-badge" data-color="1" data-ref="seq-p1" data-ref-role="source">❶</span>
+            <strong>Phase 1（Tick 開始と時間進行）：</strong>
+            <code>omni.kit.loop-isaac</code> が固定刻み幅 <code>dt</code> を決定し、<code>preUpdate</code> に続いて <code>update</code> を発火します。<code>omni.timeline</code> が再生中であれば時刻を進め、<code>omni.physics.stageupdate</code> の <code>StageUpdateFns.on_update</code> を呼び出します。
+          </li>
+          <li>
+            <span class="ref-badge" data-color="3" data-ref="seq-p2" data-ref-role="source">❷</span>
+            <strong>Phase 2（Pre-Step 介入と物理ソルバー実行）：</strong>
+            物理ステップの直前に <span class="code-chip" data-exact-target="seq-diagram-box">isaacsim.simulation.physics_pre_step</span> が通知され、ロボット制御器や強化学習方策が <code>omni.physics.tensors</code> 経由で関節目標値や外力を書き込みます。直後にアクティブな<strong>物理エンジン</strong>（PhysX または Newton）の <span class="code-chip" data-exact-target="seq-diagram-box">SimulationFns.simulate</span> と <span class="code-chip" data-exact-target="seq-diagram-box">SimulationFns.fetch_results</span> が GPU 上で拘束・衝突・変形を解きます（<code>dt</code> が物理刻みより大きい場合は内部で複数サブステップ反復）。
+          </li>
+          <li>
+            <span class="ref-badge" data-color="2" data-ref="seq-p3" data-ref-role="source">❸</span>
+            <strong>Phase 3（Fabric 同期と Post-Step 通知）：</strong>
+            ソルバー完了後、<code>omni.physx.fabric</code>（または Newton の Fabric Sync）が更新された剛体姿勢（<code>omni:fabric:worldMatrix</code> 等）や変形メッシュの頂点配列（<code>points</code>）を GPU 上の<strong>実行時共有メモリ（Fabric / USDRT）</strong>へ一括反映します。その後 <span class="code-chip" data-exact-target="seq-diagram-box">isaacsim.simulation.physics_post_step</span> が発火し、接触センサーや観測値 Tensor の読み出しが可能になります。
+          </li>
+          <li>
+            <span class="ref-badge" data-color="4" data-ref="seq-p4" data-ref-role="source">❹</span>
+            <strong>Phase 4（Hydra 差分抽出・RTX 描画・PostUpdate）：</strong>
+            レンダリング対象フレームでは、<span class="code-chip" data-exact-target="seq-diagram-box">omni.hydra.usdrt_delegate</span> が Fabric 内の変更フラグ（Dirty Bit）だけを読み取って <span class="code-chip" data-exact-target="seq-diagram-box">omni.hydra.rtx</span> に渡し、加速構造（TLAS / BLAS）を更新してレイトレーシング描画・RTX センサー計算・Replicator アノテーションを実行します。最後に <code>postUpdate</code> で1フレームが閉じます。
+          </li>
+        </ul>
+      </div>
+
+      <div class="mode-switch-bar" role="group" aria-label="シーケンス実行モード切替">
+        <button type="button" class="mode-btn is-selected" data-seq-mode="gui">標準 GUI / Timeline 同期実行モード</button>
+        <button type="button" class="mode-btn" data-seq-mode="rl">強化学習（RL）・Headless 高速ステップモード</button>
+      </div>
+      <div class="seq-mode-note" id="seq-mode-banner">
+        <strong>標準 GUI / Timeline 同期実行モード：</strong> 毎フレーム <code>update</code>（物理ステップ）と描画（Hydra / RTX）が両方走り、ビューポートとカメラセンサーがリアルタイム更新されます。
+      </div>
+
+      <div class="seq-board" id="seq-diagram-box" data-ref-scope>
+        <div class="seq-lanes-head">
+          <div>実行フェーズ</div>
+          <div>Python / 制御器</div>
+          <div>omni.kit.app + loop-isaac</div>
+          <div>omni.timeline + stageupdate</div>
+          <div>物理エンジン (PhysX / Newton)</div>
+          <div>Fabric (usdrt)</div>
+          <div>Hydra Delegate + RTX</div>
+        </div>
+
+        <!-- Row 1 -->
+        <div class="seq-phase-row" data-color="1" data-ref="seq-p1" data-ref-role="target">
+          <div class="seq-phase-label">
+            <div><span class="ref-badge" data-color="1">❶</span> Phase 1</div>
+            <div>Tick 開始・時間進行</div>
+          </div>
+          <div class="seq-steps-grid">
+            <div class="seq-node active-call"><code>app.update()</code> 呼出（GUI 時は自動周回）</div>
+            <div class="seq-node active-call">固定 <code>dt</code> 算出 → <code>preUpdate</code> → <code>update</code> 発火</div>
+            <div class="seq-node active-call">時刻加算 → <code>StageUpdateFns.on_update</code> 起動</div>
+            <div class="seq-node">待機中</div>
+            <div class="seq-node">前フレーム状態保持</div>
+            <div class="seq-node">待機中</div>
+          </div>
+        </div>
+
+        <!-- Row 2 -->
+        <div class="seq-phase-row" data-color="3" data-ref="seq-p2" data-ref-role="target">
+          <div class="seq-phase-label">
+            <div><span class="ref-badge" data-color="3">❷</span> Phase 2</div>
+            <div>Pre-Step ＆ 物理計算</div>
+          </div>
+          <div class="seq-steps-grid">
+            <div class="seq-node active-call"><code>isaacsim.simulation.physics_pre_step</code> 受信・Tensor 行動書込</div>
+            <div class="seq-node"><code>update</code> 処理継続中</div>
+            <div class="seq-node active-call"><code>IPhysics</code> 経由でアクティブエンジンへ委譲</div>
+            <div class="seq-node active-call"><code>SimulationFns.simulate</code> → <code>SimulationFns.fetch_results</code>（CUDA 実行）</div>
+            <div class="seq-node">入力反映済</div>
+            <div class="seq-node">待機中</div>
+          </div>
+        </div>
+
+        <!-- Row 3 -->
+        <div class="seq-phase-row" data-color="2" data-ref="seq-p3" data-ref-role="target">
+          <div class="seq-phase-label">
+            <div><span class="ref-badge" data-color="2">❸</span> Phase 3</div>
+            <div>Fabric 同期・Post-Step</div>
+          </div>
+          <div class="seq-steps-grid">
+            <div class="seq-node active-call"><code>isaacsim.simulation.physics_post_step</code> 受信・観測値 Tensor 取得</div>
+            <div class="seq-node"><code>update</code> 後半へ進行</div>
+            <div class="seq-node">物理コールバック完了</div>
+            <div class="seq-node active-call"><code>omni.physx.fabric</code> / Newton Sync が GPU 結果をフラッシュ</div>
+            <div class="seq-node active-call">VRAM 上の姿勢・頂点 <code>points</code> 更新（USD 通知は抑止）</div>
+            <div class="seq-node">Dirty 属性発生</div>
+          </div>
+        </div>
+
+        <!-- Row 4 -->
+        <div class="seq-phase-row" data-color="4" data-ref="seq-p4" data-ref-role="target" id="seq-render-row">
+          <div class="seq-phase-label">
+            <div><span class="ref-badge" data-color="4">❹</span> Phase 4</div>
+            <div>Hydra 同期・RTX 描画</div>
+          </div>
+          <div class="seq-steps-grid">
+            <div class="seq-node">Replicator / カメラ配列取得（必要時）</div>
+            <div class="seq-node active-call"><code>rendering_0</code> 駆動 → <code>postUpdate</code> で1周完了</div>
+            <div class="seq-node">次 Tick 待機</div>
+            <div class="seq-node">次 Tick 待機</div>
+            <div class="seq-node active-call">GPU ポインタを Hydra へ直接公開</div>
+            <div class="seq-node active-call"><code>omni.hydra.usdrt_delegate</code> → <code>omni.hydra.rtx</code>（TLAS/BLAS 更新＆レイトレ）</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================================================================
+         SECTION 5: CPU USD と GPU Fabric・Tensor の状態データ経路
+    ================================================================= -->
+    <section class="doc-section" id="sec-dataflow" data-ref-group="state-dataflow">
+      <span class="section-kicker">View 5 / CPU RAM vs GPU VRAM Data Pathways</span>
+      <h2>5. なぜ USD と Fabric と Tensor の3系統が存在するのか（CPU / GPU データ経路図）</h2>
+
+      <div class="split-view">
+        <div class="prose" data-ref-scope>
+          <p>
+            Isaac Sim を深く触り始めると必ずぶつかる疑問が「なぜ同じロボットの姿勢やメッシュに、<code>pxr.Usd</code>・<code>usdrt</code>（Fabric）・<code>omni.physics.tensors</code> の3通りのアクセス経路があるのか？」という点です。答えは<strong>CPU メモリと GPU VRAM の境界コスト</strong>にあります。
+          </p>
+          <ul>
+            <li>
+              <span class="ref-badge" data-color="1" data-ref="path-usd" data-ref-role="source">❶</span>
+              <strong>経路A：永続シーングラフ（USD / CPU RAM 主体）</strong><br>
+              OpenUSD（<code>pxr.Usd</code>）はレイヤー合成・バリアント切替・ファイル保存に最強ですが、木構造の辞書検索と <code>TfNotice</code> 変更通知が CPU 上で走るため、数千個の剛体や数万頂点の軟体を毎秒60〜120回書き換えると CPU ボトルネックで破綻します。そのため<strong>初期化・ステージ構築・停止後のリセット時のみ</strong>使われます（<span class="code-chip" data-exact-target="hw-pathway-diagram">/physics/suppressReadback</span> 設定により実行中の CPU 書き戻しは抑止可能です）。
+            </li>
+            <li>
+              <span class="ref-badge" data-color="3" data-ref="path-tensor" data-ref-role="source">❷</span>
+              <strong>経路B：物理ソルバー内部バッファ ＆ Tensor API（GPU VRAM 直結）</strong><br>
+              物理エンジン（PhysX GPU / Newton）はシミュレーション開始時に専用のアリーナを GPU VRAM 上に確保します。<span class="code-chip" data-exact-target="hw-pathway-diagram">omni.physics.tensors</span> や <span class="code-chip" data-exact-target="hw-pathway-diagram">isaacsim.physics.newton.tensors</span> は、このソルバー内部配列へのゼロコピーポインタを <code>wp.array</code> や <code>torch.Tensor</code> として直接公開するため、数千環境の強化学習でも PCIe 転送ゼロで回ります。
+            </li>
+            <li>
+              <span class="ref-badge" data-color="2" data-ref="path-fabric" data-ref-role="source">❸</span>
+              <strong>経路C：実行時共有メモリ（Fabric / USDRT — エンジン間の GPU 掲示板）</strong><br>
+              物理エンジン以外のサブシステム（描画エンジンや OmniGraph、カスタム Warp カーネル）に現在の姿勢・変形頂点を渡すための GPU 共有テーブルが <span class="code-chip" data-exact-target="hw-pathway-diagram">usdrt.scenegraph</span> です。ソルバー内部構造を知らなくても、標準属性名（<code>omni:fabric:worldMatrix</code> や <code>points</code>）で VRAM 上のまま読み書きできます。
+            </li>
+            <li>
+              <span class="ref-badge" data-color="4" data-ref="path-hydra" data-ref-role="source">❹</span>
+              <strong>経路D：Hydra USDRT Delegate → RTX BVH（GPU 内完結レンダリング）</strong><br>
+              <span class="code-chip" data-exact-target="hw-pathway-diagram">/app/useFabricSceneDelegate=true</span>（Isaac Sim 既定）のとき、<code>omni.hydra.usdrt_delegate</code> は CPU USD を経由せず GPU Fabric から直接 RTX のジオメトリバッファを更新します。
+            </li>
+          </ul>
+        </div>
+
+        <div class="split-visual">
+          <div class="diagram-frame" id="hw-pathway-diagram" data-ref-scope>
+            <div class="diagram-caption">
+              <span>CPU RAM と GPU VRAM の境界・4つの状態データ経路</span>
+              <span>Memory Residency View</span>
+            </div>
+
+            <div class="hw-split">
+              <!-- CPU Zone -->
+              <div class="hw-zone">
+                <div class="hw-zone-title">CPU Host Memory（初期化・構成・保存）</div>
+                <div class="flow-step-card" data-color="1" data-ref="path-usd" data-ref-role="target">
+                  <div><span class="ref-badge" data-color="1">❶</span> <strong>OpenUSD Stage (<code>pxr.Usd</code>)</strong></div>
+                  <div style="margin-top:0.25rem;">
+                    アセット階層・<code>UsdPhysics</code>・MDL バインドを保持。再生中は <code>/physics/suppressReadback</code> で毎フレームの CPU 書き戻しを遮断可能。
+                  </div>
+                </div>
+                <div class="port-pill" style="margin-top:0.5rem;">
+                  <strong>Stage Attach / Cooking（初回のみ）</strong>
+                  USD から衝突メッシュや四面体メッシュ（<code>UsdGeom.TetMesh</code>）を生成し GPU へ転送
+                </div>
+              </div>
+
+              <!-- GPU Zone -->
+              <div class="hw-zone gpu-zone">
+                <div class="hw-zone-title">GPU Device VRAM（毎フレーム高速実行ループ）</div>
+
+                <div class="flow-step-card" data-color="3" data-ref="path-tensor" data-ref-role="target">
+                  <div><span class="ref-badge" data-color="3">❷</span> <strong>Solver State &amp; Tensor View</strong></div>
+                  <div style="margin-top:0.25rem;">
+                    <code>omni.physics.tensors</code> / <code>isaacsim.physics.newton.tensors</code> が <code>torch.Tensor</code>・<code>wp.array</code> へゼロコピー公開。
+                  </div>
+                </div>
+
+                <div class="flow-step-card" data-color="2" data-ref="path-fabric" data-ref-role="target">
+                  <div><span class="ref-badge" data-color="2">❸</span> <strong>Fabric / USDRT (<code>usdrt.scenegraph</code>)</strong></div>
+                  <div style="margin-top:0.25rem;">
+                    剛体の世界変換行列や軟体メッシュの頂点配列 <code>points</code> を VRAM SoA テーブルで共有。
+                  </div>
+                </div>
+
+                <div class="flow-step-card" data-color="4" data-ref="path-hydra" data-ref-role="target">
+                  <div><span class="ref-badge" data-color="4">❹</span> <strong>Hydra USDRT → RTX BVH</strong></div>
+                  <div style="margin-top:0.25rem;">
+                    <code>/app/useFabricSceneDelegate=true</code> により GPU 内で BLAS Refit / TLAS 更新 → レイトレ描画へ直結。
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================================================================
+         SECTION 6: カスタム DeformableBody 実装時の改修境界（物理 vs シェーダー）
+    ================================================================= -->
+    <section class="doc-section" id="sec-deformable" data-ref-group="deformable-boundary">
+      <span class="section-kicker">View 6 / Custom DeformableBody Architectural Boundary</span>
+      <h2>6. カスタム <code>DeformableBody</code> を実装するとき、物理エンジンとシェーダーの両方に手を入れるのか？</h2>
+
+      <div class="answer-banner">
+        <strong>結論：通常の変形表現（布・ゴム・生体組織・ケーブルなど、メッシュ頂点座標 <code>points</code> の移動で表現できる変形体）であれば、シェーダーに手を入れる必要はありません。</strong><br>
+        改修が必要なのは<strong>「物理計算ソルバー層（Warp / CUDA / C++）」</strong>と<strong>「Fabric（<code>usdrt</code>）への頂点書き出し・RunLoop 接続層」</strong>の2箇所のみです。シェーダー（MDL マテリアル等）に触るのは「応力・温度などで色や質感を動的に変えたい場合」や「三角形メッシュ頂点移動では表せない破断・体積表現をする場合」に限られます。
+      </div>
+
+      <div class="split-view">
+        <div class="prose" data-ref-scope>
+          <h3>なぜシェーダーを改造しなくてもカスタム変形体が正しく描画されるのか？</h3>
+          <p>
+            一般的なゲームエンジン（ラスタライザ）で GPU スキニングや独自変形を実装する場合、頂点シェーダー（Vertex Shader）を書き換えて GPU 描画パイプライン内で頂点を動かす設計がよく採られます。しかし Isaac Sim の <strong>レイトレーシング描画エンジン（RTX Renderer）</strong> は根本的に仕組みが異なります。
+          </p>
+          <ul>
+            <li>
+              <span class="ref-badge" data-color="3" data-ref="def-solver" data-ref-role="source">❶</span>
+              <strong>物理ソルバー側の仕事（ここを作る）：</strong>
+              独自 FEM・MPM・XPBD などのカスタム計算カーネル（たとえば NVIDIA Warp カーネル）を書き、四面体格子やプロキシメッシュの節点変位を計算して、描画用 <code>UsdGeom.Mesh</code> の頂点座標配列を計算します。
+            </li>
+            <li>
+              <span class="ref-badge" data-color="2" data-ref="def-fabric" data-ref-role="source">❷</span>
+              <strong>Fabric 頂点ブリッジの仕事（ここを繋ぐ）：</strong>
+              計算した頂点座標を <span class="code-chip" data-exact-target="deformable-code">usdrt.Sdf.ValueTypeNames.Point3fArray</span> 型の <span class="code-chip" data-exact-target="deformable-code">points</span> 属性として GPU Fabric 上でインプレース更新します（<span class="code-chip" data-exact-target="deformable-code">wp.fabricarray</span> を使えば GPU ポインタを直接書き換えられます）。
+            </li>
+            <li>
+              <span class="ref-badge" data-color="4" data-ref="def-bvh" data-ref-role="source">❸</span>
+              <strong>Hydra / RTX 側の自動処理（手を入れる必要なし）：</strong>
+              レイトレーサーにはラスタライザのような「描画時の頂点シェーダー変形」ではなく、空間加速構造である
+              <span class="term-inline" tabindex="0">BLAS Refit（BVH 再フィット）<span class="term-card" role="tooltip">Bottom-Level Acceleration Structure（メッシュ単位の境界ボリューム階層）のトポロジーを保ったまま、移動した頂点座標に合わせてバウンディングボックスを GPU 上で高速更新する処理。</span></span>
+              があります。<code>omni.hydra.usdrt_delegate</code> が Fabric の <code>points</code> 変更を検知すると、<code>omni.hydra.rtx</code> が自動で BLAS を再フィットし、既存の
+              <span class="term-inline" tabindex="0">MDL サーフェスシェーダー<span class="term-card" role="tooltip">Material Definition Language。レイが三角形に衝突した後の反射率・粗さ・屈折（OmniPBR / OmniSurface 等）を記述する物理ベースマテリアル定義。</span></span>
+              （<code>OmniPBR</code> や <code>OmniSurface</code>）で影・反射・相互反射まで正確にレンダリングします。
+            </li>
+            <li>
+              <span class="ref-badge" data-color="1" data-ref="def-primvar" data-ref-role="source">❹</span>
+              <strong>例外としてシェーダー（MDL）側にも手を入れるケース：</strong>
+              「引っ張られた部分の応力（ミーゼス応力）を赤くヒートマップ表示したい」「伸び率に応じて表面の粗さ（Roughness）や透明度を変えたい」といった場合は、ソルバー側からカスタム頂点属性（<code>primvars:stress</code> や <code>primvars:displayColor</code>）を書き出し、それを受け取る MDL マテリアルグラフ（<code>UsdShade.Shader</code> の Primvar Lookup ノード）を組みます。
+            </li>
+          </ul>
+        </div>
+
+        <div class="split-visual">
+          <div class="diagram-frame" data-ref-scope>
+            <div class="diagram-caption">
+              <span>カスタム DeformableBody 実装パターン（Warp × USDRT Fabric 最小構成）</span>
+              <span>Zero Shader Modification</span>
+            </div>
+
+            <div class="code-block" id="deformable-code">
+              <div class="code-line is-muted">import omni.kit.app, usdrt, warp as wp</div>
+              <div class="code-line is-muted"></div>
+              <div class="code-line is-focus" data-color="3" data-ref="def-solver" data-ref-role="target"><span class="ref-badge" data-color="3">❶</span>@wp.kernel  # 1. 独自物理ソルバー / スキニングカーネル（要実装）</div>
+              <div class="code-line is-focus" data-color="3" data-ref="def-solver" data-ref-role="target">def step_custom_deformable(pts: wp.fabricarray(dtype=wp.vec3f), vel: wp.array(dtype=wp.vec3f), dt: float):</div>
+              <div class="code-line is-focus" data-color="3" data-ref="def-solver" data-ref-role="target">    i = wp.tid()</div>
+              <div class="code-line is-focus" data-color="3" data-ref="def-solver" data-ref-role="target">    pts[i] = pts[i] + vel[i] * dt  # FEM / XPBD / MPM 等の頂点更新</div>
+              <div class="code-line is-muted"></div>
+              <div class="code-line is-focus" data-color="2" data-ref="def-fabric" data-ref-role="target"><span class="ref-badge" data-color="2">❷</span># 2. USDRT (Fabric) 上で対象 UsdGeom.Mesh の points 属性を GPU バインド（要実装）</div>
+              <div class="code-line is-focus" data-color="2" data-ref="def-fabric" data-ref-role="target">rt_stage = usdrt.Usd.Stage.Attach(stage_id)</div>
+              <div class="code-line is-focus" data-color="2" data-ref="def-fabric" data-ref-role="target">prim = rt_stage.GetPrimAtPath("/World/CustomSoftBody")</div>
+              <div class="code-line is-focus" data-color="2" data-ref="def-fabric" data-ref-role="target">pts_attr = prim.CreateAttribute("points", usdrt.Sdf.ValueTypeNames.Point3fArray, True)</div>
+              <div class="code-line is-focus" data-color="2" data-ref="def-fabric" data-ref-role="target">fabric_pts = wp.fabricarray(pts_attr, access=wp.ACCESS_READ_WRITE)</div>
+              <div class="code-line is-muted"></div>
+              <div class="code-line is-focus" data-color="4" data-ref="def-bvh" data-ref-role="target"><span class="ref-badge" data-color="4">❸</span># 3. Hydra USDRT Delegate → RTX BLAS Refit &amp; OmniPBR 描画は完全自動（シェーダー改修不要）</div>
+              <div class="code-line is-muted"></div>
+              <div class="code-line is-focus" data-color="1" data-ref="def-primvar" data-ref-role="target"><span class="ref-badge" data-color="1">❹</span># 4. 応力可視化等が必要な場合のみ primvars:* を追加し MDL 側で参照</div>
+              <div class="code-line is-focus" data-color="1" data-ref="def-primvar" data-ref-role="target"># stress_attr = prim.CreateAttribute("primvars:stress", usdrt.Sdf.ValueTypeNames.FloatArray, True)</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 要件別の改修範囲マトリクス表 -->
+      <div class="table-wrap">
+        <table class="ergo-table">
+          <thead>
+            <tr>
+              <th>やりたいカスタム Deformable 表現</th>
+              <th>Kit 介入点（L0 / L3）</th>
+              <th>物理計算層（L1 Solver）</th>
+              <th>状態ハブ層（L2 USD / Fabric）</th>
+              <th>シェーダー / 描画層（L1 MDL / RTX）</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>① 独自の弾性体・布・紐モデル</strong><br>（FEM / XPBD / Cosserat Rod 等で頂点が動く）</td>
+              <td><span class="tag-req yes">必要</span><br><code>update</code> または <code>physics_pre_step</code> 購読（あるいは <code>IPhysics</code> 登録）</td>
+              <td><span class="tag-req yes">必要</span><br>Warp / CUDA / C++ で節点更新＋描画メッシュへの補間（Skinning）を実装</td>
+              <td><span class="tag-req yes">必要</span><br><code>usdrt</code> の <code>points</code>（必要に応じ <code>normals</code>）を GPU 更新</td>
+              <td><span class="tag-req no">不要</span><br>既存の <code>OmniPBR</code> / <code>OmniSurface</code> のまま RTX が BLAS Refit で自動描画</td>
+            </tr>
+            <tr>
+              <td><strong>② 既存の剛体ロボットと双方向接触させたい</strong><br>（グリッパで独自軟体を把持する等）</td>
+              <td><span class="tag-req yes">必要</span><br><code>physics_pre_step</code> / <code>physics_post_step</code> で毎サブステップ同期</td>
+              <td><span class="tag-req yes">必要</span><br><code>isaacsim.physics.newton</code> の XPBD を拡張するか、<code>omni.physics.tensors</code> で剛体に反力を印加</td>
+              <td><span class="tag-req yes">必要</span><br>軟体頂点 <code>points</code> を Fabric 更新＋剛体側は Tensor 経由で外力反映</td>
+              <td><span class="tag-req no">不要</span><br>既存 MDL シェーダーのままで接触変形・影ともに反映</td>
+            </tr>
+            <tr>
+              <td><strong>③ 応力・ひずみ・温度を色や質感に反映したい</strong><br>（引っ張ると白化する樹脂、応力コンター表示等）</td>
+              <td><span class="tag-req yes">必要</span><br>ステップごとの属性更新フック</td>
+              <td><span class="tag-req yes">必要</span><br>変位に加えて頂点ごとの応力・ひずみスカラーを算出</td>
+              <td><span class="tag-req yes">必要</span><br><code>points</code> に加えて <code>primvars:displayColor</code> または独自 <code>primvars:*</code> を更新</td>
+              <td><span class="tag-req opt">MDL のみ必要</span><br>C++ レンダラー改造は不要。MDL マテリアルで Primvar を読んで色・粗さに接続</td>
+            </tr>
+            <tr>
+              <td><strong>④ 切断・破断（トポロジー変化）を伴う変形体</strong><br>（メスによる切開、破砕、ちぎれる布等）</td>
+              <td><span class="tag-req yes">必要</span><br>破断発生フレームでのメッシュ再構築制御</td>
+              <td><span class="tag-req yes">必要</span><br>要素分割・頂点複製アルゴリズムを実装</td>
+              <td><span class="tag-req yes">必要</span><br><code>points</code> だけでなく <code>faceVertexIndices</code> / <code>faceVertexCounts</code> も更新</td>
+              <td><span class="tag-req opt">MDL 切断面のみ任意</span><br>トポロジー変更により RTX は BLAS Refit ではなく BLAS Rebuild を自動実行（切断面別材質なら GeomSubset 併用）</td>
+            </tr>
+            <tr>
+              <td><strong>⑤ メッシュを持たない連続体・流体・粒子表現</strong><br>（MPM 砂・煙・陰関数サーフェス・3DGS 変形）</td>
+              <td><span class="tag-req yes">必要</span><br>ステップ更新フック</td>
+              <td><span class="tag-req yes">必要</span><br>粒子・ボクセル・ガウシアン更新カーネルを実装</td>
+              <td><span class="tag-req yes">必要</span><br><code>UsdGeom.Points</code>・<code>UsdVol</code>（OpenVDB）・Gaussian Splat プリム等を更新</td>
+              <td><span class="tag-req yes">必要（専用表現選択）</span><br>Marching Cubes でメッシュ化しない限り、Volume / Point / NuRec 等の対応シェーダー経路を使用</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+</div>
+
+<script>
+(() => {
+  /* 1. 双方向ホバー連動・スポットライト・SVG一時結線・スムーズスクロール＆戻るボタン */
+  const svgLayer = document.getElementById('ref-connector-layer');
+  const returnBtn = document.getElementById('ref-return-btn');
+  let savedScrollY = null;
+
+  const COLOR_MAP = {
+    '1': '#2563eb',
+    '2': '#059669',
+    '3': '#d97706',
+    '4': '#7c3aed',
+    '5': '#db2777',
+    '6': '#0891b2'
+  };
+
+  const isInViewport = (el) => {
+    const r = el.getBoundingClientRect();
+    return r.width > 0 && r.height > 0 &&
+           r.top >= 0 && r.bottom <= window.innerHeight &&
+           r.left >= 0 && r.right <= window.innerWidth;
+  };
+
+  const clearLines = () => {
+    if (svgLayer) svgLayer.innerHTML = '';
+  };
+
+  const drawConnector = (fromEl, toEl) => {
+    if (!svgLayer || !isInViewport(fromEl) || !isInViewport(toEl)) return;
+    const a = fromEl.getBoundingClientRect();
+    const b = toEl.getBoundingClientRect();
+    const x1 = a.left + a.width / 2;
+    const y1 = a.top + a.height / 2;
+    const x2 = b.left + b.width / 2;
+    const y2 = b.top + b.height / 2;
+    const mx = (x1 + x2) / 2;
+    const cKey = fromEl.dataset.color || toEl.dataset.color || '1';
+    const stroke = COLOR_MAP[cKey] || '#2563eb';
+
+    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    path.setAttribute('d', `M ${x1} ${y1} C ${mx} ${y1}, ${mx} ${y2}, ${x2} ${y2}`);
+    path.setAttribute('fill', 'none');
+    path.setAttribute('stroke', stroke);
+    path.setAttribute('stroke-width', '2');
+    path.setAttribute('stroke-dasharray', '5 4');
+    path.setAttribute('opacity', '0.72');
+    svgLayer.appendChild(path);
+  };
+
+  const setActive = (refId, originEl) => {
+    const peers = Array.from(document.querySelectorAll(`[data-ref="${CSS.escape(refId)}"]`));
+    const scopes = new Set();
+    peers.forEach((el) => {
+      el.classList.add('is-active');
+      const sc = el.closest('[data-ref-scope]');
+      if (sc) scopes.add(sc);
+    });
+    scopes.forEach((sc) => sc.classList.add('is-dimming'));
+    clearLines();
+    if (originEl) {
+      const oppRolePeers = peers.filter((el) => el !== originEl && el.dataset.refRole !== originEl.dataset.refRole);
+      const targets = oppRolePeers.length > 0 ? [oppRolePeers[0]] : peers.filter((el) => el !== originEl).slice(0, 1);
+      targets.forEach((peer) => drawConnector(originEl, peer));
+    }
+  };
+
+  const clearActive = () => {
+    document.querySelectorAll('[data-ref].is-active').forEach((el) => el.classList.remove('is-active'));
+    document.querySelectorAll('[data-ref-scope].is-dimming').forEach((sc) => sc.classList.remove('is-dimming'));
+    clearLines();
+  };
+
+  document.querySelectorAll('[data-ref]').forEach((el) => {
+    const refId = el.dataset.ref;
+    el.addEventListener('mouseenter', () => setActive(refId, el));
+    el.addEventListener('mouseleave', clearActive);
+    el.addEventListener('focus', () => setActive(refId, el));
+    el.addEventListener('blur', clearActive);
+
+    el.addEventListener('click', (ev) => {
+      ev.stopPropagation();
+      const peers = Array.from(document.querySelectorAll(`[data-ref="${CSS.escape(refId)}"]`))
+        .filter((p) => p !== el);
+      if (peers.length === 0) return;
+      const target = peers.find((p) => p.dataset.refRole !== el.dataset.refRole) || peers[0];
+      const wasOffscreen = !isInViewport(target);
+      if (wasOffscreen && returnBtn) {
+        savedScrollY = window.scrollY;
+        returnBtn.classList.add('is-visible');
+      }
+      target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      target.classList.remove('is-pulsing');
+      void target.offsetWidth;
+      target.classList.add('is-pulsing');
+    });
+  });
+
+  if (returnBtn) {
+    returnBtn.addEventListener('click', () => {
+      if (savedScrollY !== null) {
+        window.scrollTo({ top: savedScrollY, behavior: 'smooth' });
+        savedScrollY = null;
+      }
+      returnBtn.classList.remove('is-visible');
+    });
+  }
+
+  window.addEventListener('scroll', clearLines, { passive: true });
+
+  /* 2. 追従目次（ScrollSpy） */
+  const tocLinks = Array.from(document.querySelectorAll('.toc a[href^="#"]'));
+  const sections = tocLinks
+    .map((a) => document.querySelector(a.getAttribute('href')))
+    .filter(Boolean);
+
+  if (sections.length > 0 && 'IntersectionObserver' in window) {
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        const id = entry.target.id;
+        tocLinks.forEach((a) => {
+          a.classList.toggle('is-current', a.getAttribute('href') === `#${id}`);
+        });
+      });
+    }, { rootMargin: '-15% 0px -72% 0px' });
+
+    sections.forEach((sec) => observer.observe(sec));
+  }
+
+  /* 3. View 3: パッケージ地図カテゴリフィルタ */
+  const filterBtns = Array.from(document.querySelectorAll('.filter-btn[data-filter]'));
+  const pkgCards = Array.from(document.querySelectorAll('#pkg-catalog-grid .pkg-card'));
+  filterBtns.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const cat = btn.dataset.filter;
+      filterBtns.forEach((b) => b.classList.toggle('is-selected', b === btn));
+      pkgCards.forEach((card) => {
+        const match = (cat === 'all') || (card.dataset.cat === cat);
+        card.classList.toggle('is-filtered-out', !match);
+      });
+    });
+  });
+
+  /* 4. View 4: シーケンス実行モード切替 */
+  const modeBtns = Array.from(document.querySelectorAll('.mode-btn[data-seq-mode]'));
+  const modeBanner = document.getElementById('seq-mode-banner');
+  const renderRow = document.getElementById('seq-render-row');
+  modeBtns.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const mode = btn.dataset.seqMode;
+      modeBtns.forEach((b) => b.classList.toggle('is-selected', b === btn));
+      if (mode === 'rl') {
+        if (modeBanner) {
+          modeBanner.innerHTML = '<strong>強化学習（RL）・Headless 高速ステップモード：</strong> Phase 1〜3 の物理ループと Tensor 読み書きだけを高速反復し、カメラ観測が不要な環境では Phase 4（Hydra / RTX 描画）をスキップして毎秒数万ステップを実現します。';
+        }
+        if (renderRow) renderRow.style.opacity = '0.38';
+      } else {
+        if (modeBanner) {
+          modeBanner.innerHTML = '<strong>標準 GUI / Timeline 同期実行モード：</strong> 毎フレーム <code>update</code>（物理ステップ）と描画（Hydra / RTX）が両方走り、ビューポートとカメラセンサーがリアルタイム更新されます。';
+        }
+        if (renderRow) renderRow.style.opacity = '1';
+      }
+    });
+  });
+})();
+</script>
+</body>
+</html>
