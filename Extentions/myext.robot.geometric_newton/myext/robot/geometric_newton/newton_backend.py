@@ -165,6 +165,7 @@ def _add_usd_collider_shape(
     xform_cache: UsdGeom.XformCache,
     *,
     convex_meshes: bool = True,
+    vis_out: dict[int, tuple] | None = None,
 ) -> tuple[int | None, np.ndarray]:
     """USD の `UsdGeom.Gprim` コライダーを `newton.ModelBuilder` へ登録し、`(shape_id, axis_rot_3x3)` を返す。
 
@@ -175,7 +176,11 @@ def _add_usd_collider_shape(
           `(sx, sy, sz)` を寸法パラメータへ焼き込み、`Mesh` は `scale=wp.vec3(sx, sy, sz)` として渡す。
         - `newton.usd.get_mesh(..., apply_stage_units=False)` とする理由:
           `GeometricRobot` はステージ単位そのままで FK・姿勢を扱うため、メッシュ頂点に二重の単位変換が入るのを防ぐ。
-        - `convex_meshes=True` (既定) のときは凸包化して高速な GJK/MPR 狭域判定に乗せる。
+        - `convex_meshes=True` (既定) のときは `compute_convex_hull()` で単一凸包 (`GeoType.CONVEX_MESH`) へ変換して
+          高速な GJK/MPR 狭域判定に乗せる。`convex_meshes=False` のときは元の三角形メッシュそのまま (`GeoType.MESH`) で登録する。
+        - `vis_out` を渡すと、`shape_id -> 形状仕様タプル` を記録し、Debug モード時の `DebugDraw`
+          ワイヤーフレーム可視化で「Newton が実際に判定に使っている形状」を遅延生成できるようにする
+          (通常実行時は辺配列を生成しないためメモリ・時間コストはほぼゼロ)。
     """
     newton, wp = _import_newton()
     prim = stage.GetPrimAtPath(collider_path)
@@ -193,19 +198,24 @@ def _add_usd_collider_shape(
         sid = builder.add_shape_sphere(
             body_idx, xform=_mat4_to_wp_transform(rel_mat), radius=r, cfg=shape_cfg, label=collider_path
         )
+        if vis_out is not None:
+            vis_out[sid] = ("sphere", (r,))
         return sid, axis_rot
 
     if prim.IsA(UsdGeom.Cube):
         size = float(UsdGeom.Cube(prim).GetSizeAttr().Get() or 2.0)
+        hx, hy, hz = 0.5 * size * sx, 0.5 * size * sy, 0.5 * size * sz
         sid = builder.add_shape_box(
             body_idx,
             xform=_mat4_to_wp_transform(rel_mat),
-            hx=0.5 * size * sx,
-            hy=0.5 * size * sy,
-            hz=0.5 * size * sz,
+            hx=hx,
+            hy=hy,
+            hz=hz,
             cfg=shape_cfg,
             label=collider_path,
         )
+        if vis_out is not None:
+            vis_out[sid] = ("box", (hx, hy, hz))
         return sid, axis_rot
 
     if prim.IsA(UsdGeom.Capsule):
@@ -217,14 +227,17 @@ def _add_usd_collider_shape(
         axis_rot = _axis_rot_to_z(axis_tok)
         m_adj = rel_mat.copy()
         m_adj[:3, :3] = m_adj[:3, :3] @ axis_rot
+        rr, hh = r * r_s, 0.5 * h * h_s
         sid = builder.add_shape_capsule(
             body_idx,
             xform=_mat4_to_wp_transform(m_adj),
-            radius=r * r_s,
-            half_height=0.5 * h * h_s,
+            radius=rr,
+            half_height=hh,
             cfg=shape_cfg,
             label=collider_path,
         )
+        if vis_out is not None:
+            vis_out[sid] = ("capsule", (rr, hh))
         return sid, axis_rot
 
     if prim.IsA(UsdGeom.Cylinder):
@@ -236,14 +249,17 @@ def _add_usd_collider_shape(
         axis_rot = _axis_rot_to_z(axis_tok)
         m_adj = rel_mat.copy()
         m_adj[:3, :3] = m_adj[:3, :3] @ axis_rot
+        rr, hh = r * r_s, 0.5 * h * h_s
         sid = builder.add_shape_cylinder(
             body_idx,
             xform=_mat4_to_wp_transform(m_adj),
-            radius=r * r_s,
-            half_height=0.5 * h * h_s,
+            radius=rr,
+            half_height=hh,
             cfg=shape_cfg,
             label=collider_path,
         )
+        if vis_out is not None:
+            vis_out[sid] = ("cylinder", (rr, hh))
         return sid, axis_rot
 
     if prim.IsA(UsdGeom.Cone):
@@ -255,14 +271,17 @@ def _add_usd_collider_shape(
         axis_rot = _axis_rot_to_z(axis_tok)
         m_adj = rel_mat.copy()
         m_adj[:3, :3] = m_adj[:3, :3] @ axis_rot
+        rr, hh = r * r_s, 0.5 * h * h_s
         sid = builder.add_shape_cone(
             body_idx,
             xform=_mat4_to_wp_transform(m_adj),
-            radius=r * r_s,
-            half_height=0.5 * h * h_s,
+            radius=rr,
+            half_height=hh,
             cfg=shape_cfg,
             label=collider_path,
         )
+        if vis_out is not None:
+            vis_out[sid] = ("cone", (rr, hh))
         return sid, axis_rot
 
     if prim.IsA(UsdGeom.Mesh):
@@ -285,6 +304,8 @@ def _add_usd_collider_shape(
                 cfg=shape_cfg,
                 label=collider_path,
             )
+            if vis_out is not None:
+                vis_out[sid] = ("mesh", (mesh.vertices, mesh.indices, (sx, sy, sz)))
             return sid, axis_rot
         sid = builder.add_shape_mesh(
             body_idx,
@@ -294,6 +315,8 @@ def _add_usd_collider_shape(
             cfg=shape_cfg,
             label=collider_path,
         )
+        if vis_out is not None:
+            vis_out[sid] = ("mesh", (mesh.vertices, mesh.indices, (sx, sy, sz)))
         return sid, axis_rot
 
     return None, axis_rot
@@ -527,6 +550,8 @@ class GeometricScene:
         self._joint_q_wp = None
         self._joint_qd_wp = None
         self._shape_to_owner: dict[int, tuple[str, Any, str, str]] = {}
+        self._shape_vis_info: dict[int, tuple] = {}
+        self._wireframe_cache: dict[int, tuple[np.ndarray, np.ndarray]] = {}
         self._env_entries: list[_EnvShapeEntry] = []
         self._env_by_path: dict[str, _EnvShapeEntry] = {}
         self._current_gap: float = 0.0
@@ -541,6 +566,19 @@ class GeometricScene:
     @property
     def stage(self) -> Usd.Stage:
         return self._stage
+
+    @property
+    def convex_meshes(self) -> bool:
+        """`UsdGeom.Mesh` を単一凸包へ変換して判定するか (`True`=凸包 / `False`=元の三角形メッシュ)。"""
+        return self._convex_meshes
+
+    @convex_meshes.setter
+    def convex_meshes(self, value: bool) -> None:
+        flag = bool(value)
+        if flag == self._convex_meshes:
+            return
+        self._convex_meshes = flag
+        self.mark_dirty()
 
     @property
     def device(self) -> str:
@@ -738,6 +776,8 @@ class GeometricScene:
 
         xc = UsdGeom.XformCache(Usd.TimeCode.Default())
         self._shape_to_owner = {}
+        self._shape_vis_info = {}
+        self._wireframe_cache = {}
         self._env_entries = []
         self._env_by_path = {}
 
@@ -789,6 +829,7 @@ class GeometricScene:
                         shape_cfg,
                         xc,
                         convex_meshes=self._convex_meshes,
+                        vis_out=self._shape_vis_info,
                     )
                     if sid is not None:
                         self._shape_to_owner[sid] = ("robot", robot, lname, col_path)
@@ -870,6 +911,7 @@ class GeometricScene:
                 shape_cfg,
                 xc,
                 convex_meshes=self._convex_meshes,
+                vis_out=self._shape_vis_info,
             )
             if sid is not None:
                 entry = _EnvShapeEntry(prim_path=col_path, shape_id=sid, axis_rot=axis_rot)
@@ -1483,6 +1525,291 @@ class GeometricScene:
             sync_env=sync_env,
         )
         return sorted(pairs, key=lambda p: (float("inf") if p.separation is None else p.separation, p.kind, p.link_a))
+
+    # ==========================================================================
+    # デバッグ専用: Newton 内部コライダー形状・接触点の DebugDraw 可視化
+    # ==========================================================================
+    # 配色規約 (PhysX 標準の緑 / ピンク / 黄色と衝突しない組み合わせ):
+    #   - 通常コライダー (ワイヤーフレーム): シアン (0.0, 0.9, 1.0, 1.0)
+    #   - 干渉中コライダー (ワイヤーフレーム): 赤    (1.0, 0.15, 0.15, 1.0)
+    #   - 接触点マーカー & めり込み線分    : オレンジ (1.0, 0.55, 0.0, 1.0)
+
+    _COLOR_NORMAL = (0.0, 0.9, 1.0, 1.0)
+    _COLOR_COLLIDING = (1.0, 0.15, 0.15, 1.0)
+    _COLOR_CONTACT = (1.0, 0.55, 0.0, 1.0)
+
+    @staticmethod
+    def _build_local_wireframe(vis_spec: tuple, *, max_mesh_edges: int = 24000) -> tuple[np.ndarray, np.ndarray]:
+        """Newton 登録済み形状仕様から形状ローカル座標系の線分 `(starts (E, 3), ends (E, 3))` を生成する。"""
+        kind, params = vis_spec
+        if kind == "box":
+            hx, hy, hz = params
+            corners = np.array(
+                [
+                    [-hx, -hy, -hz], [hx, -hy, -hz], [hx, hy, -hz], [-hx, hy, -hz],
+                    [-hx, -hy, hz], [hx, -hy, hz], [hx, hy, hz], [-hx, hy, hz],
+                ],
+                dtype=np.float32,
+            )
+            edges = np.array(
+                [
+                    [0, 1], [1, 2], [2, 3], [3, 0],
+                    [4, 5], [5, 6], [6, 7], [7, 4],
+                    [0, 4], [1, 5], [2, 6], [3, 7],
+                ],
+                dtype=int,
+            )
+            return corners[edges[:, 0]], corners[edges[:, 1]]
+
+        if kind == "sphere":
+            (r,) = params
+            n = 20
+            ang = np.linspace(0.0, 2.0 * np.pi, n + 1, dtype=np.float32)
+            c, s = r * np.cos(ang), r * np.sin(ang)
+            z = np.zeros_like(c)
+            rings = [
+                np.stack([c, s, z], axis=-1),
+                np.stack([c, z, s], axis=-1),
+                np.stack([z, c, s], axis=-1),
+            ]
+            starts = np.concatenate([ring[:-1] for ring in rings], axis=0)
+            ends = np.concatenate([ring[1:] for ring in rings], axis=0)
+            return starts, ends
+
+        if kind == "capsule":
+            r, hh = params
+            n = 16
+            ang = np.linspace(0.0, 2.0 * np.pi, n + 1, dtype=np.float32)
+            c, s = r * np.cos(ang), r * np.sin(ang)
+            top = np.stack([c, s, np.full_like(c, hh)], axis=-1)
+            bot = np.stack([c, s, np.full_like(c, -hh)], axis=-1)
+            # 上下リング + 4 本の側稜 + XZ/YZ 半円キャップ
+            semi = np.linspace(0.0, np.pi, n // 2 + 1, dtype=np.float32)
+            sc, ss = r * np.cos(semi), r * np.sin(semi)
+            z0 = np.zeros_like(sc)
+            cap_xz_top = np.stack([sc, z0, hh + ss], axis=-1)
+            cap_yz_top = np.stack([z0, sc, hh + ss], axis=-1)
+            cap_xz_bot = np.stack([sc, z0, -hh - ss], axis=-1)
+            cap_yz_bot = np.stack([z0, sc, -hh - ss], axis=-1)
+            rib_s = np.array([[r, 0, -hh], [-r, 0, -hh], [0, r, -hh], [0, -r, -hh]], dtype=np.float32)
+            rib_e = np.array([[r, 0, hh], [-r, 0, hh], [0, r, hh], [0, -r, hh]], dtype=np.float32)
+            curves = [top, bot, cap_xz_top, cap_yz_top, cap_xz_bot, cap_yz_bot]
+            starts = np.concatenate([*[cv[:-1] for cv in curves], rib_s], axis=0)
+            ends = np.concatenate([*[cv[1:] for cv in curves], rib_e], axis=0)
+            return starts, ends
+
+        if kind == "cylinder":
+            r, hh = params
+            n = 16
+            ang = np.linspace(0.0, 2.0 * np.pi, n + 1, dtype=np.float32)
+            c, s = r * np.cos(ang), r * np.sin(ang)
+            top = np.stack([c, s, np.full_like(c, hh)], axis=-1)
+            bot = np.stack([c, s, np.full_like(c, -hh)], axis=-1)
+            rib_s = np.array([[r, 0, -hh], [-r, 0, -hh], [0, r, -hh], [0, -r, -hh]], dtype=np.float32)
+            rib_e = np.array([[r, 0, hh], [-r, 0, hh], [0, r, hh], [0, -r, hh]], dtype=np.float32)
+            starts = np.concatenate([top[:-1], bot[:-1], rib_s], axis=0)
+            ends = np.concatenate([top[1:], bot[1:], rib_e], axis=0)
+            return starts, ends
+
+        if kind == "cone":
+            r, hh = params
+            n = 16
+            ang = np.linspace(0.0, 2.0 * np.pi, n + 1, dtype=np.float32)
+            c, s = r * np.cos(ang), r * np.sin(ang)
+            bot = np.stack([c, s, np.full_like(c, -hh)], axis=-1)
+            apex = np.array([0.0, 0.0, hh], dtype=np.float32)
+            rib_s = np.array([[r, 0, -hh], [-r, 0, -hh], [0, r, -hh], [0, -r, -hh]], dtype=np.float32)
+            rib_e = np.broadcast_to(apex, rib_s.shape).copy()
+            starts = np.concatenate([bot[:-1], rib_s], axis=0)
+            ends = np.concatenate([bot[1:], rib_e], axis=0)
+            return starts, ends
+
+        if kind == "mesh":
+            verts_raw, indices_raw, scale = params
+            verts = np.asarray(verts_raw, dtype=np.float32).reshape(-1, 3) * np.asarray(scale, dtype=np.float32)
+            tris = np.asarray(indices_raw, dtype=np.int32).reshape(-1, 3)
+            if len(verts) == 0 or len(tris) == 0:
+                empty = np.zeros((0, 3), dtype=np.float32)
+                return empty, empty
+            # 全三角形の 3 辺を抽出し、無向辺 (min, max) で重複除去して描画本数を約半分に抑える
+            e01 = tris[:, [0, 1]]
+            e12 = tris[:, [1, 2]]
+            e20 = tris[:, [2, 0]]
+            edges = np.concatenate([e01, e12, e20], axis=0)
+            edges = np.sort(edges, axis=1)
+            edges = np.unique(edges, axis=0)
+            if len(edges) > max_mesh_edges:
+                # 巨大生メッシュで Viewport が固まらないよう等間隔間引き
+                step = max(1, len(edges) // max_mesh_edges)
+                edges = edges[::step]
+            return verts[edges[:, 0]], verts[edges[:, 1]]
+
+        empty = np.zeros((0, 3), dtype=np.float32)
+        return empty, empty
+
+    @staticmethod
+    def _get_debug_draw_interface():
+        """`omni.debugdraw` インターフェースを取得する。Kit 外や拡張無効時は `None` を返す。"""
+        try:
+            from isaacsim.util.debug_draw import _debug_draw
+
+            return _debug_draw.acquire_debug_draw_interface()
+        except Exception:
+            pass
+        try:
+            import omni.debugdraw
+
+            return omni.debugdraw.get_debug_draw_interface()
+        except Exception:
+            return None
+
+    def clear_debug_draw(self) -> None:
+        """`DebugDraw` で描画したコライダー線分と接触点マーカーを消去する。"""
+        dd = self._get_debug_draw_interface()
+        if dd is None:
+            return
+        dd.clear_lines()
+        dd.clear_points()
+
+    def draw_colliders(
+        self,
+        pairs: Sequence[GeometricCollisionPair] | None = None,
+        *,
+        robot: Any | None = None,
+        include_environment: bool = True,
+        clear: bool = True,
+        sync_robots: bool = True,
+        sync_env: bool = True,
+        line_width: float = 1.5,
+        point_size: float = 9.0,
+        contact_cross_radius: float = 0.015,
+    ) -> int:
+        """Newton 内部の実際のコライダー形状と接触点を `DebugDraw` (RTX オーバーレイ) で可視化する。
+
+        特徴:
+            - `write_target="fabric"` のまま USD へ一切書き戻さず、0 フレーム遅延で最新形状を描画する。
+            - 追加の衝突判定は行わない。`pairs` に直近の `check_collisions()` 結果を渡すと、
+              干渉中リンク/環境コライダーを赤、通常コライダーをシアン、接触点とめり込み線分をオレンジで描く。
+            - 戻り値は描画した線分総数 (Kit 外等で `DebugDraw` が利用不可の場合は 0)。
+        """
+        self._ensure_finalized()
+        if sync_robots:
+            self.sync_robots()
+        if sync_env and include_environment and self._env_entries:
+            self.sync_environment(reset_manual_overrides=False)
+
+        dd = self._get_debug_draw_interface()
+        if dd is None:
+            return 0
+        if clear:
+            dd.clear_lines()
+            dd.clear_points()
+
+        # 干渉中リンク名 (ロボット別) と環境コライダーパスを集合化
+        colliding_robot_links: set[tuple[int, str]] = set()
+        colliding_env_paths: set[str] = set()
+        contact_points: list[tuple[float, float, float]] = []
+        contact_seg_s: list[tuple[float, float, float]] = []
+        contact_seg_e: list[tuple[float, float, float]] = []
+        r_cross = float(contact_cross_radius)
+
+        if pairs:
+            robots_by_name = {rec.robot.name: rec.key for rec in self._robots.values()}
+            for pair in pairs:
+                # 貫通 (`separation <= 0` または `None`) の組を干渉中として赤表示する
+                is_hit = pair.separation is None or pair.separation <= 0.0
+                if is_hit:
+                    ra_key = robots_by_name.get(pair.robot_a)
+                    if ra_key is not None:
+                        colliding_robot_links.add((ra_key, pair.link_a))
+                    if pair.link_b is not None:
+                        rb_key = robots_by_name.get(pair.robot_b or pair.robot_a)
+                        if rb_key is not None:
+                            colliding_robot_links.add((rb_key, pair.link_b))
+                    else:
+                        colliding_env_paths.add(pair.path_b)
+                if pair.point_a is not None:
+                    pa = tuple(float(v) for v in pair.point_a)
+                    contact_points.append(pa)
+                    # 離れた視点からでも接触点を見失わないようオレンジの 3 軸小クロスを重ねる
+                    for dx, dy, dz in ((r_cross, 0.0, 0.0), (0.0, r_cross, 0.0), (0.0, 0.0, r_cross)):
+                        contact_seg_s.append((pa[0] - dx, pa[1] - dy, pa[2] - dz))
+                        contact_seg_e.append((pa[0] + dx, pa[1] + dy, pa[2] + dz))
+                if pair.point_b is not None:
+                    pb = tuple(float(v) for v in pair.point_b)
+                    contact_points.append(pb)
+                if pair.point_a is not None and pair.point_b is not None:
+                    contact_seg_s.append(tuple(float(v) for v in pair.point_a))
+                    contact_seg_e.append(tuple(float(v) for v in pair.point_b))
+
+        body_q_np = self._state.body_q.numpy()  # (B, 7) [px, py, pz, qx, qy, qz, qw]
+        shape_body_np = self._model.shape_body.numpy()
+        shape_xf_np = self._model.shape_transform.numpy()
+
+        def _wp_xf_to_rt(row: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
+            p = row[:3].astype(np.float32)
+            q_wxyz = np.array([row[6], row[3], row[4], row[5]], dtype=float)
+            rot = tf.quat_to_matrix(q_wxyz).astype(np.float32)
+            return rot, p
+
+        # 全シェイプのワールド線分を通常 (シアン) / 干渉中 (赤) に仕分けて一括描画する
+        s_all: list[tuple[float, float, float]] = []
+        e_all: list[tuple[float, float, float]] = []
+        c_all: list[tuple[float, float, float, float]] = []
+        w_all: list[float] = []
+
+        for sid, owner in self._shape_to_owner.items():
+            kind_owner, owner_robot, link_or_path, _col_path = owner
+            if kind_owner == "env" and not include_environment:
+                continue
+            if kind_owner == "robot" and robot is not None and owner_robot is not robot:
+                continue
+            vis_spec = self._shape_vis_info.get(sid)
+            if vis_spec is None:
+                continue
+            cached = self._wireframe_cache.get(sid)
+            if cached is None:
+                cached = self._build_local_wireframe(vis_spec)
+                self._wireframe_cache[sid] = cached
+            loc_s, loc_e = cached
+            if len(loc_s) == 0:
+                continue
+
+            sr, sp = _wp_xf_to_rt(shape_xf_np[sid])
+            bid = int(shape_body_np[sid])
+            if bid >= 0:
+                br, bp = _wp_xf_to_rt(body_q_np[bid])
+                wr = br @ sr
+                wp_pos = br @ sp + bp
+            else:
+                wr, wp_pos = sr, sp
+
+            ws = loc_s @ wr.T + wp_pos
+            we = loc_e @ wr.T + wp_pos
+            is_colliding = (
+                (kind_owner == "robot" and (id(owner_robot), link_or_path) in colliding_robot_links)
+                or (kind_owner == "env" and link_or_path in colliding_env_paths)
+            )
+            col = self._COLOR_COLLIDING if is_colliding else self._COLOR_NORMAL
+            lw = float(line_width) * (1.6 if is_colliding else 1.0)
+            n_seg = len(ws)
+            s_all.extend(map(tuple, ws.tolist()))
+            e_all.extend(map(tuple, we.tolist()))
+            c_all.extend([col] * n_seg)
+            w_all.extend([lw] * n_seg)
+
+        if contact_seg_s:
+            n_c = len(contact_seg_s)
+            s_all.extend(contact_seg_s)
+            e_all.extend(contact_seg_e)
+            c_all.extend([self._COLOR_CONTACT] * n_c)
+            w_all.extend([float(line_width) * 2.0] * n_c)
+
+        if s_all:
+            dd.draw_lines(s_all, e_all, c_all, w_all)
+        if contact_points:
+            dd.draw_points(contact_points, [self._COLOR_CONTACT] * len(contact_points), [float(point_size)] * len(contact_points))
+        return len(s_all)
 
     def close(self) -> None:
         if self._closed:

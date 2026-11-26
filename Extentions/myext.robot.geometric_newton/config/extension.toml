@@ -39,3 +39,10 @@ exts."myext.robot.geometric_newton".collision_backend = "newton"
 exts."myext.robot.geometric_newton".fk_backend = "auto"
 # Newton バックエンドの実行デバイス。"auto" = CUDA があれば "cuda:0" なければ "cpu"
 exts."myext.robot.geometric_newton".newton_device = "auto"
+# Newton コライダー登録時に UsdGeom.Mesh を単一凸包 (Convex Hull) へ変換するか。
+# true (既定) = 単一凸包で高速な GJK/MPR、false = STL 等の元の三角形メッシュそのまま (GeoType.MESH) で判定
+exts."myext.robot.geometric_newton".convex_meshes = true
+# USD に IsaacRobotAPI が付いている場合、生成・再構築時に GeometricRobotComponent を自動生成するか (既定 true)
+exts."myext.robot.geometric_newton".auto_components = true
+# デバッグ用: Newton 内部コライダー形状 (通常=シアン・干渉中=赤) と接触点 (オレンジ) を DebugDraw で可視化するか (既定 false = 負荷ゼロ)
+exts."myext.robot.geometric_newton".debug_draw_colliders = false

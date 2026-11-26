@@ -90,12 +90,15 @@ asyncio.ensure_future(quickstart())
 | pure テストのみ実行 | `powershell -ExecutionPolicy Bypass -File run_tests.ps1 -Pure` |
 | Kit テスト（Newton 項目のみ） | `powershell -ExecutionPolicy Bypass -File run_tests.ps1 -Kit -Only newton` |
 
-## ドキュメント案内
+## ドキュメント案内（HTML 自己完結スイート推奨）
 
-目的に応じて 3 本の専用ドキュメントへ分かれています。
+ブラウザでそのまま開ける自己完結 HTML ドキュメント（全 9 ページ、公式ドキュメント出典・検索フィルタ・相互ハイライト図解付き）を推奨エントリポイントとして用意しています。
 
 | ドキュメント | 類型 | 読む対象・内容 |
 |---|---|---|
-| [explanation_architecture.md](explanation_architecture.md) | 解説（Explanation） | コード編集者向け。モジュール依存関係、データフロー、座標系・四元数・行列の規約、設計判断の理由、機能別の編集箇所ガイド |
-| [howto_recipes.md](howto_recipes.md) | ハウツー / レシピ（How-to） | 実装者向け。`Play=ON` 0 フレーム遅延駆動、`GeometricScene`、`GeometricRobotView` GPU バッチ、カスタムコライダー Sublayer 切替、DH / MDH / URDF / `attach()`、IK、VariantSet、移行手順のコピペ可能なコード集 |
-| [reference_api.md](reference_api.md) | リファレンス（Reference） | 全公開クラス・メソッドシグネチャ・引数・既定値・戻り値型、`config/extension.toml` 設定キー、20 モジュール構成の仕様一覧 |
+| [index.html](index.html) | ポータル | 全ドキュメントへの入口、クイックスタート、目的別ガイド、主要機能一覧 |
+| [explanation_architecture.html](explanation_architecture.html) | 解説（Explanation） | コード編集者向け。モジュール依存関係、データフロー図、座標系・四元数・行列規約、`convex_meshes` / `Show by Type` / `VariantSet` の背景、機能別の編集箇所ガイド |
+| [howto_recipes.html](howto_recipes.html) | ハウツー / レシピ（How-to） | 実装者向け。`Play=ON` 0 フレーム遅延駆動、`IsaacRobotAPI` 自動コンポーネント＋`batch_update()`、`convex_meshes=False` 凹メッシュ、DebugDraw コライダー可視化、`GeometricScene`、`GeometricRobotView` GPU バッチ、カスタムコライダー Sublayer 切替、DH/MDH/URDF/IK/VariantSet のレシピ集 |
+| [api/index.html](api/index.html) | リファレンス（Reference） | API 目次・逆引き表・性能ティアガイド・`config/extension.toml` 全 11 設定キー・型エイリアス一覧。個別仕様書：[robot_api.html](api/robot_api.html) / [collision_newton_api.html](api/collision_newton_api.html) / [view_batch_api.html](api/view_batch_api.html) / [model_ik_command_api.html](api/model_ik_command_api.html) / [layer_writer_internals.html](api/layer_writer_internals.html) |
+
+従来の Markdown 版（[old/explanation_architecture.md](old/explanation_architecture.md)・[old/howto_recipes.md](old/howto_recipes.md)・[old/reference_api.md](old/reference_api.md)）も参照用に残していますが、最新の完全仕様は HTML 版を参照してください。

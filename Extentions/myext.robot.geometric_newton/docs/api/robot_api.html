@@ -1,0 +1,882 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>API 仕様: GeometricRobot / Component — myext.robot.geometric_newton</title>
+<style>
+:root {
+  --bg: #ffffff;
+  --surface: #f8fafc;
+  --surface-2: #f1f5f9;
+  --text: #1e293b;
+  --text-strong: #0f172a;
+  --muted: #64748b;
+  --border: #cbd5e1;
+  --border-light: #e2e8f0;
+  --c1: #2563eb; --c1-bg: #dbeafe;
+  --c2: #059669; --c2-bg: #d1fae5;
+  --c3: #d97706; --c3-bg: #fef3c7;
+  --c4: #7c3aed; --c4-bg: #ede9fe;
+  --c5: #db2777; --c5-bg: #fce7f3;
+}
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  font-family: "Segoe UI", "Hiragino Kaku Gothic ProN", "Yu Gothic UI", Meiryo, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.78;
+}
+.topbar {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(255,255,255,0.95);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--border-light);
+  padding: 0.6rem 1.4rem;
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 0.8rem; flex-wrap: wrap;
+}
+.topbar-title {
+  display: flex; align-items: center; gap: 0.6rem;
+  font-weight: 700; color: var(--text-strong); font-size: 0.94rem;
+}
+.doc-type-pill {
+  display: inline-block; padding: 0.12rem 0.6rem; border-radius: 999px;
+  font-size: 0.76rem; font-weight: 700;
+}
+.pill-portal { background: var(--c1-bg); color: var(--c1); }
+.pill-exp { background: var(--c4-bg); color: var(--c4); }
+.pill-howto { background: var(--c2-bg); color: var(--c2); }
+.pill-ref { background: var(--c3-bg); color: var(--c3); }
+
+.topbar-nav { display: flex; align-items: center; gap: 0.45rem; flex-wrap: wrap; }
+.nav-btn {
+  display: inline-flex; align-items: center; gap: 0.3rem;
+  padding: 0.32rem 0.72rem; border-radius: 7px;
+  border: 1px solid var(--border); background: var(--surface);
+  color: var(--text-strong); text-decoration: none;
+  font-size: 0.81rem; font-weight: 600;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+.nav-btn:hover { background: var(--c1-bg); border-color: var(--c1); color: var(--c1); }
+.nav-btn.is-active { background: var(--c1); border-color: var(--c1); color: #fff; }
+
+.subnav-bar {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border-light);
+  padding: 0.45rem 1.4rem;
+  display: flex; align-items: center; gap: 0.45rem; flex-wrap: wrap;
+  font-size: 0.8rem;
+}
+.subnav-label { color: var(--muted); font-weight: 700; margin-right: 0.3rem; }
+.subnav-link {
+  padding: 0.2rem 0.6rem; border-radius: 6px; text-decoration: none;
+  color: var(--text); border: 1px solid transparent; font-weight: 600;
+}
+.subnav-link:hover { background: var(--c1-bg); color: var(--c1); }
+.subnav-link.is-active { background: #fff; border-color: var(--c1); color: var(--c1); }
+
+.page-layout {
+  max-width: 1440px; margin: 0 auto;
+  display: grid; grid-template-columns: 260px minmax(0, 1fr);
+  gap: 2.2rem; padding: 1.8rem 1.5rem 5rem;
+}
+@media (max-width: 1060px) {
+  .page-layout { grid-template-columns: 1fr; }
+  .toc-rail { display: none; }
+}
+.toc-rail {
+  position: sticky; top: 4.6rem; align-self: start;
+  max-height: calc(100vh - 5.6rem); overflow-y: auto; padding-right: 0.4rem;
+}
+.toc-label {
+  font-size: 0.74rem; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.06em; color: var(--muted); margin: 0 0 0.55rem;
+}
+.toc ul { list-style: none; margin: 0; padding: 0; }
+.toc li { margin: 0.14rem 0; }
+.toc a {
+  display: block; padding: 0.28rem 0.6rem;
+  border-left: 2px solid var(--border-light);
+  color: var(--muted); text-decoration: none;
+  font-size: 0.81rem; line-height: 1.4;
+  transition: color 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+}
+.toc a:hover { color: var(--text-strong); border-left-color: var(--border); }
+.toc a.is-current {
+  color: var(--c1); border-left-color: var(--c1);
+  background: var(--c1-bg); font-weight: 700; border-radius: 0 6px 6px 0;
+}
+
+.filter-box { margin: 0 0 1rem; }
+.filter-input {
+  width: 100%; padding: 0.48rem 0.75rem; border-radius: 8px;
+  border: 1.5px solid var(--border); font-size: 0.86rem; color: var(--text-strong);
+  background: #fff;
+}
+.filter-input:focus { outline: none; border-color: var(--c1); box-shadow: 0 0 0 3px rgba(37,99,235,0.16); }
+.filter-status { font-size: 0.78rem; color: var(--muted); margin-top: 0.35rem; }
+
+.prose { max-width: 68ch; line-height: 1.82; color: var(--text); }
+.prose ul, .prose ol { padding-left: 1.35rem; margin: 0.35rem 0 1.05rem; }
+.prose li { margin-bottom: 0.42rem; }
+.hero { margin-bottom: 2rem; padding-bottom: 1.35rem; border-bottom: 1px solid var(--border-light); }
+.hero h1 { margin: 0 0 0.6rem; font-size: 1.85rem; line-height: 1.3; color: var(--text-strong); }
+.hero-lead { max-width: 68ch; color: var(--muted); font-size: 0.98rem; margin: 0; }
+
+section { scroll-margin-top: 5rem; }
+h2 {
+  margin-top: 3rem; margin-bottom: 0.75rem; font-size: 1.4rem;
+  color: var(--text-strong); padding-bottom: 0.35rem;
+  border-bottom: 2px solid var(--border-light);
+}
+h3 { margin-top: 2rem; margin-bottom: 0.48rem; font-size: 1.08rem; color: var(--text-strong); }
+p { margin-top: 0; margin-bottom: 1rem; }
+
+.ref-badge {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 1.42em; height: 1.42em; padding: 0 0.32em; border-radius: 999px;
+  font-size: 0.78em; font-weight: 700; color: #fff; background: var(--c1);
+  cursor: pointer; vertical-align: 0.06em; margin-right: 0.22em; user-select: none;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
+}
+.ref-badge[data-color="1"] { background: var(--c1); }
+.ref-badge[data-color="2"] { background: var(--c2); }
+.ref-badge[data-color="3"] { background: var(--c3); }
+.ref-badge[data-color="4"] { background: var(--c4); }
+.ref-badge[data-color="5"] { background: var(--c5); }
+
+.ui-chip {
+  display: inline-block; padding: 0.05em 0.46em; border-radius: 6px;
+  border: 1px solid #94a3b8; background: #f1f5f9;
+  font-weight: 600; font-size: 0.89em; color: #0f172a;
+}
+.code-chip {
+  display: inline-block; padding: 0.04em 0.36em; border-radius: 4px;
+  border: 1px solid #cbd5e1; background: #f8fafc;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.86em; color: #0f172a;
+}
+
+[data-ref-scope].is-dimming [data-ref]:not(.is-active),
+[data-ref-scope].is-dimming .dim-candidate:not(.is-active) {
+  opacity: 0.25; transition: opacity 0.15s ease;
+}
+[data-ref].is-active {
+  outline: 2px solid var(--c1); outline-offset: 2px;
+  box-shadow: 0 0 0 4px rgba(37,99,235,0.2);
+}
+[data-ref][data-color="2"].is-active { outline-color: var(--c2); box-shadow: 0 0 0 4px rgba(5,150,105,0.22); }
+[data-ref][data-color="3"].is-active { outline-color: var(--c3); box-shadow: 0 0 0 4px rgba(217,119,6,0.22); }
+[data-ref][data-color="4"].is-active { outline-color: var(--c4); box-shadow: 0 0 0 4px rgba(124,58,237,0.22); }
+[data-ref][data-color="5"].is-active { outline-color: var(--c5); box-shadow: 0 0 0 4px rgba(219,39,119,0.22); }
+svg g[data-ref] { cursor: pointer; transition: opacity 0.15s ease, filter 0.15s ease; }
+svg g[data-ref].is-active { outline: none; box-shadow: none; filter: drop-shadow(0 0 5px rgba(37,99,235,0.55)); }
+svg g[data-ref][data-color="2"].is-active { filter: drop-shadow(0 0 5px rgba(5,150,105,0.6)); }
+svg g[data-ref][data-color="3"].is-active { filter: drop-shadow(0 0 5px rgba(217,119,6,0.6)); }
+svg g[data-ref][data-color="4"].is-active { filter: drop-shadow(0 0 5px rgba(124,58,237,0.6)); }
+
+@keyframes ref-pulse {
+  0% { box-shadow: 0 0 0 0 rgba(37,99,235,0.55); }
+  100% { box-shadow: 0 0 0 12px rgba(37,99,235,0); }
+}
+.is-pulsing { animation: ref-pulse 0.8s ease-out 1; }
+
+.card-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(275px, 1fr));
+  gap: 1rem; margin: 1rem 0 1.6rem;
+}
+.nav-card {
+  display: block; text-decoration: none; color: inherit;
+  background: #fff; border: 1.5px solid var(--border); border-radius: 11px;
+  padding: 1rem 1.1rem; transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.nav-card:hover { border-color: var(--c1); box-shadow: 0 6px 18px rgba(37,99,235,0.1); }
+.nav-card h3 { margin: 0 0 0.35rem; font-size: 1rem; color: var(--text-strong); }
+.nav-card p { margin: 0; font-size: 0.86rem; color: var(--muted); line-height: 1.58; }
+
+.api-card {
+  background: #fff; border: 1.5px solid var(--border); border-radius: 11px;
+  padding: 1rem 1.15rem; margin: 1rem 0 1.4rem; scroll-margin-top: 5rem;
+}
+.api-card.is-hidden { display: none; }
+.api-head {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 0.6rem; flex-wrap: wrap; margin-bottom: 0.55rem;
+}
+.api-name {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 1rem; font-weight: 700; color: var(--text-strong);
+}
+.perf-pill {
+  display: inline-block; padding: 0.12rem 0.52rem; border-radius: 999px;
+  font-size: 0.74rem; font-weight: 700;
+}
+.perf-hot { background: #dcfce7; color: #166534; border: 1px solid #86efac; }
+.perf-fast { background: #dbeafe; color: #1e40af; border: 1px solid #93c5fd; }
+.perf-cold { background: #fef3c7; color: #92400e; border: 1px solid #fcd34d; }
+.perf-debug { background: #fce7f3; color: #9d174d; border: 1px solid #f9a8d4; }
+
+.sig-box {
+  background: #0f172a; color: #e2e8f0; border-radius: 8px;
+  padding: 0.65rem 0.9rem; margin: 0.45rem 0 0.75rem;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.81rem; line-height: 1.55; overflow-x: auto; white-space: pre;
+}
+.code-ex {
+  background: #0b1220; color: #e2e8f0; border-radius: 8px;
+  padding: 0.75rem 0.95rem; margin: 0.6rem 0 0.8rem;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.8rem; line-height: 1.55; overflow-x: auto; white-space: pre;
+}
+.api-meta-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 0.65rem; margin: 0.55rem 0;
+}
+.api-meta-box {
+  background: var(--surface); border: 1px solid var(--border-light);
+  border-radius: 8px; padding: 0.55rem 0.75rem; font-size: 0.85rem; line-height: 1.58;
+}
+.api-meta-box strong { color: var(--text-strong); display: block; margin-bottom: 0.2rem; font-size: 0.81rem; }
+
+.table-wrap { overflow-x: auto; margin: 0.85rem 0 1.35rem; border: 1px solid var(--border-light); border-radius: 10px; }
+table.ergo-table { width: 100%; border-collapse: collapse; font-size: 0.86rem; }
+table.ergo-table thead th {
+  position: sticky; top: 0; background: var(--surface);
+  border-bottom: 2px solid var(--border); text-align: left;
+  padding: 0.58rem 0.75rem; color: var(--text-strong); font-weight: 700;
+}
+table.ergo-table tbody tr { transition: background 0.12s ease; }
+table.ergo-table tbody tr:hover { background: #eff6ff; }
+table.ergo-table td { padding: 0.52rem 0.75rem; border-bottom: 1px solid var(--border-light); vertical-align: top; line-height: 1.58; }
+table.ergo-table tbody tr:last-child td { border-bottom: none; }
+table.ergo-table td.num, table.ergo-table th.num { text-align: right; font-variant-numeric: tabular-nums; }
+
+.callout {
+  border-left: 4px solid var(--c1); background: var(--surface);
+  border-radius: 0 10px 10px 0; padding: 0.85rem 1.05rem;
+  margin: 1rem 0 1.35rem; max-width: 68ch; font-size: 0.9rem; line-height: 1.72;
+}
+.callout.warn { border-left-color: var(--c3); background: #fffbeb; }
+.callout.good { border-left-color: var(--c2); background: #ecfdf5; }
+.callout.danger { border-left-color: #dc2626; background: #fef2f2; }
+.callout strong { color: var(--text-strong); }
+
+.diagram-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 12px; padding: 1rem 1.15rem; margin: 1rem 0 1.5rem;
+}
+.diagram-header {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 0.75rem; margin-bottom: 0.8rem; flex-wrap: wrap;
+}
+.diagram-title { font-weight: 700; font-size: 0.94rem; color: var(--text-strong); }
+.diagram-hint { font-size: 0.78rem; color: var(--muted); }
+.svg-wrap { width: 100%; overflow-x: auto; background: #fff; border: 1px solid var(--border-light); border-radius: 9px; padding: 0.5rem; }
+.diag-svg { display: block; width: 100%; min-width: 720px; height: auto; font-family: "Segoe UI", "Hiragino Kaku Gothic ProN", "Yu Gothic UI", Meiryo, sans-serif; }
+
+.swatch { display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.1rem 0.5rem; border-radius: 999px; font-size: 0.8rem; font-weight: 700; border: 1px solid transparent; }
+.swatch-dot { width: 0.7rem; height: 0.7rem; border-radius: 50%; display: inline-block; border: 1px solid rgba(15,23,42,0.25); }
+.sw-cyan { background: #ecfeff; color: #155e75; border-color: #22d3ee; } .sw-cyan .swatch-dot { background: #06b6d4; }
+.sw-red { background: #fef2f2; color: #991b1b; border-color: #f87171; } .sw-red .swatch-dot { background: #ef4444; }
+.sw-orange { background: #fff7ed; color: #9a3412; border-color: #fb923c; } .sw-orange .swatch-dot { background: #f97316; }
+
+.source-list { list-style: none; padding: 0; margin: 0.75rem 0 1.3rem; display: flex; flex-direction: column; gap: 0.55rem; }
+.source-list li {
+  background: var(--surface); border: 1px solid var(--border-light);
+  border-radius: 8px; padding: 0.62rem 0.9rem; font-size: 0.85rem; line-height: 1.58;
+}
+.source-tag {
+  display: inline-block; font-size: 0.71rem; font-weight: 700;
+  padding: 0.08rem 0.44rem; border-radius: 999px; margin-right: 0.4rem;
+}
+.source-tag.official { background: var(--c1-bg); color: var(--c1); }
+.source-tag.web { background: var(--c2-bg); color: var(--c2); }
+.source-tag.empirical { background: var(--c3-bg); color: var(--c3); }
+
+#ref-return-btn {
+  position: fixed; right: 1.25rem; bottom: 1.25rem; z-index: 9999;
+  display: none; padding: 0.52rem 0.92rem; border-radius: 999px;
+  border: 1px solid var(--c1); background: var(--c1); color: #fff;
+  font-size: 0.83rem; font-weight: 700; cursor: pointer;
+  box-shadow: 0 8px 20px rgba(37,99,235,0.3);
+}
+#ref-return-btn.is-visible { display: inline-flex; align-items: center; gap: 0.35rem; }
+</style>
+</head>
+<body>
+<header class="topbar">
+  <div class="topbar-title">
+    <span class="doc-type-pill pill-ref">API リファレンス</span>
+    <span>myext.robot.geometric_newton</span>
+  </div>
+  <nav class="topbar-nav" aria-label="ドキュメント種別">
+    <a class="nav-btn" href="../index.html">ポータル</a>
+    <a class="nav-btn" href="../explanation_architecture.html">アーキテクチャ解説</a>
+    <a class="nav-btn" href="../howto_recipes.html">レシピ集</a>
+    <a class="nav-btn is-active" href="index.html">API リファレンス</a>
+  </nav>
+</header>
+<nav class="subnav-bar" aria-label="API ページ切替"><span class="subnav-label">API 仕様書:</span><a class="subnav-link" href="index.html">目次・逆引き・設定</a>
+  <a class="subnav-link is-active" href="robot_api.html">GeometricRobot / Component</a>
+  <a class="subnav-link" href="collision_newton_api.html">干渉判定・Newton / PhysX</a>
+  <a class="subnav-link" href="view_batch_api.html">GeometricRobotView</a>
+  <a class="subnav-link" href="model_ik_command_api.html">Model / USD / IK / 変換</a>
+  <a class="subnav-link" href="layer_writer_internals.html">Layer / Writer / 座標規約</a></nav>
+<div class="page-layout">
+  <aside class="toc-rail" aria-label="ページ内目次">
+    <div class="filter-box"><input id="api-filter-input" class="filter-input" type="search" placeholder="API 名・引数・用語で絞り込み..."><div id="api-filter-status" class="filter-status"></div></div>
+    <p class="toc-label">目次</p>
+    <nav class="toc">
+      <ul>
+        <li><a href="#sec-robot-init">GeometricRobot 生成・ファクトリ</a></li>
+        <li><a href="#sec-robot-props">構造・DOF・Mimic プロパティ</a></li>
+        <li><a href="#sec-robot-dof">関節操作・batch_update・describe</a></li>
+        <li><a href="#sec-robot-pose-ik">姿勢・ヤコビアン・既定状態・IK</a></li>
+        <li><a href="#sec-robot-variant-cmd">VariantSet・指令変換・構造リスナー</a></li>
+        <li><a href="#sec-robot-collision-vis">干渉判定・フィルタ・Collider Sublayer・DebugDraw</a></li>
+        <li><a href="#sec-robot-lifecycle">書込先・flush_to_usd・refresh・close</a></li>
+        <li><a href="#sec-component">GeometricRobotComponent</a></li>
+        <li><a href="#sec-joint-link-err">GeometricJoint / GeometricLink / 例外</a></li>
+        <li><a href="#sec-sources">公式出典・同梱ソース・実機検証</a></li>
+      </ul>
+    </nav>
+  </aside>
+  <main>
+    <div class="hero">
+      <h1>GeometricRobot / GeometricRobotComponent API</h1>
+      <p class="hero-lead">単体ロボット・複合ロボットの生成、関節操作、Mimic 規約、batch_update、VariantSet、干渉判定、DebugDraw 可視化、IsaacRobotAPI コンポーネント操作の完全仕様（metersPerUnit=1 のステージ専用）。</p>
+    </div>
+    
+<section id="sec-robot-init">
+  <h2>GeometricRobot 生成・ファクトリ</h2>
+  <div class="prose">
+    <p><span class="code-chip">GeometricRobot</span> は、物理ソルバーを介さずに順運動学（FK）で全リンクのワールド姿勢を計算し、Fabric または USD Sublayer へ直接書き込む単体ロボット API です。通常の利用では <span class="code-chip">GeometricRobot.from_articulation(...)</span> などのクラスメソッドから生成します。長さ・距離・直動関節位置の単位はすべて <strong>m（<span class="code-chip">metersPerUnit=1</span> のステージ専用）</strong> です。</p>
+  </div>
+
+  <article class="api-card" id="robot-init"><div class="api-head"><span class="api-name">GeometricRobot.__init__</span><span class="perf-pill perf-cold">初期化時（低頻度）</span></div><div class="sig-box">GeometricRobot(
+    stage: Usd.Stage,
+    model: GeometricRobotModel,
+    link_prim_paths: dict[str, str],
+    *,
+    info: UsdRobotInfo | None = None,
+    source: UsdArticulationSource | None = None,
+    layer: GeometricLayer | None = None,
+    layer_options: GeometricLayerOptions | None = None,
+    write_target: WriteTarget | None = None,
+    limit_policy: LimitPolicy = "clip",
+    angle_unit: AngleUnit | None = None,
+    apply_layer: bool = True,
+    collision_backend: CollisionBackend | None = None,
+    fk_backend: FkBackend | None = None,
+    scene: GeometricScene | None = None,
+    newton_device: str | None = None,
+    convex_meshes: bool | None = None,
+    debug_draw_colliders: bool | None = None,
+    use_gpu_fabric_writer: bool = False,
+)</div><div class="prose"><p>構築済みの <span class='code-chip'>GeometricRobotModel</span> とリンク Prim パス対応表から <span class='code-chip'>GeometricRobot</span> を初期化します。<span class='code-chip'>None</span> の設定引数は <span class='code-chip'>config/extension.toml</span>（<span class='code-chip'>/exts/myext.robot.geometric_newton/*</span>）の既定値を参照します。</p></div><div class="table-wrap"><table class="ergo-table"><thead><tr><th>引数 / フィールド</th><th>型</th><th>既定値</th><th>意味・形状・単位・制約</th></tr></thead><tbody><tr><td><span class='code-chip'>stage</span></td><td><span class='code-chip'>Usd.Stage</span></td><td><span class='code-chip'>必須</span></td><td>操作対象の USD Stage（<span class='code-chip'>metersPerUnit=1</span> のステージ専用）。</td></tr>
+<tr><td><span class='code-chip'>model</span></td><td><span class='code-chip'>GeometricRobotModel</span></td><td><span class='code-chip'>必須</span></td><td>NumPy 完結の純粋運動学モデル。</td></tr>
+<tr><td><span class='code-chip'>link_prim_paths</span></td><td><span class='code-chip'>dict[str, str]</span></td><td><span class='code-chip'>必須</span></td><td>リンク名 → USD Prim パスの辞書。</td></tr>
+<tr><td><span class='code-chip'>info</span></td><td><span class='code-chip'>UsdRobotInfo | None</span></td><td><span class='code-chip'>None</span></td><td><span class='code-chip'>read_articulation()</span> が抽出したメタ情報（VariantSet・コンポーネント・除外ペア情報を含む）。</td></tr>
+<tr><td><span class='code-chip'>source</span></td><td><span class='code-chip'>UsdArticulationSource | None</span></td><td><span class='code-chip'>None</span></td><td>VariantSet 切替後の <span class='code-chip'>rebuild()</span> に使う再読込元設定。</td></tr>
+<tr><td><span class='code-chip'>layer</span></td><td><span class='code-chip'>GeometricLayer | None</span></td><td><span class='code-chip'>None</span></td><td>複数ロボット間で 1 枚の幾何モード用 Sublayer を共有する場合に外部生成したインスタンスを渡す。</td></tr>
+<tr><td><span class='code-chip'>layer_options</span></td><td><span class='code-chip'>GeometricLayerOptions | None</span></td><td><span class='code-chip'>None</span></td><td>内部で <span class='code-chip'>GeometricLayer</span> を生成するときのオプション（<span class='code-chip'>collision_mode</span>, <span class='code-chip'>layer_target</span> 等）。</td></tr>
+<tr><td><span class='code-chip'>write_target</span></td><td><span class='code-chip'>"fabric" | "usd" | "both" | None</span></td><td><span class='code-chip'>None (既定 fabric)</span></td><td>リンク姿勢の書込先。<span class='code-chip'>"fabric"</span> は 1 ステップ最速で USD に書き戻さない。<span class='code-chip'>"usd"</span> は Sublayer に書き戻す。<span class='code-chip'>"both"</span> は両方に書き込む。</td></tr>
+<tr><td><span class='code-chip'>limit_policy</span></td><td><span class='code-chip'>"clip" | "warn" | "error" | "ignore"</span></td><td><span class='code-chip'>"clip"</span></td><td>関節リミット超過時の振る舞い。範囲丸め / 警告出力して継続 / <span class='code-chip'>ValueError</span> 送出 / 無視。</td></tr>
+<tr><td><span class='code-chip'>angle_unit</span></td><td><span class='code-chip'>"rad" | "deg" | None</span></td><td><span class='code-chip'>None (既定 rad)</span></td><td>回転関節（<span class='code-chip'>revolute</span>）の入出力単位。直動関節（<span class='code-chip'>prismatic</span>）は常に <strong>m（<span class='code-chip'>metersPerUnit=1</span> のステージ専用）</strong>。</td></tr>
+<tr><td><span class='code-chip'>apply_layer</span></td><td><span class='code-chip'>bool</span></td><td><span class='code-chip'>True</span></td><td><span class='code-chip'>True</span> のとき初期化と同時に <span class='code-chip'>GeometricLayer</span> を適用し、Articulation の PhysX 駆動を幾何モードへ切り替える。</td></tr>
+<tr><td><span class='code-chip'>collision_backend</span></td><td><span class='code-chip'>"newton" | "physx" | None</span></td><td><span class='code-chip'>None (既定 newton)</span></td><td>干渉・距離計算のバックエンド。既定の <span class='code-chip'>"newton"</span> は 0 フレーム遅延かつ Play=OFF でも動作。</td></tr>
+<tr><td><span class='code-chip'>fk_backend</span></td><td><span class='code-chip'>"auto" | "numpy" | "newton" | None</span></td><td><span class='code-chip'>None (既定 auto)</span></td><td>順運動学の計算バックエンド。<span class='code-chip'>"auto"</span> は単体ロボットで DOF 数が <span class='code-chip'>_AUTO_FK_MIN_DOFS</span>（32）以上かつ CUDA ありのとき <span class='code-chip'>"newton"</span>、それ以外は <span class='code-chip'>"numpy"</span> を選択する（<span class='code-chip'>GeometricRobotView</span> では 16 台以上かつ CUDA ありで <span class='code-chip'>"newton"</span>）。</td></tr>
+<tr><td><span class='code-chip'>scene</span></td><td><span class='code-chip'>GeometricScene | None</span></td><td><span class='code-chip'>None</span></td><td>複数ロボット間で Newton コリジョン空間を共有する場合に渡す外部 <span class='code-chip'>GeometricScene</span>。</td></tr>
+<tr><td><span class='code-chip'>newton_device</span></td><td><span class='code-chip'>str | None</span></td><td><span class='code-chip'>None (既定 auto)</span></td><td>Newton 実行デバイス（<span class='code-chip'>"auto"</span> / <span class='code-chip'>"cuda:0"</span> / <span class='code-chip'>"cpu"</span>）。</td></tr>
+<tr><td><span class='code-chip'>convex_meshes</span></td><td><span class='code-chip'>bool | None</span></td><td><span class='code-chip'>None (既定 True)</span></td><td><span class='code-chip'>True</span>: <span class='code-chip'>UsdGeom.Mesh</span> コライダーを単一 Convex Hull（<span class='code-chip'>GeoType.CONVEX_MESH</span>）へ変換。<span class='code-chip'>False</span>: 三角メッシュそのまま（<span class='code-chip'>GeoType.MESH</span>）を使用（凹形状に有効。水密閉メッシュ必須）。</td></tr>
+<tr><td><span class='code-chip'>debug_draw_colliders</span></td><td><span class='code-chip'>bool | None</span></td><td><span class='code-chip'>None (既定 False)</span></td><td><span class='code-chip'>True</span> にすると <span class='code-chip'>set_dof_positions()</span> 等による姿勢更新と <span class='code-chip'>check_collisions()</span> 後に、Newton コライダーのワイヤーフレーム（通常=シアン・干渉中=赤・接触点=オレンジ）を自動描画する。<span class='code-chip'>False</span> では描画負荷 0。</td></tr>
+<tr><td><span class='code-chip'>use_gpu_fabric_writer</span></td><td><span class='code-chip'>bool</span></td><td><span class='code-chip'>False</span></td><td>Newton FK 使用中かつ <span class='code-chip'>write_target</span> が <span class='code-chip'>"fabric"</span> / <span class='code-chip'>"both"</span> 時に GPU 上の <span class='code-chip'>body_q</span> を直接 Fabric GPU バッファへ書き込む。</td></tr></tbody></table></div><div class="api-meta-grid"><div class="api-meta-box"><strong>戻り値 / 型</strong><span class='code-chip'>GeometricRobot</span> インスタンス。初期化時に <span class='code-chip'>model.components</span> に従って <span class='code-chip'>components</span> が自動生成され、<span class='code-chip'>robot.joints</span>・<span class='code-chip'>robot.links</span> も構築される。</div><div class="api-meta-box"><strong>副作用・前提・落とし穴</strong><strong>USD ルートレイヤー不変：</strong><span class='code-chip'>apply_layer=True</span> でも元の USD ファイルは書き換えない。<span class='code-chip'>close()</span> で Sublayer を外すと元の Articulation 構成へ戻る。</div></div></article>
+
+  <article class="api-card" id="robot-from-articulation"><div class="api-head"><span class="api-name">GeometricRobot.from_articulation</span><span class="perf-pill perf-cold">初期化時（低頻度）</span></div><div class="sig-box">@classmethod
+GeometricRobot.from_articulation(
+    stage: Usd.Stage,
+    source: UsdArticulationSource | str,
+    *,
+    auto_components: bool | None = None,
+    **kwargs,
+) -&gt; GeometricRobot</div><div class="prose"><p>既存の USD Articulation（単体ロボット・複数ロボット合成・ネストした <span class='code-chip'>IsaacRobotAPI</span> を含むステージ Prim）から <span class='code-chip'>GeometricRobot</span> を生成する標準エントリポイントです。</p></div><div class="table-wrap"><table class="ergo-table"><thead><tr><th>引数 / フィールド</th><th>型</th><th>既定値</th><th>意味・形状・単位・制約</th></tr></thead><tbody><tr><td><span class='code-chip'>stage</span></td><td><span class='code-chip'>Usd.Stage</span></td><td><span class='code-chip'>必須</span></td><td>対象 USD Stage（<span class='code-chip'>metersPerUnit=1</span> のステージ専用）。</td></tr>
+<tr><td><span class='code-chip'>source</span></td><td><span class='code-chip'>UsdArticulationSource | str</span></td><td><span class='code-chip'>必須</span></td><td>ロボットルート Prim パス文字列、または詳細設定を持つ <span class='code-chip'>UsdArticulationSource</span>。</td></tr>
+<tr><td><span class='code-chip'>auto_components</span></td><td><span class='code-chip'>bool | None</span></td><td><span class='code-chip'>None (既定 True)</span></td><td><span class='code-chip'>source</span> が文字列の場合、<span class='code-chip'>IsaacRobotAPI</span> が付与された Prim から <span class='code-chip'>GeometricRobotComponent</span> を自動生成するかどうか。<span class='code-chip'>source</span> が <span class='code-chip'>UsdArticulationSource</span> のとき明示指定すると上書きする。</td></tr>
+<tr><td><span class='code-chip'>**kwargs</span></td><td><span class='code-chip'>Any</span></td><td><span class='code-chip'>—</span></td><td><span class='code-chip'>GeometricRobot.__init__</span> の全キーワード引数（<span class='code-chip'>convex_meshes</span>, <span class='code-chip'>debug_draw_colliders</span>, <span class='code-chip'>write_target</span>, <span class='code-chip'>angle_unit</span> 等）をそのまま転送。</td></tr></tbody></table></div><div class="api-meta-grid"><div class="api-meta-box"><strong>戻り値 / 型</strong><span class='code-chip'>GeometricRobot</span>。全リンクの初期姿勢が USD から読み込まれ、コンポーネントと DOF 索引が構築済みの状態。</div><div class="api-meta-box"><strong>副作用・前提・落とし穴</strong>複数ロボットを組み合わせた <span class='code-chip'>multi_arm</span> 等の USD に <span class='code-chip'>IsaacRobotAPI</span> が付いている場合、既定（<span class='code-chip'>auto_components=True</span>）で <span class='code-chip'>robot.components</span> が即座に生成される。入れ子のロボット構成では最も深い所有者 Prim にリンクが割り当てられる。</div></div><div class="code-ex">from myext.robot.geometric_newton import GeometricRobot
+
+robot = GeometricRobot.from_articulation(
+    stage,
+    "/World/MultiArm",
+    convex_meshes=False,        # 凹メッシュをそのまま衝突判定に使う
+    auto_components=True,       # IsaacRobotAPI からコンポーネントを自動生成
+    debug_draw_colliders=True,  # デバッグ可視化 ON（通常=シアン / 干渉=赤 / 接点=オレンジ）
+)
+print(robot.describe())</div></article>
+
+  <article class="api-card" id="robot-other-factories"><div class="api-head"><span class="api-name">GeometricRobot.from_model / from_dh / from_mdh / from_screw / from_urdf</span><span class="perf-pill perf-cold">初期化時（低頻度）</span></div><div class="sig-box">@classmethod GeometricRobot.from_model(stage, model: GeometricRobotModel, prim_path: str, *, style=None, base_transform=None, **kwargs) -&gt; GeometricRobot
+@classmethod GeometricRobot.from_dh(stage, params: DHParameters, prim_path: str, **kwargs) -&gt; GeometricRobot
+@classmethod GeometricRobot.from_mdh(stage, params: MDHParameters, prim_path: str, **kwargs) -&gt; GeometricRobot
+@classmethod GeometricRobot.from_screw(stage, params: ScrewParameters, prim_path: str, **kwargs) -&gt; GeometricRobot
+@classmethod GeometricRobot.from_urdf(stage, source: UrdfSource | str, prim_path: str, **kwargs) -&gt; GeometricRobot</div><div class="prose"><p>USD アセットが存在しない状態から、運動学パラメータ（モデル・標準 DH・修正 DH・スクリュー軸・URDF ファイル）に基づいてプリミティブ可視化＋コライダー付き USD Prim を <span class='code-chip'>prim_path</span> 配下に生成し、<span class='code-chip'>GeometricRobot</span> を構築します。</p></div><div class="table-wrap"><table class="ergo-table"><thead><tr><th>引数 / フィールド</th><th>型</th><th>既定値</th><th>意味・形状・単位・制約</th></tr></thead><tbody><tr><td><span class='code-chip'>stage</span></td><td><span class='code-chip'>Usd.Stage</span></td><td><span class='code-chip'>必須</span></td><td>Prim を生成する USD Stage（<span class='code-chip'>metersPerUnit=1</span> のステージ専用）。</td></tr>
+<tr><td><span class='code-chip'>model / params / source</span></td><td><span class='code-chip'>モデル定義</span></td><td><span class='code-chip'>必須</span></td><td>各方式のパラメータ定義。詳細は <a href='model_ik_command_api.html'>Model / USD / IK / 変換</a> を参照。</td></tr>
+<tr><td><span class='code-chip'>prim_path</span></td><td><span class='code-chip'>str</span></td><td><span class='code-chip'>必須</span></td><td>生成先ルート Prim パス（例: <span class='code-chip'>"/World/MyRobot"</span>）。</td></tr>
+<tr><td><span class='code-chip'>style</span></td><td><span class='code-chip'>GeometricVisualStyle | None</span></td><td><span class='code-chip'>None</span></td><td>リンク・関節の円柱半径・色・コライダー付与の有無を指定。<span class='code-chip'>from_dh</span> / <span class='code-chip'>from_mdh</span> / <span class='code-chip'>from_screw</span> / <span class='code-chip'>from_urdf</span> からもキーワード引数として指定可能。</td></tr>
+<tr><td><span class='code-chip'>base_transform</span></td><td><span class='code-chip'>np.ndarray | None</span></td><td><span class='code-chip'>None</span></td><td>形状 <span class='code-chip'>(4, 4)</span> のベース配置同次変換行列。<span class='code-chip'>from_dh</span> / <span class='code-chip'>from_mdh</span> / <span class='code-chip'>from_screw</span> / <span class='code-chip'>from_urdf</span> からも指定可能。</td></tr>
+<tr><td><span class='code-chip'>**kwargs</span></td><td><span class='code-chip'>Any</span></td><td><span class='code-chip'>—</span></td><td><span class='code-chip'>from_dh</span> / <span class='code-chip'>from_mdh</span> / <span class='code-chip'>from_screw</span> / <span class='code-chip'>from_urdf</span> は内部で <span class='code-chip'>from_model()</span> を呼ぶため、<span class='code-chip'>style</span>・<span class='code-chip'>base_transform</span> を受け付け、残りのキーワード引数が <span class='code-chip'>GeometricRobot.__init__</span> へ転送される。</td></tr></tbody></table></div><div class="api-meta-grid"><div class="api-meta-box"><strong>戻り値 / 型</strong><span class='code-chip'>GeometricRobot</span>。</div><div class="api-meta-box"><strong>副作用・前提・落とし穴</strong>URDF 読込時は運動学のみを読み込み（メッシュは読まない）、<span class='code-chip'>build_robot_prims()</span> が簡易カプセル形状を生成する。URDF の値は m としてそのまま使う。既存の USD アセットを使う場合は <span class='code-chip'>from_articulation()</span> を使用すること。</div></div></article>
+</section>
+
+<section id="sec-robot-props">
+  <h2>構造・DOF・Mimic プロパティ</h2>
+  <div class="callout warn">
+    <strong>Mimic 従属 DOF の重要仕様（Isaac Sim <span class="code-chip">ArticulationRootAPI</span> 互換）：</strong>
+    <span class="code-chip">robot.dof_names</span> と <span class="code-chip">robot.num_dofs</span> には <strong>Mimic 従属関節も含まれます</strong>（PhysX <span class="code-chip">Articulation</span> と同じ配列長・順序）。ただし <span class="code-chip">set_dof_positions()</span> 実行時に <span class="code-chip">model.resolve_mimic()</span> が必ず適用されるため、<strong>Mimic 従属 DOF のスロットへ渡した値は親 DOF の式 <span class="code-chip">q_dep = multiplier * q_ref + offset</span> で必ず上書きされます</strong>。独立に指令すべき軸だけを得るには <span class="code-chip">independent_dof_indices</span> / <span class="code-chip">independent_dof_names</span> を使用してください。
+  </div>
+
+  <div class="table-wrap">
+    <table class="ergo-table">
+      <thead>
+        <tr><th>プロパティ / 属性 / 索引取得メソッド</th><th>戻り値の型・形状</th><th>意味・挙動・注意点</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><span class="code-chip">name</span></td><td><span class="code-chip">str</span></td><td>ロボット名（<span class="code-chip">model.name</span>）。</td></tr>
+        <tr><td><span class="code-chip">stage</span> / <span class="code-chip">model</span> / <span class="code-chip">layer</span> / <span class="code-chip">info</span></td><td>各内部オブジェクト</td><td>操作対象 Stage・純粋運動学モデル・幾何 Sublayer・読込時メタ情報（<span class="code-chip">UsdRobotInfo | None</span>）。</td></tr>
+        <tr><td><span class="code-chip">links</span> / <span class="code-chip">joints</span></td><td><span class="code-chip">dict[str, GeometricLink]</span> / <span class="code-chip">dict[str, GeometricJoint]</span></td><td>リンク名 → <span class="code-chip">GeometricLink</span>、関節名 → <span class="code-chip">GeometricJoint</span> の辞書属性（例：<span class="code-chip">robot.links["wrist_3_link"].get_world_pose()</span>）。<span class="code-chip">_rebuild()</span> のたびに作り直される。</td></tr>
+        <tr><td><span class="code-chip">structure_version</span></td><td><span class="code-chip">int</span></td><td>初期値 <span class="code-chip">0</span>。<span class="code-chip">set_variant()</span> / <span class="code-chip">rebuild()</span> でリンク・DOF 構造が再構築されるたびに <span class="code-chip">+1</span> される。キャッシュ済み <span class="code-chip">dof_indices</span> の鮮度検証に使用。</td></tr>
+        <tr><td><span class="code-chip">num_dofs</span></td><td><span class="code-chip">int</span></td><td>全可動 DOF 数（<span class="code-chip">revolute</span> + <span class="code-chip">prismatic</span>、<strong>Mimic 従属 DOF を含む</strong>）。</td></tr>
+        <tr><td><span class="code-chip">dof_names</span> / <span class="code-chip">dof_paths</span> / <span class="code-chip">dof_types</span></td><td><span class="code-chip">list[str]</span> / <span class="code-chip">list[str | None]</span></td><td>長さ <span class="code-chip">num_dofs</span>。各 DOF の名前・USD Joint Prim パス・型（<span class="code-chip">"revolute"</span> / <span class="code-chip">"prismatic"</span>）。</td></tr>
+        <tr><td><span class="code-chip">independent_dof_indices</span></td><td><span class="code-chip">np.ndarray</span> <span class="code-chip">(K,) int</span></td><td>Mimic 従属ではない<strong>独立 DOF のインデックス配列</strong>。最適化・サンプリング・<span class="code-chip">set_dof_positions(q_ind, dof_indices=robot.independent_dof_indices)</span> にそのまま渡せる。</td></tr>
+        <tr><td><span class="code-chip">independent_dof_names</span></td><td><span class="code-chip">list[str]</span></td><td><span class="code-chip">independent_dof_indices</span> に対応する独立 DOF 名一覧。長さ <span class="code-chip">K</span>（Mimic が無ければ <span class="code-chip">K == num_dofs</span>）。</td></tr>
+        <tr><td><span class="code-chip">num_joints</span> / <span class="code-chip">joint_names</span> / <span class="code-chip">joint_paths</span> / <span class="code-chip">joint_types</span></td><td><span class="code-chip">int</span> / <span class="code-chip">list</span></td><td><span class="code-chip">fixed</span> 関節を含む全関節数・名前・USD パス・型。</td></tr>
+        <tr><td><span class="code-chip">num_links</span> / <span class="code-chip">link_names</span> / <span class="code-chip">link_paths</span> / <span class="code-chip">link_path_map</span></td><td><span class="code-chip">int</span> / <span class="code-chip">list</span> / <span class="code-chip">dict[str, str]</span></td><td>全リンク数・名前・USD Prim パス・名前→パスの写像。</td></tr>
+        <tr><td><span class="code-chip">root_prim_paths</span></td><td><span class="code-chip">list[str]</span></td><td>このロボットを構成する USD ルート Prim パス群。</td></tr>
+        <tr><td><span class="code-chip">angle_unit</span>（読取 / 書込可）</td><td><span class="code-chip">"rad" | "deg"</span></td><td>既定の回転関節単位。変更しても内部の <span class="code-chip">_q</span>（常に <span class="code-chip">rad</span> / m）自体は変わらず、以後の入出力換算のみ変わる。</td></tr>
+        <tr><td><span class="code-chip">get_dof_indices(names)</span> / <span class="code-chip">get_joint_indices(names)</span> / <span class="code-chip">get_link_indices(names)</span></td><td><span class="code-chip">np.ndarray</span>（int）</td><td>名前文字列（または文字列列）→ インデックスの NumPy 整数配列へ解決。ホットループの外で 1 回だけ呼び、戻り値をキャッシュして使うのが最速パターン。存在しない名前は <span class="code-chip">KeyError</span>。</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section id="sec-robot-dof">
+  <h2>関節操作・batch_update・describe</h2>
+  <article class="api-card" id="robot-set-dof-positions"><div class="api-head"><span class="api-name">GeometricRobot.set_dof_positions</span><span class="perf-pill perf-hot">ホットパス（配列 / 事前キャッシュ index 時）</span></div><div class="sig-box">robot.set_dof_positions(
+    positions: Sequence[float] | np.ndarray | Mapping[str, float],
+    *,
+    dof_indices: Sequence[int] | np.ndarray | None = None,
+    dof_names: str | Sequence[str] | None = None,
+    unit: AngleUnit | None = None,
+) -&gt; None</div><div class="prose"><p>関節位置を設定し、リミット処理（<span class='code-chip'>limit_policy</span>）・Mimic 解決（<span class='code-chip'>resolve_mimic</span>）・順運動学（FK）・リンク姿勢書込（Fabric または USD）を一括実行します。</p></div><div class="table-wrap"><table class="ergo-table"><thead><tr><th>引数 / フィールド</th><th>型</th><th>既定値</th><th>意味・形状・単位・制約</th></tr></thead><tbody><tr><td><span class='code-chip'>positions</span></td><td><span class='code-chip'>配列 / Mapping[str, float]</span></td><td><span class='code-chip'>必須</span></td><td>次の 3 形式を受け付ける。<br>1) <strong>全 DOF 配列</strong>（長さ <span class='code-chip'>num_dofs</span>、<span class='code-chip'>(1, num_dofs)</span> も許容）<br>2) <strong>部分配列</strong>（<span class='code-chip'>dof_indices</span> または <span class='code-chip'>dof_names</span> と同じ長さ、単一要素時はスカラーも可）<br>3) <strong>名前→値の辞書</strong>（例: <span class='code-chip'>{"shoulder_pan_joint": 0.5}</span>）。辞書時は <span class='code-chip'>dof_indices</span> / <span class='code-chip'>dof_names</span> と併用不可（<span class='code-chip'>ValueError</span>）。</td></tr>
+<tr><td><span class='code-chip'>dof_indices</span></td><td><span class='code-chip'>Sequence[int] | np.ndarray | None</span></td><td><span class='code-chip'>None</span></td><td>更新対象 DOF のインデックス列。<strong>ホットループ最速経路</strong>（辞書ルックアップ無し）。<span class='code-chip'>dof_names</span> と同時指定不可。</td></tr>
+<tr><td><span class='code-chip'>dof_names</span></td><td><span class='code-chip'>str | Sequence[str] | None</span></td><td><span class='code-chip'>None</span></td><td>更新対象 DOF の名前列。内部 <span class='code-chip'>_dof_name_to_idx</span> で解決（初期化・デバッグ・低頻度向け）。存在しない名前は <span class='code-chip'>KeyError</span>。</td></tr>
+<tr><td><span class='code-chip'>unit</span></td><td><span class='code-chip'>"rad" | "deg" | None</span></td><td><span class='code-chip'>None</span></td><td>回転関節の入力単位。<span class='code-chip'>None</span> は <span class='code-chip'>robot.angle_unit</span> を使用。直動関節は常に <strong>m（<span class='code-chip'>metersPerUnit=1</span> のステージ専用）</strong>。</td></tr></tbody></table></div><div class="api-meta-grid"><div class="api-meta-box"><strong>戻り値 / 型</strong><span class='code-chip'>None</span>。</div><div class="api-meta-box"><strong>副作用・前提・落とし穴</strong><strong>1) 性能の使い分け：</strong>高頻度ループでは <span class='code-chip'>idx = robot.get_dof_indices(...)</span> をループ外でキャッシュし、配列＋<span class='code-chip'>dof_indices=idx</span>（または <span class='code-chip'>component.set_dof_positions(arr)</span>）を使うこと。辞書や <span class='code-chip'>dof_names</span> は毎回 Python 辞書探索が入る。<br><strong>2) Mimic 上書き：</strong>Mimic 従属 DOF に値を渡しても <span class='code-chip'>resolve_mimic()</span> で親 DOF から再計算される。<br><strong>3) <span class='code-chip'>batch_update()</span> 中：</strong>内部配列 <span class='code-chip'>_q</span> だけ更新し、FK と書込は <span class='code-chip'>with</span> ブロック脱出時に 1 回だけ実行される。<br><strong>4) <span class='code-chip'>debug_draw_colliders=True</span> 時：</strong>書込後に自動で <span class='code-chip'>draw_colliders()</span> を呼び出す（デバッグ用途のみ有効化すること）。</div></div><div class="code-ex"># ホットパス（最速）: 事前にインデックスをキャッシュ
+arm_idx = robot.get_dof_indices(["shoulder_pan_joint", "shoulder_lift_joint"])
+q_cmd = np.array([0.4, -0.8], dtype=np.float64)
+robot.set_dof_positions(q_cmd, dof_indices=arm_idx)
+
+# 初期化・テスト向け（可読性優先）: 辞書または dof_names
+robot.set_dof_positions({"shoulder_pan_joint": 30.0, "elbow_joint": -45.0}, unit="deg")</div></article>
+
+  <article class="api-card" id="robot-batch-update"><div class="api-head"><span class="api-name">GeometricRobot.batch_update</span><span class="perf-pill perf-hot">ホットパス最適化（FK 1 回化）</span></div><div class="sig-box">with robot.batch_update():
+    ...</div><div class="prose"><p>コンテキスト内の複数回にわたる <span class='code-chip'>set_dof_positions()</span> / <span class='code-chip'>component.set_dof_positions()</span> / <span class='code-chip'>set_world_poses()</span> の FK 計算・Mimic 解決・Fabric 書込を保留し、ブロック終了時に <strong>1 回だけ</strong>実行します。</p></div><div class="api-meta-grid"><div class="api-meta-box"><strong>戻り値 / 型</strong>コンテキストマネージャ（ネスト対応：最外のブロック終了時のみ実行）。</div><div class="api-meta-box"><strong>副作用・前提・落とし穴</strong><strong>効果：</strong>例えば 4 本アーム＋ベース（5 コンポーネント）を個別に更新する場合、通常は FK と Fabric 書込が 5 回走るが、<span class='code-chip'>with robot.batch_update():</span> で囲むと <strong>FK 1 回＋Fabric 書込 1 回</strong>に集約される。ブロック内で例外が発生した場合は保留分をフラッシュせず抜ける。</div></div><div class="code-ex">arm_a = robot.components["arm_a"]
+arm_b = robot.components["arm_b"]
+with robot.batch_update():
+    arm_a.set_dof_positions(q_a)  # _q への代入のみ
+    arm_b.set_dof_positions(q_b)  # _q への代入のみ
+# ここで FK 1 回 + Mimic 解決 1 回 + Fabric 書込 1 回が実行される</div></article>
+
+  <article class="api-card" id="robot-get-dof-and-limits"><div class="api-head"><span class="api-name">get_dof_positions / get_dof_positions_dict / get_dof_limits / set_dof_limits / *_targets</span><span class="perf-pill perf-fast">高速（内部配列参照）</span></div><div class="sig-box">robot.get_dof_positions(*, dof_indices=None, dof_names=None, unit=None) -&gt; np.ndarray
+robot.get_dof_positions_dict(*, dof_names=None, independent_only: bool = False, unit=None) -&gt; dict[str, float]
+robot.get_dof_limits(*, dof_indices=None, dof_names=None, unit=None) -&gt; tuple[np.ndarray, np.ndarray]
+robot.set_dof_limits(lower=None, upper=None, *, dof_indices=None, dof_names=None, unit=None) -&gt; None
+robot.set_dof_position_targets(positions, *, dof_indices=None, dof_names=None, unit=None) -&gt; None
+robot.get_dof_position_targets(*, dof_indices=None, dof_names=None, unit=None) -&gt; np.ndarray</div><div class="prose"><p>現在の関節位置・関節リミットの取得と更新を行います。<span class='code-chip'>set_dof_position_targets</span> / <span class='code-chip'>get_dof_position_targets</span> は Isaac Sim <span class='code-chip'>Articulation</span> との API 互換エイリアス（幾何モードでは目標値＝即座の到達位置のため <span class='code-chip'>set_dof_positions</span> / <span class='code-chip'>get_dof_positions</span> と等価）です。</p></div><div class="table-wrap"><table class="ergo-table"><thead><tr><th>引数 / フィールド</th><th>型</th><th>既定値</th><th>意味・形状・単位・制約</th></tr></thead><tbody><tr><td><span class='code-chip'>dof_indices / dof_names</span></td><td><span class='code-chip'>対象絞込</span></td><td><span class='code-chip'>None</span></td><td>省略時は全 <span class='code-chip'>num_dofs</span> 個を返す（または更新する）。同時指定は不可。</td></tr>
+<tr><td><span class='code-chip'>independent_only</span></td><td><span class='code-chip'>bool</span></td><td><span class='code-chip'>False</span></td><td><span class='code-chip'>get_dof_positions_dict()</span> 専用。<span class='code-chip'>True</span> のとき Mimic 従属 DOF を除いた独立 DOF のみ辞書化する。</td></tr>
+<tr><td><span class='code-chip'>lower / upper</span></td><td><span class='code-chip'>配列または None</span></td><td><span class='code-chip'>None</span></td><td><span class='code-chip'>set_dof_limits()</span> の下限・上限。片方だけ <span class='code-chip'>None</span> にすると他方のみ更新。</td></tr>
+<tr><td><span class='code-chip'>unit</span></td><td><span class='code-chip'>"rad" | "deg" | None</span></td><td><span class='code-chip'>None</span></td><td>回転関節の換算単位。直動関節は常に <strong>m（<span class='code-chip'>metersPerUnit=1</span> のステージ専用）</strong>。</td></tr></tbody></table></div><div class="api-meta-grid"><div class="api-meta-box"><strong>戻り値 / 型</strong><span class='code-chip'>get_dof_positions</span> は <span class='code-chip'>(M,) float64</span> 配列（コピー）、<span class='code-chip'>get_dof_limits</span> は <span class='code-chip'>(lower, upper)</span> の 2 要素タプル、<span class='code-chip'>get_dof_positions_dict</span> は <span class='code-chip'>dict[str, float]</span>。</div><div class="api-meta-box"><strong>副作用・前提・落とし穴</strong><span class='code-chip'>set_dof_limits()</span> はメモリ上の可動範囲を変更し USD ファイル自体は書き換えない。なお <span class='code-chip'>set_variant()</span> / <span class='code-chip'>rebuild()</span> で構造再構築されると、変更した可動範囲はモデルの値に戻る。</div></div></article>
+
+  <article class="api-card" id="robot-describe"><div class="api-head"><span class="api-name">GeometricRobot.describe</span><span class="perf-pill perf-debug">診断・調査用</span></div><div class="sig-box">robot.describe() -&gt; str</div><div class="prose"><p>ロボットの構造（全 DOF のインデックス・名前・型・リミット・独立/Mimic 従属関係、コンポーネント一覧とそれぞれの担当 DOF 範囲、主要設定値 <span class='code-chip'>write_target</span> / <span class='code-chip'>collision_backend</span> / <span class='code-chip'>convex_meshes</span> / <span class='code-chip'>debug_draw_colliders</span>）を人間が即座に読める整形テキストで返します。</p></div><div class="api-meta-grid"><div class="api-meta-box"><strong>戻り値 / 型</strong>複数行の診断文字列（<span class='code-chip'>print(robot.describe())</span> で利用）。</div><div class="api-meta-box"><strong>副作用・前提・落とし穴</strong>multi_arm のような多自由度ロボットで「どのインデックスがどのアームの何番軸か」「どれが Mimic 従属か」を 1 行で確認できる。</div></div></article>
+</section>
+
+<section id="sec-robot-pose-ik">
+  <h2>姿勢・ヤコビアン・既定状態・IK</h2>
+  <div class="table-wrap">
+    <table class="ergo-table">
+      <thead>
+        <tr><th>メソッド</th><th>シグネチャ・引数</th><th>戻り値・仕様・単位</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="code-chip">get_world_poses</span> / <span class="code-chip">set_world_poses</span></td>
+          <td><span class="code-chip">get_world_poses()</span><br><span class="code-chip">set_world_poses(positions=None, orientations=None)</span></td>
+          <td>ロボットベースのワールド姿勢。<span class="code-chip">get_world_poses()</span> の戻り値は <strong><span class="code-chip">(3,)</span> と <span class="code-chip">(4,)</span></strong>（位置は m、<span class="code-chip">metersPerUnit=1</span> のステージ専用、四元数は <strong><span class="code-chip">(w, x, y, z)</span></strong>）。<span class="code-chip">set_world_poses</span> は <span class="code-chip">(3,)</span> / <span class="code-chip">(1, 3)</span> と <span class="code-chip">(4,)</span> / <span class="code-chip">(1, 4)</span> を受け付け、片方 <span class="code-chip">None</span> で現在値維持、呼出後に FK＋書込を実行。</td>
+        </tr>
+        <tr>
+          <td><span class="code-chip">get_local_poses</span> / <span class="code-chip">set_local_poses</span></td>
+          <td><span class="code-chip">get_local_poses()</span><br><span class="code-chip">set_local_poses(translations=None, orientations=None)</span></td>
+          <td>ベース親 Prim 座標系でのローカル姿勢。戻り値は <span class="code-chip">(3,)</span> と <span class="code-chip">(4,)</span>（<span class="code-chip">(w, x, y, z)</span>）。</td>
+        </tr>
+        <tr>
+          <td><span class="code-chip">get_link_world_matrices</span></td>
+          <td><span class="code-chip">get_link_world_matrices()</span></td>
+          <td>全リンクの <span class="code-chip">(num_links, 4, 4) float64</span> ワールド同次変換行列（列ベクトル規約、並進は第 4 列）。</td>
+        </tr>
+        <tr>
+          <td><span class="code-chip">get_link_world_poses</span> / <span class="code-chip">get_link_local_poses</span></td>
+          <td><span class="code-chip">(*, link_indices=None)</span></td>
+          <td><span class="code-chip">(positions, orientations)</span>。形状は <span class="code-chip">(M, 3)</span> と <span class="code-chip">(M, 4)</span>（<span class="code-chip">(w, x, y, z)</span>）。</td>
+        </tr>
+        <tr>
+          <td><span class="code-chip">get_jacobian_matrices</span></td>
+          <td><span class="code-chip">get_jacobian_matrices()</span></td>
+          <td>ワールド座標系における全リンク原点の空間ヤコビアン <span class="code-chip">(num_links, 6, num_dofs) float64</span>。上 3 行が並進速度（m/s）、下 3 行が角速度（rad/s）。<strong>注意：</strong>Mimic 従動軸の列は「その軸だけを単独で動かした値」であり <span class="code-chip">mimic_matrix</span> は合成されていない。参照軸へ畳み込んだ合成済みヤコビアンが必要な場合は <span class="code-chip">robot.model.jacobian(q, reduced=True)</span> を使う。</td>
+        </tr>
+        <tr>
+          <td><span class="code-chip">set_default_state</span> / <span class="code-chip">get_default_state</span> / <span class="code-chip">reset_to_default_state</span></td>
+          <td><span class="code-chip">set_default_state(positions=None, orientations=None, dof_positions=None, *, unit=None)</span></td>
+          <td>既定ベース姿勢と既定関節値の保存・取得・一括復元。<span class="code-chip">get_default_state()</span> は <span class="code-chip">(pos, quat, q)</span> を返す。</td>
+        </tr>
+        <tr>
+          <td><span class="code-chip">get_kinematic_chain</span></td>
+          <td><span class="code-chip">(base_link: str, tip_link: str, tip_offset=None)</span></td>
+          <td>指定 2 リンク間の直列鎖 <span class="code-chip">KinematicChain</span> を抽出。<span class="code-chip">tip_offset</span> は <span class="code-chip">(4, 4)</span> ツールオフセット行列。</td>
+        </tr>
+        <tr>
+          <td><span class="code-chip">create_ik_solver</span></td>
+          <td><span class="code-chip">(name, base_link, tip_link, config=None, *, tip_offset=None)</span></td>
+          <td>登録済みソルバー名（<span class="code-chip">"jacobian"</span> / <span class="code-chip">"ikpy"</span> 等）で <span class="code-chip">IKSolver</span> を生成。</td>
+        </tr>
+        <tr>
+          <td><span class="code-chip">world_to_link_frame</span></td>
+          <td><span class="code-chip">(link: str, position, orientation=None)</span></td>
+          <td>ワールド座標の目標姿勢を <span class="code-chip">link</span>（通常は IK の <span class="code-chip">base_link</span>）ローカル座標へ変換して <span class="code-chip">(pos_local, quat_local_or_None)</span> を返す。</td>
+        </tr>
+        <tr>
+          <td><span class="code-chip">solve_ik</span></td>
+          <td><span class="code-chip">(solver: IKSolver, target_position, target_orientation=None, *, apply=True)</span></td>
+          <td>ワールド座標の目標姿勢（<span class="code-chip">target_orientation</span> は <span class="code-chip">(w, x, y, z)</span> 四元数または 3×3 回転行列）に対して IK を解き <span class="code-chip">IKResult</span> を返す。<span class="code-chip">IKResult.dof_positions</span> は <span class="code-chip">angle_unit</span> に関わらず常に <strong>rad</strong>。<span class="code-chip">apply=True</span>（既定）のとき <strong><span class="code-chip">success=True</span> の場合のみ</strong>ロボットへ反映する。</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section id="sec-robot-variant-cmd">
+  <h2>VariantSet・指令変換・構造リスナー</h2>
+  <article class="api-card" id="robot-variants"><div class="api-head"><span class="api-name">get_variants / get_variant_choices / set_variant / set_variants / rebuild / structure_listener</span><span class="perf-pill perf-cold">構成切替時（再構築あり）</span></div><div class="sig-box">robot.get_variants() -&gt; dict[str, dict[str, str]]
+robot.get_variant_choices() -&gt; dict[str, dict[str, list[str]]]
+robot.set_variant(variant_set: str, variant: str, *, prim: str | None = None) -&gt; None
+robot.set_variants(selections: Mapping[tuple[str | None, str], str]) -&gt; None
+robot.rebuild() -&gt; None
+robot.add_structure_listener(callback: Callable[[list[str], list[str]], None]) -&gt; None
+robot.remove_structure_listener(callback: Callable[[list[str], list[str]], None]) -&gt; None</div><div class="prose"><p>ロボット配下の USD VariantSet（例：グリッパー種類やアタッチメント切替）を取得・切替し、関節・リンク・コンポーネント・Newton コリジョン空間を自動再構築します。</p></div><div class="table-wrap"><table class="ergo-table"><thead><tr><th>引数 / フィールド</th><th>型</th><th>既定値</th><th>意味・形状・単位・制約</th></tr></thead><tbody><tr><td><span class='code-chip'>variant_set</span></td><td><span class='code-chip'>str</span></td><td><span class='code-chip'>必須</span></td><td>切替対象の VariantSet 名（例: <span class='code-chip'>"Gripper"</span>）。</td></tr>
+<tr><td><span class='code-chip'>variant</span></td><td><span class='code-chip'>str</span></td><td><span class='code-chip'>必須</span></td><td>選択するバリアント名（例: <span class='code-chip'>"Robotiq_2F_85"</span>）。</td></tr>
+<tr><td><span class='code-chip'>prim</span></td><td><span class='code-chip'>str | None</span></td><td><span class='code-chip'>None</span></td><td>対象 Prim パス。省略時は該当 VariantSet を持つ Prim が一意なら自動特定、複数ある場合は <span class='code-chip'>ValueError</span>。</td></tr>
+<tr><td><span class='code-chip'>selections</span></td><td><span class='code-chip'>Mapping[tuple[str | None, str], str]</span></td><td><span class='code-chip'>必須</span></td><td><span class='code-chip'>{(prim_or_None, variant_set): variant}</span> の一括切替辞書。</td></tr>
+<tr><td><span class='code-chip'>callback</span></td><td><span class='code-chip'>Callable[[list[str], list[str]], None]</span></td><td><span class='code-chip'>必須</span></td><td><span class='code-chip'>add_structure_listener()</span> のコールバック。引数は <strong><span class='code-chip'>(再構築前の DOF 名一覧, 再構築後の DOF 名一覧)</span></strong> であり、<span class='code-chip'>_rebuild()</span> の最後に呼ばれる。</td></tr></tbody></table></div><div class="api-meta-grid"><div class="api-meta-box"><strong>戻り値 / 型</strong><span class='code-chip'>get_variants()</span> は入れ子辞書 <span class='code-chip'>{prim パス: {VariantSet 名: 現在の選択}}</span>、<span class='code-chip'>get_variant_choices()</span> は <span class='code-chip'>{prim パス: {VariantSet 名: [候補, ...]}}</span>。</div><div class="api-meta-box"><strong>副作用・前提・落とし穴</strong><strong>なぜ USD 経由が必要か（USDRT 公式仕様）：</strong>VariantSet 切替は USD コンポジション層（PCP）の再評価を伴うため Fabric 単体では完結しない。本メソッドは切替直前に現在のリンク姿勢を幾何 Sublayer へ 1 回書き戻してから VariantSet を変更し（USD の旧ポーズへ瞬間的に戻ってちらつく現象を防止）、直後に <span class='code-chip'>rebuild()</span> を実行して共通 DOF 値を引き継いだうえで新構成を再構築する。さらに <span class='code-chip'>write_target="fabric"</span> 時は FSD 再ポピュレーションによる上書きを防ぐため、後続 3 フレームにわたって Fabric 姿勢を再プッシュする。なおパラメータ生成ロボット（<span class='code-chip'>from_dh</span> 等）で VariantSet 系 API を呼ぶと <span class='code-chip'>RuntimeError</span> になる。</div></div></article>
+
+  <article class="api-card" id="robot-commands"><div class="api-head"><span class="api-name">set_command_converter / remove_command_converter / active_command_converters / apply_command / read_command</span><span class="perf-pill perf-fast">変換＋DOF 更新</span></div><div class="sig-box">robot.set_command_converter(name: str, converter: GeometricCommandConverter, *, when: Mapping[tuple[str, str], str] | None = None) -&gt; None
+robot.remove_command_converter(name: str) -&gt; None
+robot.active_command_converters() -&gt; list[str]
+robot.apply_command(command: Mapping[str, float], *, unit: AngleUnit | None = None) -&gt; None
+robot.read_command() -&gt; dict[str, float]</div><div class="prose"><p>上位指令値（例: グリッパー開度 <span class='code-chip'>0.0〜1.0</span> や mm 幅）をロボットの DOF 位置へ変換するコンバータを登録・適用します。</p></div><div class="table-wrap"><table class="ergo-table"><thead><tr><th>引数 / フィールド</th><th>型</th><th>既定値</th><th>意味・形状・単位・制約</th></tr></thead><tbody><tr><td><span class='code-chip'>name</span></td><td><span class='code-chip'>str</span></td><td><span class='code-chip'>必須</span></td><td>コンバータ登録名。</td></tr>
+<tr><td><span class='code-chip'>converter</span></td><td><span class='code-chip'>GeometricCommandConverter</span></td><td><span class='code-chip'>必須</span></td><td><span class='code-chip'>LinearCommandConverter</span> / <span class='code-chip'>InterpCommandConverter</span> / <span class='code-chip'>FunctionCommandConverter</span> 等のインスタンス。</td></tr>
+<tr><td><span class='code-chip'>when</span></td><td><span class='code-chip'>Mapping[tuple[str, str], str] | None</span></td><td><span class='code-chip'>None</span></td><td>VariantSet 条件 <span class='code-chip'>{(prim, variant_set): variant}</span>。<span class='code-chip'>prim</span> はパターンではなく、<strong>ロボット Prim からの相対パスまたは絶対パス</strong>（空文字 <span class='code-chip'>""</span> はロボットのルート Prim <span class='code-chip'>root_prim_paths[0]</span>）。<strong>すべての条件が一致したときだけ</strong>有効になる。</td></tr>
+<tr><td><span class='code-chip'>command</span></td><td><span class='code-chip'>Mapping[str, float]</span></td><td><span class='code-chip'>必須</span></td><td>上位指令名または DOF 名→数値の辞書。ある有効変換器の入力キーが全部そろっていればその変換器を使い、残ったキーは DOF 名として <span class='code-chip'>unit</span> の単位で直接設定する。どちらにも該当しないキーは <span class='code-chip'>KeyError</span>、同じ DOF へ 2 箇所から書こうとすると <span class='code-chip'>ValueError</span>。</td></tr></tbody></table></div><div class="api-meta-grid"><div class="api-meta-box"><strong>戻り値 / 型</strong><span class='code-chip'>active_command_converters()</span> は現在有効な変換名の <span class='code-chip'>list[str]</span>。<span class='code-chip'>read_command()</span> は現在の関節値から逆変換した上位指令辞書 <span class='code-chip'>dict[str, float]</span>。</div><div class="api-meta-box"><strong>副作用・前提・落とし穴</strong>複数のグリッパー Variant を切り替えるロボットで、<span class='code-chip'>when</span> を付けて別々の変換式を登録しておくと、上位コードは常に同じ指令名 <span class='code-chip'>"gripper_open"</span> だけで操作できる。</div></div></article>
+</section>
+
+<section id="sec-robot-collision-vis">
+  <h2>干渉判定・フィルタ・Collider Sublayer・DebugDraw</h2>
+  <article class="api-card" id="robot-collision-methods"><div class="api-head"><span class="api-name">check_collisions / is_in_collision / compute_clearances / touching_pairs / ignore_touching_pairs / collision_filter</span><span class="perf-pill perf-fast">高速（Newton 0F 遅延）</span></div><div class="sig-box">robot.check_collisions(scope=None, *, clearance: float = 0.0, extra_filter=None, ignore_prim_paths=(), backend=None) -&gt; list[GeometricCollisionPair]
+robot.is_in_collision(scope=None, **kwargs) -&gt; bool
+robot.compute_clearances(scope=None, *, max_distance: float = 0.05, extra_filter=None, ignore_prim_paths=()) -&gt; list[GeometricCollisionPair]
+robot.touching_pairs(*, clearance: float = 0.0, backend=None) -&gt; list[GeometricCollisionPair]
+robot.ignore_touching_pairs(reason: str | None = None, *, samples: int = 0, seed: int = 0, always_ratio: float = 1.0) -&gt; list[tuple[str, str]]
+robot.collision_filter -&gt; GeometricCollisionFilter</div><div class="prose"><p>ロボットの自己干渉・環境干渉・最近接クリアランス（符号付き距離）を計算します。既定の <span class='code-chip'>collision_backend="newton"</span> では <span class='code-chip'>set_dof_positions()</span> 直後の姿勢を 0 フレーム遅延で評価できます。</p></div><div class="table-wrap"><table class="ergo-table"><thead><tr><th>引数 / フィールド</th><th>型</th><th>既定値</th><th>意味・形状・単位・制約</th></tr></thead><tbody><tr><td><span class='code-chip'>scope</span></td><td><span class='code-chip'>"within" | "environment" | "all" | None</span></td><td><span class='code-chip'>None（後記の条件で決定）</span></td><td><strong>既定値ルール：</strong><span class='code-chip'>from_articulation()</span> で既存 USD から生成したロボットで、その USD に <span class='code-chip'>physxArticulation:enabledSelfCollisions=false</span> と設定されていれば <span class='code-chip'>"environment"</span>、それ以外（DH 等のパラメータ生成を含む）は <span class='code-chip'>"all"</span>（<span class='code-chip'>compute_clearances</span> も同じ）。<br><strong>各値の範囲：</strong><br>・<span class='code-chip'>"all"</span>: <span class='code-chip'>"within"</span> と <span class='code-chip'>"environment"</span> の両方。<br>・<span class='code-chip'>"within"</span>: このロボット内の全リンク同士（同一コンポーネント内は <span class='code-chip'>kind="within_component"</span>、別コンポーネント間は <span class='code-chip'>"between_components"</span>）。<br>・<span class='code-chip'>"environment"</span>: このロボット以外の全コライダー。<strong>共有 <span class='code-chip'>GeometricScene</span> に登録された別ロボットのリンクも <span class='code-chip'>kind="environment"</span>（<span class='code-chip'>link_b=None</span>、<span class='code-chip'>path_b</span>＝相手のコライダー Prim）として検出される</strong>（<span class='code-chip'>kind="between_robots"</span> を得たい場合は <span class='code-chip'>scene.check_between()</span> を使う）。</td></tr>
+<tr><td><span class='code-chip'>clearance</span></td><td><span class='code-chip'>float</span></td><td><span class='code-chip'>0.0</span></td><td>安全マージン（m、<span class='code-chip'>metersPerUnit=1</span> のステージ専用）。<span class='code-chip'>separation &lt;= clearance</span> のペアを干渉として返す。</td></tr>
+<tr><td><span class='code-chip'>max_distance</span></td><td><span class='code-chip'>float</span></td><td><span class='code-chip'>0.05</span></td><td><span class='code-chip'>compute_clearances()</span> の探索上限距離（m、<span class='code-chip'>metersPerUnit=1</span> のステージ専用）。距離昇順（負＝めり込み先頭）で返す。</td></tr>
+<tr><td><span class='code-chip'>extra_filter</span></td><td><span class='code-chip'>Callable[[str, str], bool] | None</span></td><td><span class='code-chip'>None</span></td><td>追加ペア除外関数（<span class='code-chip'>True</span> を返すと除外）。</td></tr>
+<tr><td><span class='code-chip'>ignore_prim_paths</span></td><td><span class='code-chip'>Sequence[str]</span></td><td><span class='code-chip'>()</span></td><td>一時的に無視する環境 Prim パス（配下も含む）。</td></tr>
+<tr><td><span class='code-chip'>backend</span></td><td><span class='code-chip'>"newton" | "physx" | None</span></td><td><span class='code-chip'>None</span></td><td>一時的なバックエンド上書き。</td></tr>
+<tr><td><span class='code-chip'>reason / samples / seed / always_ratio</span></td><td><span class='code-chip'>ignore_touching_pairs 引数</span></td><td><span class='code-chip'>None / 0 / 0 / 1.0</span></td><td>検出した重なりペアを <span class='code-chip'>collision_filter</span> に追加し、追加した <span class='code-chip'>(link_a, link_b)</span> 一覧を返す。<span class='code-chip'>samples=0</span> は現在 1 姿勢の重なりを全登録（既定理由ラベル <span class='code-chip'>"touching_at_setup"</span>）。<span class='code-chip'>samples &gt; 0</span> はランダム姿勢で <span class='code-chip'>always_ratio</span> 以上の割合で常に重なる組のみ登録（既定理由ラベル <span class='code-chip'>"always_touching"</span>）。取り消しは <span class='code-chip'>robot.collision_filter.remove_by_reason(reason)</span>。</td></tr></tbody></table></div><div class="api-meta-grid"><div class="api-meta-box"><strong>戻り値 / 型</strong><span class='code-chip'>list[GeometricCollisionPair]</span>（<span class='code-chip'>is_in_collision</span> は <span class='code-chip'>bool</span>、<span class='code-chip'>ignore_touching_pairs</span> は <span class='code-chip'>list[tuple[str, str]]</span>）。</div><div class="api-meta-box"><strong>副作用・前提・落とし穴</strong><strong>1) <span class='code-chip'>touching_pairs()</span> の用途：</strong>診断用に <span class='code-chip'>collision_filter</span> を一時的に空にして、ロボット内で現在重なっている全リンク組を返す。<br><strong>2) <span class='code-chip'>robot.collision_filter</span> の即時反映と再構築：</strong>ロボットが内部保持するフィルタ本体を返すため、<span class='code-chip'>add_pair()</span> 等の変更は次の判定から即座に効く。<span class='code-chip'>add_pattern()</span> は大文字小文字を区別する <span class='code-chip'>fnmatch.fnmatchcase</span> 記法（組の順序不問）。<span class='code-chip'>_rebuild()</span> 時は自動登録ルール（<span class='code-chip'>"adjacent"</span>・<span class='code-chip'>"mount"</span>・<span class='code-chip'>"usd_filtered_pairs"</span>）だけを作り直し、利用者が追加したルールは保持される。<br><strong>3) 1 パス高速化：</strong>干渉とクリアランスの両方が必要なら <span class='code-chip'>pairs = robot.compute_clearances(max_distance=0.05)</span> 1 回から <span class='code-chip'>sep &lt;= 0.0</span> で分類する。</div></div></article>
+
+  <article class="api-card" id="robot-convex-and-debug-draw"><div class="api-head"><span class="api-name">convex_meshes / debug_draw_colliders / draw_colliders / clear_collider_debug_draw</span><span class="perf-pill perf-debug">設定切替 / デバッグ可視化</span></div><div class="sig-box">robot.convex_meshes -&gt; bool          # 読取・実行時切替可（True=Convex Hull / False=生三角メッシュ）
+robot.debug_draw_colliders -&gt; bool   # 読取・実行時切替可（既定 False = 負荷 0）
+robot.draw_colliders(
+    pairs: Sequence[GeometricCollisionPair] | None = None,
+    *,
+    include_environment: bool = True,
+    clear: bool = True,
+    sync_robots: bool = True,
+    sync_env: bool = True,
+) -&gt; int
+robot.clear_collider_debug_draw() -&gt; None</div><div class="prose"><p>Newton 衝突形状の近似方式（<span class='code-chip'>convex_meshes</span>）の実行時切替と、Newton 空間で実際に使われているコライダー形状＋干渉箇所を Viewport へオーバーレイ描画するデバッグ機能です。</p></div><div class="table-wrap"><table class="ergo-table"><thead><tr><th>引数 / フィールド</th><th>型</th><th>既定値</th><th>意味・形状・単位・制約</th></tr></thead><tbody><tr><td><span class='code-chip'>convex_meshes</span></td><td><span class='code-chip'>bool</span></td><td><span class='code-chip'>True</span></td><td><span class='code-chip'>True</span>: <span class='code-chip'>UsdGeom.Mesh</span> を単一 Convex Hull 化。<span class='code-chip'>False</span>: 三角メッシュをそのまま使用（凹み・穴に対応、水密閉メッシュ必須）。値を変更すると紐付く <span class='code-chip'>GeometricScene</span> が自動で再構築される。</td></tr>
+<tr><td><span class='code-chip'>debug_draw_colliders</span></td><td><span class='code-chip'>bool</span></td><td><span class='code-chip'>False</span></td><td><span class='code-chip'>True</span> にすると <span class='code-chip'>set_dof_positions()</span> / <span class='code-chip'>check_collisions()</span> 実行時に自動で <span class='code-chip'>draw_colliders()</span> を呼ぶ。<span class='code-chip'>False</span> に戻すと直ちに <span class='code-chip'>clear_collider_debug_draw()</span> で描画を消去し、以降オーバーヘッド 0 に戻る。</td></tr>
+<tr><td><span class='code-chip'>pairs</span></td><td><span class='code-chip'>Sequence[GeometricCollisionPair] | None</span></td><td><span class='code-chip'>None</span></td><td>明示指定した場合はその干渉ペアを強調表示する。<strong><span class='code-chip'>None</span> の場合は直前の <span class='code-chip'>check_collisions()</span> / <span class='code-chip'>compute_clearances()</span> の結果を再利用する</strong>（未実行なら通常色で描画）。</td></tr>
+<tr><td><span class='code-chip'>include_environment</span></td><td><span class='code-chip'>bool</span></td><td><span class='code-chip'>True</span></td><td>環境障害物コライダーも描画対象に含めるか。</td></tr></tbody></table></div><div class="api-meta-grid"><div class="api-meta-box"><strong>戻り値 / 型</strong><span class='code-chip'>draw_colliders()</span> は<strong>描いたコライダー数（<span class='code-chip'>int</span>）</strong>を返す。<span class='code-chip'>clear_collider_debug_draw()</span> は <span class='code-chip'>None</span>。</div><div class="api-meta-box"><strong>副作用・前提・落とし穴</strong><strong>固定の可視化配色：</strong>通常コライダー＝<span class='swatch sw-cyan'><span class='swatch-dot'></span>シアン (0.0, 0.9, 1.0)</span>（PhysX 動的剛体の緑と重複回避）、干渉中コライダー＝<span class='swatch sw-red'><span class='swatch-dot'></span>赤 (1.0, 0.15, 0.15)</span>、接触点マーカー＆貫通線分＝<span class='swatch sw-orange'><span class='swatch-dot'></span>オレンジ (1.0, 0.55, 0.0)</span>（赤ワイヤーフレームと重複回避）。<br><strong>重要（Viewport 標準表示との違い）：</strong>Isaac Sim 標準メニュー <span class='ui-chip'>Show by Type &gt; Physics &gt; Colliders</span> は USD / PhysX 側のデータを読むため、<span class='code-chip'>write_target="fabric"</span> で動かしたロボットのピンク表示は初期位置に留まる。Fabric 運転中の実際の衝突形状を確認するには必ず本メソッドを使うこと。</div></div><div class="code-ex"># デバッグ時だけ可視化を ON にして確認し、本番ループでは OFF に戻す
+robot.debug_draw_colliders = True
+hits = robot.check_collisions()   # 干渉コライダーが赤・接触点がオレンジで描画される
+...
+robot.debug_draw_colliders = False  # 描画を消去し、以降のオーバーヘッドはゼロ</div></article>
+
+  <article class="api-card" id="robot-collider-sublayers"><div class="api-head"><span class="api-name">collider_paths / collider_version / collider_layers / refresh_colliders / reload_colliders / attach・set・detach_collider_layer</span><span class="perf-pill perf-cold">コライダー構成変更時</span></div><div class="sig-box">robot.collider_paths -&gt; dict[str, list[str]]
+robot.collider_version -&gt; int
+robot.collider_layers -&gt; list[str]
+robot.refresh_colliders() -&gt; None
+robot.reload_colliders() -&gt; dict[str, list[str]]
+robot.attach_collider_layer(layer_or_path, *, target: LayerTarget = "session") -&gt; str
+robot.set_collider_layer_enabled(layer_or_path, enabled: bool) -&gt; None
+robot.detach_collider_layer(layer_or_path=None) -&gt; bool</div><div class="prose"><p>ロボットに別 USD レイヤー（例：安全マージンを膨らませた簡易コライダー層や、別設計のワーク干渉体）を動的に付け外し・ON/OFF 切り替えし、Newton コリジョン空間へ即座に反映します。</p></div><div class="table-wrap"><table class="ergo-table"><thead><tr><th>引数 / フィールド</th><th>型</th><th>既定値</th><th>意味・形状・単位・制約</th></tr></thead><tbody><tr><td><span class='code-chip'>layer_or_path</span></td><td><span class='code-chip'>str | PathLike | Sdf.Layer | None</span></td><td><span class='code-chip'>必須（detach は None 可）</span></td><td>外部 USD コライダーレイヤーのファイルパス・<span class='code-chip'>Sdf.Layer</span>・または <span class='code-chip'>attach_collider_layer()</span> が返した識別子。<span class='code-chip'>detach_collider_layer(None)</span> は取り付けた全レイヤーを外す。</td></tr>
+<tr><td><span class='code-chip'>target</span></td><td><span class='code-chip'>"session" | "root"</span></td><td><span class='code-chip'>"session"</span></td><td>差し込み先サブレイヤー。通常は元ファイルを汚さない <span class='code-chip'>"session"</span> を使う。</td></tr>
+<tr><td><span class='code-chip'>enabled</span></td><td><span class='code-chip'>bool</span></td><td><span class='code-chip'>必須</span></td><td>差し込んだコライダーレイヤーの有効 / 無効切替。</td></tr></tbody></table></div><div class="api-meta-grid"><div class="api-meta-box"><strong>戻り値 / 型</strong>・<span class='code-chip'>collider_paths</span>: <span class='code-chip'>dict[str, list[str]]</span>（リンク名 → コライダー Prim パス一覧）。<br>・<span class='code-chip'>collider_layers</span>: 取付中のレイヤー識別子一覧 <span class='code-chip'>list[str]</span>。<br>・<span class='code-chip'>refresh_colliders()</span>: <span class='code-chip'>None</span>（キャッシュを捨てて再構築フラグを立てるのみ）。<br>・<span class='code-chip'>reload_colliders()</span>: キャッシュを捨てて読み直した <span class='code-chip'>dict[str, list[str]]</span>。<br>・<span class='code-chip'>attach_collider_layer()</span>: <span class='code-chip'>Sdf.Layer.identifier</span>（<span class='code-chip'>str</span>）。<span class='code-chip'>set_collider_layer_enabled()</span> / <span class='code-chip'>detach_collider_layer()</span> へそのまま渡せる。<br>・<span class='code-chip'>detach_collider_layer()</span>: 1 つ以上外せたら <span class='code-chip'>True</span> を返す <span class='code-chip'>bool</span>。</div><div class="api-meta-box"><strong>副作用・前提・落とし穴</strong>コライダーが変化すると <span class='code-chip'>collider_version</span> が増加し、<span class='code-chip'>GeometricScene</span> が自動的に再構築される。ファイルが開けない場合は <span class='code-chip'>FileNotFoundError</span>。</div></div></article>
+</section>
+
+<section id="sec-robot-lifecycle">
+  <h2>書込先・flush_to_usd・refresh・close</h2>
+  <div class="table-wrap">
+    <table class="ergo-table">
+      <thead>
+        <tr><th>プロパティ / メソッド</th><th>シグネチャ</th><th>仕様・注意点</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="code-chip">write_target</span></td>
+          <td><span class="code-chip">robot.write_target = "fabric" | "usd" | "both"</span></td>
+          <td>実行時に書込先を切替。<span class="code-chip">"fabric"</span> から <span class="code-chip">"usd"</span> / <span class="code-chip">"both"</span> へ切り替えると以降の更新が Sublayer にも反映される。</td>
+        </tr>
+        <tr>
+          <td><span class="code-chip">collision_backend</span> / <span class="code-chip">fk_backend</span></td>
+          <td>読取 / 書込プロパティ</td>
+          <td><span class="code-chip">"newton"</span> / <span class="code-chip">"physx"</span>（干渉）、<span class="code-chip">"auto"</span> / <span class="code-chip">"numpy"</span> / <span class="code-chip">"newton"</span>（FK）を実行時に切替。</td>
+        </tr>
+        <tr>
+          <td><span class="code-chip">scene</span> / <span class="code-chip">collision_filter</span> / <span class="code-chip">link_set</span> / <span class="code-chip">collision_checker</span></td>
+          <td>読取プロパティ</td>
+          <td>内部の <span class="code-chip">GeometricScene</span>・<span class="code-chip">GeometricCollisionFilter</span>・<span class="code-chip">GeometricLinkSet</span>・<span class="code-chip">GeometricCollisionChecker</span> へ直接アクセス。</td>
+        </tr>
+        <tr>
+          <td><span class="code-chip">flush_to_usd()</span></td>
+          <td><span class="code-chip">robot.flush_to_usd() -> bool</span></td>
+          <td><span class="code-chip">write_target="fabric"</span> で更新した現在の全リンク姿勢を、幾何 Sublayer（USD）へ 1 回だけ書き戻す（実際に書いたら <span class="code-chip">True</span>）。USD エクスポートや <span class="ui-chip">Show by Type &gt; Physics &gt; Colliders</span> で静止確認したいときに使用。</td>
+        </tr>
+        <tr>
+          <td><span class="code-chip">refresh()</span></td>
+          <td><span class="code-chip">robot.refresh() -> None</span></td>
+          <td>親 Prim 側の外部移動やスケール変更を <span class="code-chip">LocalPoseSolver</span> に再同期し、現在関節値で姿勢を再書込する。</td>
+        </tr>
+        <tr>
+          <td><span class="code-chip">close()</span></td>
+          <td><span class="code-chip">robot.close(*, remove_layer: bool = True) -> None</span></td>
+          <td>DebugDraw 消去・Collider Sublayer 解除・<span class="code-chip">GeometricScene</span> 解放・<span class="code-chip">GeometricLayer</span> 除去（<span class="code-chip">remove_layer=True</span> 時）を実行する。<strong>ライフサイクル仕様：</strong><br>1) 2 回呼んでも安全（2 回目は何もしない）。<span class="code-chip">close()</span> 後のロボットは再利用できないため作り直すこと。<br>2) 自動生成した <span class="code-chip">GeometricScene</span> は <span class="code-chip">close()</span> で閉じるが、外部から渡した共有 <span class="code-chip">scene</span> はこのロボットの登録を外すだけ。<br>3) <span class="code-chip">close()</span> を呼ばずに別ステージを開くと、毎フレームの更新処理が自動検知して購読を止める（それ以降の API 呼出動作は非保証）。<br>4) <span class="code-chip">set_dof_limits()</span> で変更した可動範囲は、再構築（<span class="code-chip">rebuild()</span>）されるとモデルの値へ戻る。</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section id="sec-component">
+  <h2>GeometricRobotComponent</h2>
+  <div class="prose">
+    <p><span class="code-chip">GeometricRobotComponent</span> は、1 台の複合ロボット（例：<span class="code-chip">multi_arm</span> のベース＋4 本のアーム＋各グリッパー）のうち <strong>特定部位のリンク群と DOF 群だけを切り出して扱う軽量ハンドル</strong>です。独自の配列や FK を重複保持せず、内部では親 <span class="code-chip">GeometricRobot</span> の <span class="code-chip">dof_indices</span> スライスへ直接委譲するため、ホットループでの追加コストはほぼゼロです。</p>
+  </div>
+
+  <article class="api-card" id="robot-components-access"><div class="api-head"><span class="api-name">robot.components / robot.component_names / robot.get_component(name)</span><span class="perf-pill perf-hot">事前生成済み（O(1) 参照）</span></div><div class="sig-box">robot.component_names -&gt; list[str]
+robot.components -&gt; dict[str, GeometricRobotComponent]
+robot.get_component(name: str) -&gt; GeometricRobotComponent</div><div class="prose"><p><span class='code-chip'>GeometricRobot</span> 生成時（および <span class='code-chip'>rebuild()</span> 後）に自動構築されたコンポーネント群へアクセスします。</p></div><div class="api-meta-grid"><div class="api-meta-box"><strong>副作用・前提・落とし穴</strong><strong>自動生成の優先順位と <span class='code-chip'>IsaacRobotAPI</span> コンポーネント名の決まり方：</strong><br>1) <span class='code-chip'>UsdArticulationSource(components=...)</span> または <span class='code-chip'>model.attach()</span> による明示定義があればそれを使用。<br>2) 未指定かつ <span class='code-chip'>auto_components=True</span>（既定）のとき、USD 内の <span class='code-chip'>IsaacRobotAPI</span> Prim から自動生成する。<br>・<strong>リンク帰属先：</strong><span class='code-chip'>isaac:physics:robotLinks</span> による明示参照（子 <span class='code-chip'>IsaacRobotAPI</span> への参照は除く）があれば優先し、無ければ最深の祖先 <span class='code-chip'>IsaacRobotAPI</span> Prim へ割り当てる。<br>・<strong>コンポーネント名：</strong><span class='code-chip'>isaac:namespace</span> 属性（空白を除いて空でなければ前後 <span class='code-chip'>/</span> を除去して採用）または Prim 名を基本名とする。同じ基本名が複数 Prim で衝突した場合は、<span class='code-chip'>from_articulation()</span> へ渡したロボットルート Prim からの相対パス（ルート配下外なら先頭 <span class='code-chip'>/</span> を除いたフルパス）へ切り替え、さらに重複すれば <span class='code-chip'>_0</span>, <span class='code-chip'>_1</span>, ... で一意化する。<br>・<strong>命名例 1：</strong><span class='code-chip'>/World/Robot/arm0</span>（<span class='code-chip'>isaac:namespace</span> なし）→ <span class='code-chip'>"arm0"</span>。<br>・<strong>命名例 2：</strong><span class='code-chip'>/World/Robot/arm0/gripper</span> と <span class='code-chip'>/World/Robot/arm1/gripper</span> がどちらも <span class='code-chip'>"gripper"</span> → <span class='code-chip'>"arm0/gripper"</span> と <span class='code-chip'>"arm1/gripper"</span>。</div></div></article>
+
+  <article class="api-card" id="component-methods"><div class="api-head"><span class="api-name">GeometricRobotComponent 全プロパティ・メソッド</span><span class="perf-pill perf-hot">ホットパス推奨</span></div><div class="sig-box">comp.robot -&gt; GeometricRobot
+comp.link_names -&gt; tuple[str, ...]
+comp.link_paths -&gt; list[str]
+comp.dof_indices -&gt; np.ndarray              # 親 robot 内の DOF インデックス列 (D_comp,)
+comp.num_dofs -&gt; int
+comp.dof_names -&gt; list[str]
+comp.independent_dof_indices -&gt; np.ndarray  # このコンポーネント内のローカル番号 (0 .. comp.num_dofs - 1)
+comp.independent_dof_names -&gt; list[str]
+comp.link_set -&gt; GeometricLinkSet
+
+comp.set_dof_positions(positions, *, dof_indices=None, dof_names=None, unit=None) -&gt; None
+comp.get_dof_positions(*, dof_indices=None, dof_names=None, unit=None) -&gt; np.ndarray
+comp.get_dof_positions_dict(*, dof_names=None, independent_only=False, unit=None) -&gt; dict[str, float]
+comp.get_dof_limits(*, dof_indices=None, dof_names=None, unit=None) -&gt; tuple[np.ndarray, np.ndarray]
+comp.get_link_world_poses() -&gt; tuple[np.ndarray, np.ndarray]
+comp.get_variants() -&gt; dict[str, dict[str, str]]
+comp.set_variant(variant_set: str, variant: str, *, prim=None) -&gt; None
+comp.check_collisions(scope=None, *, clearance=0.0, extra_filter=None, ignore_prim_paths=(), backend=None) -&gt; list[GeometricCollisionPair]
+comp.compute_clearances(scope=None, *, max_distance=0.05, extra_filter=None, ignore_prim_paths=()) -&gt; list[GeometricCollisionPair]
+comp.is_in_collision(scope=None, **kwargs) -&gt; bool</div><div class="prose"><p>コンポーネント単位で関節設定・取得・リミット取得・VariantSet 切替・干渉チェックを行います。</p></div><div class="api-meta-grid"><div class="api-meta-box"><strong>副作用・前提・落とし穴</strong><strong>1) 番号系の違いに注意：</strong><span class='code-chip'>comp.dof_indices</span> は<strong>親 <span class='code-chip'>robot</span> 内の DOF 番号</strong>だが、<span class='code-chip'>comp.independent_dof_indices</span> は<strong>このコンポーネント内のローカル番号（<span class='code-chip'>0 .. comp.num_dofs - 1</span>）</strong>であり、<span class='code-chip'>comp.set_dof_positions(q_ind, dof_indices=comp.independent_dof_indices)</span> へそのまま渡せる。<br><strong>2) <span class='code-chip'>comp.check_collisions</span> の <span class='code-chip'>scope</span>：</strong><span class='code-chip'>"within"</span> はこのコンポーネント内のリンク同士のみ、<span class='code-chip'>"environment"</span> はロボット全体の外側のみを見るため、<strong>同じロボット内の別コンポーネント同士の干渉は <span class='code-chip'>comp.check_collisions()</span> には出ない</strong>（コンポーネント間干渉は <span class='code-chip'>robot.check_collisions("within")</span> または <span class='code-chip'>scene.check_between(comp_a.link_set, comp_b.link_set)</span> を使う）。<br><strong>3) 複数部位の同時更新：</strong><span class='code-chip'>with robot.batch_update():</span> で囲むことで FK を 1 回に集約できる。</div></div><div class="code-ex"># multi_arm (54 DOF) でも、左アーム (6 DOF) だけを 6 要素配列で操作
+left = robot.components["left_arm"]
+right = robot.components["right_arm"]
+
+with robot.batch_update():
+    left.set_dof_positions([0.0, -1.2, 1.5, -1.8, -1.57, 0.0])
+    right.set_dof_positions([0.0, -1.2, 1.5, -1.8, -1.57, 0.0])
+
+# 左アーム配下の VariantSet だけを切り替え
+left.set_variant("Gripper", "Robotiq_2F_85")</div></article>
+</section>
+
+<section id="sec-joint-link-err">
+  <h2>GeometricJoint / GeometricLink / 例外</h2>
+  <div class="table-wrap">
+    <table class="ergo-table">
+      <thead>
+        <tr><th>クラス</th><th>プロパティ / メソッド</th><th>仕様</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="code-chip">GeometricJoint</span></td>
+          <td><span class="code-chip">name</span>, <span class="code-chip">is_dof</span>, <span class="code-chip">dof_index</span>, <span class="code-chip">get_position(unit=None)</span>, <span class="code-chip">set_position(value, unit=None)</span>, <span class="code-chip">get_limits(unit=None)</span></td>
+          <td>単一関節のオブジェクトラッパー（<span class="code-chip">robot.joints[name]</span> で取得）。<span class="code-chip">fixed</span> 関節では <span class="code-chip">is_dof == False</span>, <span class="code-chip">dof_index == None</span>。</td>
+        </tr>
+        <tr>
+          <td><span class="code-chip">GeometricLink</span></td>
+          <td><span class="code-chip">name</span>, <span class="code-chip">prim_path</span>, <span class="code-chip">get_world_pose()</span>, <span class="code-chip">get_world_matrix()</span></td>
+          <td>単一リンクのオブジェクトラッパー（<span class="code-chip">robot.links[name]</span> で取得）。<span class="code-chip">get_world_pose()</span> は <span class="code-chip">(pos (3,), quat (4,) wxyz)</span> を返す。</td>
+        </tr>
+        <tr>
+          <td><span class="code-chip">GeometricStructureChangedError</span></td>
+          <td><span class="code-chip">RuntimeError</span> サブクラス</td>
+          <td><span class="code-chip">set_variant()</span> / <span class="code-chip">rebuild()</span> による構造再構築の前に作成した <span class="code-chip">KinematicChain</span> / <span class="code-chip">IKSolver</span> / <span class="code-chip">GeometricRobotView</span> を使用したときに送出される。再生成して復旧する。</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section id="sec-sources">
+  <h2>公式出典・同梱ソース・実機検証の切り分け</h2>
+  <ul class="source-list">
+    <li>
+      <span class="source-tag official">同梱公式 Doc</span><span class="source-tag web">Web 公式</span>
+      <strong>USD / Fabric / USDRT Population（合成前 VariantSet は USD 必須・FSD 遅延同期・2 面キャッシュ）</strong>：<br>
+      <span class="code-chip">C:\isaacsim-6.2.0\extscache\usdrt.scenegraph-7.6.3...\docs\fabricsd\fsd_vs_omnihydra.md</span>・<span class="code-chip">fabric_overview.rst</span>・<span class="code-chip">fabric_hierarchy.rst</span> ／
+      <a href="https://docs.omniverse.nvidia.com/kit/docs/usdrt.scenegraph/latest/index.html" target="_blank" rel="noopener">Omniverse USDRT / Fabric Documentation</a>
+    </li>
+    <li>
+      <span class="source-tag official">同梱公式スキーマ</span>
+      <strong>IsaacRobotAPI（<code>isaac:physics:robotLinks</code> / <code>robotJoints</code> / 入れ子サブロボット構成）</strong>：<br>
+      <span class="code-chip">C:\isaacsim-6.2.0\exts\isaacsim.robot.schema\pip_prebundle\usd\schema\isaac\robot_schema\RobotSchema.usda</span>
+    </li>
+    <li>
+      <span class="source-tag official">同梱公式 Doc</span><span class="source-tag web">Web 公式</span>
+      <strong>PhysX 5（Articulation・MimicJoint・Scene Queries CPU 実行・Contact Reports・Collider 可視化色）</strong>：<br>
+      <span class="code-chip">C:\isaacsim-6.2.0\extscache\omni.physx.ui-110.4.4...\docs\dev_guide\collision_debug_vis.rst</span>・<span class="code-chip">viewport_overlays.rst</span>・<span class="code-chip">physics_debug_wnd.rst</span>・<span class="code-chip">omni.physx-110.4.4...\docs\dev_guide\scene_queries.rst</span> ／
+      <a href="https://nvidia-omniverse.github.io/PhysX/physx/5.4.1/index.html" target="_blank" rel="noopener">NVIDIA PhysX 5.4.1 SDK Documentation</a>
+    </li>
+    <li>
+      <span class="source-tag web">Web 公式</span><span class="source-tag official">同梱公式ソース</span>
+      <strong>Newton 1.6.1（<code>eval_fk</code>・<code>CollisionPipeline</code>・<code>GeoType.MESH</code> / <code>CONVEX_MESH</code>・<code>sdf_contact.py</code>）＆ Warp</strong>：<br>
+      <span class="code-chip">C:\isaacsim-6.2.0\exts\isaacsim.pip.newton\pip_prebundle\newton[sim]\newton-1.6.1-py3-none-any\newton\_src\sim\collide.py</span>・<span class="code-chip">geometry\narrow_phase.py</span>・<span class="code-chip">geometry\sdf_contact.py</span> ／
+      <a href="https://newton-physics.github.io/newton/1.6.1/guide/overview.html" target="_blank" rel="noopener">Newton 1.6.1 Documentation</a>・<a href="https://nvidia.github.io/warp/" target="_blank" rel="noopener">NVIDIA Warp Documentation</a>
+    </li>
+    <li>
+      <span class="source-tag official">同梱公式ソース</span>
+      <strong>Isaac Sim Experimental Articulation API・DebugDraw（RTX オーバーレイ描画）</strong>：<br>
+      <span class="code-chip">C:\isaacsim-6.2.0\exts\isaacsim.core.experimental.prims\...\articulation.py</span>・<span class="code-chip">extscache\isaacsim.util.debug_draw-3.2.8...\docs\Overview.md</span>
+    </li>
+    <li>
+      <span class="source-tag empirical">実機検証</span>
+      <strong>Isaac Sim 6.2.0（RTX 3060）での全テスト・U 字凹メッシュ実測</strong>：<br>
+      <span class="code-chip">tests_pure/</span>（73 本全通過）・<span class="code-chip">tests_kit/run_kit_tests.py</span>（34 本全通過）・U 字水密メッシュ対実測（<span class="code-chip">convex_meshes=True</span>: 溝誤検知 1 件 / 5 cm 貫通時 −0.45 m / 2.35 ms 対 <span class="code-chip">convex_meshes=False</span>: 溝非接触 0 件 / 5 cm 貫通時 −0.0500 m / 2.39 ms）。
+    </li>
+  </ul>
+</section>
+
+
+  </main>
+</div>
+<svg id="ref-connector-layer" style="position:fixed;inset:0;width:100vw;height:100vh;pointer-events:none;z-index:9990;"></svg>
+<button id="ref-return-btn" type="button">↩ 元の位置へ戻る</button>
+<script>
+(() => {
+  const svgLayer = document.getElementById('ref-connector-layer');
+  const returnBtn = document.getElementById('ref-return-btn');
+  let savedScrollY = null;
+  const colorMap = { '1': '#2563eb', '2': '#059669', '3': '#d97706', '4': '#7c3aed', '5': '#db2777' };
+  const isInViewport = (el) => {
+    const r = el.getBoundingClientRect();
+    return r.width > 0 && r.height > 0 && r.top >= 0 && r.bottom <= window.innerHeight && r.left >= 0 && r.right <= window.innerWidth;
+  };
+  const clearLines = () => { if (svgLayer) svgLayer.innerHTML = ''; };
+  const drawConnector = (fromEl, toEl) => {
+    if (!svgLayer || !isInViewport(fromEl) || !isInViewport(toEl)) return;
+    const a = fromEl.getBoundingClientRect(), b = toEl.getBoundingClientRect();
+    const x1 = a.left + a.width / 2, y1 = a.top + a.height / 2;
+    const x2 = b.left + b.width / 2, y2 = b.top + b.height / 2;
+    const mx = (x1 + x2) / 2;
+    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    path.setAttribute('d', `M ${x1} ${y1} C ${mx} ${y1}, ${mx} ${y2}, ${x2} ${y2}`);
+    path.setAttribute('fill', 'none');
+    path.setAttribute('stroke', colorMap[fromEl.dataset.color] || '#2563eb');
+    path.setAttribute('stroke-width', '2');
+    path.setAttribute('stroke-dasharray', '4 3');
+    path.setAttribute('opacity', '0.72');
+    svgLayer.appendChild(path);
+  };
+  const setActive = (refId, originEl) => {
+    const peers = Array.from(document.querySelectorAll(`[data-ref="${CSS.escape(refId)}"]`));
+    const scopes = new Set();
+    peers.forEach((el) => { el.classList.add('is-active'); const sc = el.closest('[data-ref-scope]'); if (sc) scopes.add(sc); });
+    scopes.forEach((sc) => sc.classList.add('is-dimming'));
+    clearLines();
+    if (originEl) peers.filter((el) => el !== originEl).forEach((peer) => drawConnector(originEl, peer));
+  };
+  const clearActive = () => {
+    document.querySelectorAll('[data-ref].is-active').forEach((el) => el.classList.remove('is-active'));
+    document.querySelectorAll('[data-ref-scope].is-dimming').forEach((sc) => sc.classList.remove('is-dimming'));
+    clearLines();
+  };
+  document.querySelectorAll('[data-ref]').forEach((el) => {
+    const refId = el.dataset.ref;
+    el.addEventListener('mouseenter', () => setActive(refId, el));
+    el.addEventListener('mouseleave', clearActive);
+    el.addEventListener('focus', () => setActive(refId, el));
+    el.addEventListener('blur', clearActive);
+    el.addEventListener('click', () => {
+      const peers = Array.from(document.querySelectorAll(`[data-ref="${CSS.escape(refId)}"]`)).filter((p) => p !== el);
+      if (peers.length === 0) return;
+      const target = peers.find((p) => p.dataset.refRole !== el.dataset.refRole) || peers[0];
+      if (!isInViewport(target) && returnBtn) { savedScrollY = window.scrollY; returnBtn.classList.add('is-visible'); }
+      target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      target.classList.remove('is-pulsing'); void target.offsetWidth; target.classList.add('is-pulsing');
+    });
+  });
+  if (returnBtn) {
+    returnBtn.addEventListener('click', () => {
+      if (savedScrollY !== null) { window.scrollTo({ top: savedScrollY, behavior: 'smooth' }); savedScrollY = null; }
+      returnBtn.classList.remove('is-visible');
+    });
+  }
+  const tocLinks = Array.from(document.querySelectorAll('.toc a[href^="#"]'));
+  const sections = tocLinks.map((a) => document.querySelector(a.getAttribute('href'))).filter(Boolean);
+  if (sections.length > 0) {
+    const obs = new IntersectionObserver((entries) => {
+      entries.forEach((e) => {
+        if (!e.isIntersecting) return;
+        tocLinks.forEach((a) => a.classList.toggle('is-current', a.getAttribute('href') === `#${e.target.id}`));
+      });
+    }, { rootMargin: '-14% 0px -75% 0px' });
+    sections.forEach((s) => obs.observe(s));
+  }
+  const filterInput = document.getElementById('api-filter-input');
+  const filterStatus = document.getElementById('api-filter-status');
+  if (filterInput) {
+    const cards = Array.from(document.querySelectorAll('.api-card'));
+    const runFilter = () => {
+      const q = filterInput.value.trim().toLowerCase();
+      let shown = 0;
+      cards.forEach((c) => {
+        const hit = !q || c.textContent.toLowerCase().includes(q);
+        c.classList.toggle('is-hidden', !hit);
+        if (hit) shown += 1;
+      });
+      if (filterStatus) filterStatus.textContent = q ? `${shown} / ${cards.length} 件表示` : `全 ${cards.length} 件`;
+    };
+    filterInput.addEventListener('input', runFilter);
+    runFilter();
+  }
+})();
+</script>
+</body>
+</html>

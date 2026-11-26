@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>API 仕様: Model / USD / IK / 指令変換 — myext.robot.geometric_newton</title>
+<style>
+:root {
+  --bg: #ffffff;
+  --surface: #f8fafc;
+  --surface-2: #f1f5f9;
+  --text: #1e293b;
+  --text-strong: #0f172a;
+  --muted: #64748b;
+  --border: #cbd5e1;
+  --border-light: #e2e8f0;
+  --c1: #2563eb; --c1-bg: #dbeafe;
+  --c2: #059669; --c2-bg: #d1fae5;
+  --c3: #d97706; --c3-bg: #fef3c7;
+  --c4: #7c3aed; --c4-bg: #ede9fe;
+  --c5: #db2777; --c5-bg: #fce7f3;
+}
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  font-family: "Segoe UI", "Hiragino Kaku Gothic ProN", "Yu Gothic UI", Meiryo, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.78;
+}
+.topbar {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(255,255,255,0.95);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--border-light);
+  padding: 0.6rem 1.4rem;
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 0.8rem; flex-wrap: wrap;
+}
+.topbar-title {
+  display: flex; align-items: center; gap: 0.6rem;
+  font-weight: 700; color: var(--text-strong); font-size: 0.94rem;
+}
+.doc-type-pill {
+  display: inline-block; padding: 0.12rem 0.6rem; border-radius: 999px;
+  font-size: 0.76rem; font-weight: 700;
+}
+.pill-portal { background: var(--c1-bg); color: var(--c1); }
+.pill-exp { background: var(--c4-bg); color: var(--c4); }
+.pill-howto { background: var(--c2-bg); color: var(--c2); }
+.pill-ref { background: var(--c3-bg); color: var(--c3); }
+
+.topbar-nav { display: flex; align-items: center; gap: 0.45rem; flex-wrap: wrap; }
+.nav-btn {
+  display: inline-flex; align-items: center; gap: 0.3rem;
+  padding: 0.32rem 0.72rem; border-radius: 7px;
+  border: 1px solid var(--border); background: var(--surface);
+  color: var(--text-strong); text-decoration: none;
+  font-size: 0.81rem; font-weight: 600;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+.nav-btn:hover { background: var(--c1-bg); border-color: var(--c1); color: var(--c1); }
+.nav-btn.is-active { background: var(--c1); border-color: var(--c1); color: #fff; }
+
+.subnav-bar {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border-light);
+  padding: 0.45rem 1.4rem;
+  display: flex; align-items: center; gap: 0.45rem; flex-wrap: wrap;
+  font-size: 0.8rem;
+}
+.subnav-label { color: var(--muted); font-weight: 700; margin-right: 0.3rem; }
+.subnav-link {
+  padding: 0.2rem 0.6rem; border-radius: 6px; text-decoration: none;
+  color: var(--text); border: 1px solid transparent; font-weight: 600;
+}
+.subnav-link:hover { background: var(--c1-bg); color: var(--c1); }
+.subnav-link.is-active { background: #fff; border-color: var(--c1); color: var(--c1); }
+
+.page-layout {
+  max-width: 1440px; margin: 0 auto;
+  display: grid; grid-template-columns: 260px minmax(0, 1fr);
+  gap: 2.2rem; padding: 1.8rem 1.5rem 5rem;
+}
+@media (max-width: 1060px) {
+  .page-layout { grid-template-columns: 1fr; }
+  .toc-rail { display: none; }
+}
+.toc-rail {
+  position: sticky; top: 4.6rem; align-self: start;
+  max-height: calc(100vh - 5.6rem); overflow-y: auto; padding-right: 0.4rem;
+}
+.toc-label {
+  font-size: 0.74rem; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.06em; color: var(--muted); margin: 0 0 0.55rem;
+}
+.toc ul { list-style: none; margin: 0; padding: 0; }
+.toc li { margin: 0.14rem 0; }
+.toc a {
+  display: block; padding: 0.28rem 0.6rem;
+  border-left: 2px solid var(--border-light);
+  color: var(--muted); text-decoration: none;
+  font-size: 0.81rem; line-height: 1.4;
+  transition: color 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+}
+.toc a:hover { color: var(--text-strong); border-left-color: var(--border); }
+.toc a.is-current {
+  color: var(--c1); border-left-color: var(--c1);
+  background: var(--c1-bg); font-weight: 700; border-radius: 0 6px 6px 0;
+}
+
+.filter-box { margin: 0 0 1rem; }
+.filter-input {
+  width: 100%; padding: 0.48rem 0.75rem; border-radius: 8px;
+  border: 1.5px solid var(--border); font-size: 0.86rem; color: var(--text-strong);
+  background: #fff;
+}
+.filter-input:focus { outline: none; border-color: var(--c1); box-shadow: 0 0 0 3px rgba(37,99,235,0.16); }
+.filter-status { font-size: 0.78rem; color: var(--muted); margin-top: 0.35rem; }
+
+.prose { max-width: 68ch; line-height: 1.82; color: var(--text); }
+.prose ul, .prose ol { padding-left: 1.35rem; margin: 0.35rem 0 1.05rem; }
+.prose li { margin-bottom: 0.42rem; }
+.hero { margin-bottom: 2rem; padding-bottom: 1.35rem; border-bottom: 1px solid var(--border-light); }
+.hero h1 { margin: 0 0 0.6rem; font-size: 1.85rem; line-height: 1.3; color: var(--text-strong); }
+.hero-lead { max-width: 68ch; color: var(--muted); font-size: 0.98rem; margin: 0; }
+
+section { scroll-margin-top: 5rem; }
+h2 {
+  margin-top: 3rem; margin-bottom: 0.75rem; font-size: 1.4rem;
+  color: var(--text-strong); padding-bottom: 0.35rem;
+  border-bottom: 2px solid var(--border-light);
+}
+h3 { margin-top: 2rem; margin-bottom: 0.48rem; font-size: 1.08rem; color: var(--text-strong); }
+p { margin-top: 0; margin-bottom: 1rem; }
+
+.ref-badge {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 1.42em; height: 1.42em; padding: 0 0.32em; border-radius: 999px;
+  font-size: 0.78em; font-weight: 700; color: #fff; background: var(--c1);
+  cursor: pointer; vertical-align: 0.06em; margin-right: 0.22em; user-select: none;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
+}
+.ref-badge[data-color="1"] { background: var(--c1); }
+.ref-badge[data-color="2"] { background: var(--c2); }
+.ref-badge[data-color="3"] { background: var(--c3); }
+.ref-badge[data-color="4"] { background: var(--c4); }
+.ref-badge[data-color="5"] { background: var(--c5); }
+
+.ui-chip {
+  display: inline-block; padding: 0.05em 0.46em; border-radius: 6px;
+  border: 1px solid #94a3b8; background: #f1f5f9;
+  font-weight: 600; font-size: 0.89em; color: #0f172a;
+}
+.code-chip {
+  display: inline-block; padding: 0.04em 0.36em; border-radius: 4px;
+  border: 1px solid #cbd5e1; background: #f8fafc;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.86em; color: #0f172a;
+}
+
+[data-ref-scope].is-dimming [data-ref]:not(.is-active),
+[data-ref-scope].is-dimming .dim-candidate:not(.is-active) {
+  opacity: 0.25; transition: opacity 0.15s ease;
+}
+[data-ref].is-active {
+  outline: 2px solid var(--c1); outline-offset: 2px;
+  box-shadow: 0 0 0 4px rgba(37,99,235,0.2);
+}
+[data-ref][data-color="2"].is-active { outline-color: var(--c2); box-shadow: 0 0 0 4px rgba(5,150,105,0.22); }
+[data-ref][data-color="3"].is-active { outline-color: var(--c3); box-shadow: 0 0 0 4px rgba(217,119,6,0.22); }
+[data-ref][data-color="4"].is-active { outline-color: var(--c4); box-shadow: 0 0 0 4px rgba(124,58,237,0.22); }
+[data-ref][data-color="5"].is-active { outline-color: var(--c5); box-shadow: 0 0 0 4px rgba(219,39,119,0.22); }
+svg g[data-ref] { cursor: pointer; transition: opacity 0.15s ease, filter 0.15s ease; }
+svg g[data-ref].is-active { outline: none; box-shadow: none; filter: drop-shadow(0 0 5px rgba(37,99,235,0.55)); }
+svg g[data-ref][data-color="2"].is-active { filter: drop-shadow(0 0 5px rgba(5,150,105,0.6)); }
+svg g[data-ref][data-color="3"].is-active { filter: drop-shadow(0 0 5px rgba(217,119,6,0.6)); }
+svg g[data-ref][data-color="4"].is-active { filter: drop-shadow(0 0 5px rgba(124,58,237,0.6)); }
+
+@keyframes ref-pulse {
+  0% { box-shadow: 0 0 0 0 rgba(37,99,235,0.55); }
+  100% { box-shadow: 0 0 0 12px rgba(37,99,235,0); }
+}
+.is-pulsing { animation: ref-pulse 0.8s ease-out 1; }
+
+.card-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(275px, 1fr));
+  gap: 1rem; margin: 1rem 0 1.6rem;
+}
+.nav-card {
+  display: block; text-decoration: none; color: inherit;
+  background: #fff; border: 1.5px solid var(--border); border-radius: 11px;
+  padding: 1rem 1.1rem; transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.nav-card:hover { border-color: var(--c1); box-shadow: 0 6px 18px rgba(37,99,235,0.1); }
+.nav-card h3 { margin: 0 0 0.35rem; font-size: 1rem; color: var(--text-strong); }
+.nav-card p { margin: 0; font-size: 0.86rem; color: var(--muted); line-height: 1.58; }
+
+.api-card {
+  background: #fff; border: 1.5px solid var(--border); border-radius: 11px;
+  padding: 1rem 1.15rem; margin: 1rem 0 1.4rem; scroll-margin-top: 5rem;
+}
+.api-card.is-hidden { display: none; }
+.api-head {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 0.6rem; flex-wrap: wrap; margin-bottom: 0.55rem;
+}
+.api-name {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 1rem; font-weight: 700; color: var(--text-strong);
+}
+.perf-pill {
+  display: inline-block; padding: 0.12rem 0.52rem; border-radius: 999px;
+  font-size: 0.74rem; font-weight: 700;
+}
+.perf-hot { background: #dcfce7; color: #166534; border: 1px solid #86efac; }
+.perf-fast { background: #dbeafe; color: #1e40af; border: 1px solid #93c5fd; }
+.perf-cold { background: #fef3c7; color: #92400e; border: 1px solid #fcd34d; }
+.perf-debug { background: #fce7f3; color: #9d174d; border: 1px solid #f9a8d4; }
+
+.sig-box {
+  background: #0f172a; color: #e2e8f0; border-radius: 8px;
+  padding: 0.65rem 0.9rem; margin: 0.45rem 0 0.75rem;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.81rem; line-height: 1.55; overflow-x: auto; white-space: pre;
+}
+.code-ex {
+  background: #0b1220; color: #e2e8f0; border-radius: 8px;
+  padding: 0.75rem 0.95rem; margin: 0.6rem 0 0.8rem;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.8rem; line-height: 1.55; overflow-x: auto; white-space: pre;
+}
+.api-meta-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 0.65rem; margin: 0.55rem 0;
+}
+.api-meta-box {
+  background: var(--surface); border: 1px solid var(--border-light);
+  border-radius: 8px; padding: 0.55rem 0.75rem; font-size: 0.85rem; line-height: 1.58;
+}
+.api-meta-box strong { color: var(--text-strong); display: block; margin-bottom: 0.2rem; font-size: 0.81rem; }
+
+.table-wrap { overflow-x: auto; margin: 0.85rem 0 1.35rem; border: 1px solid var(--border-light); border-radius: 10px; }
+table.ergo-table { width: 100%; border-collapse: collapse; font-size: 0.86rem; }
+table.ergo-table thead th {
+  position: sticky; top: 0; background: var(--surface);
+  border-bottom: 2px solid var(--border); text-align: left;
+  padding: 0.58rem 0.75rem; color: var(--text-strong); font-weight: 700;
+}
+table.ergo-table tbody tr { transition: background 0.12s ease; }
+table.ergo-table tbody tr:hover { background: #eff6ff; }
+table.ergo-table td { padding: 0.52rem 0.75rem; border-bottom: 1px solid var(--border-light); vertical-align: top; line-height: 1.58; }
+table.ergo-table tbody tr:last-child td { border-bottom: none; }
+table.ergo-table td.num, table.ergo-table th.num { text-align: right; font-variant-numeric: tabular-nums; }
+
+.callout {
+  border-left: 4px solid var(--c1); background: var(--surface);
+  border-radius: 0 10px 10px 0; padding: 0.85rem 1.05rem;
+  margin: 1rem 0 1.35rem; max-width: 68ch; font-size: 0.9rem; line-height: 1.72;
+}
+.callout.warn { border-left-color: var(--c3); background: #fffbeb; }
+.callout.good { border-left-color: var(--c2); background: #ecfdf5; }
+.callout.danger { border-left-color: #dc2626; background: #fef2f2; }
+.callout strong { color: var(--text-strong); }
+
+.diagram-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 12px; padding: 1rem 1.15rem; margin: 1rem 0 1.5rem;
+}
+.diagram-header {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 0.75rem; margin-bottom: 0.8rem; flex-wrap: wrap;
+}
+.diagram-title { font-weight: 700; font-size: 0.94rem; color: var(--text-strong); }
+.diagram-hint { font-size: 0.78rem; color: var(--muted); }
+.svg-wrap { width: 100%; overflow-x: auto; background: #fff; border: 1px solid var(--border-light); border-radius: 9px; padding: 0.5rem; }
+.diag-svg { display: block; width: 100%; min-width: 720px; height: auto; font-family: "Segoe UI", "Hiragino Kaku Gothic ProN", "Yu Gothic UI", Meiryo, sans-serif; }
+
+.swatch { display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.1rem 0.5rem; border-radius: 999px; font-size: 0.8rem; font-weight: 700; border: 1px solid transparent; }
+.swatch-dot { width: 0.7rem; height: 0.7rem; border-radius: 50%; display: inline-block; border: 1px solid rgba(15,23,42,0.25); }
+.sw-cyan { background: #ecfeff; color: #155e75; border-color: #22d3ee; } .sw-cyan .swatch-dot { background: #06b6d4; }
+.sw-red { background: #fef2f2; color: #991b1b; border-color: #f87171; } .sw-red .swatch-dot { background: #ef4444; }
+.sw-orange { background: #fff7ed; color: #9a3412; border-color: #fb923c; } .sw-orange .swatch-dot { background: #f97316; }
+
+.source-list { list-style: none; padding: 0; margin: 0.75rem 0 1.3rem; display: flex; flex-direction: column; gap: 0.55rem; }
+.source-list li {
+  background: var(--surface); border: 1px solid var(--border-light);
+  border-radius: 8px; padding: 0.62rem 0.9rem; font-size: 0.85rem; line-height: 1.58;
+}
+.source-tag {
+  display: inline-block; font-size: 0.71rem; font-weight: 700;
+  padding: 0.08rem 0.44rem; border-radius: 999px; margin-right: 0.4rem;
+}
+.source-tag.official { background: var(--c1-bg); color: var(--c1); }
+.source-tag.web { background: var(--c2-bg); color: var(--c2); }
+.source-tag.empirical { background: var(--c3-bg); color: var(--c3); }
+
+#ref-return-btn {
+  position: fixed; right: 1.25rem; bottom: 1.25rem; z-index: 9999;
+  display: none; padding: 0.52rem 0.92rem; border-radius: 999px;
+  border: 1px solid var(--c1); background: var(--c1); color: #fff;
+  font-size: 0.83rem; font-weight: 700; cursor: pointer;
+  box-shadow: 0 8px 20px rgba(37,99,235,0.3);
+}
+#ref-return-btn.is-visible { display: inline-flex; align-items: center; gap: 0.35rem; }
+</style>
+</head>
+<body>
+<header class="topbar">
+  <div class="topbar-title">
+    <span class="doc-type-pill pill-ref">API リファレンス</span>
+    <span>myext.robot.geometric_newton</span>
+  </div>
+  <nav class="topbar-nav" aria-label="ドキュメント種別">
+    <a class="nav-btn" href="../index.html">ポータル</a>
+    <a class="nav-btn" href="../explanation_architecture.html">アーキテクチャ解説</a>
+    <a class="nav-btn" href="../howto_recipes.html">レシピ集</a>
+    <a class="nav-btn is-active" href="index.html">API リファレンス</a>
+  </nav>
+</header>
+<nav class="subnav-bar" aria-label="API ページ切替"><span class="subnav-label">API 仕様書:</span><a class="subnav-link" href="index.html">目次・逆引き・設定</a>
+  <a class="subnav-link" href="robot_api.html">GeometricRobot / Component</a>
+  <a class="subnav-link" href="collision_newton_api.html">干渉判定・Newton / PhysX</a>
+  <a class="subnav-link" href="view_batch_api.html">GeometricRobotView</a>
+  <a class="subnav-link is-active" href="model_ik_command_api.html">Model / USD / IK / 変換</a>
+  <a class="subnav-link" href="layer_writer_internals.html">Layer / Writer / 座標規約</a></nav>
+<div class="page-layout">
+  <aside class="toc-rail" aria-label="ページ内目次">
+    <div class="filter-box"><input id="api-filter-input" class="filter-input" type="search" placeholder="API 名・引数・用語で絞り込み..."><div id="api-filter-status" class="filter-status"></div></div>
+    <p class="toc-label">目次</p>
+    <nav class="toc">
+      <ul>
+        <li><a href="#sec-model-spec">GeometricRobotModel・Spec データクラス</a></li>
+        <li><a href="#sec-model-methods">GeometricRobotModel 全 18 メソッド・serial_model</a></li>
+        <li><a href="#sec-usd-reader">UsdArticulationSource / UsdRobotInfo / read_articulation</a></li>
+        <li><a href="#sec-sources-urdf">DH / MDH / Screw / URDF / USD Prim ビルダー</a></li>
+        <li><a href="#sec-chain-ik">KinematicChain / IK ソルバー群</a></li>
+        <li><a href="#sec-command-conv">GeometricCommandConverter 群</a></li>
+        <li><a href="#sec-sources">公式出典・同梱ソース・実機検証</a></li>
+      </ul>
+    </nav>
+  </aside>
+  <main>
+    <div class="hero">
+      <h1>Model / USD Reader / IK / 指令変換 API</h1>
+      <p class="hero-lead">NumPy 完結の GeometricRobotModel 全 18 メソッド、UsdArticulationSource と IsaacRobotAPI 自動検出、DH/MDH/Screw/URDF、KinematicChain・IK、指令変換コンバータの完全仕様（metersPerUnit=1 のステージ専用）。</p>
+    </div>
+    
+<section id="sec-model-spec">
+  <h2>GeometricRobotModel・Spec データクラス</h2>
+  <div class="prose">
+    <p><span class="code-chip">myext.robot.geometric_newton.model</span> 配下は <strong>NumPy のみで完結</strong>し、Isaac Sim・OpenUSD・Warp・Newton のいずれにも依存しません。オフライン軌道計画や単体テストでそのまま利用できます（長さ・直動関節の単位は <strong>m、<span class="code-chip">metersPerUnit=1</span> のステージ専用</strong>）。</p>
+  </div>
+
+  <article class="api-card" id="model-dataclasses"><div class="api-head"><span class="api-name">GeometricMimicSpec / GeometricJointSpec / GeometricLinkSpec</span><span class="perf-pill perf-hot">不変データクラス（NumPy のみ）</span></div><div class="sig-box">@dataclass(frozen=True)
+class GeometricMimicSpec:
+    reference_joint: str   # 親となる参照関節名
+    multiplier: float = 1.0
+    offset: float = 0.0    # q_dep = multiplier * q_ref + offset
+
+@dataclass(frozen=True, eq=False)
+class GeometricJointSpec:
+    name: str
+    joint_type: Literal["revolute", "prismatic", "fixed"]
+    parent_link: str
+    child_link: str
+    parent_frame: np.ndarray = field(default_factory=tf.identity)  # (4, 4) 親リンク座標での関節座標系（既定: 単位行列）
+    child_frame: np.ndarray = field(default_factory=tf.identity)   # (4, 4) 子リンク座標での関節座標系（既定: 単位行列）
+    axis: tuple[float, float, float] = (0.0, 0.0, 1.0)             # 関節座標系で表した単位回転/直動軸（自動正規化）
+    lower_limit: float = -np.inf  # revolute: rad / prismatic: m（metersPerUnit=1 のステージ専用）
+    upper_limit: float = np.inf
+    mimic: GeometricMimicSpec | None = None
+    prim_path: str | None = None
+    # プロパティ: is_dof -&gt; bool, メソッド: replaced(**changes) -&gt; GeometricJointSpec
+
+@dataclass(frozen=True)
+class GeometricLinkSpec:
+    name: str
+    prim_path: str | None = None</div><div class="prose"><p>ロボットのリンク・関節・Mimic 関係を表す不変定義です。回転関節は <span class='code-chip'>rad</span>、直動関節は <strong>m（<span class='code-chip'>metersPerUnit=1</span> のステージ専用）</strong>を内部統一単位とします。関節変換式は <span class='code-chip'>X_wc = X_wp @ parent_frame @ motion(q) @ inv(child_frame)</span> で、Newton の <span class='code-chip'>eval_fk</span> と数学的に完全一致します。<span class='code-chip'>parent_frame</span>・<span class='code-chip'>child_frame</span> の既定値は 4×4 単位行列、<span class='code-chip'>axis</span> は関節座標系で表した向きです。</p></div></article>
+
+  <article class="api-card" id="model-props"><div class="api-head"><span class="api-name">GeometricRobotModel プロパティ一覧</span><span class="perf-pill perf-hot">不変運動学モデル</span></div><div class="sig-box">model = GeometricRobotModel(
+    name: str,
+    links: Sequence[GeometricLinkSpec],
+    joints: Sequence[GeometricJointSpec],
+    root_link: str | None = None,
+    components: dict[str, tuple[str, ...]] = {},
+)</div><div class="prose"><p>木構造（分岐・複数アーム対応）の剛体リンク連鎖を保持し、幅優先トポロジカル順の FK・Mimic 解決・ヤコビアン計算・直列鎖抽出・モデル合成を提供します。</p></div><div class="table-wrap"><table class="ergo-table"><thead><tr><th>引数 / フィールド</th><th>型</th><th>既定値</th><th>意味・形状・単位・制約</th></tr></thead><tbody><tr><td><span class='code-chip'>num_links / num_joints / num_dofs</span></td><td><span class='code-chip'>int</span></td><td><span class='code-chip'>—</span></td><td>全リンク数 / 全関節数（fixed 含む）/ 全可動 DOF 数（Mimic 従属含む）。</td></tr>
+<tr><td><span class='code-chip'>link_names / joint_names / joint_types</span></td><td><span class='code-chip'>tuple[str, ...]</span></td><td><span class='code-chip'>—</span></td><td>リンク名・関節名・関節型。</td></tr>
+<tr><td><span class='code-chip'>dof_joints / dof_names / dof_types</span></td><td><span class='code-chip'>tuple</span></td><td><span class='code-chip'>—</span></td><td>可動関節 Spec 列・DOF 名列・DOF 型列。</td></tr>
+<tr><td><span class='code-chip'>dof_lower_limits / dof_upper_limits</span></td><td><span class='code-chip'>np.ndarray (D,)</span></td><td><span class='code-chip'>—</span></td><td>各 DOF の下限・上限配列（<span class='code-chip'>rad</span> または m、<span class='code-chip'>metersPerUnit=1</span> のステージ専用）。</td></tr>
+<tr><td><span class='code-chip'>independent_dof_indices</span></td><td><span class='code-chip'>np.ndarray (K,) int64</span></td><td><span class='code-chip'>—</span></td><td>Mimic 従属ではない<strong>独立 DOF の添字配列</strong>。例えば 8 DOF 中 2 軸が Mimic 従属なら長さ 6 の整数配列を返す。</td></tr>
+<tr><td><span class='code-chip'>mimic_matrix</span></td><td><span class='code-chip'>np.ndarray (D, D) float64</span></td><td><span class='code-chip'>—</span></td><td>Mimic 結合行列 <span class='code-chip'>M</span>。任意の関節ベクトル <span class='code-chip'>q</span> に対し <span class='code-chip'>q_resolved = M @ q + mimic_offset</span> が成り立つ。連鎖 Mimic（A→B→C）も初期化時に展開済み。</td></tr>
+<tr><td><span class='code-chip'>mimic_offset</span></td><td><span class='code-chip'>np.ndarray (D,) float64</span></td><td><span class='code-chip'>—</span></td><td>Mimic 定数オフセットベクトル <span class='code-chip'>b</span>。<span class='code-chip'>resolve_mimic(q)</span> で加算される。</td></tr></tbody></table></div></article>
+</section>
+
+<section id="sec-model-methods">
+  <h2>GeometricRobotModel 全 18 メソッド・serial_model</h2>
+  <div class="table-wrap">
+    <table class="ergo-table">
+      <thead>
+        <tr><th>メソッド</th><th>シグネチャ・引数</th><th>戻り値・形状・意味</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><span class="code-chip">get_link_index</span></td><td><span class="code-chip">(name: str)</span></td><td><span class="code-chip">int</span>：リンクの内部添字（存在しないと <span class="code-chip">KeyError</span>）。</td></tr>
+        <tr><td><span class="code-chip">get_joint_index</span></td><td><span class="code-chip">(name: str)</span></td><td><span class="code-chip">int</span>：関節の内部添字。</td></tr>
+        <tr><td><span class="code-chip">get_dof_index</span></td><td><span class="code-chip">(name: str)</span></td><td><span class="code-chip">int</span>：DOF の添字（<span class="code-chip">fixed</span> 関節は <span class="code-chip">KeyError</span>）。</td></tr>
+        <tr><td><span class="code-chip">parent_joint_of</span></td><td><span class="code-chip">(link_name: str)</span></td><td><span class="code-chip">GeometricJointSpec | None</span>：リンクへ接続する親関節（ルートリンクは <span class="code-chip">None</span>）。</td></tr>
+        <tr><td><span class="code-chip">child_joints_of</span></td><td><span class="code-chip">(link_name: str)</span></td><td><span class="code-chip">tuple[GeometricJointSpec, ...]</span>：リンクから分岐する子関節タプル。</td></tr>
+        <tr><td><span class="code-chip">component_of_link</span></td><td><span class="code-chip">(link_name: str)</span></td><td><span class="code-chip">str | None</span>：リンクが属するコンポーネント名。</td></tr>
+        <tr><td><span class="code-chip">adjacent_link_pairs</span></td><td><span class="code-chip">()</span>（引数なし）</td><td><span class="code-chip">list[tuple[str, str, str]]</span>：関節で直接結ばれた <span class="code-chip">(親リンク名, 子リンク名, 関節名)</span> の一覧。</td></tr>
+        <tr><td><span class="code-chip">resolve_mimic</span></td><td><span class="code-chip">(q: np.ndarray)</span></td><td><span class="code-chip">np.ndarray (D,)</span> または <span class="code-chip">(N, D)</span>：<span class="code-chip">q @ M.T + mimic_offset</span> で Mimic 従属 DOF を親 DOF から上書き計算して返す。</td></tr>
+        <tr><td><span class="code-chip">joint_local_transforms</span></td><td><span class="code-chip">(q: np.ndarray, *, resolve_mimic=True)</span></td><td><span class="code-chip">np.ndarray (num_joints, 4, 4)</span>：各関節の親リンク基準ローカル変換行列 <span class="code-chip">T_parent_child</span>。</td></tr>
+        <tr><td><span class="code-chip">forward_kinematics</span></td><td><span class="code-chip">(dof_positions=None, *, resolve_mimic=True)</span></td><td><span class="code-chip">np.ndarray (num_links, 4, 4)</span>（バッチ入力 <span class="code-chip">(N, D)</span> 時は <span class="code-chip">(N, num_links, 4, 4)</span>）：ルートリンク基準のベクトル化高速 FK。</td></tr>
+        <tr><td><span class="code-chip">forward_kinematics_reference</span></td><td><span class="code-chip">(dof_positions=None, *, resolve_mimic=True)</span></td><td><span class="code-chip">np.ndarray (num_links, 4, 4)</span>：単純ループによる参照実装（単体テストでの数値一致検証用）。</td></tr>
+        <tr><td><span class="code-chip">jacobian</span></td><td><span class="code-chip">(dof_positions=None, *, reduced=False)</span></td><td><span class="code-chip">np.ndarray (num_links, 6, num_dofs)</span>（並進 m/s 3 行＋角速度 rad/s 3 行）。<span class="code-chip">reduced=False</span>（既定）は各軸単独の列、<span class="code-chip">reduced=True</span> は Mimic 連鎖律を参照軸へ畳み込んだ独立 DOF 列のみを返す。</td></tr>
+        <tr><td><span class="code-chip">path_between</span></td><td><span class="code-chip">(base_link: str, tip_link: str)</span></td><td><span class="code-chip">list[tuple[GeometricJointSpec, int]]</span>：2 リンク間の最短経路と各関節の進行方向（<span class="code-chip">+1</span>=順方向 / <span class="code-chip">-1</span>=逆方向）。</td></tr>
+        <tr><td><span class="code-chip">get_kinematic_chain</span></td><td><span class="code-chip">(base_link: str, tip_link: str, tip_offset=None)</span></td><td><span class="code-chip">KinematicChain</span>：IK 計算用の直列運動学鎖を生成。</td></tr>
+        <tr><td><span class="code-chip">with_prefix</span></td><td><span class="code-chip">(prefix: str)</span></td><td><span class="code-chip">GeometricRobotModel</span>：全リンク名・全関節名および <span class="code-chip">components</span> 内のリンク名へ <span class="code-chip">prefix</span> を前置した新モデルを返す。</td></tr>
+        <tr><td><span class="code-chip">attach</span></td><td><span class="code-chip">(other: GeometricRobotModel, parent_link: str, mount_transform: np.ndarray | None = None, *, name: str, base_name: str | None = None)</span></td><td><span class="code-chip">GeometricRobotModel</span>：<span class="code-chip">name</span> は<strong>必須のキーワード引数</strong>。<span class="code-chip">other</span> の全リンク・全関節に <span class="code-chip">f"{name}/"</span> を前置し、結合用固定関節 <span class="code-chip">f"{name}/mount"</span> で <span class="code-chip">parent_link</span> へ接続する。<span class="code-chip">components</span> には親側（<span class="code-chip">base_name or self.name</span>）と子側（<span class="code-chip">name</span>）が自動登録される。例：<span class="code-chip">cart.attach(arm, "body", name="left")</span> ならアームの <span class="code-chip">joint1</span> は <span class="code-chip">"left/joint1"</span> になり、<span class="code-chip">robot.get_component("left")</span> で取り出せる。</td></tr>
+        <tr><td><span class="code-chip">is_kinematically_equal</span></td><td><span class="code-chip">(other: GeometricRobotModel, tol: float = 1e-9)</span></td><td><span class="code-chip">bool</span>：トポロジ・関節種類・フレーム・軸・Mimic が許容誤差 <span class="code-chip">tol</span> 以内で一致するか判定（名前と <span class="code-chip">prim_path</span> は不問）。</td></tr>
+        <tr><td><span class="code-chip">to_urdf</span></td><td><span class="code-chip">(path: str | None = None, *, robot_name: str | None = None)</span></td><td><span class="code-chip">str</span>：モデルを URDF XML 文字列へ変換。<span class="code-chip">path</span> を渡すとファイルにも保存する。</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="prose">
+    <p>また補助ファクトリ <span class="code-chip">serial_model(name, joint_specs, link_names)</span>（トップレベル <span class="code-chip">myext.robot.geometric_newton</span> から直接 import 可能）を使うと、<span class="code-chip">link_names[0]</span> を根リンクとした直列 <span class="code-chip">GeometricRobotModel</span> を簡潔に組み立てられます。</p>
+  </div>
+</section>
+
+<section id="sec-usd-reader">
+  <h2>UsdArticulationSource / UsdRobotInfo / read_articulation</h2>
+  <article class="api-card" id="usd-source-and-info"><div class="api-head"><span class="api-name">UsdArticulationSource / UsdRobotInfo / read_articulation</span><span class="perf-pill perf-cold">USD 解析（初期化・rebuild 時）</span></div><div class="sig-box">@dataclass
+class UsdArticulationSource:
+    root_prim_path: str | Sequence[str]
+    components: dict[str, str | Sequence[str]] | None = None
+    auto_components: bool = True
+    extra_joint_paths: Sequence[str] = ()
+    ignore_joint_paths: Sequence[str] = ()
+    dof_order: Sequence[str] | None = None
+    unsupported_joints: Literal["error", "fixed", "ignore"] = "error"
+    world_joints: Literal["ignore", "dof"] = "ignore"
+    name: str | None = None
+
+read_articulation(stage: Usd.Stage, source: UsdArticulationSource | str) -&gt; tuple[GeometricRobotModel, UsdRobotInfo]</div><div class="prose"><p>USD Stage 上の Articulation（<span class='code-chip'>UsdPhysics.Joint</span>・<span class='code-chip'>PhysxMimicJointAPI</span>・<span class='code-chip'>PhysicsFilteredPairsAPI</span>・<span class='code-chip'>IsaacRobotAPI</span>）を読み取り、<span class='code-chip'>GeometricRobotModel</span> と付帯情報 <span class='code-chip'>UsdRobotInfo</span> を返します。</p></div><div class="table-wrap"><table class="ergo-table"><thead><tr><th>引数 / フィールド</th><th>型</th><th>既定値</th><th>意味・形状・単位・制約</th></tr></thead><tbody><tr><td><span class='code-chip'>root_prim_path</span></td><td><span class='code-chip'>str | Sequence[str]</span></td><td><span class='code-chip'>必須</span></td><td>単一または複数ルート Prim パス。</td></tr>
+<tr><td><span class='code-chip'>components</span></td><td><span class='code-chip'>dict[str, str | Sequence[str]] | None</span></td><td><span class='code-chip'>None</span></td><td>明示的なコンポーネント定義（例: <span class='code-chip'>{"arm": "/World/Bot/arm*"}</span>）。指定すると自動検出より優先される。パターンの照合規約は<strong>「その Prim 自身」「その配下の全 Prim」「<span class='code-chip'>fnmatch</span> のワイルドカード一致」</strong>のいずれか。</td></tr>
+<tr><td><span class='code-chip'>auto_components</span></td><td><span class='code-chip'>bool</span></td><td><span class='code-chip'>True</span></td><td><span class='code-chip'>components=None</span> のとき、USD 配下の <span class='code-chip'>IsaacRobotAPI</span>（<span class='code-chip'>isaac:physics:robotLinks</span> / 入れ子サブロボット Prim / <span class='code-chip'>isaac:namespace</span>）から自動的にコンポーネント辞書を構築する。</td></tr>
+<tr><td><span class='code-chip'>extra_joint_paths / ignore_joint_paths</span></td><td><span class='code-chip'>Sequence[str]</span></td><td><span class='code-chip'>()</span></td><td>ルート外にある追加ジョイントの取り込み、または特定ジョイントの除外。</td></tr>
+<tr><td><span class='code-chip'>dof_order</span></td><td><span class='code-chip'>Sequence[str] | None</span></td><td><span class='code-chip'>None</span></td><td>DOF 配列の並び順を明示固定したい場合に指定。</td></tr>
+<tr><td><span class='code-chip'>unsupported_joints</span></td><td><span class='code-chip'>"error" | "fixed" | "ignore"</span></td><td><span class='code-chip'>"error"</span></td><td>Spherical / D6 等の未対応ジョイント遭遇時のポリシー（<span class='code-chip'>"error"</span> は <span class='code-chip'>NotImplementedError</span>）。</td></tr>
+<tr><td><span class='code-chip'>world_joints</span></td><td><span class='code-chip'>"ignore" | "dof"</span></td><td><span class='code-chip'>"ignore"</span></td><td>片側 body が空（ワールド接続）のジョイントを無視するか DOF として取り込むか。</td></tr></tbody></table></div><div class="api-meta-grid"><div class="api-meta-box"><strong>戻り値 / 型</strong><span class='code-chip'>(model, info)</span>。<span class='code-chip'>UsdRobotInfo</span> には <span class='code-chip'>root_prim_paths</span>, <span class='code-chip'>articulation_root_paths</span>, <span class='code-chip'>joint_prim_paths</span>, <span class='code-chip'>link_prim_paths</span>, <span class='code-chip'>self_collision_enabled</span>, <span class='code-chip'>colliding_adjacent_pairs</span>, <span class='code-chip'>filtered_pairs</span>, <span class='code-chip'>reversed_joints</span>, <span class='code-chip'>component_prim_paths</span>, <span class='code-chip'>warnings</span>, <span class='code-chip'>timings_ms</span> が格納される。</div><div class="api-meta-box"><strong>副作用・前提・落とし穴</strong><strong>1) 既存 USD 読込時のリンク名・関節名の決まり：</strong>リンク名は剛体 Prim の名前、関節名は Joint Prim の名前を使う。同名が重なった場合は 2 個目から <span class='code-chip'>_0</span>, <span class='code-chip'>_1</span>, ... を付けて一意化する。ワールドにつながる側の仮想リンク名は <span class='code-chip'>"world"</span>。<br><strong>2) <span class='code-chip'>IsaacRobotAPI</span> 検出：</strong>Kit 環境・純粋 OpenUSD 環境の両方で動作するよう <span class='code-chip'>GetAppliedSchemas()</span>・<span class='code-chip'>HasAPI("IsaacRobotAPI")</span>・生の <span class='code-chip'>apiSchemas</span> ListOp メタデータ・<span class='code-chip'>isaac:physics:robotLinks</span> のすべてを検査する。</div></div></article>
+</section>
+
+<section id="sec-sources-urdf">
+  <h2>DH / MDH / Screw / URDF / USD Prim ビルダー</h2>
+  <div class="callout">
+    <strong>DH / MDH / Screw の共通規約（命名・オフセット・座標系）：</strong><br>
+    ・<strong>生成される名前：</strong>リンク名は <span class="code-chip">link0</span>（根）〜<span class="code-chip">link{n}</span> と末尾の <span class="code-chip">tool</span>。関節名は各行の <span class="code-chip">name</span>（省略時は <span class="code-chip">joint1</span>, <span class="code-chip">joint2</span>, ...）と末尾の固定関節 <span class="code-chip">tool_fixed</span>。<br>
+    ・<strong><span class="code-chip">DHRow</span> / <span class="code-chip">MDHRow</span> の関節変位：</strong>回転関節は <span class="code-chip">theta + q</span>、直動関節は <span class="code-chip">d + q</span> として計算される（<span class="code-chip">theta</span> / <span class="code-chip">d</span> は <span class="code-chip">q=0</span> のときのオフセット）。<br>
+    ・<strong><span class="code-chip">base</span> / <span class="code-chip">tool</span> / <span class="code-chip">tool_home</span>：</strong>いずれも形状 <span class="code-chip">(4, 4)</span> の同次変換行列（<span class="code-chip">None</span> なら単位行列）。<br>
+    ・<strong><span class="code-chip">ScrewAxisRow</span>：</strong><span class="code-chip">direction</span> は単位ベクトル（自動で正規化）。回転関節の <span class="code-chip">moment</span> は <span class="code-chip">point × direction</span>（直動関節では未使用）。軸は <span class="code-chip">q=0</span> のときの根リンク座標系で与える。軸上の 1 点と向きから作れる <span class="code-chip">ScrewAxisRow.through(point, direction, ...)</span> が便利。
+  </div>
+  <div class="table-wrap">
+    <table class="ergo-table">
+      <thead>
+        <tr><th>クラス / 関数</th><th>主要フィールド・引数</th><th>仕様・変換規約</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="code-chip">DHRow</span> / <span class="code-chip">DHParameters</span></td>
+          <td><span class="code-chip">DHRow(theta=0, d=0, a=0, alpha=0, joint_type="revolute", lower_limit=-inf, upper_limit=inf, name=None)</span><br><span class="code-chip">DHParameters(rows, base=None, tool=None, name="dh_robot")</span></td>
+          <td>標準 DH 法：<span class="code-chip">RotZ(θ) · TransZ(d) · TransX(a) · RotX(α)</span>。長さは m（<span class="code-chip">metersPerUnit=1</span> のステージ専用）。<span class="code-chip">.to_model()</span> で変換。</td>
+        </tr>
+        <tr>
+          <td><span class="code-chip">MDHRow</span> / <span class="code-chip">MDHParameters</span></td>
+          <td><span class="code-chip">MDHRow(alpha=0, a=0, theta=0, d=0, joint_type="revolute", lower_limit=-inf, upper_limit=inf, name=None)</span><br><span class="code-chip">MDHParameters(rows, base=None, tool=None, name="mdh_robot")</span></td>
+          <td>修正 DH 法（Craig 式）：<span class="code-chip">RotX(α) · TransX(a) · RotZ(θ) · TransZ(d)</span>。<span class="code-chip">.to_model()</span> で変換。</td>
+        </tr>
+        <tr>
+          <td><span class="code-chip">ScrewAxisRow</span> / <span class="code-chip">ScrewParameters</span></td>
+          <td><span class="code-chip">ScrewAxisRow(direction, moment=(0,0,0), joint_type="revolute", lower_limit=-inf, upper_limit=inf, name=None)</span><br><span class="code-chip">ScrewAxisRow.through(point, direction, ...)</span><br><span class="code-chip">ScrewParameters(rows, tool_home=None, name="screw_robot")</span></td>
+          <td>Product of Exponentials：<span class="code-chip">exp([S_1]θ_1) ... exp([S_n]θ_n) · M</span>。<span class="code-chip">.to_model()</span> で変換。</td>
+        </tr>
+        <tr>
+          <td><span class="code-chip">UrdfSource</span> / <span class="code-chip">read_urdf</span> / <span class="code-chip">read_urdf_string</span> / <span class="code-chip">model_to_urdf</span></td>
+          <td><span class="code-chip">UrdfSource(urdf_path: str, name: str | None = None)</span><br><span class="code-chip">read_urdf(path, name=None)</span> / <span class="code-chip">read_urdf_string(text, name=None)</span> / <span class="code-chip">model_to_urdf(model, robot_name=None)</span></td>
+          <td>URDF XML との相互変換（<span class="code-chip">&lt;mimic&gt;</span> 対応）。<strong>読むのは運動学のみで、メッシュ（STL/DAE）は読み込まない</strong>（形状は <span class="code-chip">build_robot_prims()</span> による簡易カプセル）。URDF の値は m としてそのまま使う。</td>
+        </tr>
+        <tr>
+          <td><span class="code-chip">GeometricVisualStyle</span> / <span class="code-chip">build_robot_prims</span></td>
+          <td><span class="code-chip">link_radius=0.025</span>, <span class="code-chip">joint_radius=0.035</span>, <span class="code-chip">joint_length=0.09</span>, <span class="code-chip">link_color=(0.75, 0.78, 0.82)</span>, <span class="code-chip">revolute_color=(0.95, 0.55, 0.1)</span>, <span class="code-chip">prismatic_color=(0.15, 0.55, 0.95)</span>, <span class="code-chip">collisions=True</span>, <span class="code-chip">collision_radius=None</span></td>
+          <td>純粋 <span class="code-chip">GeometricRobotModel</span> から USD 上に可視化メッシュと簡易コライダー Prim を構築し <span class="code-chip">link_prim_paths</span> を返す。寸法はすべて m（<span class="code-chip">metersPerUnit=1</span> のステージ専用）。</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section id="sec-chain-ik">
+  <h2>KinematicChain / IK ソルバー群</h2>
+  <article class="api-card" id="kinematic-chain-and-ik"><div class="api-head"><span class="api-name">KinematicChain / IKSolverConfig / IKResult / JacobianIKSolver / IKPySolver / レジストリ</span><span class="perf-pill perf-fast">NumPy 完結（反復計算）</span></div><div class="sig-box">chain = KinematicChain.from_model(model, base_link: str, tip_link: str, tip_offset=None)
+# フィールド/プロパティ: base_link, tip_link, variable_names, dof_indices, lower_limits, upper_limits, num_variables, num_joints, has_mimic
+# メソッド: joint_values(x), forward_kinematics(x), jacobian(x), pose_and_jacobian(x), clip(x), to_model(), to_urdf()
+
+@dataclass(frozen=True)
+class IKSolverConfig:
+    active_dof_mask: Sequence[bool] | None = None
+    orientation_mode: Literal["full", "none"] = "full"
+    position_tolerance: float = 1e-5      # m（metersPerUnit=1 のステージ専用）
+    orientation_tolerance: float = 1e-4   # rad
+    max_iterations: int = 200
+    num_restarts: int = 20
+    damping: float = 1e-2                 # Levenberg-Marquardt 減衰係数
+    orientation_weight: float = 1.0
+    respect_limits: bool = True
+    random_seed: int = 0
+
+@dataclass(frozen=True)
+class IKResult:
+    dof_positions: np.ndarray     # 独立変数の解ベクトル（chain.variable_names 順・常に rad / m）
+    success: bool
+    position_error: float         # m（metersPerUnit=1 のステージ専用）
+    orientation_error: float      # rad
+    iterations: int = 0
+    message: str = ""
+
+register_ik_solver(name: str, cls) -&gt; None
+available_ik_solvers() -&gt; list[str]
+create_ik_solver(name: str, chain: KinematicChain, config: IKSolverConfig | None = None) -&gt; IKSolver
+# IKSolver 共通メソッド: set_config(**changes), set_active_dofs(mask_or_names), get_active_dofs(), solve(target_position, target_orientation=None, *, seed=None) -&gt; IKResult</div><div class="prose"><p>任意 2 リンク間の直列運動学鎖に対して減衰最小二乗法（Levenberg-Marquardt: <span class='code-chip'>JacobianIKSolver</span>、既定・外部依存なし）または <span class='code-chip'>IKPySolver</span>（要 <span class='code-chip'>ikpy</span>）で逆運動学を解きます。</p></div><div class="api-meta-grid"><div class="api-meta-box"><strong>副作用・前提・落とし穴</strong><strong>利用・自作時の必須規約：</strong><br>1) <strong><span class='code-chip'>apply=False</span> の手動反映：</strong><span class='code-chip'>IKResult.dof_positions</span> は <span class='code-chip'>robot.angle_unit</span> が何であっても<strong>常に rad</strong>（直動は m）であるため、<span class='code-chip'>robot.set_dof_positions(res.dof_positions, dof_indices=solver.chain.dof_indices, unit="rad")</span> で反映する。<br>2) <strong><span class='code-chip'>apply=True</span> の挙動：</strong><span class='code-chip'>res.success == True</span> のときだけロボットへ反映される。<br>3) <strong><span class='code-chip'>target_orientation</span>：</strong><span class='code-chip'>(w, x, y, z)</span> の四元数または 3×3 回転行列を受け付ける。<br>4) <strong><span class='code-chip'>set_active_dofs()</span>：</strong>名前で指定する場合は <span class='code-chip'>chain.variable_names</span> の中の名前を渡す。<br>5) <strong>自作ソルバーの実装：</strong><span class='code-chip'>IKSolver</span> を継承し、<span class='code-chip'>__init__(self, chain, config=None)</span>（基底で <span class='code-chip'>self.chain</span> と <span class='code-chip'>self.config</span> が設定される）と <span class='code-chip'>solve(target_position, target_orientation=None, *, seed=None) -> IKResult</span> を実装して <span class='code-chip'>register_ik_solver()</span> で登録する。<span class='code-chip'>solve()</span> へ渡される目標姿勢は <strong><span class='code-chip'>chain.base_link</span> 座標系</strong>。</div></div></article>
+</section>
+
+<section id="sec-command-conv">
+  <h2>GeometricCommandConverter 群</h2>
+  <div class="table-wrap">
+    <table class="ergo-table">
+      <thead>
+        <tr><th>クラス</th><th>コンストラクタ主要引数</th><th>変換式・制約・用途</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="code-chip">GeometricCommandConverter</span></td>
+          <td><span class="code-chip">(input_names, output_dofs, output_angle_unit="rad")</span></td>
+          <td>抽象基底クラス。自作する場合は <span class="code-chip">to_dof_positions(command)</span>（<span class="code-chip">input_names</span> 順の <span class="code-chip">np.ndarray</span>、形状 <span class="code-chip">(..., 入力数)</span> → 形状 <span class="code-chip">(..., 出力数)</span>）を実装。逆変換できない場合は <span class="code-chip">from_dof_positions()</span> で <span class="code-chip">NotImplementedError</span> を送出する。</td>
+        </tr>
+        <tr>
+          <td><span class="code-chip">LinearCommandConverter</span></td>
+          <td><span class="code-chip">(input_names, output_dofs, matrix, offset=None, output_angle_unit="rad")</span></td>
+          <td>線形変換 <span class="code-chip">q = matrix @ cmd + offset</span>。逆変換できるのは <strong><span class="code-chip">matrix</span> の階数（rank）が入力数に等しいときだけ</strong>（それ以外は <span class="code-chip">NotImplementedError</span>）。</td>
+        </tr>
+        <tr>
+          <td><span class="code-chip">InterpCommandConverter</span></td>
+          <td><span class="code-chip">(input_name, output_dofs, table_inputs, table_outputs, output_angle_unit="rad", output_for_inverse=None)</span></td>
+          <td>1 次元区分線形補間テーブル。<span class="code-chip">table_inputs</span> は <strong>2 個以上で単調増加</strong>、<span class="code-chip">table_outputs</span> は形状 <span class="code-chip">(K, 出力数)</span>。範囲外入力は両端値に切り詰める。逆変換に使う <span class="code-chip">output_for_inverse</span>（出力 DOF 名）の列は単調でなければならない。</td>
+        </tr>
+        <tr>
+          <td><span class="code-chip">FunctionCommandConverter</span></td>
+          <td><span class="code-chip">(input_names, output_dofs, forward, inverse=None, output_angle_unit="rad")</span></td>
+          <td>任意の Python 関数 <span class="code-chip">forward(cmd_vec) -> dof_vec</span> を登録。<span class="code-chip">inverse=None</span> のとき逆変換は <span class="code-chip">NotImplementedError</span>。</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section id="sec-sources">
+  <h2>公式出典・同梱ソース・実機検証の切り分け</h2>
+  <ul class="source-list">
+    <li>
+      <span class="source-tag official">同梱公式 Doc</span><span class="source-tag web">Web 公式</span>
+      <strong>USD / Fabric / USDRT Population（合成前 VariantSet は USD 必須・FSD 遅延同期・2 面キャッシュ）</strong>：<br>
+      <span class="code-chip">C:\isaacsim-6.2.0\extscache\usdrt.scenegraph-7.6.3...\docs\fabricsd\fsd_vs_omnihydra.md</span>・<span class="code-chip">fabric_overview.rst</span>・<span class="code-chip">fabric_hierarchy.rst</span> ／
+      <a href="https://docs.omniverse.nvidia.com/kit/docs/usdrt.scenegraph/latest/index.html" target="_blank" rel="noopener">Omniverse USDRT / Fabric Documentation</a>
+    </li>
+    <li>
+      <span class="source-tag official">同梱公式スキーマ</span>
+      <strong>IsaacRobotAPI（<code>isaac:physics:robotLinks</code> / <code>robotJoints</code> / 入れ子サブロボット構成）</strong>：<br>
+      <span class="code-chip">C:\isaacsim-6.2.0\exts\isaacsim.robot.schema\pip_prebundle\usd\schema\isaac\robot_schema\RobotSchema.usda</span>
+    </li>
+    <li>
+      <span class="source-tag official">同梱公式 Doc</span><span class="source-tag web">Web 公式</span>
+      <strong>PhysX 5（Articulation・MimicJoint・Scene Queries CPU 実行・Contact Reports・Collider 可視化色）</strong>：<br>
+      <span class="code-chip">C:\isaacsim-6.2.0\extscache\omni.physx.ui-110.4.4...\docs\dev_guide\collision_debug_vis.rst</span>・<span class="code-chip">viewport_overlays.rst</span>・<span class="code-chip">physics_debug_wnd.rst</span>・<span class="code-chip">omni.physx-110.4.4...\docs\dev_guide\scene_queries.rst</span> ／
+      <a href="https://nvidia-omniverse.github.io/PhysX/physx/5.4.1/index.html" target="_blank" rel="noopener">NVIDIA PhysX 5.4.1 SDK Documentation</a>
+    </li>
+    <li>
+      <span class="source-tag web">Web 公式</span><span class="source-tag official">同梱公式ソース</span>
+      <strong>Newton 1.6.1（<code>eval_fk</code>・<code>CollisionPipeline</code>・<code>GeoType.MESH</code> / <code>CONVEX_MESH</code>・<code>sdf_contact.py</code>）＆ Warp</strong>：<br>
+      <span class="code-chip">C:\isaacsim-6.2.0\exts\isaacsim.pip.newton\pip_prebundle\newton[sim]\newton-1.6.1-py3-none-any\newton\_src\sim\collide.py</span>・<span class="code-chip">geometry\narrow_phase.py</span>・<span class="code-chip">geometry\sdf_contact.py</span> ／
+      <a href="https://newton-physics.github.io/newton/1.6.1/guide/overview.html" target="_blank" rel="noopener">Newton 1.6.1 Documentation</a>・<a href="https://nvidia.github.io/warp/" target="_blank" rel="noopener">NVIDIA Warp Documentation</a>
+    </li>
+    <li>
+      <span class="source-tag official">同梱公式ソース</span>
+      <strong>Isaac Sim Experimental Articulation API・DebugDraw（RTX オーバーレイ描画）</strong>：<br>
+      <span class="code-chip">C:\isaacsim-6.2.0\exts\isaacsim.core.experimental.prims\...\articulation.py</span>・<span class="code-chip">extscache\isaacsim.util.debug_draw-3.2.8...\docs\Overview.md</span>
+    </li>
+    <li>
+      <span class="source-tag empirical">実機検証</span>
+      <strong>Isaac Sim 6.2.0（RTX 3060）での全テスト・U 字凹メッシュ実測</strong>：<br>
+      <span class="code-chip">tests_pure/</span>（73 本全通過）・<span class="code-chip">tests_kit/run_kit_tests.py</span>（34 本全通過）・U 字水密メッシュ対実測（<span class="code-chip">convex_meshes=True</span>: 溝誤検知 1 件 / 5 cm 貫通時 −0.45 m / 2.35 ms 対 <span class="code-chip">convex_meshes=False</span>: 溝非接触 0 件 / 5 cm 貫通時 −0.0500 m / 2.39 ms）。
+    </li>
+  </ul>
+</section>
+
+
+  </main>
+</div>
+<svg id="ref-connector-layer" style="position:fixed;inset:0;width:100vw;height:100vh;pointer-events:none;z-index:9990;"></svg>
+<button id="ref-return-btn" type="button">↩ 元の位置へ戻る</button>
+<script>
+(() => {
+  const svgLayer = document.getElementById('ref-connector-layer');
+  const returnBtn = document.getElementById('ref-return-btn');
+  let savedScrollY = null;
+  const colorMap = { '1': '#2563eb', '2': '#059669', '3': '#d97706', '4': '#7c3aed', '5': '#db2777' };
+  const isInViewport = (el) => {
+    const r = el.getBoundingClientRect();
+    return r.width > 0 && r.height > 0 && r.top >= 0 && r.bottom <= window.innerHeight && r.left >= 0 && r.right <= window.innerWidth;
+  };
+  const clearLines = () => { if (svgLayer) svgLayer.innerHTML = ''; };
+  const drawConnector = (fromEl, toEl) => {
+    if (!svgLayer || !isInViewport(fromEl) || !isInViewport(toEl)) return;
+    const a = fromEl.getBoundingClientRect(), b = toEl.getBoundingClientRect();
+    const x1 = a.left + a.width / 2, y1 = a.top + a.height / 2;
+    const x2 = b.left + b.width / 2, y2 = b.top + b.height / 2;
+    const mx = (x1 + x2) / 2;
+    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    path.setAttribute('d', `M ${x1} ${y1} C ${mx} ${y1}, ${mx} ${y2}, ${x2} ${y2}`);
+    path.setAttribute('fill', 'none');
+    path.setAttribute('stroke', colorMap[fromEl.dataset.color] || '#2563eb');
+    path.setAttribute('stroke-width', '2');
+    path.setAttribute('stroke-dasharray', '4 3');
+    path.setAttribute('opacity', '0.72');
+    svgLayer.appendChild(path);
+  };
+  const setActive = (refId, originEl) => {
+    const peers = Array.from(document.querySelectorAll(`[data-ref="${CSS.escape(refId)}"]`));
+    const scopes = new Set();
+    peers.forEach((el) => { el.classList.add('is-active'); const sc = el.closest('[data-ref-scope]'); if (sc) scopes.add(sc); });
+    scopes.forEach((sc) => sc.classList.add('is-dimming'));
+    clearLines();
+    if (originEl) peers.filter((el) => el !== originEl).forEach((peer) => drawConnector(originEl, peer));
+  };
+  const clearActive = () => {
+    document.querySelectorAll('[data-ref].is-active').forEach((el) => el.classList.remove('is-active'));
+    document.querySelectorAll('[data-ref-scope].is-dimming').forEach((sc) => sc.classList.remove('is-dimming'));
+    clearLines();
+  };
+  document.querySelectorAll('[data-ref]').forEach((el) => {
+    const refId = el.dataset.ref;
+    el.addEventListener('mouseenter', () => setActive(refId, el));
+    el.addEventListener('mouseleave', clearActive);
+    el.addEventListener('focus', () => setActive(refId, el));
+    el.addEventListener('blur', clearActive);
+    el.addEventListener('click', () => {
+      const peers = Array.from(document.querySelectorAll(`[data-ref="${CSS.escape(refId)}"]`)).filter((p) => p !== el);
+      if (peers.length === 0) return;
+      const target = peers.find((p) => p.dataset.refRole !== el.dataset.refRole) || peers[0];
+      if (!isInViewport(target) && returnBtn) { savedScrollY = window.scrollY; returnBtn.classList.add('is-visible'); }
+      target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      target.classList.remove('is-pulsing'); void target.offsetWidth; target.classList.add('is-pulsing');
+    });
+  });
+  if (returnBtn) {
+    returnBtn.addEventListener('click', () => {
+      if (savedScrollY !== null) { window.scrollTo({ top: savedScrollY, behavior: 'smooth' }); savedScrollY = null; }
+      returnBtn.classList.remove('is-visible');
+    });
+  }
+  const tocLinks = Array.from(document.querySelectorAll('.toc a[href^="#"]'));
+  const sections = tocLinks.map((a) => document.querySelector(a.getAttribute('href'))).filter(Boolean);
+  if (sections.length > 0) {
+    const obs = new IntersectionObserver((entries) => {
+      entries.forEach((e) => {
+        if (!e.isIntersecting) return;
+        tocLinks.forEach((a) => a.classList.toggle('is-current', a.getAttribute('href') === `#${e.target.id}`));
+      });
+    }, { rootMargin: '-14% 0px -75% 0px' });
+    sections.forEach((s) => obs.observe(s));
+  }
+  const filterInput = document.getElementById('api-filter-input');
+  const filterStatus = document.getElementById('api-filter-status');
+  if (filterInput) {
+    const cards = Array.from(document.querySelectorAll('.api-card'));
+    const runFilter = () => {
+      const q = filterInput.value.trim().toLowerCase();
+      let shown = 0;
+      cards.forEach((c) => {
+        const hit = !q || c.textContent.toLowerCase().includes(q);
+        c.classList.toggle('is-hidden', !hit);
+        if (hit) shown += 1;
+      });
+      if (filterStatus) filterStatus.textContent = q ? `${shown} / ${cards.length} 件表示` : `全 ${cards.length} 件`;
+    };
+    filterInput.addEventListener('input', runFilter);
+    runFilter();
+  }
+})();
+</script>
+</body>
+</html>

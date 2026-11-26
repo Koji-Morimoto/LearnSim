@@ -67,6 +67,7 @@ class GeometricRobotView:
         collision_backend: CollisionBackend | None = None,
         fk_backend: FkBackend | None = None,
         newton_device: str | None = None,
+        convex_meshes: bool | None = None,
         environment_roots: Sequence[str] | None = None,
         use_cuda_graph: bool = True,
         use_gpu_fabric_writer: bool = False,
@@ -74,6 +75,8 @@ class GeometricRobotView:
         """`robots` は同一の運動学構造を持ち、同じ `GeometricLayer` を共有している必要がある。
 
         通常は `GeometricRobotView.from_articulations()` を使うと共有 `GeometricLayer` ごと一括生成できる。
+        `convex_meshes` は `BatchedNewtonScene` で `UsdGeom.Mesh` を単一凸包化 (`True`、既定) するか
+        元の三角形メッシュ (`False`) で判定するかを選ぶ。
         `use_gpu_fabric_writer=True` かつ Newton FK が有効な場合、Newton の `state.body_q` を CPU へ
         コピーせずに `GeometricGpuFabricWriter` で直接 `omni:fabric:worldMatrix` へ書き込む。
         """
@@ -102,6 +105,7 @@ class GeometricRobotView:
         self._collision_backend: CollisionBackend = col_be
         self._fk_backend: FkBackend = fk_be
         self._newton_device: str = newton_device if newton_device is not None else _setting("newton_device", "auto")
+        self._convex_meshes: bool = bool(convex_meshes) if convex_meshes is not None else bool(first.convex_meshes)
         self._environment_roots = None if environment_roots is None else list(environment_roots)
         self._use_cuda_graph = bool(use_cuda_graph)
         self._use_gpu_fabric_writer = bool(use_gpu_fabric_writer)
@@ -180,6 +184,22 @@ class GeometricRobotView:
         return self._fk_backend
 
     @property
+    def convex_meshes(self) -> bool:
+        """Newton バッチ干渉判定で `UsdGeom.Mesh` を単一凸包へ変換するか (`True`=凸包 / `False`=生三角形メッシュ)。"""
+        return self._convex_meshes
+
+    @convex_meshes.setter
+    def convex_meshes(self, value: bool) -> None:
+        flag = bool(value)
+        if flag == self._convex_meshes:
+            return
+        self._convex_meshes = flag
+        if self._newton_scene is not None:
+            self._newton_scene.close()
+            self._newton_scene = None
+            self._newton_scene_collider_version = -1
+
+    @property
     def newton_scene(self) -> BatchedNewtonScene:
         """全 N 台を multi-world で扱う `BatchedNewtonScene` (初回アクセス時に遅延生成する)。"""
         self._check_fresh()
@@ -195,6 +215,7 @@ class GeometricRobotView:
                 self,
                 device=self._newton_device,
                 environment_roots=self._environment_roots,
+                convex_meshes=self._convex_meshes,
                 use_cuda_graph=self._use_cuda_graph,
             )
             self._newton_scene_collider_version = cur_cver
@@ -271,6 +292,8 @@ class GeometricRobotView:
         collision_backend: CollisionBackend | None = None,
         fk_backend: FkBackend | None = None,
         newton_device: str | None = None,
+        convex_meshes: bool | None = None,
+        auto_components: bool | None = None,
         environment_roots: Sequence[str] | None = None,
         use_cuda_graph: bool = True,
         use_gpu_fabric_writer: bool = False,
@@ -292,6 +315,8 @@ class GeometricRobotView:
                 apply_layer=False,
                 collision_backend=collision_backend,
                 fk_backend="numpy",
+                convex_meshes=convex_meshes,
+                auto_components=auto_components,
             )
             for s in sources
         ]
@@ -303,6 +328,7 @@ class GeometricRobotView:
             collision_backend=collision_backend,
             fk_backend=fk_backend,
             newton_device=newton_device,
+            convex_meshes=convex_meshes,
             environment_roots=environment_roots,
             use_cuda_graph=use_cuda_graph,
             use_gpu_fabric_writer=use_gpu_fabric_writer,

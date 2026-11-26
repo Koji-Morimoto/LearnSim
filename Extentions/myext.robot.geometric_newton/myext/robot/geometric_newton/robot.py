@@ -26,10 +26,11 @@
 
 from __future__ import annotations
 
+from contextlib import contextmanager
 import dataclasses
 import os
 import time
-from typing import Callable, Literal, Mapping, Sequence, get_args
+from typing import Callable, Iterator, Literal, Mapping, Sequence, get_args
 
 import numpy as np
 from pxr import Sdf, Tf, Usd, UsdGeom, UsdPhysics
@@ -54,7 +55,7 @@ from .model import (
 )
 from .model import transforms as tf
 from .model.command import check_angle_unit
-from .newton_backend import CollisionBackend, FkBackend, GeometricScene
+from .newton_backend import _AUTO_FK_MIN_DOFS, CollisionBackend, FkBackend, GeometricScene
 from .usd_reader import UsdArticulationSource, UsdRobotInfo, _np, component_patterns, prim_matches, read_articulation, split_scale
 from .writer import GeometricFabricWriter, GeometricGpuFabricWriter, GeometricUsdWriter, LocalPoseSolver, WriteTarget
 
@@ -202,6 +203,8 @@ class GeometricRobot:
         fk_backend: FkBackend | None = None,
         scene: GeometricScene | None = None,
         newton_device: str | None = None,
+        convex_meshes: bool | None = None,
+        debug_draw_colliders: bool | None = None,
         use_gpu_fabric_writer: bool = False,
     ) -> None:
         """通常は `from_articulation` / `from_model` / `from_dh` / `from_mdh` / `from_screw` / `from_urdf` 経由で生成する。
@@ -220,6 +223,12 @@ class GeometricRobot:
             fk_backend            : `"auto"` (既定: 単体は NumPy、View バッチは Newton GPU) / `"numpy"` / `"newton"`。
             scene                 : 複数ロボットで共有する `GeometricScene`。省略時は必要時に専用 `GeometricScene` を遅延生成する。
             newton_device         : Newton バックエンドのデバイス (`"auto"` / `"cuda:0"` / `"cpu"`)。
+            convex_meshes         : Newton へ `UsdGeom.Mesh` を登録する際の扱い。
+                                    `True` (既定) = 単一凸包 (`GeoType.CONVEX_MESH`) へ変換して高速判定、
+                                    `False` = STL 等の元の三角形メッシュそのまま (`GeoType.MESH`) で判定。
+            debug_draw_colliders  : `True` にすると Newton 内部コライダー形状 (通常=シアン・干渉中=赤) と
+                                    接触点 (オレンジ) を `DebugDraw` で自動可視化する (既定 `False` = 負荷ゼロ)。
+                                    生成後も `robot.debug_draw_colliders = True / False` で随時切り替え可能。
             use_gpu_fabric_writer : `True` かつ `fk_backend="newton"` のとき、`state.body_q` を直接 GPU Fabric (`wp.fabricarray`) へ書く。
         """
         if limit_policy not in get_args(LimitPolicy):
@@ -240,6 +249,17 @@ class GeometricRobot:
         self._collision_backend: CollisionBackend = col_be
         self._fk_backend: FkBackend = fk_be
         self._newton_device: str = newton_device if newton_device is not None else _setting("newton_device", "auto")
+        self._convex_meshes: bool = (
+            bool(convex_meshes)
+            if convex_meshes is not None
+            else (bool(scene.convex_meshes) if scene is not None else bool(_setting("convex_meshes", True)))
+        )
+        self._debug_draw_colliders: bool = (
+            bool(debug_draw_colliders) if debug_draw_colliders is not None else bool(_setting("debug_draw_colliders", False))
+        )
+        self._last_collision_pairs: list | None = None
+        self._batch_depth: int = 0
+        self._batch_dirty: bool = False
         self._use_gpu_fabric_writer: bool = bool(use_gpu_fabric_writer)
         self._scene: GeometricScene | None = scene
         self._owns_scene: bool = False
@@ -352,7 +372,15 @@ class GeometricRobot:
                 self._filter.add_pair(a, b, reason="usd_filtered_pairs")
         self._colliders: dict[str, list[str]] | None = None
         self._collider_version += 1
-        self._components: dict[str, GeometricRobotComponent] = {}
+        # DOF 名 -> 番号の高速ルックアップ辞書と独立軸一覧を再構築時に 1 回だけ構築する
+        self._dof_name_to_idx: dict[str, int] = {name: i for i, name in enumerate(dof_names)}
+        self._independent_dof_indices: np.ndarray = model.independent_dof_indices
+        self._independent_dof_names: list[str] = [dof_names[i] for i in self._independent_dof_indices]
+        # 構成要素 (`GeometricRobotComponent`) はロボット生成・再構築時点で即時生成しておく
+        # (`IsaacRobotAPI` 自動検出または `UsdArticulationSource(components=...)` / `attach()` 由来)
+        self._components: dict[str, GeometricRobotComponent] = {
+            comp_name: GeometricRobotComponent(self, comp_name) for comp_name in model.components
+        }
         self._active_converters = None
         self.joints = {spec.name: GeometricJoint(self, spec) for spec in model.joints}
         self.links = {spec.name: GeometricLink(self, spec, i) for i, spec in enumerate(model.links)}
@@ -374,12 +402,28 @@ class GeometricRobot:
     # ==========================================================================
 
     @classmethod
-    def from_articulation(cls, stage: Usd.Stage, source: UsdArticulationSource | str, **kwargs) -> "GeometricRobot":
+    def from_articulation(
+        cls,
+        stage: Usd.Stage,
+        source: UsdArticulationSource | str,
+        *,
+        auto_components: bool | None = None,
+        **kwargs,
+    ) -> "GeometricRobot":
         """ステージ上の既存ロボット (`ArticulationRoot` と `Joint` を持つ prim) から作る。元の USD は書き換えない。
 
-        `source` は prim パス文字列または `UsdArticulationSource`。`kwargs` は `__init__` のキーワード引数と同じ。
+        引数:
+            source          : prim パス文字列または `UsdArticulationSource`。
+            auto_components : `True` (既定) のとき、ロボット配下の `IsaacRobotAPI` から
+                              `GeometricRobotComponent` を自動生成する (`source.components` 明示時はそちらを優先)。
+            kwargs          : `__init__` のキーワード引数 (`convex_meshes`, `debug_draw_colliders`,
+                              `write_target`, `angle_unit`, `collision_backend`, `fk_backend` 等)。
         """
-        source = UsdArticulationSource(source) if isinstance(source, str) else source
+        auto_flag = bool(_setting("auto_components", True)) if auto_components is None else bool(auto_components)
+        if isinstance(source, str):
+            source = UsdArticulationSource(source, auto_components=auto_flag)
+        elif auto_components is not None and source.auto_components != auto_flag:
+            source = dataclasses.replace(source, auto_components=auto_flag)
         model, info = read_articulation(stage, source)
         for message in info.warnings:
             _log_warn(message)
@@ -467,6 +511,18 @@ class GeometricRobot:
         return list(self.model.dof_types)
 
     @property
+    def independent_dof_indices(self) -> np.ndarray:
+        """mimic 従動軸を除いた独立 DOF の番号配列 (このロボットの `dof_names` 上のインデックス)。"""
+        self._ensure_current()
+        return self._independent_dof_indices.copy()
+
+    @property
+    def independent_dof_names(self) -> list[str]:
+        """mimic 従動軸を除いた独立 DOF の名前一覧 (`set_dof_positions` で実際に指令できる軸)。"""
+        self._ensure_current()
+        return list(self._independent_dof_names)
+
+    @property
     def num_joints(self) -> int:
         return self.model.num_joints
 
@@ -536,61 +592,227 @@ class GeometricRobot:
         return np.where(self._revolute[idx], np.pi / 180.0, 1.0)
 
     # ==========================================================================
-    # 関節値の読み書き・可動範囲
+    # 関節値の読み書き・可動範囲・バッチ更新・構造確認
     # ==========================================================================
 
-    def set_dof_positions(self, positions, *, dof_indices=None, unit: AngleUnit | None = None) -> None:
-        """関節値を更新し、FK と書き込みを実行する。mimic の従動軸は参照軸から再計算される (渡した値は使われない)。
+    @contextmanager
+    def batch_update(self) -> Iterator[None]:
+        """複数の部位・関節更新を 1 回の FK と Fabric 書き込みへまとめるコンテキストマネージャ。
 
-        `unit` を省略すると `angle_unit` を使用する。直動関節の値は常にステージの長さ単位。
+        使用例 (multi-arm で 4 本のアームを順に書いても FK + Fabric 書込はブロック終了時に 1 回だけ):
+            with robot.batch_update():
+                robot.get_component("arm0").set_dof_positions(q0)
+                robot.get_component("arm1").set_dof_positions(q1)
+        """
+        self._batch_depth += 1
+        try:
+            yield
+        finally:
+            self._batch_depth -= 1
+            if self._batch_depth == 0 and self._batch_dirty:
+                self._batch_dirty = False
+                self._q = self._model.resolve_mimic(self._q)
+                self._push()
+
+    def _resolve_dof_selector(self, dof_indices, dof_names) -> np.ndarray:
+        """`dof_indices` / `dof_names` を DOF 番号配列へ解決する。`dof_indices` 単独時は高速経路を使う。"""
+        if dof_names is None:
+            return _as_indices(dof_indices, self._model.num_dofs)
+        if dof_indices is not None:
+            raise ValueError("dof_indices と dof_names は同時に指定できない")
+        names = [dof_names] if isinstance(dof_names, str) else list(dof_names)
+        name_to_idx = self._dof_name_to_idx
+        missing = [n for n in names if n not in name_to_idx]
+        if missing:
+            raise KeyError(f"存在しない DOF 名: {missing} (利用可能: {self._model.dof_names})")
+        return np.fromiter((name_to_idx[n] for n in names), dtype=int, count=len(names))
+
+    def set_dof_positions(
+        self,
+        positions,
+        *,
+        dof_indices=None,
+        dof_names: str | Sequence[str] | None = None,
+        unit: AngleUnit | None = None,
+    ) -> None:
+        """関節値を更新し、FK と書き込みを実行する。
+
+        重要仕様:
+            - `dof_names` / `dof_indices` ともに省略して配列を渡す場合、配列長は **mimic 従動軸を含む `num_dofs`**。
+            - mimic の従動軸へ書いた値は、直後の `resolve_mimic()` により参照軸から再計算された値で必ず上書きされる。
+            - **最速ホットパス**: 毎フレーム呼ぶループでは NumPy 配列 + `dof_indices` (または事前取得した
+              `component.set_dof_positions(arr)`) を使うこと。辞書や `dof_names=` は名前解決のハッシュ引きが入るため
+              初期化・テスト・低頻度操作向け。
+            - `positions` に辞書 `{"joint_name": value, ...}` を渡すと指定した軸だけ部分更新できる
+              (このとき `dof_indices` / `dof_names` は併用不可)。
+            - `unit` 省略時は `angle_unit` を使用。直動関節の値は常にステージの長さ単位。
         """
         self._ensure_current()
-        idx = _as_indices(dof_indices, self._model.num_dofs)
-        values = np.asarray(positions, dtype=float).reshape(-1)
-        if values.shape[0] != idx.shape[0]:
-            raise ValueError(f"positions の個数 {values.shape[0]} が DOF の個数 {idx.shape[0]} と合わない")
+        # 最速パス: 非辞書かつ dof_names 未指定
+        if dof_names is None and not isinstance(positions, Mapping):
+            idx = _as_indices(dof_indices, self._model.num_dofs)
+            values = np.asarray(positions, dtype=float).reshape(-1)
+            if values.shape[0] != idx.shape[0]:
+                raise ValueError(f"positions の個数 {values.shape[0]} が DOF の個数 {idx.shape[0]} と合わない")
+            scale = self._unit_scale(idx, unit)
+            self._set_positions_rad(values if scale is None else values * scale, idx)
+            return
+
+        if isinstance(positions, Mapping):
+            if dof_indices is not None or dof_names is not None:
+                raise ValueError("positions に辞書を渡すときは dof_indices / dof_names を併用できない")
+            if not positions:
+                return
+            name_to_idx = self._dof_name_to_idx
+            keys = list(positions.keys())
+            missing = [k for k in keys if k not in name_to_idx]
+            if missing:
+                raise KeyError(f"存在しない DOF 名: {missing} (利用可能: {self._model.dof_names})")
+            idx = np.fromiter((name_to_idx[k] for k in keys), dtype=int, count=len(keys))
+            values = np.fromiter((positions[k] for k in keys), dtype=float, count=len(keys))
+        else:
+            idx = self._resolve_dof_selector(dof_indices, dof_names)
+            values = np.asarray(positions, dtype=float).reshape(-1)
+            if values.shape[0] != idx.shape[0]:
+                raise ValueError(f"positions の個数 {values.shape[0]} が DOF の個数 {idx.shape[0]} と合わない")
         scale = self._unit_scale(idx, unit)
         self._set_positions_rad(values if scale is None else values * scale, idx)
 
     def _set_positions_rad(self, values: np.ndarray, idx: np.ndarray) -> None:
         self._q[idx] = self._apply_limits(values, idx)
+        if self._batch_depth > 0:
+            # `batch_update()` 内では `_push()` を遅延し、ブロック終了時に 1 回だけ FK + 書き込みを実行する
+            self._batch_dirty = True
+            return
         # mimic の従動軸をこの時点で解決しておき、後段の `_compute_world` や `GeometricScene.sync_robots` では
         # `resolve_mimic=False` で二重計算を避ける。
         self._q = self._model.resolve_mimic(self._q)
         self._push()
 
-    def get_dof_positions(self, *, dof_indices=None, unit: AngleUnit | None = None) -> np.ndarray:
+    def get_dof_positions(
+        self,
+        *,
+        dof_indices=None,
+        dof_names: str | Sequence[str] | None = None,
+        unit: AngleUnit | None = None,
+    ) -> np.ndarray:
         """現在の関節値 (mimic 解決済み) を返す。"""
         self._ensure_current()
-        idx = _as_indices(dof_indices, self._model.num_dofs)
+        idx = self._resolve_dof_selector(dof_indices, dof_names)
         scale = self._unit_scale(idx, unit)
         return self._q[idx].copy() if scale is None else self._q[idx] / scale
 
-    def set_dof_position_targets(self, positions, *, dof_indices=None, unit: AngleUnit | None = None) -> None:
-        """Drive を持たないため `set_dof_positions` と同義 (`Articulation` 用コードを移行するための別名)。"""
-        self.set_dof_positions(positions, dof_indices=dof_indices, unit=unit)
-
-    def get_dof_position_targets(self, *, dof_indices=None, unit: AngleUnit | None = None) -> np.ndarray:
-        return self.get_dof_positions(dof_indices=dof_indices, unit=unit)
-
-    def get_dof_limits(self, *, dof_indices=None, unit: AngleUnit | None = None) -> tuple[np.ndarray, np.ndarray]:
+    def get_dof_positions_dict(
+        self,
+        *,
+        dof_names: str | Sequence[str] | None = None,
+        independent_only: bool = False,
+        unit: AngleUnit | None = None,
+    ) -> dict[str, float]:
+        """現在の関節値を `{dof_name: value}` 辞書で返す (デバッグ・ログ・名前指定操作向け)。"""
         self._ensure_current()
-        idx = _as_indices(dof_indices, self._model.num_dofs)
+        if dof_names is not None:
+            idx = self._resolve_dof_selector(None, dof_names)
+            names = [self._model.dof_names[i] for i in idx]
+        elif independent_only:
+            idx = self._independent_dof_indices
+            names = self._independent_dof_names
+        else:
+            idx = np.arange(self._model.num_dofs, dtype=int)
+            names = self._model.dof_names
+        vals = self.get_dof_positions(dof_indices=idx, unit=unit)
+        return dict(zip(names, vals.tolist()))
+
+    def set_dof_position_targets(
+        self,
+        positions,
+        *,
+        dof_indices=None,
+        dof_names: str | Sequence[str] | None = None,
+        unit: AngleUnit | None = None,
+    ) -> None:
+        """Drive を持たないため `set_dof_positions` と同義 (`Articulation` 用コードを移行するための別名)。"""
+        self.set_dof_positions(positions, dof_indices=dof_indices, dof_names=dof_names, unit=unit)
+
+    def get_dof_position_targets(
+        self,
+        *,
+        dof_indices=None,
+        dof_names: str | Sequence[str] | None = None,
+        unit: AngleUnit | None = None,
+    ) -> np.ndarray:
+        return self.get_dof_positions(dof_indices=dof_indices, dof_names=dof_names, unit=unit)
+
+    def get_dof_limits(
+        self,
+        *,
+        dof_indices=None,
+        dof_names: str | Sequence[str] | None = None,
+        unit: AngleUnit | None = None,
+    ) -> tuple[np.ndarray, np.ndarray]:
+        self._ensure_current()
+        idx = self._resolve_dof_selector(dof_indices, dof_names)
         scale = self._unit_scale(idx, unit)
         if scale is None:
             return self._lower[idx].copy(), self._upper[idx].copy()
         return self._lower[idx] / scale, self._upper[idx] / scale
 
-    def set_dof_limits(self, lower=None, upper=None, *, dof_indices=None, unit: AngleUnit | None = None) -> None:
+    def set_dof_limits(
+        self,
+        lower=None,
+        upper=None,
+        *,
+        dof_indices=None,
+        dof_names: str | Sequence[str] | None = None,
+        unit: AngleUnit | None = None,
+    ) -> None:
         """このインスタンス上の可動範囲を変更する (モデルと USD は書き換えない。再構築時はモデルの値へ戻る)。"""
         self._ensure_current()
-        idx = _as_indices(dof_indices, self._model.num_dofs)
+        idx = self._resolve_dof_selector(dof_indices, dof_names)
         scale = self._unit_scale(idx, unit)
         factor = 1.0 if scale is None else scale
         if lower is not None:
             self._lower[idx] = np.asarray(lower, dtype=float).reshape(-1) * factor
         if upper is not None:
             self._upper[idx] = np.asarray(upper, dtype=float).reshape(-1) * factor
+
+    def describe(self) -> str:
+        """ロボットの構成・構成要素・全 DOF (番号 / 名前 / 種別 / 可動範囲 / mimic / 所属)・VariantSet を整形文字列で返す。"""
+        self._ensure_current()
+        model = self._model
+        unit_label = self._angle_unit
+        lo, hi = self.get_dof_limits()
+        lines = [
+            f"GeometricRobot({model.name!r})",
+            f"  links={model.num_links}, joints={model.num_joints}, dofs={model.num_dofs} (independent={len(self._independent_dof_indices)})",
+            f"  write_target={self._write_target!r}, collision_backend={self._collision_backend!r}, "
+            f"fk_backend={self._fk_backend!r}, convex_meshes={self._convex_meshes}, "
+            f"debug_draw_colliders={self._debug_draw_colliders}, angle_unit={unit_label!r}",
+        ]
+        if model.components:
+            comp_strs = [f"{c}(dofs={self._components[c].num_dofs}, links={len(lks)})" for c, lks in model.components.items()]
+            lines.append("  components: " + ", ".join(comp_strs))
+        else:
+            lines.append("  components: (なし)")
+        lines.append("  DOFs:")
+        for d, js in enumerate(model.dof_joints):
+            comp = model.component_of_link(js.child_link) or "-"
+            u = unit_label if js.joint_type == "revolute" else "m"
+            mimic_s = (
+                f" [mimic <- {js.mimic.reference_joint} * {js.mimic.multiplier:g} + {js.mimic.offset:g}]"
+                if js.mimic is not None
+                else ""
+            )
+            lines.append(
+                f"    [{d:2d}] {js.name} ({js.joint_type}, {lo[d]:.3g}..{hi[d]:.3g} {u}, comp={comp}){mimic_s}"
+            )
+        if self._source is not None:
+            variants = self.get_variants()
+            if variants:
+                lines.append("  VariantSets:")
+                for p, vs in variants.items():
+                    lines.append(f"    {p}: {vs}")
+        return "\n".join(lines)
 
     def _apply_limits(self, values: np.ndarray, idx: np.ndarray) -> np.ndarray:
         if self._limit_policy == "ignore":
@@ -621,6 +843,9 @@ class GeometricRobot:
             self._base[:3, 3] = np.asarray(positions, dtype=float).reshape(3)
         if orientations is not None:
             self._base[:3, :3] = tf.quat_to_matrix(np.asarray(orientations, dtype=float).reshape(4))
+        if self._batch_depth > 0:
+            self._batch_dirty = True
+            return
         self._push()
 
     def get_local_poses(self) -> tuple[np.ndarray, np.ndarray]:
@@ -638,6 +863,9 @@ class GeometricRobot:
         if orientations is not None:
             local[:3, :3] = tf.quat_to_matrix(np.asarray(orientations, dtype=float).reshape(4))
         self._base = parent @ local
+        if self._batch_depth > 0:
+            self._batch_dirty = True
+            return
         self._push()
 
     def _root_parent_world(self) -> np.ndarray:
@@ -1101,11 +1329,75 @@ class GeometricRobot:
         self._fk_backend = value
 
     @property
+    def convex_meshes(self) -> bool:
+        """Newton 干渉判定で `UsdGeom.Mesh` を単一凸包へ変換するか (`True`=凸包 / `False`=元の三角形メッシュ)。"""
+        return self._convex_meshes
+
+    @convex_meshes.setter
+    def convex_meshes(self, value: bool) -> None:
+        flag = bool(value)
+        if flag == self._convex_meshes:
+            return
+        self._convex_meshes = flag
+        if self._scene is not None:
+            self._scene.convex_meshes = flag
+
+    @property
+    def debug_draw_colliders(self) -> bool:
+        """デバッグ用 `DebugDraw` コライダー可視化 (通常=シアン / 干渉中=赤 / 接触点=オレンジ) の有効スイッチ。"""
+        return self._debug_draw_colliders
+
+    @debug_draw_colliders.setter
+    def debug_draw_colliders(self, value: bool) -> None:
+        flag = bool(value)
+        if flag == self._debug_draw_colliders:
+            return
+        self._debug_draw_colliders = flag
+        if flag:
+            self.draw_colliders(self._last_collision_pairs)
+        else:
+            self.clear_collider_debug_draw()
+
+    def draw_colliders(
+        self,
+        pairs: Sequence | None = None,
+        *,
+        include_environment: bool = True,
+        clear: bool = True,
+        sync_robots: bool = True,
+        sync_env: bool = True,
+    ) -> int:
+        """現在の Newton 内部コライダー形状と接触点を `DebugDraw` で 1 回描画する (デバッグ用途)。
+
+        配色: 通常=シアン / 干渉中=赤 / 接触点とめり込み線分=オレンジ。
+        `pairs` 省略時は直近の `check_collisions()` / `compute_clearances()` の結果を再利用する。
+        """
+        use_pairs = self._last_collision_pairs if pairs is None else pairs
+        return self.scene.draw_colliders(
+            use_pairs,
+            robot=self,
+            include_environment=include_environment,
+            clear=clear,
+            sync_robots=sync_robots,
+            sync_env=sync_env,
+        )
+
+    def clear_collider_debug_draw(self) -> None:
+        """`DebugDraw` で描画したコライダー線分と接触点マーカーを消去する。"""
+        if self._scene is not None:
+            self._scene.clear_debug_draw()
+            return
+        dd = GeometricScene._get_debug_draw_interface()
+        if dd is not None:
+            dd.clear_lines()
+            dd.clear_points()
+
+    @property
     def scene(self) -> GeometricScene:
         """このロボットが属する自前コリジョン空間 (`GeometricScene`)。未指定なら必要時に専用インスタンスを自動生成する。"""
         self._ensure_current()
         if self._scene is None:
-            self._scene = GeometricScene(self._stage, device=self._newton_device)
+            self._scene = GeometricScene(self._stage, device=self._newton_device, convex_meshes=self._convex_meshes)
             self._owns_scene = True
             self._scene.add_robot(self)
         return self._scene
@@ -1321,7 +1613,11 @@ class GeometricRobot:
             backend   : 省略時は `self.collision_backend` (既定 `"newton"`: `flush_to_usd()` 不要で 0 フレーム遅延)。
                         `"physx"` を選んだ場合は `GeometricCollisionChecker._prepare()` 内で自動的に `flush_to_usd()` が呼ばれる。
         """
-        return _check(self, self.link_set, scope, extra_filter, ignore_prim_paths, clearance=clearance, backend=backend)
+        pairs = _check(self, self.link_set, scope, extra_filter, ignore_prim_paths, clearance=clearance, backend=backend)
+        self._last_collision_pairs = pairs
+        if self._debug_draw_colliders:
+            self.scene.draw_colliders(pairs, robot=self, sync_robots=False, sync_env=False)
+        return pairs
 
     def is_in_collision(self, scope=None, **kwargs) -> bool:
         return bool(self.check_collisions(scope, **kwargs))
@@ -1346,7 +1642,7 @@ class GeometricRobot:
     ) -> list:
         """`max_distance` [m] 以内の組と符号付き距離 (`separation`) を近い順 (負=めり込みが先頭) で返す (`GeometricScene` 使用)。"""
         self._ensure_current()
-        return self.scene.compute_clearances(
+        pairs = self.scene.compute_clearances(
             self,
             link_set=self.link_set,
             scope=scope,
@@ -1354,6 +1650,10 @@ class GeometricRobot:
             extra_filter=extra_filter,
             ignore_prim_paths=ignore_prim_paths,
         )
+        self._last_collision_pairs = pairs
+        if self._debug_draw_colliders:
+            self.scene.draw_colliders(pairs, robot=self, sync_robots=False, sync_env=False)
+        return pairs
 
     def ignore_touching_pairs(
         self,
@@ -1449,15 +1749,21 @@ class GeometricRobot:
         return added
 
     # ==========================================================================
-    # 構成要素 (attach で結合したロボットの部分ビュー)
+    # 構成要素 (IsaacRobotAPI 自動検出 / components= / attach() による部分ビュー)
     # ==========================================================================
 
     @property
     def component_names(self) -> list[str]:
         return list(self.model.components)
 
+    @property
+    def components(self) -> dict[str, "GeometricRobotComponent"]:
+        """ロボット生成・再構築時に自動生成された全構成要素の辞書 `{名前: GeometricRobotComponent}`。"""
+        self._ensure_current()
+        return dict(self._components)
+
     def get_component(self, name: str) -> "GeometricRobotComponent":
-        """結合ロボットの構成要素 (`GeometricRobot` と状態を共有する部分ロボットハンドル) を取得する。"""
+        """結合ロボット・`IsaacRobotAPI` サブロボットの構成要素 (`GeometricRobot` と状態を共有する部分ロボットハンドル) を取得する。"""
         if name not in self.model.components:
             raise KeyError(f"構成要素 {name!r} は無い。ある名前: {self.component_names}")
         if name not in self._components:
@@ -1510,9 +1816,22 @@ class GeometricRobot:
                 _log_warn(f"GPU Fabric 直接書き込みを使えないので通常 Fabric ライターに切替: {exc}")
         return self._gpu_fabric_writer
 
+    def _use_newton_fk(self) -> bool:
+        """現在の `fk_backend`・DOF 数・CUDA 可否から、FK に `GeometricScene` (Newton) を使うか判定する。"""
+        if self._fk_backend == "newton":
+            return True
+        if self._fk_backend == "auto" and self._model.num_dofs >= _AUTO_FK_MIN_DOFS:
+            try:
+                import warp as wp
+
+                return bool(wp.is_cuda_available())
+            except Exception:
+                return False
+        return False
+
     def _compute_world(self) -> np.ndarray:
         """現在の `self._q` (mimic 解決済み) と `self._base` から全リンクのワールド行列 `(L, 4, 4)` を計算する。"""
-        if self._fk_backend == "newton":
+        if self._use_newton_fk():
             return self.scene.eval_fk(self, self._q, base_matrix=self._base, resolve_mimic=False)
         return self._base @ self._model.forward_kinematics(self._q, resolve_mimic=False)
 
@@ -1529,7 +1848,7 @@ class GeometricRobot:
         if not self._layer.is_applied() or self._closed or not self._prim_paths:
             return
         world = self._prim_world()
-        gpu_fab = self._gpu_fabric() if (self._fk_backend == "newton" and self._write_target in ("fabric", "both")) else None
+        gpu_fab = self._gpu_fabric() if (self._use_newton_fk() and self._write_target in ("fabric", "both")) else None
         fabric = None if gpu_fab is not None else (self._fabric() if self._write_target in ("fabric", "both") else None)
         if self._write_target in ("usd", "both") or (gpu_fab is None and fabric is None):
             self._usd_writer.write(self._solver, world)
@@ -1543,6 +1862,9 @@ class GeometricRobot:
             gpu_fab.write_body_q(sc.newton_state.body_q, int(sc.newton_model.body_count))
         elif fabric is not None:
             fabric.write(self._solver, world)
+        # Debug モードが OFF (既定) のときはこの 1 回の bool 判定だけで抜け、性能影響はゼロ
+        if self._debug_draw_colliders:
+            self.scene.draw_colliders(self._last_collision_pairs, robot=self, sync_robots=True, sync_env=False)
 
     def flush_to_usd(self) -> bool:
         """Fabric にのみ書いてある姿勢を USD (無名 Sublayer) へ書き出す。実際に書いたら `True`。
@@ -1633,7 +1955,7 @@ class GeometricRobot:
             return
         self._repush_frames -= 1
         if self._write_target in ("fabric", "both") and self._prim_paths:
-            if self._use_gpu_fabric_writer and self._fk_backend == "newton":
+            if self._use_gpu_fabric_writer and self._use_newton_fk():
                 gpu_fab = self._gpu_fabric()
                 if gpu_fab is not None:
                     try:
@@ -1678,6 +2000,10 @@ class GeometricRobot:
         if self._gpu_fabric_writer is not None:
             self._gpu_fabric_writer.close()
             self._gpu_fabric_writer = None
+        if self._debug_draw_colliders:
+            self._debug_draw_colliders = False
+            if self._scene is not None:
+                self._scene.clear_debug_draw()
         if self._scene is not None:
             if self._owns_scene:
                 self._scene.close()
@@ -1786,30 +2112,109 @@ class GeometricRobotComponent:
         return [names[d] for d in self._resolve()[1]]
 
     @property
+    def independent_dof_indices(self) -> np.ndarray:
+        """この構成要素内の独立 DOF (mimic 従動軸を除く) のローカル番号配列 (`0..num_dofs-1`)。"""
+        own = self._resolve()[1]
+        indep_set = set(self._robot.independent_dof_indices.tolist())
+        return np.array([i for i, d in enumerate(own) if int(d) in indep_set], dtype=int)
+
+    @property
+    def independent_dof_names(self) -> list[str]:
+        """この構成要素内の独立 DOF 名一覧。"""
+        names = self.dof_names
+        return [names[i] for i in self.independent_dof_indices]
+
+    @property
     def link_paths(self) -> list[str | None]:
         return [self._robot.link_path_map.get(n) for n in self._resolve()[0]]
 
-    def _map(self, dof_indices) -> np.ndarray:
+    def _map(self, dof_indices, dof_names=None) -> np.ndarray:
         own = self._resolve()[1]
-        return own[_as_indices(dof_indices, len(own))]
+        if dof_names is None:
+            return own[_as_indices(dof_indices, len(own))]
+        if dof_indices is not None:
+            raise ValueError("dof_indices と dof_names は同時に指定できない")
+        own_names = self.dof_names
+        name_to_global = {n: int(g) for n, g in zip(own_names, own)}
+        req = [dof_names] if isinstance(dof_names, str) else list(dof_names)
+        missing = [n for n in req if n not in name_to_global]
+        if missing:
+            raise KeyError(f"構成要素 {self.name!r} に存在しない DOF 名: {missing} (利用可能: {own_names})")
+        return np.fromiter((name_to_global[n] for n in req), dtype=int, count=len(req))
 
-    def set_dof_positions(self, positions, *, dof_indices=None, unit: AngleUnit | None = None) -> None:
-        self._robot.set_dof_positions(positions, dof_indices=self._map(dof_indices), unit=unit)
+    def set_dof_positions(
+        self,
+        positions,
+        *,
+        dof_indices=None,
+        dof_names: str | Sequence[str] | None = None,
+        unit: AngleUnit | None = None,
+    ) -> None:
+        """この構成要素の関節値を更新する。配列 (最速パス)・辞書 `{dof_name: val}`・`dof_names=` に対応。"""
+        if isinstance(positions, Mapping):
+            if dof_indices is not None or dof_names is not None:
+                raise ValueError("positions に辞書を渡すときは dof_indices / dof_names を併用できない")
+            if not positions:
+                return
+            keys = list(positions.keys())
+            g_idx = self._map(None, keys)
+            vals = np.fromiter((positions[k] for k in keys), dtype=float, count=len(keys))
+            self._robot.set_dof_positions(vals, dof_indices=g_idx, unit=unit)
+            return
+        self._robot.set_dof_positions(positions, dof_indices=self._map(dof_indices, dof_names), unit=unit)
 
-    def get_dof_positions(self, *, dof_indices=None, unit: AngleUnit | None = None) -> np.ndarray:
-        return self._robot.get_dof_positions(dof_indices=self._map(dof_indices), unit=unit)
+    def get_dof_positions(
+        self,
+        *,
+        dof_indices=None,
+        dof_names: str | Sequence[str] | None = None,
+        unit: AngleUnit | None = None,
+    ) -> np.ndarray:
+        return self._robot.get_dof_positions(dof_indices=self._map(dof_indices, dof_names), unit=unit)
 
-    def get_dof_limits(self, *, dof_indices=None, unit: AngleUnit | None = None) -> tuple[np.ndarray, np.ndarray]:
-        return self._robot.get_dof_limits(dof_indices=self._map(dof_indices), unit=unit)
+    def get_dof_positions_dict(
+        self,
+        *,
+        dof_names: str | Sequence[str] | None = None,
+        independent_only: bool = False,
+        unit: AngleUnit | None = None,
+    ) -> dict[str, float]:
+        """この構成要素の現在関節値を `{dof_name: value}` 辞書で返す。"""
+        if dof_names is not None:
+            req = [dof_names] if isinstance(dof_names, str) else list(dof_names)
+            vals = self.get_dof_positions(dof_names=req, unit=unit)
+            return dict(zip(req, vals.tolist()))
+        if independent_only:
+            l_idx = self.independent_dof_indices
+            names = [self.dof_names[i] for i in l_idx]
+            vals = self.get_dof_positions(dof_indices=l_idx, unit=unit)
+            return dict(zip(names, vals.tolist()))
+        names = self.dof_names
+        vals = self.get_dof_positions(unit=unit)
+        return dict(zip(names, vals.tolist()))
+
+    def get_dof_limits(
+        self,
+        *,
+        dof_indices=None,
+        dof_names: str | Sequence[str] | None = None,
+        unit: AngleUnit | None = None,
+    ) -> tuple[np.ndarray, np.ndarray]:
+        return self._robot.get_dof_limits(dof_indices=self._map(dof_indices, dof_names), unit=unit)
 
     def get_link_world_poses(self) -> tuple[np.ndarray, np.ndarray]:
         return self._robot.get_link_world_poses(link_indices=self._robot.get_link_indices(self._resolve()[0]))
 
     def _patterns(self) -> list[str]:
         source = self._robot._require_source("構成要素の set_variant")
+        info = self._robot.info
+        if info is not None and self.name in info.component_prim_paths:
+            return list(info.component_prim_paths[self.name])
         spec = (source.components or {}).get(self.name)
         if spec is None:
-            raise RuntimeError(f"構成要素 {self.name!r} は UsdArticulationSource(components=...) で指定したものではないので、prim の範囲が決まらない")
+            raise RuntimeError(
+                f"構成要素 {self.name!r} は IsaacRobotAPI 自動生成または UsdArticulationSource(components=...) 由来ではないため、prim の範囲が決まらない"
+            )
         return component_patterns(spec)
 
     def set_variant(self, variant_set: str, variant: str, *, prim: str | None = None) -> None:

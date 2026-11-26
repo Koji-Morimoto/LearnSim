@@ -23,7 +23,7 @@ from .ik import (
     register_ik_solver,
 )
 from .sources import DHParameters, DHRow, MDHParameters, MDHRow, MovableJointType, ScrewAxisRow, ScrewParameters, UrdfSource
-from .spec import GeometricJointSpec, GeometricLinkSpec, GeometricMimicSpec, GeometricRobotModel, JointType
+from .spec import GeometricJointSpec, GeometricLinkSpec, GeometricMimicSpec, GeometricRobotModel, JointType, serial_model
 from .urdf import model_to_urdf, read_urdf, read_urdf_string
 
 __all__ = [
@@ -58,6 +58,7 @@ __all__ = [
     "GeometricMimicSpec",
     "GeometricRobotModel",
     "JointType",
+    "serial_model",
     "model_to_urdf",
     "read_urdf",
     "read_urdf_string",

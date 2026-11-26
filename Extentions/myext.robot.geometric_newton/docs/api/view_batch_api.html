@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>API 仕様: GeometricRobotView — myext.robot.geometric_newton</title>
+<style>
+:root {
+  --bg: #ffffff;
+  --surface: #f8fafc;
+  --surface-2: #f1f5f9;
+  --text: #1e293b;
+  --text-strong: #0f172a;
+  --muted: #64748b;
+  --border: #cbd5e1;
+  --border-light: #e2e8f0;
+  --c1: #2563eb; --c1-bg: #dbeafe;
+  --c2: #059669; --c2-bg: #d1fae5;
+  --c3: #d97706; --c3-bg: #fef3c7;
+  --c4: #7c3aed; --c4-bg: #ede9fe;
+  --c5: #db2777; --c5-bg: #fce7f3;
+}
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  font-family: "Segoe UI", "Hiragino Kaku Gothic ProN", "Yu Gothic UI", Meiryo, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.78;
+}
+.topbar {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(255,255,255,0.95);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--border-light);
+  padding: 0.6rem 1.4rem;
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 0.8rem; flex-wrap: wrap;
+}
+.topbar-title {
+  display: flex; align-items: center; gap: 0.6rem;
+  font-weight: 700; color: var(--text-strong); font-size: 0.94rem;
+}
+.doc-type-pill {
+  display: inline-block; padding: 0.12rem 0.6rem; border-radius: 999px;
+  font-size: 0.76rem; font-weight: 700;
+}
+.pill-portal { background: var(--c1-bg); color: var(--c1); }
+.pill-exp { background: var(--c4-bg); color: var(--c4); }
+.pill-howto { background: var(--c2-bg); color: var(--c2); }
+.pill-ref { background: var(--c3-bg); color: var(--c3); }
+
+.topbar-nav { display: flex; align-items: center; gap: 0.45rem; flex-wrap: wrap; }
+.nav-btn {
+  display: inline-flex; align-items: center; gap: 0.3rem;
+  padding: 0.32rem 0.72rem; border-radius: 7px;
+  border: 1px solid var(--border); background: var(--surface);
+  color: var(--text-strong); text-decoration: none;
+  font-size: 0.81rem; font-weight: 600;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+.nav-btn:hover { background: var(--c1-bg); border-color: var(--c1); color: var(--c1); }
+.nav-btn.is-active { background: var(--c1); border-color: var(--c1); color: #fff; }
+
+.subnav-bar {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border-light);
+  padding: 0.45rem 1.4rem;
+  display: flex; align-items: center; gap: 0.45rem; flex-wrap: wrap;
+  font-size: 0.8rem;
+}
+.subnav-label { color: var(--muted); font-weight: 700; margin-right: 0.3rem; }
+.subnav-link {
+  padding: 0.2rem 0.6rem; border-radius: 6px; text-decoration: none;
+  color: var(--text); border: 1px solid transparent; font-weight: 600;
+}
+.subnav-link:hover { background: var(--c1-bg); color: var(--c1); }
+.subnav-link.is-active { background: #fff; border-color: var(--c1); color: var(--c1); }
+
+.page-layout {
+  max-width: 1440px; margin: 0 auto;
+  display: grid; grid-template-columns: 260px minmax(0, 1fr);
+  gap: 2.2rem; padding: 1.8rem 1.5rem 5rem;
+}
+@media (max-width: 1060px) {
+  .page-layout { grid-template-columns: 1fr; }
+  .toc-rail { display: none; }
+}
+.toc-rail {
+  position: sticky; top: 4.6rem; align-self: start;
+  max-height: calc(100vh - 5.6rem); overflow-y: auto; padding-right: 0.4rem;
+}
+.toc-label {
+  font-size: 0.74rem; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.06em; color: var(--muted); margin: 0 0 0.55rem;
+}
+.toc ul { list-style: none; margin: 0; padding: 0; }
+.toc li { margin: 0.14rem 0; }
+.toc a {
+  display: block; padding: 0.28rem 0.6rem;
+  border-left: 2px solid var(--border-light);
+  color: var(--muted); text-decoration: none;
+  font-size: 0.81rem; line-height: 1.4;
+  transition: color 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+}
+.toc a:hover { color: var(--text-strong); border-left-color: var(--border); }
+.toc a.is-current {
+  color: var(--c1); border-left-color: var(--c1);
+  background: var(--c1-bg); font-weight: 700; border-radius: 0 6px 6px 0;
+}
+
+.filter-box { margin: 0 0 1rem; }
+.filter-input {
+  width: 100%; padding: 0.48rem 0.75rem; border-radius: 8px;
+  border: 1.5px solid var(--border); font-size: 0.86rem; color: var(--text-strong);
+  background: #fff;
+}
+.filter-input:focus { outline: none; border-color: var(--c1); box-shadow: 0 0 0 3px rgba(37,99,235,0.16); }
+.filter-status { font-size: 0.78rem; color: var(--muted); margin-top: 0.35rem; }
+
+.prose { max-width: 68ch; line-height: 1.82; color: var(--text); }
+.prose ul, .prose ol { padding-left: 1.35rem; margin: 0.35rem 0 1.05rem; }
+.prose li { margin-bottom: 0.42rem; }
+.hero { margin-bottom: 2rem; padding-bottom: 1.35rem; border-bottom: 1px solid var(--border-light); }
+.hero h1 { margin: 0 0 0.6rem; font-size: 1.85rem; line-height: 1.3; color: var(--text-strong); }
+.hero-lead { max-width: 68ch; color: var(--muted); font-size: 0.98rem; margin: 0; }
+
+section { scroll-margin-top: 5rem; }
+h2 {
+  margin-top: 3rem; margin-bottom: 0.75rem; font-size: 1.4rem;
+  color: var(--text-strong); padding-bottom: 0.35rem;
+  border-bottom: 2px solid var(--border-light);
+}
+h3 { margin-top: 2rem; margin-bottom: 0.48rem; font-size: 1.08rem; color: var(--text-strong); }
+p { margin-top: 0; margin-bottom: 1rem; }
+
+.ref-badge {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 1.42em; height: 1.42em; padding: 0 0.32em; border-radius: 999px;
+  font-size: 0.78em; font-weight: 700; color: #fff; background: var(--c1);
+  cursor: pointer; vertical-align: 0.06em; margin-right: 0.22em; user-select: none;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
+}
+.ref-badge[data-color="1"] { background: var(--c1); }
+.ref-badge[data-color="2"] { background: var(--c2); }
+.ref-badge[data-color="3"] { background: var(--c3); }
+.ref-badge[data-color="4"] { background: var(--c4); }
+.ref-badge[data-color="5"] { background: var(--c5); }
+
+.ui-chip {
+  display: inline-block; padding: 0.05em 0.46em; border-radius: 6px;
+  border: 1px solid #94a3b8; background: #f1f5f9;
+  font-weight: 600; font-size: 0.89em; color: #0f172a;
+}
+.code-chip {
+  display: inline-block; padding: 0.04em 0.36em; border-radius: 4px;
+  border: 1px solid #cbd5e1; background: #f8fafc;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.86em; color: #0f172a;
+}
+
+[data-ref-scope].is-dimming [data-ref]:not(.is-active),
+[data-ref-scope].is-dimming .dim-candidate:not(.is-active) {
+  opacity: 0.25; transition: opacity 0.15s ease;
+}
+[data-ref].is-active {
+  outline: 2px solid var(--c1); outline-offset: 2px;
+  box-shadow: 0 0 0 4px rgba(37,99,235,0.2);
+}
+[data-ref][data-color="2"].is-active { outline-color: var(--c2); box-shadow: 0 0 0 4px rgba(5,150,105,0.22); }
+[data-ref][data-color="3"].is-active { outline-color: var(--c3); box-shadow: 0 0 0 4px rgba(217,119,6,0.22); }
+[data-ref][data-color="4"].is-active { outline-color: var(--c4); box-shadow: 0 0 0 4px rgba(124,58,237,0.22); }
+[data-ref][data-color="5"].is-active { outline-color: var(--c5); box-shadow: 0 0 0 4px rgba(219,39,119,0.22); }
+svg g[data-ref] { cursor: pointer; transition: opacity 0.15s ease, filter 0.15s ease; }
+svg g[data-ref].is-active { outline: none; box-shadow: none; filter: drop-shadow(0 0 5px rgba(37,99,235,0.55)); }
+svg g[data-ref][data-color="2"].is-active { filter: drop-shadow(0 0 5px rgba(5,150,105,0.6)); }
+svg g[data-ref][data-color="3"].is-active { filter: drop-shadow(0 0 5px rgba(217,119,6,0.6)); }
+svg g[data-ref][data-color="4"].is-active { filter: drop-shadow(0 0 5px rgba(124,58,237,0.6)); }
+
+@keyframes ref-pulse {
+  0% { box-shadow: 0 0 0 0 rgba(37,99,235,0.55); }
+  100% { box-shadow: 0 0 0 12px rgba(37,99,235,0); }
+}
+.is-pulsing { animation: ref-pulse 0.8s ease-out 1; }
+
+.card-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(275px, 1fr));
+  gap: 1rem; margin: 1rem 0 1.6rem;
+}
+.nav-card {
+  display: block; text-decoration: none; color: inherit;
+  background: #fff; border: 1.5px solid var(--border); border-radius: 11px;
+  padding: 1rem 1.1rem; transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.nav-card:hover { border-color: var(--c1); box-shadow: 0 6px 18px rgba(37,99,235,0.1); }
+.nav-card h3 { margin: 0 0 0.35rem; font-size: 1rem; color: var(--text-strong); }
+.nav-card p { margin: 0; font-size: 0.86rem; color: var(--muted); line-height: 1.58; }
+
+.api-card {
+  background: #fff; border: 1.5px solid var(--border); border-radius: 11px;
+  padding: 1rem 1.15rem; margin: 1rem 0 1.4rem; scroll-margin-top: 5rem;
+}
+.api-card.is-hidden { display: none; }
+.api-head {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 0.6rem; flex-wrap: wrap; margin-bottom: 0.55rem;
+}
+.api-name {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 1rem; font-weight: 700; color: var(--text-strong);
+}
+.perf-pill {
+  display: inline-block; padding: 0.12rem 0.52rem; border-radius: 999px;
+  font-size: 0.74rem; font-weight: 700;
+}
+.perf-hot { background: #dcfce7; color: #166534; border: 1px solid #86efac; }
+.perf-fast { background: #dbeafe; color: #1e40af; border: 1px solid #93c5fd; }
+.perf-cold { background: #fef3c7; color: #92400e; border: 1px solid #fcd34d; }
+.perf-debug { background: #fce7f3; color: #9d174d; border: 1px solid #f9a8d4; }
+
+.sig-box {
+  background: #0f172a; color: #e2e8f0; border-radius: 8px;
+  padding: 0.65rem 0.9rem; margin: 0.45rem 0 0.75rem;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.81rem; line-height: 1.55; overflow-x: auto; white-space: pre;
+}
+.code-ex {
+  background: #0b1220; color: #e2e8f0; border-radius: 8px;
+  padding: 0.75rem 0.95rem; margin: 0.6rem 0 0.8rem;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.8rem; line-height: 1.55; overflow-x: auto; white-space: pre;
+}
+.api-meta-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 0.65rem; margin: 0.55rem 0;
+}
+.api-meta-box {
+  background: var(--surface); border: 1px solid var(--border-light);
+  border-radius: 8px; padding: 0.55rem 0.75rem; font-size: 0.85rem; line-height: 1.58;
+}
+.api-meta-box strong { color: var(--text-strong); display: block; margin-bottom: 0.2rem; font-size: 0.81rem; }
+
+.table-wrap { overflow-x: auto; margin: 0.85rem 0 1.35rem; border: 1px solid var(--border-light); border-radius: 10px; }
+table.ergo-table { width: 100%; border-collapse: collapse; font-size: 0.86rem; }
+table.ergo-table thead th {
+  position: sticky; top: 0; background: var(--surface);
+  border-bottom: 2px solid var(--border); text-align: left;
+  padding: 0.58rem 0.75rem; color: var(--text-strong); font-weight: 700;
+}
+table.ergo-table tbody tr { transition: background 0.12s ease; }
+table.ergo-table tbody tr:hover { background: #eff6ff; }
+table.ergo-table td { padding: 0.52rem 0.75rem; border-bottom: 1px solid var(--border-light); vertical-align: top; line-height: 1.58; }
+table.ergo-table tbody tr:last-child td { border-bottom: none; }
+table.ergo-table td.num, table.ergo-table th.num { text-align: right; font-variant-numeric: tabular-nums; }
+
+.callout {
+  border-left: 4px solid var(--c1); background: var(--surface);
+  border-radius: 0 10px 10px 0; padding: 0.85rem 1.05rem;
+  margin: 1rem 0 1.35rem; max-width: 68ch; font-size: 0.9rem; line-height: 1.72;
+}
+.callout.warn { border-left-color: var(--c3); background: #fffbeb; }
+.callout.good { border-left-color: var(--c2); background: #ecfdf5; }
+.callout.danger { border-left-color: #dc2626; background: #fef2f2; }
+.callout strong { color: var(--text-strong); }
+
+.diagram-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 12px; padding: 1rem 1.15rem; margin: 1rem 0 1.5rem;
+}
+.diagram-header {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 0.75rem; margin-bottom: 0.8rem; flex-wrap: wrap;
+}
+.diagram-title { font-weight: 700; font-size: 0.94rem; color: var(--text-strong); }
+.diagram-hint { font-size: 0.78rem; color: var(--muted); }
+.svg-wrap { width: 100%; overflow-x: auto; background: #fff; border: 1px solid var(--border-light); border-radius: 9px; padding: 0.5rem; }
+.diag-svg { display: block; width: 100%; min-width: 720px; height: auto; font-family: "Segoe UI", "Hiragino Kaku Gothic ProN", "Yu Gothic UI", Meiryo, sans-serif; }
+
+.swatch { display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.1rem 0.5rem; border-radius: 999px; font-size: 0.8rem; font-weight: 700; border: 1px solid transparent; }
+.swatch-dot { width: 0.7rem; height: 0.7rem; border-radius: 50%; display: inline-block; border: 1px solid rgba(15,23,42,0.25); }
+.sw-cyan { background: #ecfeff; color: #155e75; border-color: #22d3ee; } .sw-cyan .swatch-dot { background: #06b6d4; }
+.sw-red { background: #fef2f2; color: #991b1b; border-color: #f87171; } .sw-red .swatch-dot { background: #ef4444; }
+.sw-orange { background: #fff7ed; color: #9a3412; border-color: #fb923c; } .sw-orange .swatch-dot { background: #f97316; }
+
+.source-list { list-style: none; padding: 0; margin: 0.75rem 0 1.3rem; display: flex; flex-direction: column; gap: 0.55rem; }
+.source-list li {
+  background: var(--surface); border: 1px solid var(--border-light);
+  border-radius: 8px; padding: 0.62rem 0.9rem; font-size: 0.85rem; line-height: 1.58;
+}
+.source-tag {
+  display: inline-block; font-size: 0.71rem; font-weight: 700;
+  padding: 0.08rem 0.44rem; border-radius: 999px; margin-right: 0.4rem;
+}
+.source-tag.official { background: var(--c1-bg); color: var(--c1); }
+.source-tag.web { background: var(--c2-bg); color: var(--c2); }
+.source-tag.empirical { background: var(--c3-bg); color: var(--c3); }
+
+#ref-return-btn {
+  position: fixed; right: 1.25rem; bottom: 1.25rem; z-index: 9999;
+  display: none; padding: 0.52rem 0.92rem; border-radius: 999px;
+  border: 1px solid var(--c1); background: var(--c1); color: #fff;
+  font-size: 0.83rem; font-weight: 700; cursor: pointer;
+  box-shadow: 0 8px 20px rgba(37,99,235,0.3);
+}
+#ref-return-btn.is-visible { display: inline-flex; align-items: center; gap: 0.35rem; }
+</style>
+</head>
+<body>
+<header class="topbar">
+  <div class="topbar-title">
+    <span class="doc-type-pill pill-ref">API リファレンス</span>
+    <span>myext.robot.geometric_newton</span>
+  </div>
+  <nav class="topbar-nav" aria-label="ドキュメント種別">
+    <a class="nav-btn" href="../index.html">ポータル</a>
+    <a class="nav-btn" href="../explanation_architecture.html">アーキテクチャ解説</a>
+    <a class="nav-btn" href="../howto_recipes.html">レシピ集</a>
+    <a class="nav-btn is-active" href="index.html">API リファレンス</a>
+  </nav>
+</header>
+<nav class="subnav-bar" aria-label="API ページ切替"><span class="subnav-label">API 仕様書:</span><a class="subnav-link" href="index.html">目次・逆引き・設定</a>
+  <a class="subnav-link" href="robot_api.html">GeometricRobot / Component</a>
+  <a class="subnav-link" href="collision_newton_api.html">干渉判定・Newton / PhysX</a>
+  <a class="subnav-link is-active" href="view_batch_api.html">GeometricRobotView</a>
+  <a class="subnav-link" href="model_ik_command_api.html">Model / USD / IK / 変換</a>
+  <a class="subnav-link" href="layer_writer_internals.html">Layer / Writer / 座標規約</a></nav>
+<div class="page-layout">
+  <aside class="toc-rail" aria-label="ページ内目次">
+    <div class="filter-box"><input id="api-filter-input" class="filter-input" type="search" placeholder="API 名・引数・用語で絞り込み..."><div id="api-filter-status" class="filter-status"></div></div>
+    <p class="toc-label">目次</p>
+    <nav class="toc">
+      <ul>
+        <li><a href="#sec-view-init">GeometricRobotView 生成・from_articulations</a></li>
+        <li><a href="#sec-view-props">構造プロパティ・設定切替</a></li>
+        <li><a href="#sec-view-ops">バッチ関節操作・姿勢取得・干渉判定</a></li>
+        <li><a href="#sec-view-perf">状態共有・入力規約・GPU ゼロコピー・構造変更</a></li>
+        <li><a href="#sec-sources">公式出典・同梱ソース・実機検証</a></li>
+      </ul>
+    </nav>
+  </aside>
+  <main>
+    <div class="hero">
+      <h1>GeometricRobotView バッチ API</h1>
+      <p class="hero-lead">同一構造の N 台ロボットを一括制御・GPU FK・CUDA Graph 衝突判定・GPU Fabric 直接書込するバッチ API の完全仕様（metersPerUnit=1 のステージ専用）。</p>
+    </div>
+    
+<section id="sec-view-init">
+  <h2>GeometricRobotView 生成・from_articulations</h2>
+  <div class="prose">
+    <p><span class="code-chip">GeometricRobotView</span> は、<strong>同一の運動学構造（<span class="code-chip">is_kinematically_equal</span>）を持つ <span class="code-chip">N</span> 台のロボット</strong>をまとめて制御・FK・干渉判定するバッチ API です。入力と出力は先頭次元がロボット台数 <span class="code-chip">N</span> の配列（例：<span class="code-chip">(N, D)</span>）となり、<span class="code-chip">BatchedNewtonScene</span> と CUDA Graph を用いて全 <span class="code-chip">N</span> 台を 1 回のカーネル起動で処理します（長さ・距離はすべて <strong>m、<span class="code-chip">metersPerUnit=1</span> のステージ専用</strong>）。</p>
+  </div>
+
+  <article class="api-card" id="view-init"><div class="api-head"><span class="api-name">GeometricRobotView.__init__ / GeometricRobotView.from_articulations</span><span class="perf-pill perf-cold">初期化時（N 台一括構築）</span></div><div class="sig-box">GeometricRobotView(
+    robots: Sequence[GeometricRobot],
+    *,
+    write_target: WriteTarget | None = None,
+    angle_unit: AngleUnit | None = None,
+    collision_backend: CollisionBackend | None = None,
+    fk_backend: FkBackend | None = None,
+    newton_device: str | None = None,
+    convex_meshes: bool | None = None,
+    environment_roots: Sequence[str] | None = None,
+    use_cuda_graph: bool = True,
+    use_gpu_fabric_writer: bool = False,
+)
+
+@classmethod
+GeometricRobotView.from_articulations(
+    stage: Usd.Stage,
+    sources: Sequence[UsdArticulationSource | str],
+    *,
+    layer_options: GeometricLayerOptions | None = None,
+    write_target: WriteTarget | None = None,
+    apply_layer: bool = True,
+    collision_backend: CollisionBackend | None = None,
+    fk_backend: FkBackend | None = None,
+    newton_device: str | None = None,
+    convex_meshes: bool | None = None,
+    auto_components: bool | None = None,
+    environment_roots: Sequence[str] | None = None,
+    use_cuda_graph: bool = True,
+    use_gpu_fabric_writer: bool = False,
+) -&gt; GeometricRobotView</div><div class="prose"><p>複数ロボットを 1 枚の共有 <span class='code-chip'>GeometricLayer</span> と 1 つの <span class='code-chip'>BatchedNewtonScene</span> で束ねて管理するビューを生成します。</p></div><div class="table-wrap"><table class="ergo-table"><thead><tr><th>引数 / フィールド</th><th>型</th><th>既定値</th><th>意味・形状・単位・制約</th></tr></thead><tbody><tr><td><span class='code-chip'>sources / robots</span></td><td><span class='code-chip'>長さ N の列</span></td><td><span class='code-chip'>必須</span></td><td>全ロボットが同一の運動学構造を持つこと（異構造は <span class='code-chip'>ValueError</span>）。直接 <span class='code-chip'>GeometricRobotView(robots)</span> を呼ぶ場合は、<strong>全ロボットが同一の <span class='code-chip'>GeometricLayer</span> インスタンスを共有</strong>していなければならない（異なると <span class='code-chip'>ValueError</span>）。</td></tr>
+<tr><td><span class='code-chip'>convex_meshes</span></td><td><span class='code-chip'>bool | None</span></td><td><span class='code-chip'>None (既定 True)</span></td><td><span class='code-chip'>BatchedNewtonScene</span> へ渡すメッシュ近似設定。<span class='code-chip'>False</span> で生三角メッシュ判定。</td></tr>
+<tr><td><span class='code-chip'>auto_components</span></td><td><span class='code-chip'>bool | None</span></td><td><span class='code-chip'>None (既定 True)</span></td><td><span class='code-chip'>from_articulations()</span> 時に各ロボットで <span class='code-chip'>IsaacRobotAPI</span> からコンポーネント自動生成するか。</td></tr>
+<tr><td><span class='code-chip'>environment_roots</span></td><td><span class='code-chip'>Sequence[str] | None</span></td><td><span class='code-chip'>None</span></td><td><strong>全ロボット共通の障害物（Newton の <span class='code-chip'>world=-1</span>）</strong>としてまとめて登録するルート Prim パス列（ロボットごとの個別環境ではない）。<span class='code-chip'>None</span> のとき <span class='code-chip'>/World</span>（なければ <span class='code-chip'>/</span>）を自動探索。</td></tr>
+<tr><td><span class='code-chip'>use_cuda_graph</span></td><td><span class='code-chip'>bool</span></td><td><span class='code-chip'>True</span></td><td><span class='code-chip'>BatchedNewtonScene</span> の FK / 衝突カーネル群を CUDA Graph キャプチャして起動オーバーヘッドを最小化する。</td></tr>
+<tr><td><span class='code-chip'>use_gpu_fabric_writer</span></td><td><span class='code-chip'>bool</span></td><td><span class='code-chip'>False</span></td><td><span class='code-chip'>True</span> かつ Newton FK 使用中・<span class='code-chip'>write_target="fabric"</span> のとき、GPU 上の <span class='code-chip'>body_q</span> を CPU 経由せず直接 Fabric GPU バッファへ書き込む。</td></tr></tbody></table></div><div class="api-meta-grid"><div class="api-meta-box"><strong>戻り値 / 型</strong><span class='code-chip'>GeometricRobotView</span> インスタンス（<span class='code-chip'>len(view)</span> は台数 <span class='code-chip'>N</span>）。</div></div><div class="code-ex">from myext.robot.geometric_newton import GeometricRobotView
+
+paths = [f"/World/Env_{i}/Robot" for i in range(64)]
+view = GeometricRobotView.from_articulations(
+    stage,
+    paths,
+    fk_backend="newton",
+    collision_backend="newton",
+    convex_meshes=True,
+    use_cuda_graph=True,
+    use_gpu_fabric_writer=True,
+)
+q = np.zeros((64, view.num_dofs), dtype=np.float64)
+view.set_dof_positions(q)
+hits_per_env = view.check_collisions_batch(scope="all")</div></article>
+</section>
+
+<section id="sec-view-props">
+  <h2>構造プロパティ・設定切替</h2>
+  <div class="table-wrap">
+    <table class="ergo-table">
+      <thead>
+        <tr><th>プロパティ / メソッド</th><th>型・戻り値</th><th>仕様</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><span class="code-chip">robots</span></td><td><span class="code-chip">tuple[GeometricRobot, ...]</span></td><td>配下の <span class="code-chip">N</span> 台のロボットタプル。</td></tr>
+        <tr><td><span class="code-chip">layer</span> / <span class="code-chip">newton_scene</span></td><td><span class="code-chip">GeometricLayer</span> / <span class="code-chip">BatchedNewtonScene</span></td><td>共有 Sublayer およびバッチ Newton シーン。</td></tr>
+        <tr><td><span class="code-chip">angle_unit</span>（読取 / 書込可）</td><td><span class="code-chip">"rad" | "deg"</span></td><td>設定すると全配下ロボットの <span class="code-chip">angle_unit</span> を同期変更。</td></tr>
+        <tr><td><span class="code-chip">convex_meshes</span>（読取 / 書込可）</td><td><span class="code-chip">bool</span></td><td>変更すると配下ロボットと <span class="code-chip">BatchedNewtonScene</span> の設定を更新し、次回判定時に再構築される。</td></tr>
+        <tr><td><span class="code-chip">collision_backend</span> / <span class="code-chip">fk_backend</span></td><td>読取プロパティ</td><td>ビュー全体のバックエンド設定。<span class="code-chip">fk_backend="auto"</span> は 16 台以上かつ CUDA ありで Newton GPU バッチを選択。</td></tr>
+        <tr><td><span class="code-chip">num_dofs</span> / <span class="code-chip">dof_names</span> / <span class="code-chip">dof_types</span></td><td><span class="code-chip">int</span> / <span class="code-chip">list[str]</span></td><td>1 台あたりの DOF 数（Mimic 従属含む）・名前・型。</td></tr>
+        <tr><td><span class="code-chip">num_joints</span> / <span class="code-chip">joint_names</span> / <span class="code-chip">num_links</span> / <span class="code-chip">link_names</span></td><td><span class="code-chip">int</span> / <span class="code-chip">list[str]</span></td><td>1 台あたりの関節・リンクメタ情報。</td></tr>
+        <tr><td><span class="code-chip">dof_paths</span> / <span class="code-chip">joint_paths</span> / <span class="code-chip">link_paths</span></td><td><span class="code-chip">list[list[str | None]]</span></td><td><span class="code-chip">N</span> 台分それぞれの USD Prim パス列。</td></tr>
+        <tr><td><span class="code-chip">get_dof_indices</span> / <span class="code-chip">get_joint_indices</span> / <span class="code-chip">get_link_indices</span></td><td><strong><span class="code-chip">wp.array</span>（<span class="code-chip">int32</span>, <span class="code-chip">device="cpu"</span>）</strong></td><td>名前→インデックス変換（1 台内の共通添字）。</td></tr>
+        <tr><td><span class="code-chip">reload_colliders()</span></td><td><span class="code-chip">None</span></td><td>全ロボットのコライダーを再収集し <span class="code-chip">BatchedNewtonScene</span> を再構築。</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section id="sec-view-ops">
+  <h2>バッチ関節操作・姿勢取得・干渉判定</h2>
+  <div class="callout warn">
+    <strong>取得系メソッドの戻り値型（Isaac Sim Experimental Articulation 互換）：</strong>
+    <span class="code-chip">get_dof_positions</span>・<span class="code-chip">get_dof_position_targets</span>・<span class="code-chip">get_dof_limits</span>・<span class="code-chip">get_world_poses</span>・<span class="code-chip">get_link_world_poses</span> は <strong><span class="code-chip">wp.array</span>（<span class="code-chip">float32</span>, <span class="code-chip">device="cpu"</span>）</strong> を返します（NumPy 配列が必要な場合は <span class="code-chip">.numpy()</span> を呼ぶ）。<span class="code-chip">get_dof_indices</span>・<span class="code-chip">get_joint_indices</span>・<span class="code-chip">get_link_indices</span> は <strong><span class="code-chip">wp.array</span>（<span class="code-chip">int32</span>）</strong> です。NumPy <span class="code-chip">float64</span> を直接返すのは <span class="code-chip">get_link_world_matrices()</span> のみです。
+  </div>
+  <div class="table-wrap">
+    <table class="ergo-table">
+      <thead>
+        <tr><th>メソッド</th><th>シグネチャ</th><th>入出力形状・戻り値型・動作</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="code-chip">set_dof_positions</span> / <span class="code-chip">set_dof_position_targets</span></td>
+          <td><span class="code-chip">(positions, *, indices=None, dof_indices=None, unit=None)</span></td>
+          <td>入力は <span class="code-chip">(K, M)</span> または 1 行 <span class="code-chip">(M,)</span>（全対象台へブロードキャスト）の NumPy 配列（<span class="code-chip">float32/float64</span>）または <span class="code-chip">wp.array</span>（内部で <span class="code-chip">float64</span> NumPy へ変換）。<strong><span class="code-chip">limit_policy</span> に関わらず可動範囲で切り詰める</strong>。</td>
+        </tr>
+        <tr>
+          <td><span class="code-chip">get_dof_positions</span> / <span class="code-chip">get_dof_position_targets</span></td>
+          <td><span class="code-chip">(*, indices=None, dof_indices=None, unit=None)</span></td>
+          <td><span class="code-chip">wp.array</span>（形状 <span class="code-chip">(K, M)</span>, <span class="code-chip">float32</span>, <span class="code-chip">device="cpu"</span>）。</td>
+        </tr>
+        <tr>
+          <td><span class="code-chip">get_dof_limits</span></td>
+          <td><span class="code-chip">(*, indices=None, dof_indices=None, unit=None)</span></td>
+          <td><span class="code-chip">(lower, upper)</span>。各 <span class="code-chip">wp.array</span>（形状 <span class="code-chip">(K, M)</span>, <span class="code-chip">float32</span>, <span class="code-chip">device="cpu"</span>）。</td>
+        </tr>
+        <tr>
+          <td><span class="code-chip">get_world_poses</span> / <span class="code-chip">set_world_poses</span></td>
+          <td><span class="code-chip">get_world_poses(*, indices=None)</span><br><span class="code-chip">set_world_poses(positions=None, orientations=None, *, indices=None)</span></td>
+          <td>各ロボットベースのワールド位置 <span class="code-chip">(K, 3)</span>（m、<span class="code-chip">metersPerUnit=1</span> のステージ専用）と四元数 <span class="code-chip">(K, 4)</span>（<strong><span class="code-chip">(w, x, y, z)</span></strong>）。<span class="code-chip">get_world_poses()</span> の戻り値は <span class="code-chip">(wp.array, wp.array)</span>（<span class="code-chip">float32</span>, <span class="code-chip">device="cpu"</span>）。</td>
+        </tr>
+        <tr>
+          <td><span class="code-chip">get_link_world_poses</span> / <span class="code-chip">get_link_world_matrices</span></td>
+          <td><span class="code-chip">get_link_world_poses(*, indices=None, link_indices=None)</span><br><span class="code-chip">get_link_world_matrices()</span></td>
+          <td><span class="code-chip">get_link_world_poses()</span> は <span class="code-chip">(wp.array (K, L_sub, 3), wp.array (K, L_sub, 4))</span>（<span class="code-chip">float32</span>, <span class="code-chip">device="cpu"</span>）。<span class="code-chip">get_link_world_matrices()</span> は <strong>NumPy <span class="code-chip">(N, num_links, 4, 4) float64</span></strong>。</td>
+        </tr>
+        <tr>
+          <td><span class="code-chip">sync_environment</span></td>
+          <td><span class="code-chip">(*, use_fabric="auto")</span></td>
+          <td>共通環境障害物の最新姿勢を <span class="code-chip">BatchedNewtonScene</span> へ同期。</td>
+        </tr>
+        <tr>
+          <td><span class="code-chip">check_collisions_batch</span></td>
+          <td><span class="code-chip">(scope="all", *, clearance=0.0, extra_filter=None, ignore_prim_paths=(), sync_env=True)</span></td>
+          <td>長さ <span class="code-chip">N</span> の <span class="code-chip">list[list[GeometricCollisionPair]]</span>。<strong><span class="code-chip">collision_backend</span> が何であっても常に Newton で判定</strong>する。ロボット同士の干渉は判定せず、各ロボット自身のリンク同士と共通障害物のみを評価。</td>
+        </tr>
+        <tr>
+          <td><span class="code-chip">compute_clearances_batch</span></td>
+          <td><span class="code-chip">(scope="all", *, max_distance=0.05, extra_filter=None, ignore_prim_paths=(), sync_env=True)</span></td>
+          <td>長さ <span class="code-chip">N</span> の <span class="code-chip">list[list[GeometricCollisionPair]]</span>。常に Newton で判定。ロボット同士の距離は評価しない。</td>
+        </tr>
+        <tr>
+          <td><span class="code-chip">flush_to_usd</span> / <span class="code-chip">close</span></td>
+          <td><span class="code-chip">flush_to_usd() -> bool</span> / <span class="code-chip">close(*, remove_layer=True) -> None</span></td>
+          <td>全 <span class="code-chip">N</span> 台分の姿勢を USD Sublayer へ一括書き戻し / 全リソース解放。</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section id="sec-view-perf">
+  <h2>状態共有・入力規約・GPU ゼロコピー・構造変更</h2>
+  <div class="callout good">
+    <strong>View と単体ロボットの状態共有・大規模バッチ最速設定：</strong><br>
+    ・<span class="code-chip">GeometricRobotView</span> と配下の単体ロボット（<span class="code-chip">view.robots[i]</span>）は状態を共有するため、<span class="code-chip">view.robots[i].set_dof_positions(...)</span> と View 側のバッチ操作を混在させても整合が保たれます。<br>
+    ・16 台以上の大規模バッチでは <span class="code-chip">fk_backend="newton"</span>（または <span class="code-chip">"auto"</span>）+ <span class="code-chip">write_target="fabric"</span> + <span class="code-chip">use_cuda_graph=True</span> + <span class="code-chip">use_gpu_fabric_writer=True</span> で GPU ゼロコピー経路が有効になります。
+  </div>
+  <div class="callout warn">
+    <strong>配下ロボットでの VariantSet 切替について：</strong>
+    <span class="code-chip">GeometricRobotView</span> に属するいずれかのロボットで <span class="code-chip">set_variant()</span> 等により <span class="code-chip">structure_version</span> が変化すると、次の View 操作時に <span class="code-chip">GeometricStructureChangedError</span> が送出されます。構成変更後は新しいロボット構造で <span class="code-chip">GeometricRobotView</span> を再生成してください。
+  </div>
+</section>
+
+<section id="sec-sources">
+  <h2>公式出典・同梱ソース・実機検証の切り分け</h2>
+  <ul class="source-list">
+    <li>
+      <span class="source-tag official">同梱公式 Doc</span><span class="source-tag web">Web 公式</span>
+      <strong>USD / Fabric / USDRT Population（合成前 VariantSet は USD 必須・FSD 遅延同期・2 面キャッシュ）</strong>：<br>
+      <span class="code-chip">C:\isaacsim-6.2.0\extscache\usdrt.scenegraph-7.6.3...\docs\fabricsd\fsd_vs_omnihydra.md</span>・<span class="code-chip">fabric_overview.rst</span>・<span class="code-chip">fabric_hierarchy.rst</span> ／
+      <a href="https://docs.omniverse.nvidia.com/kit/docs/usdrt.scenegraph/latest/index.html" target="_blank" rel="noopener">Omniverse USDRT / Fabric Documentation</a>
+    </li>
+    <li>
+      <span class="source-tag official">同梱公式スキーマ</span>
+      <strong>IsaacRobotAPI（<code>isaac:physics:robotLinks</code> / <code>robotJoints</code> / 入れ子サブロボット構成）</strong>：<br>
+      <span class="code-chip">C:\isaacsim-6.2.0\exts\isaacsim.robot.schema\pip_prebundle\usd\schema\isaac\robot_schema\RobotSchema.usda</span>
+    </li>
+    <li>
+      <span class="source-tag official">同梱公式 Doc</span><span class="source-tag web">Web 公式</span>
+      <strong>PhysX 5（Articulation・MimicJoint・Scene Queries CPU 実行・Contact Reports・Collider 可視化色）</strong>：<br>
+      <span class="code-chip">C:\isaacsim-6.2.0\extscache\omni.physx.ui-110.4.4...\docs\dev_guide\collision_debug_vis.rst</span>・<span class="code-chip">viewport_overlays.rst</span>・<span class="code-chip">physics_debug_wnd.rst</span>・<span class="code-chip">omni.physx-110.4.4...\docs\dev_guide\scene_queries.rst</span> ／
+      <a href="https://nvidia-omniverse.github.io/PhysX/physx/5.4.1/index.html" target="_blank" rel="noopener">NVIDIA PhysX 5.4.1 SDK Documentation</a>
+    </li>
+    <li>
+      <span class="source-tag web">Web 公式</span><span class="source-tag official">同梱公式ソース</span>
+      <strong>Newton 1.6.1（<code>eval_fk</code>・<code>CollisionPipeline</code>・<code>GeoType.MESH</code> / <code>CONVEX_MESH</code>・<code>sdf_contact.py</code>）＆ Warp</strong>：<br>
+      <span class="code-chip">C:\isaacsim-6.2.0\exts\isaacsim.pip.newton\pip_prebundle\newton[sim]\newton-1.6.1-py3-none-any\newton\_src\sim\collide.py</span>・<span class="code-chip">geometry\narrow_phase.py</span>・<span class="code-chip">geometry\sdf_contact.py</span> ／
+      <a href="https://newton-physics.github.io/newton/1.6.1/guide/overview.html" target="_blank" rel="noopener">Newton 1.6.1 Documentation</a>・<a href="https://nvidia.github.io/warp/" target="_blank" rel="noopener">NVIDIA Warp Documentation</a>
+    </li>
+    <li>
+      <span class="source-tag official">同梱公式ソース</span>
+      <strong>Isaac Sim Experimental Articulation API・DebugDraw（RTX オーバーレイ描画）</strong>：<br>
+      <span class="code-chip">C:\isaacsim-6.2.0\exts\isaacsim.core.experimental.prims\...\articulation.py</span>・<span class="code-chip">extscache\isaacsim.util.debug_draw-3.2.8...\docs\Overview.md</span>
+    </li>
+    <li>
+      <span class="source-tag empirical">実機検証</span>
+      <strong>Isaac Sim 6.2.0（RTX 3060）での全テスト・U 字凹メッシュ実測</strong>：<br>
+      <span class="code-chip">tests_pure/</span>（73 本全通過）・<span class="code-chip">tests_kit/run_kit_tests.py</span>（34 本全通過）・U 字水密メッシュ対実測（<span class="code-chip">convex_meshes=True</span>: 溝誤検知 1 件 / 5 cm 貫通時 −0.45 m / 2.35 ms 対 <span class="code-chip">convex_meshes=False</span>: 溝非接触 0 件 / 5 cm 貫通時 −0.0500 m / 2.39 ms）。
+    </li>
+  </ul>
+</section>
+
+
+  </main>
+</div>
+<svg id="ref-connector-layer" style="position:fixed;inset:0;width:100vw;height:100vh;pointer-events:none;z-index:9990;"></svg>
+<button id="ref-return-btn" type="button">↩ 元の位置へ戻る</button>
+<script>
+(() => {
+  const svgLayer = document.getElementById('ref-connector-layer');
+  const returnBtn = document.getElementById('ref-return-btn');
+  let savedScrollY = null;
+  const colorMap = { '1': '#2563eb', '2': '#059669', '3': '#d97706', '4': '#7c3aed', '5': '#db2777' };
+  const isInViewport = (el) => {
+    const r = el.getBoundingClientRect();
+    return r.width > 0 && r.height > 0 && r.top >= 0 && r.bottom <= window.innerHeight && r.left >= 0 && r.right <= window.innerWidth;
+  };
+  const clearLines = () => { if (svgLayer) svgLayer.innerHTML = ''; };
+  const drawConnector = (fromEl, toEl) => {
+    if (!svgLayer || !isInViewport(fromEl) || !isInViewport(toEl)) return;
+    const a = fromEl.getBoundingClientRect(), b = toEl.getBoundingClientRect();
+    const x1 = a.left + a.width / 2, y1 = a.top + a.height / 2;
+    const x2 = b.left + b.width / 2, y2 = b.top + b.height / 2;
+    const mx = (x1 + x2) / 2;
+    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    path.setAttribute('d', `M ${x1} ${y1} C ${mx} ${y1}, ${mx} ${y2}, ${x2} ${y2}`);
+    path.setAttribute('fill', 'none');
+    path.setAttribute('stroke', colorMap[fromEl.dataset.color] || '#2563eb');
+    path.setAttribute('stroke-width', '2');
+    path.setAttribute('stroke-dasharray', '4 3');
+    path.setAttribute('opacity', '0.72');
+    svgLayer.appendChild(path);
+  };
+  const setActive = (refId, originEl) => {
+    const peers = Array.from(document.querySelectorAll(`[data-ref="${CSS.escape(refId)}"]`));
+    const scopes = new Set();
+    peers.forEach((el) => { el.classList.add('is-active'); const sc = el.closest('[data-ref-scope]'); if (sc) scopes.add(sc); });
+    scopes.forEach((sc) => sc.classList.add('is-dimming'));
+    clearLines();
+    if (originEl) peers.filter((el) => el !== originEl).forEach((peer) => drawConnector(originEl, peer));
+  };
+  const clearActive = () => {
+    document.querySelectorAll('[data-ref].is-active').forEach((el) => el.classList.remove('is-active'));
+    document.querySelectorAll('[data-ref-scope].is-dimming').forEach((sc) => sc.classList.remove('is-dimming'));
+    clearLines();
+  };
+  document.querySelectorAll('[data-ref]').forEach((el) => {
+    const refId = el.dataset.ref;
+    el.addEventListener('mouseenter', () => setActive(refId, el));
+    el.addEventListener('mouseleave', clearActive);
+    el.addEventListener('focus', () => setActive(refId, el));
+    el.addEventListener('blur', clearActive);
+    el.addEventListener('click', () => {
+      const peers = Array.from(document.querySelectorAll(`[data-ref="${CSS.escape(refId)}"]`)).filter((p) => p !== el);
+      if (peers.length === 0) return;
+      const target = peers.find((p) => p.dataset.refRole !== el.dataset.refRole) || peers[0];
+      if (!isInViewport(target) && returnBtn) { savedScrollY = window.scrollY; returnBtn.classList.add('is-visible'); }
+      target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      target.classList.remove('is-pulsing'); void target.offsetWidth; target.classList.add('is-pulsing');
+    });
+  });
+  if (returnBtn) {
+    returnBtn.addEventListener('click', () => {
+      if (savedScrollY !== null) { window.scrollTo({ top: savedScrollY, behavior: 'smooth' }); savedScrollY = null; }
+      returnBtn.classList.remove('is-visible');
+    });
+  }
+  const tocLinks = Array.from(document.querySelectorAll('.toc a[href^="#"]'));
+  const sections = tocLinks.map((a) => document.querySelector(a.getAttribute('href'))).filter(Boolean);
+  if (sections.length > 0) {
+    const obs = new IntersectionObserver((entries) => {
+      entries.forEach((e) => {
+        if (!e.isIntersecting) return;
+        tocLinks.forEach((a) => a.classList.toggle('is-current', a.getAttribute('href') === `#${e.target.id}`));
+      });
+    }, { rootMargin: '-14% 0px -75% 0px' });
+    sections.forEach((s) => obs.observe(s));
+  }
+  const filterInput = document.getElementById('api-filter-input');
+  const filterStatus = document.getElementById('api-filter-status');
+  if (filterInput) {
+    const cards = Array.from(document.querySelectorAll('.api-card'));
+    const runFilter = () => {
+      const q = filterInput.value.trim().toLowerCase();
+      let shown = 0;
+      cards.forEach((c) => {
+        const hit = !q || c.textContent.toLowerCase().includes(q);
+        c.classList.toggle('is-hidden', !hit);
+        if (hit) shown += 1;
+      });
+      if (filterStatus) filterStatus.textContent = q ? `${shown} / ${cards.length} 件表示` : `全 ${cards.length} 件`;
+    };
+    filterInput.addEventListener('input', runFilter);
+    runFilter();
+  }
+})();
+</script>
+</body>
+</html>

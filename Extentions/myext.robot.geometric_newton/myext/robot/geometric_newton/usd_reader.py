@@ -68,7 +68,12 @@ class UsdArticulationSource:
     root_prim_path      : ロボットのルート prim パス (複数ロボットを 1 本の木として読むときはパス列)。
                           `ArticulationRootAPI` が Joint や単一剛体に直接付いている場合は親 prim を探索範囲にする。
     components          : 構成要素名 -> prim パス / `fnmatch` パターン (例 `"/World/Robot/arm0_*"`) またはその列。
-                          複数に一致した場合は最長パターンを採用する。結合ロボットの部位別干渉チェックに使う。
+                          複数に一致した場合は最長パターンを採用する。結合ロボットの部位別操作・干渉チェックに使う。
+                          `None` のまま `auto_components=True` (既定) にすると、ステージ上の `IsaacRobotAPI` から
+                          構成要素を自動生成する。
+    auto_components     : `True` (既定) かつ `components` が未指定のとき、探索範囲内の `IsaacRobotAPI` (入れ子構成や
+                          `isaac:physics:robotLinks` 関係を含む) から `GeometricRobotComponent` を自動生成する。
+                          `components` を明示指定した場合はユーザー指定が優先される。
     extra_joint_paths   : `root_prim_path` の外に置かれた追加 Joint (ロボット同士をつなぐ固定関節など)。
     ignore_joint_paths  : 読み取り対象から除外する Joint パス。
     dof_order           : DOF の並びを関節名で明示指定する (`None` なら BFS 順)。
@@ -81,6 +86,7 @@ class UsdArticulationSource:
 
     root_prim_path: str | Sequence[str]
     components: dict[str, str | Sequence[str]] | None = None
+    auto_components: bool = True
     extra_joint_paths: Sequence[str] = ()
     ignore_joint_paths: Sequence[str] = ()
     dof_order: Sequence[str] | None = None
@@ -111,6 +117,7 @@ class UsdRobotInfo:
     colliding_adjacent_pairs: list[tuple[str, str]] = field(default_factory=list)  # `physics:collisionEnabled=true` の Joint の両端
     filtered_pairs: list[tuple[str, str]] = field(default_factory=list)  # USD 側に既存の `FilteredPairsAPI` ペア (リンク名組)
     reversed_joints: list[str] = field(default_factory=list)  # 木の親が `body1` 側だった (軸反転で正規化した) 関節名一覧
+    component_prim_paths: dict[str, list[str]] = field(default_factory=dict)  # 構成要素名 -> 担当 prim パス/パターン一覧 (`set_variant` 用)
     warnings: list[str] = field(default_factory=list)
     timings_ms: dict[str, float] = field(default_factory=dict)  # 読み取り各フェーズの所要時間 [ms]
 
@@ -230,6 +237,150 @@ def component_of_prim(path: str, components: dict[str, str | Sequence[str]]) -> 
             if prim_matches(path, pattern) and len(pattern) > best_len:
                 best, best_len = name, len(pattern)
     return best
+
+
+def _has_isaac_robot_api(prim: Usd.Prim) -> bool:
+    """prim に `IsaacRobotAPI` (またはその関係属性) が付与されているか判定する。
+
+    Pure OpenUSD 環境 (Kit の `isaacsim.robot.schema` 未登録時) では `prim.HasAPI("IsaacRobotAPI")`
+    および `prim.GetAppliedSchemas()` が未登録スキーマ名を返さないことがあるため、
+    `apiSchemas` メタデータの `ListOp` 生項目と `isaac:physics:robotLinks` / `robotJoints` の存在も併せて確認する。
+    """
+    if not prim or not prim.IsValid():
+        return False
+    if "IsaacRobotAPI" in prim.GetAppliedSchemas():
+        return True
+    try:
+        if prim.HasAPI("IsaacRobotAPI"):
+            return True
+    except Exception:
+        pass
+    api_op = prim.GetMetadata("apiSchemas")
+    if api_op is not None:
+        items = list(api_op.explicitItems) + list(api_op.prependedItems) + list(api_op.appendedItems)
+        if "IsaacRobotAPI" in items:
+            return True
+    for rel_name in ("isaac:physics:robotLinks", "isaac:physics:robotJoints"):
+        rel = prim.GetRelationship(rel_name)
+        if rel and rel.GetTargets():
+            return True
+    return False
+
+
+def _discover_isaac_robot_components(
+    stage: Usd.Stage,
+    roots: Sequence[Usd.Prim],
+    links: Sequence[GeometricLinkSpec],
+) -> tuple[dict[str, tuple[str, ...]], dict[str, list[str]]]:
+    """探索範囲内の `IsaacRobotAPI` 構成から `(components, component_prim_paths)` を自動生成する。
+
+    設計上のルール:
+        1. `roots` 配下 (および `isaac:physics:robotLinks` / `robotJoints` の参照先) にある
+           すべての `IsaacRobotAPI` 付き prim を収集する。
+        2. 各リンク prim の所属先は、`isaac:physics:robotLinks` による明示参照 (ただし子 `IsaacRobotAPI`
+           への参照は除く) を優先し、明示参照が無ければ最深の祖先 `IsaacRobotAPI` prim へ割り当てる。
+           これにより、入れ子ロボット (`/Robot` 配下に `/Robot/arm0`・`/Robot/arm0/gripper` 等) でも
+           最深のサブロボットへ正確に帰属する。
+        3. 構成要素名は `isaac:namespace` 属性 (空でなければ優先) または prim 名を使う。
+           同名衝突 (例: `/Robot/arm0/gripper` と `/Robot/arm1/gripper`) はルートからの相対パスで一意化する。
+    """
+    robot_prims_by_path: dict[str, Usd.Prim] = {}
+    queue: list[Usd.Prim] = []
+    for root in roots:
+        for p in Usd.PrimRange(root):
+            if _has_isaac_robot_api(p):
+                ps = str(p.GetPath())
+                if ps not in robot_prims_by_path:
+                    robot_prims_by_path[ps] = p
+                    queue.append(p)
+    # `isaac:physics:robotLinks` / `robotJoints` が参照する入れ子サブロボットも漏れなく辿る
+    head = 0
+    while head < len(queue):
+        rp = queue[head]
+        head += 1
+        for rel_name in ("isaac:physics:robotLinks", "isaac:physics:robotJoints"):
+            rel = rp.GetRelationship(rel_name)
+            if not rel:
+                continue
+            for tgt in rel.GetTargets():
+                tp = stage.GetPrimAtPath(tgt)
+                if tp and tp.IsValid() and _has_isaac_robot_api(tp):
+                    tps = str(tp.GetPath())
+                    if tps not in robot_prims_by_path:
+                        robot_prims_by_path[tps] = tp
+                        queue.append(tp)
+
+    if not robot_prims_by_path:
+        return {}, {}
+
+    robot_paths = list(robot_prims_by_path.keys())
+    # 各 `IsaacRobotAPI` prim が `isaac:physics:robotLinks` で直接指している剛体パス集合
+    explicit_targets: dict[str, set[str]] = {}
+    for rpath, rp in robot_prims_by_path.items():
+        rel = rp.GetRelationship("isaac:physics:robotLinks")
+        bodies: set[str] = set()
+        if rel:
+            for tgt in rel.GetTargets():
+                tps = str(tgt)
+                # 子サブロボット (`IsaacRobotAPI`) 自体を指しているエントリは子側へ委譲する
+                if tps in robot_prims_by_path and tps != rpath:
+                    continue
+                tp = stage.GetPrimAtPath(tgt)
+                body = _body_of(tp) if tp and tp.IsValid() else None
+                bodies.add(str(body.GetPath()) if body is not None else tps)
+        explicit_targets[rpath] = bodies
+
+    # 各リンクの帰属先 `IsaacRobotAPI` パスを決定 (明示参照 -> 祖先パスの最深一致)
+    owner_links: dict[str, list[str]] = {}
+    for link in links:
+        lpath = link.prim_path
+        if not lpath:
+            continue
+        matched_explicit = [rp for rp, bset in explicit_targets.items() if lpath in bset]
+        if matched_explicit:
+            best_rp = max(matched_explicit, key=len)
+        else:
+            matched_anc = [rp for rp in robot_paths if lpath == rp or lpath.startswith(rp + "/")]
+            if not matched_anc:
+                continue
+            best_rp = max(matched_anc, key=len)
+        owner_links.setdefault(best_rp, []).append(link.name)
+
+    if not owner_links:
+        return {}, {}
+
+    # 構成要素名の決定 (`isaac:namespace` 優先、衝突時はルートからの相対パスで一意化)
+    root_prefixes = [str(r.GetPath()).rstrip("/") for r in roots]
+
+    def _base_name(rp_path: str) -> str:
+        prim = robot_prims_by_path[rp_path]
+        ns_attr = prim.GetAttribute("isaac:namespace")
+        ns = ns_attr.Get() if ns_attr else None
+        if isinstance(ns, str) and ns.strip():
+            return ns.strip().strip("/")
+        return prim.GetName()
+
+    raw_names = {rp_path: _base_name(rp_path) for rp_path in owner_links}
+    counts: dict[str, int] = {}
+    for nm in raw_names.values():
+        counts[nm] = counts.get(nm, 0) + 1
+
+    used: dict[str, int] = {}
+    components: dict[str, tuple[str, ...]] = {}
+    comp_prim_paths: dict[str, list[str]] = {}
+    for rp_path, lnames in owner_links.items():
+        nm = raw_names[rp_path]
+        if counts[nm] > 1:
+            rel_name = rp_path.lstrip("/")
+            for pref in root_prefixes:
+                if rp_path.startswith(pref + "/"):
+                    rel_name = rp_path[len(pref) + 1 :]
+                    break
+            nm = rel_name or nm
+        final_name = _unique(nm, used)
+        components[final_name] = tuple(lnames)
+        comp_prim_paths[final_name] = [rp_path]
+    return components, comp_prim_paths
 
 
 def _resolve_root_prim(
@@ -764,6 +915,9 @@ def read_articulation(stage: Usd.Stage, source: UsdArticulationSource | str) -> 
             if best is not None:
                 components.setdefault(best, ())
                 components[best] = components[best] + (link.name,)
+        info.component_prim_paths = {name: component_patterns(spec) for name, spec in source.components.items() if name in components}
+    elif source.auto_components:
+        components, info.component_prim_paths = _discover_isaac_robot_components(stage, roots, links)
     info.colliding_adjacent_pairs = [(link_name_of[a], link_name_of[b]) for a, b in info.colliding_adjacent_pairs if a in link_name_of and b in link_name_of]
     path_to_link = {v: k for k, v in info.link_prim_paths.items()}
     for prim in filtered_prims:

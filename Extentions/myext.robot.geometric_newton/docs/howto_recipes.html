@@ -1,0 +1,1090 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ハウツー / レシピ集 — myext.robot.geometric_newton</title>
+<style>
+:root {
+  --bg: #ffffff;
+  --surface: #f8fafc;
+  --surface-2: #f1f5f9;
+  --text: #1e293b;
+  --text-strong: #0f172a;
+  --muted: #64748b;
+  --border: #cbd5e1;
+  --border-light: #e2e8f0;
+  --c1: #2563eb; --c1-bg: #dbeafe;
+  --c2: #059669; --c2-bg: #d1fae5;
+  --c3: #d97706; --c3-bg: #fef3c7;
+  --c4: #7c3aed; --c4-bg: #ede9fe;
+  --c5: #db2777; --c5-bg: #fce7f3;
+}
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  font-family: "Segoe UI", "Hiragino Kaku Gothic ProN", "Yu Gothic UI", Meiryo, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.78;
+}
+.topbar {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(255,255,255,0.95);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--border-light);
+  padding: 0.6rem 1.4rem;
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 0.8rem; flex-wrap: wrap;
+}
+.topbar-title {
+  display: flex; align-items: center; gap: 0.6rem;
+  font-weight: 700; color: var(--text-strong); font-size: 0.94rem;
+}
+.doc-type-pill {
+  display: inline-block; padding: 0.12rem 0.6rem; border-radius: 999px;
+  font-size: 0.76rem; font-weight: 700;
+}
+.pill-portal { background: var(--c1-bg); color: var(--c1); }
+.pill-exp { background: var(--c4-bg); color: var(--c4); }
+.pill-howto { background: var(--c2-bg); color: var(--c2); }
+.pill-ref { background: var(--c3-bg); color: var(--c3); }
+
+.topbar-nav { display: flex; align-items: center; gap: 0.45rem; flex-wrap: wrap; }
+.nav-btn {
+  display: inline-flex; align-items: center; gap: 0.3rem;
+  padding: 0.32rem 0.72rem; border-radius: 7px;
+  border: 1px solid var(--border); background: var(--surface);
+  color: var(--text-strong); text-decoration: none;
+  font-size: 0.81rem; font-weight: 600;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+.nav-btn:hover { background: var(--c1-bg); border-color: var(--c1); color: var(--c1); }
+.nav-btn.is-active { background: var(--c1); border-color: var(--c1); color: #fff; }
+
+.subnav-bar {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border-light);
+  padding: 0.45rem 1.4rem;
+  display: flex; align-items: center; gap: 0.45rem; flex-wrap: wrap;
+  font-size: 0.8rem;
+}
+.subnav-label { color: var(--muted); font-weight: 700; margin-right: 0.3rem; }
+.subnav-link {
+  padding: 0.2rem 0.6rem; border-radius: 6px; text-decoration: none;
+  color: var(--text); border: 1px solid transparent; font-weight: 600;
+}
+.subnav-link:hover { background: var(--c1-bg); color: var(--c1); }
+.subnav-link.is-active { background: #fff; border-color: var(--c1); color: var(--c1); }
+
+.page-layout {
+  max-width: 1440px; margin: 0 auto;
+  display: grid; grid-template-columns: 260px minmax(0, 1fr);
+  gap: 2.2rem; padding: 1.8rem 1.5rem 5rem;
+}
+@media (max-width: 1060px) {
+  .page-layout { grid-template-columns: 1fr; }
+  .toc-rail { display: none; }
+}
+.toc-rail {
+  position: sticky; top: 4.6rem; align-self: start;
+  max-height: calc(100vh - 5.6rem); overflow-y: auto; padding-right: 0.4rem;
+}
+.toc-label {
+  font-size: 0.74rem; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.06em; color: var(--muted); margin: 0 0 0.55rem;
+}
+.toc ul { list-style: none; margin: 0; padding: 0; }
+.toc li { margin: 0.14rem 0; }
+.toc a {
+  display: block; padding: 0.28rem 0.6rem;
+  border-left: 2px solid var(--border-light);
+  color: var(--muted); text-decoration: none;
+  font-size: 0.81rem; line-height: 1.4;
+  transition: color 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+}
+.toc a:hover { color: var(--text-strong); border-left-color: var(--border); }
+.toc a.is-current {
+  color: var(--c1); border-left-color: var(--c1);
+  background: var(--c1-bg); font-weight: 700; border-radius: 0 6px 6px 0;
+}
+
+.filter-box { margin: 0 0 1rem; }
+.filter-input {
+  width: 100%; padding: 0.48rem 0.75rem; border-radius: 8px;
+  border: 1.5px solid var(--border); font-size: 0.86rem; color: var(--text-strong);
+  background: #fff;
+}
+.filter-input:focus { outline: none; border-color: var(--c1); box-shadow: 0 0 0 3px rgba(37,99,235,0.16); }
+.filter-status { font-size: 0.78rem; color: var(--muted); margin-top: 0.35rem; }
+
+.prose { max-width: 68ch; line-height: 1.82; color: var(--text); }
+.prose ul, .prose ol { padding-left: 1.35rem; margin: 0.35rem 0 1.05rem; }
+.prose li { margin-bottom: 0.42rem; }
+.hero { margin-bottom: 2rem; padding-bottom: 1.35rem; border-bottom: 1px solid var(--border-light); }
+.hero h1 { margin: 0 0 0.6rem; font-size: 1.85rem; line-height: 1.3; color: var(--text-strong); }
+.hero-lead { max-width: 68ch; color: var(--muted); font-size: 0.98rem; margin: 0; }
+
+section { scroll-margin-top: 5rem; }
+h2 {
+  margin-top: 3rem; margin-bottom: 0.75rem; font-size: 1.4rem;
+  color: var(--text-strong); padding-bottom: 0.35rem;
+  border-bottom: 2px solid var(--border-light);
+}
+h3 { margin-top: 2rem; margin-bottom: 0.48rem; font-size: 1.08rem; color: var(--text-strong); }
+p { margin-top: 0; margin-bottom: 1rem; }
+
+.ref-badge {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 1.42em; height: 1.42em; padding: 0 0.32em; border-radius: 999px;
+  font-size: 0.78em; font-weight: 700; color: #fff; background: var(--c1);
+  cursor: pointer; vertical-align: 0.06em; margin-right: 0.22em; user-select: none;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
+}
+.ref-badge[data-color="1"] { background: var(--c1); }
+.ref-badge[data-color="2"] { background: var(--c2); }
+.ref-badge[data-color="3"] { background: var(--c3); }
+.ref-badge[data-color="4"] { background: var(--c4); }
+.ref-badge[data-color="5"] { background: var(--c5); }
+
+.ui-chip {
+  display: inline-block; padding: 0.05em 0.46em; border-radius: 6px;
+  border: 1px solid #94a3b8; background: #f1f5f9;
+  font-weight: 600; font-size: 0.89em; color: #0f172a;
+}
+.code-chip {
+  display: inline-block; padding: 0.04em 0.36em; border-radius: 4px;
+  border: 1px solid #cbd5e1; background: #f8fafc;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.86em; color: #0f172a;
+}
+
+[data-ref-scope].is-dimming [data-ref]:not(.is-active),
+[data-ref-scope].is-dimming .dim-candidate:not(.is-active) {
+  opacity: 0.25; transition: opacity 0.15s ease;
+}
+[data-ref].is-active {
+  outline: 2px solid var(--c1); outline-offset: 2px;
+  box-shadow: 0 0 0 4px rgba(37,99,235,0.2);
+}
+[data-ref][data-color="2"].is-active { outline-color: var(--c2); box-shadow: 0 0 0 4px rgba(5,150,105,0.22); }
+[data-ref][data-color="3"].is-active { outline-color: var(--c3); box-shadow: 0 0 0 4px rgba(217,119,6,0.22); }
+[data-ref][data-color="4"].is-active { outline-color: var(--c4); box-shadow: 0 0 0 4px rgba(124,58,237,0.22); }
+[data-ref][data-color="5"].is-active { outline-color: var(--c5); box-shadow: 0 0 0 4px rgba(219,39,119,0.22); }
+svg g[data-ref] { cursor: pointer; transition: opacity 0.15s ease, filter 0.15s ease; }
+svg g[data-ref].is-active { outline: none; box-shadow: none; filter: drop-shadow(0 0 5px rgba(37,99,235,0.55)); }
+svg g[data-ref][data-color="2"].is-active { filter: drop-shadow(0 0 5px rgba(5,150,105,0.6)); }
+svg g[data-ref][data-color="3"].is-active { filter: drop-shadow(0 0 5px rgba(217,119,6,0.6)); }
+svg g[data-ref][data-color="4"].is-active { filter: drop-shadow(0 0 5px rgba(124,58,237,0.6)); }
+
+@keyframes ref-pulse {
+  0% { box-shadow: 0 0 0 0 rgba(37,99,235,0.55); }
+  100% { box-shadow: 0 0 0 12px rgba(37,99,235,0); }
+}
+.is-pulsing { animation: ref-pulse 0.8s ease-out 1; }
+
+.card-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(275px, 1fr));
+  gap: 1rem; margin: 1rem 0 1.6rem;
+}
+.nav-card {
+  display: block; text-decoration: none; color: inherit;
+  background: #fff; border: 1.5px solid var(--border); border-radius: 11px;
+  padding: 1rem 1.1rem; transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.nav-card:hover { border-color: var(--c1); box-shadow: 0 6px 18px rgba(37,99,235,0.1); }
+.nav-card h3 { margin: 0 0 0.35rem; font-size: 1rem; color: var(--text-strong); }
+.nav-card p { margin: 0; font-size: 0.86rem; color: var(--muted); line-height: 1.58; }
+
+.api-card {
+  background: #fff; border: 1.5px solid var(--border); border-radius: 11px;
+  padding: 1rem 1.15rem; margin: 1rem 0 1.4rem; scroll-margin-top: 5rem;
+}
+.api-card.is-hidden { display: none; }
+.api-head {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 0.6rem; flex-wrap: wrap; margin-bottom: 0.55rem;
+}
+.api-name {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 1rem; font-weight: 700; color: var(--text-strong);
+}
+.perf-pill {
+  display: inline-block; padding: 0.12rem 0.52rem; border-radius: 999px;
+  font-size: 0.74rem; font-weight: 700;
+}
+.perf-hot { background: #dcfce7; color: #166534; border: 1px solid #86efac; }
+.perf-fast { background: #dbeafe; color: #1e40af; border: 1px solid #93c5fd; }
+.perf-cold { background: #fef3c7; color: #92400e; border: 1px solid #fcd34d; }
+.perf-debug { background: #fce7f3; color: #9d174d; border: 1px solid #f9a8d4; }
+
+.sig-box {
+  background: #0f172a; color: #e2e8f0; border-radius: 8px;
+  padding: 0.65rem 0.9rem; margin: 0.45rem 0 0.75rem;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.81rem; line-height: 1.55; overflow-x: auto; white-space: pre;
+}
+.code-ex {
+  background: #0b1220; color: #e2e8f0; border-radius: 8px;
+  padding: 0.75rem 0.95rem; margin: 0.6rem 0 0.8rem;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.8rem; line-height: 1.55; overflow-x: auto; white-space: pre;
+}
+.api-meta-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 0.65rem; margin: 0.55rem 0;
+}
+.api-meta-box {
+  background: var(--surface); border: 1px solid var(--border-light);
+  border-radius: 8px; padding: 0.55rem 0.75rem; font-size: 0.85rem; line-height: 1.58;
+}
+.api-meta-box strong { color: var(--text-strong); display: block; margin-bottom: 0.2rem; font-size: 0.81rem; }
+
+.table-wrap { overflow-x: auto; margin: 0.85rem 0 1.35rem; border: 1px solid var(--border-light); border-radius: 10px; }
+table.ergo-table { width: 100%; border-collapse: collapse; font-size: 0.86rem; }
+table.ergo-table thead th {
+  position: sticky; top: 0; background: var(--surface);
+  border-bottom: 2px solid var(--border); text-align: left;
+  padding: 0.58rem 0.75rem; color: var(--text-strong); font-weight: 700;
+}
+table.ergo-table tbody tr { transition: background 0.12s ease; }
+table.ergo-table tbody tr:hover { background: #eff6ff; }
+table.ergo-table td { padding: 0.52rem 0.75rem; border-bottom: 1px solid var(--border-light); vertical-align: top; line-height: 1.58; }
+table.ergo-table tbody tr:last-child td { border-bottom: none; }
+table.ergo-table td.num, table.ergo-table th.num { text-align: right; font-variant-numeric: tabular-nums; }
+
+.callout {
+  border-left: 4px solid var(--c1); background: var(--surface);
+  border-radius: 0 10px 10px 0; padding: 0.85rem 1.05rem;
+  margin: 1rem 0 1.35rem; max-width: 68ch; font-size: 0.9rem; line-height: 1.72;
+}
+.callout.warn { border-left-color: var(--c3); background: #fffbeb; }
+.callout.good { border-left-color: var(--c2); background: #ecfdf5; }
+.callout.danger { border-left-color: #dc2626; background: #fef2f2; }
+.callout strong { color: var(--text-strong); }
+
+.diagram-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 12px; padding: 1rem 1.15rem; margin: 1rem 0 1.5rem;
+}
+.diagram-header {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 0.75rem; margin-bottom: 0.8rem; flex-wrap: wrap;
+}
+.diagram-title { font-weight: 700; font-size: 0.94rem; color: var(--text-strong); }
+.diagram-hint { font-size: 0.78rem; color: var(--muted); }
+.svg-wrap { width: 100%; overflow-x: auto; background: #fff; border: 1px solid var(--border-light); border-radius: 9px; padding: 0.5rem; }
+.diag-svg { display: block; width: 100%; min-width: 720px; height: auto; font-family: "Segoe UI", "Hiragino Kaku Gothic ProN", "Yu Gothic UI", Meiryo, sans-serif; }
+
+.swatch { display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.1rem 0.5rem; border-radius: 999px; font-size: 0.8rem; font-weight: 700; border: 1px solid transparent; }
+.swatch-dot { width: 0.7rem; height: 0.7rem; border-radius: 50%; display: inline-block; border: 1px solid rgba(15,23,42,0.25); }
+.sw-cyan { background: #ecfeff; color: #155e75; border-color: #22d3ee; } .sw-cyan .swatch-dot { background: #06b6d4; }
+.sw-red { background: #fef2f2; color: #991b1b; border-color: #f87171; } .sw-red .swatch-dot { background: #ef4444; }
+.sw-orange { background: #fff7ed; color: #9a3412; border-color: #fb923c; } .sw-orange .swatch-dot { background: #f97316; }
+
+.source-list { list-style: none; padding: 0; margin: 0.75rem 0 1.3rem; display: flex; flex-direction: column; gap: 0.55rem; }
+.source-list li {
+  background: var(--surface); border: 1px solid var(--border-light);
+  border-radius: 8px; padding: 0.62rem 0.9rem; font-size: 0.85rem; line-height: 1.58;
+}
+.source-tag {
+  display: inline-block; font-size: 0.71rem; font-weight: 700;
+  padding: 0.08rem 0.44rem; border-radius: 999px; margin-right: 0.4rem;
+}
+.source-tag.official { background: var(--c1-bg); color: var(--c1); }
+.source-tag.web { background: var(--c2-bg); color: var(--c2); }
+.source-tag.empirical { background: var(--c3-bg); color: var(--c3); }
+
+#ref-return-btn {
+  position: fixed; right: 1.25rem; bottom: 1.25rem; z-index: 9999;
+  display: none; padding: 0.52rem 0.92rem; border-radius: 999px;
+  border: 1px solid var(--c1); background: var(--c1); color: #fff;
+  font-size: 0.83rem; font-weight: 700; cursor: pointer;
+  box-shadow: 0 8px 20px rgba(37,99,235,0.3);
+}
+#ref-return-btn.is-visible { display: inline-flex; align-items: center; gap: 0.35rem; }
+</style>
+</head>
+<body>
+<header class="topbar">
+  <div class="topbar-title">
+    <span class="doc-type-pill pill-howto">ハウツー / How-to</span>
+    <span>myext.robot.geometric_newton</span>
+  </div>
+  <nav class="topbar-nav" aria-label="ドキュメント種別">
+    <a class="nav-btn" href="index.html">ポータル</a>
+    <a class="nav-btn" href="explanation_architecture.html">アーキテクチャ解説</a>
+    <a class="nav-btn is-active" href="howto_recipes.html">レシピ集</a>
+    <a class="nav-btn" href="api/index.html">API リファレンス</a>
+  </nav>
+</header>
+
+<div class="page-layout">
+  <aside class="toc-rail" aria-label="ページ内目次">
+    
+    <p class="toc-label">目次</p>
+    <nav class="toc">
+      <ul>
+        <li><a href="#recipe-1">レシピ 1：既存 Articulation を `Play=ON` で 0 フレーム遅延・Fabric 駆動する</a></li>
+        <li><a href="#recipe-2">レシピ 2：自前コリジョン空間 `GeometricScene` でロボット＋環境物（静的・動的）の干渉とクリアランスを測る</a></li>
+        <li><a href="#recipe-3">レシピ 3：複数ロボットの共有シーンとロボット間干渉（`check_between`）</a></li>
+        <li><a href="#recipe-4">レシピ 4：`GeometricRobotView` で多数台・多数姿勢を GPU バッチ処理する</a></li>
+        <li><a href="#recipe-5">レシピ 5：パラメータ（DH / 修正 DH / スクリュー軸 / URDF）からのロボット構築と `attach()` 結合</a></li>
+        <li><a href="#recipe-6">レシピ 6：IK（`jacobian` / `ikpy` / 自作ソルバー登録）とアクティブ軸マスク</a></li>
+        <li><a href="#recipe-7">レシピ 7：VariantSet 切り替え・角度単位（度）・`CommandConverter` による外部指令変換</a></li>
+        <li><a href="#recipe-8">レシピ 8：カスタムコライダー用 `.usda` Sublayer の実行時 ON/OFF 切替（非破壊・0 フレーム遅延）</a></li>
+        <li><a href="#recipe-9">レシピ 9：既存 `myext.robot.geometric` からの移行手順と PhysX バックエンドへの切替</a></li>
+        <li><a href="#recipe-10">レシピ 10：IsaacRobotAPI 自動 Component・batch_update・生メッシュ・DebugDraw 可視化</a></li>
+        <li><a href="#recipe-11">レシピ 11：毎フレーム駆動（async ループ版 / 更新イベント購読版）</a></li>
+        <li><a href="#sec-sources">公式出典・実機検証</a></li>
+      </ul>
+    </nav>
+  </aside>
+  <main>
+    <div class="hero">
+      <h1>ハウツー / レシピ集（全 11 レシピ）</h1>
+      <p class="hero-lead">Isaac Sim 6.2.0 の Script Editor へそのまま貼って動かせる目的別レシピ集です（<span class='code-chip'>metersPerUnit=1</span> のステージ専用）。詳細な引数仕様は <a href='api/index.html'>API リファレンス</a> を参照してください。</p>
+    </div>
+    <section id="recipe-1"><h2>レシピ 1：既存 Articulation を `Play=ON` で 0 フレーム遅延・Fabric 駆動する</h2><div class="prose"><p><span class="code-chip">Play=ON</span> のまま周囲の PhysX 動的剛体（<span class="code-chip">/World/DynamicBox</span>）を重力で落下させつつ、UR10e は <span class="code-chip">GeometricLayer</span> で物理を無効化して Fabric 駆動し、同一フレーム（Frame 0）で自己干渉 5 組を検出します。</p></div><div class="code-ex">import asyncio
+from pathlib import Path
+import numpy as np
+import omni.kit.app
+import omni.timeline
+import omni.usd
+from pxr import Gf, PhysxSchema, UsdGeom, UsdPhysics
+
+ISAAC_ROOT = Path(r"C:\isaacsim-6.2.0")
+UR10E_USD = ISAAC_ROOT / "exts/isaacsim.asset.transformer.rules/data/tests/ur10e/ur10e.usd"
+
+mgr = omni.kit.app.get_app().get_extension_manager()
+mgr.add_path((ISAAC_ROOT / "extsUser/Extentions").as_posix())
+mgr.set_extension_enabled_immediate("myext.robot.geometric_newton", True)
+from myext.robot.geometric_newton import GeometricRobot
+
+
+async def main():
+    app = omni.kit.app.get_app()
+    ctx = omni.usd.get_context()
+    await ctx.new_stage_async()
+    stage = ctx.get_stage()
+    UsdGeom.SetStageUpAxis(stage, UsdGeom.Tokens.z)
+    UsdGeom.SetStageMetersPerUnit(stage, 1.0)
+    UsdGeom.Xform.Define(stage, "/World")
+
+    ps = UsdPhysics.Scene.Define(stage, "/World/physicsScene")
+    ps.CreateGravityDirectionAttr(Gf.Vec3f(0, 0, -1))
+    ps.CreateGravityMagnitudeAttr(9.81)
+    PhysxSchema.PhysxSceneAPI.Apply(ps.GetPrim()).CreateEnableGPUDynamicsAttr(False)
+
+    # 共存する PhysX 動的剛体
+    dyn = UsdGeom.Cube.Define(stage, "/World/DynamicBox")
+    dyn.CreateSizeAttr(0.18)
+    dyn.AddTranslateOp().Set(Gf.Vec3d(-0.9, -0.5, 1.4))
+    UsdPhysics.RigidBodyAPI.Apply(dyn.GetPrim())
+    UsdPhysics.CollisionAPI.Apply(dyn.GetPrim())
+    UsdPhysics.MassAPI.Apply(dyn.GetPrim()).CreateMassAttr(1.0)
+
+    stage.DefinePrim("/World/UR10e", "Xform").GetReferences().AddReference(UR10E_USD.as_posix())
+    await app.next_update_async()
+
+    # 既定値: collision_backend="newton", write_target="fabric", apply_layer=True
+    robot = GeometricRobot.from_articulation(stage, "/World/UR10e")
+    q_safe = np.array([0.0, -np.pi / 2, 0.0, -np.pi / 2, 0.0, 0.0])
+    q_self = np.array([1.57, -0.5, 2.95, -np.pi / 2, -np.pi / 2, 0.0])
+    robot.set_dof_positions(q_safe)
+    robot.flush_to_usd()
+
+    tl = omni.timeline.get_timeline_interface()
+    tl.play()
+    await app.next_update_async()
+
+    # Fabric のみに書き込み（USD フラッシュなし）-&gt; Frame 0 で 5 組すべて検出
+    robot.set_dof_positions(q_self)
+    pairs = robot.check_collisions("within")
+    print(f"Frame 0 検出={len(pairs)}組:", [(p.names, round(p.separation * 1e3, 1)) for p in pairs])
+
+    tl.stop()
+    await app.next_update_async()
+    robot.close()
+
+
+asyncio.ensure_future(main())</div></section><section id="recipe-2"><h2>レシピ 2：自前コリジョン空間 `GeometricScene` でロボット＋環境物（静的・動的）の干渉とクリアランスを測る</h2><div class="prose"><p><span class="code-chip">UsdPhysics.Scene</span> を作成せず、<span class="code-chip">GeometricScene</span> 単体で移動障害物の同期（<span class="code-chip">sync_environment()</span> / <span class="code-chip">set_obstacle_pose()</span>）とクリアランス計測（<span class="code-chip">compute_clearances()</span>）を行います。</p></div><div class="code-ex">import asyncio
+from pathlib import Path
+import numpy as np
+import omni.kit.app
+import omni.usd
+from pxr import Gf, UsdGeom, UsdPhysics
+
+ISAAC_ROOT = Path(r"C:\isaacsim-6.2.0")
+UR10E_USD = ISAAC_ROOT / "exts/isaacsim.asset.transformer.rules/data/tests/ur10e/ur10e.usd"
+
+mgr = omni.kit.app.get_app().get_extension_manager()
+mgr.add_path((ISAAC_ROOT / "extsUser/Extentions").as_posix())
+mgr.set_extension_enabled_immediate("myext.robot.geometric_newton", True)
+from myext.robot.geometric_newton import GeometricRobot, GeometricScene
+
+
+async def main():
+    app = omni.kit.app.get_app()
+    ctx = omni.usd.get_context()
+    await ctx.new_stage_async()
+    stage = ctx.get_stage()
+    UsdGeom.SetStageUpAxis(stage, UsdGeom.Tokens.z)
+    UsdGeom.SetStageMetersPerUnit(stage, 1.0)
+    UsdGeom.Xform.Define(stage, "/World")  # UsdPhysics.Scene は不要
+
+    UsdGeom.Xform.Define(stage, "/World/Obstacles")
+    box = UsdGeom.Cube.Define(stage, "/World/Obstacles/Box0")
+    box.CreateSizeAttr(0.22)
+    box_op = box.AddTranslateOp()
+    box_op.Set(Gf.Vec3d(2.0, 0.0, 0.5))
+    UsdPhysics.CollisionAPI.Apply(box.GetPrim())
+
+    stage.DefinePrim("/World/UR10e", "Xform").GetReferences().AddReference(UR10E_USD.as_posix())
+    await app.next_update_async()
+
+    scene = GeometricScene(stage)
+    robot = GeometricRobot.from_articulation(stage, "/World/UR10e", scene=scene)
+    scene.add_environment("/World/Obstacles", exclude_robots=True)
+    robot.set_dof_positions(np.array([0.0, -0.55, 0.90, -0.35, 1.57, 0.0]))
+    tip = robot.links["wrist_3_link"].get_world_pose()[0]
+
+    # 1. USD 上で障害物を動かし sync_environment() でモデル再構築なし同期
+    box_op.Set(Gf.Vec3d(*tip.tolist()))
+    scene.sync_environment()
+    print("干渉:", [(p.names, round(p.separation * 1e3, 1)) for p in robot.check_collisions("environment")])
+
+    # 2. USD を触らず set_obstacle_pose() で少し離し、クリアランス計測
+    scene.set_obstacle_pose("/World/Obstacles/Box0", position=(tip + np.array([0.0, 0.20, 0.0])).tolist())
+    near = robot.compute_clearances("environment", max_distance=0.15)
+    print("クリアランス:", [(p.names, round(p.separation * 1e3, 1)) for p in near])
+
+    # 3. 安全マージン込みの干渉判定（5 cm 以内を干渉扱い）
+    print("マージン5cm:", [p.names for p in robot.check_collisions("environment", clearance=0.05)])
+
+    scene.sync_environment(reset_manual_overrides=True)
+    robot.close()
+    scene.close()
+
+
+asyncio.ensure_future(main())</div></section><section id="recipe-3"><h2>レシピ 3：複数ロボットの共有シーンとロボット間干渉（`check_between`）</h2><div class="prose"><p>2 台の UR10e を 1 つの <span class="code-chip">GeometricLayer</span> と 1 つの <span class="code-chip">GeometricScene</span> に登録し、ベース移動とロボット間干渉（<span class="code-chip">kind == "between_robots"</span>）を調べます。</p></div><div class="code-ex">import asyncio
+from pathlib import Path
+import omni.kit.app
+import omni.usd
+from pxr import Gf, UsdGeom
+
+ISAAC_ROOT = Path(r"C:\isaacsim-6.2.0")
+UR10E_USD = ISAAC_ROOT / "exts/isaacsim.asset.transformer.rules/data/tests/ur10e/ur10e.usd"
+
+mgr = omni.kit.app.get_app().get_extension_manager()
+mgr.add_path((ISAAC_ROOT / "extsUser/Extentions").as_posix())
+mgr.set_extension_enabled_immediate("myext.robot.geometric_newton", True)
+from myext.robot.geometric_newton import GeometricLayer, GeometricRobot, GeometricScene
+
+
+async def main():
+    app = omni.kit.app.get_app()
+    ctx = omni.usd.get_context()
+    await ctx.new_stage_async()
+    stage = ctx.get_stage()
+    UsdGeom.SetStageUpAxis(stage, UsdGeom.Tokens.z)
+    UsdGeom.SetStageMetersPerUnit(stage, 1.0)
+    UsdGeom.Xform.Define(stage, "/World")
+
+    for path, x in (("/World/Robot0", 0.0), ("/World/Robot1", 1.5)):
+        p = stage.DefinePrim(path, "Xform")
+        p.GetReferences().AddReference(UR10E_USD.as_posix())
+        UsdGeom.Xformable(p).AddTranslateOp().Set(Gf.Vec3d(x, 0.0, 0.0))
+    await app.next_update_async()
+
+    layer = GeometricLayer(stage)
+    scene = GeometricScene(stage)
+    r0 = GeometricRobot.from_articulation(stage, "/World/Robot0", layer=layer, scene=scene, apply_layer=False)
+    r1 = GeometricRobot.from_articulation(stage, "/World/Robot1", layer=layer, scene=scene, apply_layer=False)
+    layer.apply()
+
+    print("初期距離(1.5m)の干渉:", scene.check_between(r0.link_set, r1.link_set))
+
+    # ベース姿勢を動的に接近させると root FREE joint 経由で即座に反映される
+    r1.set_world_poses(positions=[0.10, 0.0, 0.0])
+    hits = scene.check_between(r0.link_set, r1.link_set)
+    print("接近時(0.1m)のロボット間干渉:", [(p.names, p.kind, round(p.separation * 1e3, 1)) for p in hits])
+
+    r0.close(remove_layer=False)
+    r1.close(remove_layer=False)
+    layer.remove()
+    scene.close()
+
+
+asyncio.ensure_future(main())</div><div class="callout"><strong>補足：<span class="code-chip">root FREE joint</span> とは：</strong>Newton 側のコリジョン空間（<span class="code-chip">GeometricScene</span>）では、各ロボットの根リンクを <strong>6 自由度の自由関節（FREE joint）</strong>でワールドに接続しています。<span class="code-chip">r1.set_world_poses(...)</span> を呼ぶと、この自由関節の 7 要素姿勢（位置 3＋四元数 4）だけを更新するため、Newton モデルを再構築せずにベース移動が即座に干渉判定へ反映されます。</div></section><section id="recipe-4"><h2>レシピ 4：`GeometricRobotView` で多数台・多数姿勢を GPU バッチ処理する</h2><div class="prose"><p>8 台の UR10e を <span class="code-chip">GeometricRobotView</span> でまとめ、<span class="code-chip">BatchedNewtonScene</span>（CUDA Graph + GPU 直接 Fabric 書込）で一括 FK・一括干渉・一括クリアランスを実行します。</p></div><div class="code-ex">import asyncio
+from pathlib import Path
+import numpy as np
+import omni.kit.app
+import omni.usd
+from pxr import Gf, UsdGeom
+
+ISAAC_ROOT = Path(r"C:\isaacsim-6.2.0")
+UR10E_USD = ISAAC_ROOT / "exts/isaacsim.asset.transformer.rules/data/tests/ur10e/ur10e.usd"
+
+mgr = omni.kit.app.get_app().get_extension_manager()
+mgr.add_path((ISAAC_ROOT / "extsUser/Extentions").as_posix())
+mgr.set_extension_enabled_immediate("myext.robot.geometric_newton", True)
+from myext.robot.geometric_newton import GeometricRobotView
+
+
+async def main():
+    app = omni.kit.app.get_app()
+    ctx = omni.usd.get_context()
+    await ctx.new_stage_async()
+    stage = ctx.get_stage()
+    UsdGeom.SetStageUpAxis(stage, UsdGeom.Tokens.z)
+    UsdGeom.SetStageMetersPerUnit(stage, 1.0)
+    UsdGeom.Xform.Define(stage, "/World")
+
+    paths = []
+    for i in range(8):
+        p = f"/World/UR_{i}"
+        prim = stage.DefinePrim(p, "Xform")
+        prim.GetReferences().AddReference(UR10E_USD.as_posix())
+        r, c = divmod(i, 4)
+        UsdGeom.Xformable(prim).AddTranslateOp().Set(Gf.Vec3d(c * 1.6, r * 1.8, 0.0))
+        paths.append(p)
+    await app.next_update_async()
+
+    view = GeometricRobotView.from_articulations(
+        stage,
+        paths,
+        write_target="fabric",
+        collision_backend="newton",
+        fk_backend="newton",
+        use_cuda_graph=True,
+        use_gpu_fabric_writer=True,
+    )
+
+    q_safe = np.array([0.0, -np.pi / 2, 0.0, -np.pi / 2, 0.0, 0.0], dtype=np.float32)
+    q_self = np.array([1.57, -0.5, 2.95, -np.pi / 2, -np.pi / 2, 0.0], dtype=np.float32)
+    q_batch = np.stack([q_self if i % 2 else q_safe for i in range(len(view))])
+    view.set_dof_positions(q_batch)
+
+    hits_per_robot = view.check_collisions_batch("within")
+    cl_per_robot = view.compute_clearances_batch("within", max_distance=0.08)
+    print("各ロボットの干渉数:", [len(h) for h in hits_per_robot])
+    print("各ロボットの近接数:", [len(c) for c in cl_per_robot])
+
+    view.close()
+
+
+asyncio.ensure_future(main())</div></section><section id="recipe-5"><h2>レシピ 5：パラメータ（DH / 修正 DH / スクリュー軸 / URDF）からのロボット構築と `attach()` 結合</h2><div class="prose"><p>外部 USD 不要で DH・MDH・スクリュー軸・同梱 Franka URDF からモデルを生成し、台車＋双腕へ結合します。</p></div><div class="code-ex">import asyncio
+from pathlib import Path
+import numpy as np
+import omni.kit.app
+import omni.usd
+from pxr import UsdGeom
+
+ISAAC_ROOT = Path(r"C:\isaacsim-6.2.0")
+FRANKA_URDF = ISAAC_ROOT / "exts/isaacsim.asset.importer.urdf/data/urdf/robots/franka_description/robots/panda_arm_hand.urdf"
+
+mgr = omni.kit.app.get_app().get_extension_manager()
+mgr.add_path((ISAAC_ROOT / "extsUser/Extentions").as_posix())
+mgr.set_extension_enabled_immediate("myext.robot.geometric_newton", True)
+from myext.robot.geometric_newton import (
+    DHParameters,
+    DHRow,
+    GeometricLinkSpec,
+    GeometricRobot,
+    GeometricRobotModel,
+    GeometricVisualStyle,
+    MDHParameters,
+    MDHRow,
+    ScrewAxisRow,
+    ScrewParameters,
+    UrdfSource,
+)
+from myext.robot.geometric_newton import transforms as tf
+
+
+async def main():
+    ctx = omni.usd.get_context()
+    await ctx.new_stage_async()
+    stage = ctx.get_stage()
+    UsdGeom.SetStageUpAxis(stage, UsdGeom.Tokens.z)
+    UsdGeom.SetStageMetersPerUnit(stage, 1.0)
+    UsdGeom.Xform.Define(stage, "/World")
+
+    pi = np.pi
+    lim = dict(lower_limit=-pi, upper_limit=pi)
+    mdh_arm = MDHParameters(
+        rows=[
+            MDHRow(alpha=0.0, a=0.0, theta=0.0, d=0.40, **lim),
+            MDHRow(alpha=-pi / 2, a=0.05, theta=-pi / 2, d=0.0, **lim),
+            MDHRow(alpha=0.0, a=0.45, theta=0.0, d=0.0, **lim),
+            MDHRow(alpha=-pi / 2, a=0.04, theta=0.0, d=0.42, **lim),
+            MDHRow(alpha=pi / 2, a=0.0, theta=0.0, d=0.0, **lim),
+            MDHRow(alpha=-pi / 2, a=0.0, theta=0.0, d=0.10, **lim),
+        ],
+        tool=tf.translation(z=0.08),
+    ).to_model()
+
+    # 台車 + 左右 2 本のアームを attach() で結合
+    cart = GeometricRobotModel("cart", (GeometricLinkSpec("body"),), ())
+    dual = cart.attach(mdh_arm, "body", tf.translation(y=0.25), name="left").attach(mdh_arm, "body", tf.translation(y=-0.25), name="right")
+    robot = GeometricRobot.from_model(stage, dual, "/World/DualArm", style=GeometricVisualStyle(collisions=True))
+    # 既定 samples=0 は現在の 1 姿勢のみ検査（複数姿勢で常に重なる組だけ除外する場合は samples=16 等を指定）
+    robot.ignore_touching_pairs()
+
+    # 標準 DH / スクリュー軸 / 同梱 URDF からの生成
+    dh_r = GeometricRobot.from_dh(stage, DHParameters(rows=[DHRow(theta=0.0, d=0.3, a=0.25, alpha=0.0)]), "/World/DH", base_transform=tf.translation(x=-1.0))
+    sc_r = GeometricRobot.from_screw(stage, ScrewParameters(rows=[ScrewAxisRow.through((0, 0, 0.3), (0, 1, 0))]), "/World/Screw", base_transform=tf.translation(x=-1.0, y=0.6))
+    ur_r = GeometricRobot.from_urdf(stage, UrdfSource(str(FRANKA_URDF)), "/World/Panda", base_transform=tf.translation(x=1.0))
+
+    left = robot.get_component("left")
+    left.set_dof_positions([0.3, 0.2, 0.4, 0.0, 0.2, 0.0])
+    print("DualArm 左アーム内干渉:", left.check_collisions("within"))
+    print("Panda DOFs:", ur_r.dof_names)
+
+    for r in (robot, dh_r, sc_r, ur_r):
+        r.close()
+
+
+asyncio.ensure_future(main())</div></section><section id="recipe-6"><h2>レシピ 6：IK（`jacobian` / `ikpy` / 自作ソルバー登録）とアクティブ軸マスク</h2><div class="prose"><p>UR10e に対して 3 軸マスク付き位置 IK、6 軸位置＋姿勢 IK、自作 IK ソルバー登録を実行します。</p></div><div class="code-ex">import asyncio
+from pathlib import Path
+import numpy as np
+import omni.kit.app
+import omni.usd
+from pxr import UsdGeom
+
+ISAAC_ROOT = Path(r"C:\isaacsim-6.2.0")
+UR10E_USD = ISAAC_ROOT / "exts/isaacsim.asset.transformer.rules/data/tests/ur10e/ur10e.usd"
+
+mgr = omni.kit.app.get_app().get_extension_manager()
+mgr.add_path((ISAAC_ROOT / "extsUser/Extentions").as_posix())
+mgr.set_extension_enabled_immediate("myext.robot.geometric_newton", True)
+from myext.robot.geometric_newton import GeometricRobot, IKResult, IKSolver, IKSolverConfig, register_ik_solver
+
+
+class ZeroIKSolver(IKSolver):
+    def solve(self, target_position, target_orientation=None, *, seed=None) -&gt; IKResult:
+        return IKResult(dof_positions=np.zeros(self.chain.num_variables), success=True, position_error=0.0, orientation_error=0.0)
+
+
+async def main():
+    app = omni.kit.app.get_app()
+    ctx = omni.usd.get_context()
+    await ctx.new_stage_async()
+    stage = ctx.get_stage()
+    UsdGeom.SetStageUpAxis(stage, UsdGeom.Tokens.z)
+    UsdGeom.SetStageMetersPerUnit(stage, 1.0)
+    UsdGeom.Xform.Define(stage, "/World")
+    stage.DefinePrim("/World/UR10e", "Xform").GetReferences().AddReference(UR10E_USD.as_posix())
+    await app.next_update_async()
+
+    robot = GeometricRobot.from_articulation(stage, "/World/UR10e")
+    solver = robot.create_ik_solver("jacobian", "base_link", "wrist_3_link", IKSolverConfig(orientation_mode="none", num_restarts=4))
+
+    # 1. 全軸で位置追従
+    res = robot.solve_ik(solver, target_position=[0.55, 0.20, 0.45], apply=True)
+    print("位置IK:", res.success, f"err={res.position_error:.2e} m")
+
+    # 2. アクティブ軸マスク（最初の 3 軸のみ動かす）
+    solver.set_active_dofs(["shoulder_pan_joint", "shoulder_lift_joint", "elbow_joint"])
+    res_3 = robot.solve_ik(solver, target_position=[0.50, 0.25, 0.50])
+    print("3軸マスクIK:", res_3.success, f"err={res_3.position_error:.2e} m")
+
+    # 3. 6-DOF 位置＋姿勢 IK（(w, x, y, z) 四元数）
+    solver.set_active_dofs([True] * solver.chain.num_variables)
+    solver.set_config(orientation_mode="full", orientation_tolerance=1e-3)
+    res_6 = robot.solve_ik(solver, target_position=[0.50, 0.25, 0.50], target_orientation=[1.0, 0.0, 0.0, 0.0])
+    print("6軸IK:", res_6.success, f"pos={res_6.position_error:.2e}, ori={res_6.orientation_error:.2e}")
+
+    # 4. 自作ソルバー登録
+    register_ik_solver("my_zero", ZeroIKSolver)
+    custom = robot.create_ik_solver("my_zero", "base_link", "wrist_3_link")
+    print("自作ソルバー:", robot.solve_ik(custom, [0.0, 0.0, 0.5]).success)
+
+    robot.close()
+
+
+asyncio.ensure_future(main())</div></section><section id="recipe-7"><h2>レシピ 7：VariantSet 切り替え・角度単位（度）・`CommandConverter` による外部指令変換</h2><div class="prose"><p>UR10e の <span class="code-chip">Gripper</span> VariantSet を実行中に切り替え、<span class="code-chip">angle_unit="deg"</span> と <span class="code-chip">when=</span> 条件付き <span class="code-chip">LinearCommandConverter</span> が連動する流れを確認します。</p></div><div class="code-ex">import asyncio
+from pathlib import Path
+import omni.kit.app
+import omni.usd
+from pxr import UsdGeom
+
+ISAAC_ROOT = Path(r"C:\isaacsim-6.2.0")
+UR10E_USD = ISAAC_ROOT / "exts/isaacsim.asset.transformer.rules/data/tests/ur10e/ur10e.usd"
+
+mgr = omni.kit.app.get_app().get_extension_manager()
+mgr.add_path((ISAAC_ROOT / "extsUser/Extentions").as_posix())
+mgr.set_extension_enabled_immediate("myext.robot.geometric_newton", True)
+from myext.robot.geometric_newton import GeometricRobot, LinearCommandConverter
+
+
+async def main():
+    app = omni.kit.app.get_app()
+    ctx = omni.usd.get_context()
+    await ctx.new_stage_async()
+    stage = ctx.get_stage()
+    UsdGeom.SetStageUpAxis(stage, UsdGeom.Tokens.z)
+    UsdGeom.SetStageMetersPerUnit(stage, 1.0)
+    UsdGeom.Xform.Define(stage, "/World")
+
+    prim = stage.DefinePrim("/World/UR10e", "Xform")
+    prim.GetReferences().AddReference(UR10E_USD.as_posix())
+    prim.GetVariantSet("Gripper").SetVariantSelection("Robotiq_2F_85")
+    await app.next_update_async()
+
+    robot = GeometricRobot.from_articulation(stage, "/World/UR10e", angle_unit="deg")
+    robot.add_structure_listener(lambda old, new: print(f"構造更新: {len(old)} -&gt; {len(new)} DOFs"))
+
+    # 度単位と呼び出しごとの rad 指定の混用
+    robot.set_dof_positions([45.0, -75.0], dof_indices=[0, 1])
+    robot.set_dof_positions([0.5], dof_indices=[2], unit="rad")
+
+    # Variant 条件付きコマンド変換を登録
+    conv_140 = LinearCommandConverter(["grip_ratio"], ["finger_joint"], [[35.0]], output_angle_unit="deg")
+    robot.set_command_converter("grip_140", conv_140, when={("", "Gripper"): "Robotiq_2F_140"})
+
+    # Variant 切り替え -&gt; GeometricLayer と GeometricScene が自動再構築
+    robot.set_variant("Gripper", "Robotiq_2F_140")
+    robot.apply_command({"grip_ratio": 0.6, "shoulder_pan_joint": 30.0})
+    print("変換後 DOF(deg):", robot.joints["finger_joint"].get_position(), "逆変換:", robot.read_command())
+
+    robot.close()
+
+
+asyncio.ensure_future(main())</div></section><section id="recipe-8"><h2>レシピ 8：カスタムコライダー用 `.usda` Sublayer の実行時 ON/OFF 切替（非破壊・0 フレーム遅延）</h2><div class="prose"><p>元のロボット USD ファイルを変更せず、カスタムコライダー <span class="code-chip">.usda</span> を <span class="code-chip">GeometricLayer</span> 直下の Session Sublayer として差し込み、<span class="code-chip">set_collider_layer_enabled()</span> で実行時に Mute / Unmute を切り替えます。完全版アニメーションデモは <span class="code-chip">demo/demo_03_collider_sublayer_toggle.py</span> にあります。</p></div><div class="code-ex">import asyncio
+import shutil
+import tempfile
+from pathlib import Path
+import numpy as np
+import omni.kit.app
+import omni.usd
+from pxr import Gf, Sdf, Usd, UsdGeom, UsdPhysics
+
+ISAAC_ROOT = Path(r"C:\isaacsim-6.2.0")
+UR10E_USD = ISAAC_ROOT / "exts/isaacsim.asset.transformer.rules/data/tests/ur10e/ur10e.usd"
+
+mgr = omni.kit.app.get_app().get_extension_manager()
+mgr.add_path((ISAAC_ROOT / "extsUser/Extentions").as_posix())
+mgr.set_extension_enabled_immediate("myext.robot.geometric_newton", True)
+from myext.robot.geometric_newton import GeometricRobot
+
+
+async def main():
+    app = omni.kit.app.get_app()
+    ctx = omni.usd.get_context()
+    await ctx.new_stage_async()
+    stage = ctx.get_stage()
+    UsdGeom.SetStageUpAxis(stage, UsdGeom.Tokens.z)
+    UsdGeom.SetStageMetersPerUnit(stage, 1.0)
+    UsdGeom.Xform.Define(stage, "/World")
+
+    probe = UsdGeom.Cube.Define(stage, "/World/SafetyProbe")
+    probe.CreateSizeAttr(0.16)
+    probe_op = probe.AddTranslateOp()
+    UsdPhysics.CollisionAPI.Apply(probe.GetPrim())
+
+    stage.DefinePrim("/World/UR10e", "Xform").GetReferences().AddReference(UR10E_USD.as_posix())
+    await app.next_update_async()
+
+    robot = GeometricRobot.from_articulation(stage, "/World/UR10e")
+    robot.set_dof_positions(np.array([0.0, -1.15, 1.35, -1.57, -1.57, 0.0]))
+    wrist_pos, _ = robot.links["wrist_1_link"].get_world_pose()
+    probe_op.Set(Gf.Vec3d(*(wrist_pos + np.array([0.0, 0.24, 0.0])).tolist()))
+    robot.scene.sync_environment()
+
+    # 1. 元コライダーを無効化し、wrist_1_link に半径 0.22 m の安全球を追加する .usda を一時生成
+    tmp_dir = Path(tempfile.mkdtemp(prefix="geom_newton_recipe08_"))
+    usda_path = tmp_dir / "custom_safety_colliders.usda"
+    sub = Usd.Stage.CreateNew(str(usda_path))
+    for cpaths in robot.collider_paths.values():
+        for cp in cpaths:
+            for anc in Sdf.Path(cp).GetPrefixes()[:-1]:
+                if anc != Sdf.Path.absoluteRootPath:
+                    sub.OverridePrim(anc)
+            UsdPhysics.CollisionAPI.Apply(sub.OverridePrim(cp)).CreateCollisionEnabledAttr(False)
+    lpath = robot.link_path_map["wrist_1_link"]
+    for anc in Sdf.Path(lpath).GetPrefixes():
+        if anc != Sdf.Path.absoluteRootPath:
+            sub.OverridePrim(anc)
+    bubble = UsdGeom.Sphere.Define(sub, f"{lpath}/CustomSafetyBubble")
+    bubble.CreateRadiusAttr(0.22)
+    UsdPhysics.CollisionAPI.Apply(bubble.GetPrim()).CreateCollisionEnabledAttr(True)
+    sub.GetRootLayer().Save()
+
+    print("元コライダー干渉:", len(robot.check_collisions("environment")))
+
+    # 2. Session Layer（GeometricLayer 直下）へ差し込み -&gt; 0 フレーム遅延で干渉検出
+    layer_id = robot.attach_collider_layer(usda_path, target="session")
+    print("カスタムON 干渉:", len(robot.check_collisions("environment")), "ver=", robot.collider_version)
+
+    # 3. Mute で元コライダーへ復帰 -&gt; Unmute で再びカスタム有効化
+    robot.set_collider_layer_enabled(layer_id, False)
+    print("カスタムOFF(Mute) 干渉:", len(robot.check_collisions("environment")), "ver=", robot.collider_version)
+    robot.set_collider_layer_enabled(layer_id, True)
+    print("カスタム再ON(Unmute) 干渉:", len(robot.check_collisions("environment")), "ver=", robot.collider_version)
+
+    # 4. Sublayer を外して元構成へ完全復帰
+    robot.detach_collider_layer(layer_id)
+    robot.close()
+    shutil.rmtree(tmp_dir, ignore_errors=True)
+
+
+asyncio.ensure_future(main())</div></section><section id="recipe-9"><h2>レシピ 9：既存 `myext.robot.geometric` からの移行手順と PhysX バックエンドへの切替</h2><div class="prose"><p>既存の <span class="code-chip">myext.robot.geometric</span> 向けコードを <span class="code-chip">myext.robot.geometric_newton</span> へ移す手順です。</p></div><h3>移行チェックリスト</h3><div class="prose"><p>1. <strong>import パスと拡張機能 ID の置換</strong>：<br>   - 拡張機能有効化：<span class="code-chip">"myext.robot.geometric"</span> → <span class="code-chip">"myext.robot.geometric_newton"</span><br>   - Python import：<span class="code-chip">from myext.robot.geometric import ...</span> → <span class="code-chip">from myext.robot.geometric_newton import ...</span><br>   - Kit 起動引数設定プレフィックス：<span class="code-chip">--/exts/myext.robot.geometric/...</span> → <span class="code-chip">--/exts/myext.robot.geometric_newton/...</span><br>2. <strong>既定の干渉判定バックエンドの違いを確認</strong>：<br>   - <span class="code-chip">myext.robot.geometric_newton</span> は <span class="code-chip">collision_backend="newton"</span> が既定です。<span class="code-chip">check_collisions()</span> は <span class="code-chip">flush_to_usd()</span> を呼ばないため、USD 側に最新姿勢を書きたい処理がある場合は明示的に <span class="code-chip">robot.flush_to_usd()</span> を呼びます。<br>   - <span class="code-chip">GeometricCollisionPair</span> の既存フィールド（<span class="code-chip">link_a</span>, <span class="code-chip">link_b</span>, <span class="code-chip">path_a</span>, <span class="code-chip">path_b</span>, <span class="code-chip">kind</span>, <span class="code-chip">component_a</span>, <span class="code-chip">component_b</span>, <span class="code-chip">robot_a</span>, <span class="code-chip">robot_b</span>, <span class="code-chip">.names</span>）はすべて互換のまま、<span class="code-chip">separation</span>, <span class="code-chip">point_a</span>, <span class="code-chip">point_b</span>, <span class="code-chip">normal</span> が追加されています。</p></div><h3>PhysX バックエンド（従来挙動）へ切り替える場合</h3><div class="code-ex"># 方法 A: コンストラクタでロボット単位に指定
+robot = GeometricRobot.from_articulation(
+    stage,
+    "/World/UR10e",
+    collision_backend="physx",
+    fk_backend="numpy",
+)
+
+# 方法 B: 呼び出し単位で一時的に PhysX を使う
+physx_pairs = robot.check_collisions("all", backend="physx")
+
+# 方法 C: 実行時にプロパティで切り替え
+robot.collision_backend = "physx"
+
+# 方法 D: 起動引数で全ロボットの既定値を変更
+# --/exts/myext.robot.geometric_newton/collision_backend=physx
+# --/exts/myext.robot.geometric_newton/fk_backend=numpy</div></section>
+<section id="recipe-10">
+  <h2>レシピ 10：IsaacRobotAPI 自動 Component・batch_update・生メッシュ・DebugDraw 可視化</h2>
+  <div class="prose">
+    <p>
+      新設されたユーザー向けトップレベル引数（<span class="code-chip">auto_components=True</span>・<span class="code-chip">convex_meshes=False</span>・<span class="code-chip">debug_draw_colliders=True</span>）と、最速パスを保ったままマルチアームを簡潔に書ける <span class="code-chip">batch_update()</span>・<span class="code-chip">describe()</span>・<span class="code-chip">dof_names=</span>／辞書指定を組み合わせた実践例です。
+    </p>
+  </div>
+  <div class="callout good">
+    <strong>DebugDraw 可視化の配色（<span class="code-chip">debug_draw_colliders=True</span> 時のみ動作、OFF 時は負荷 0 ms）：</strong><br>
+    通常コライダー＝<span class="swatch sw-cyan"><span class="swatch-dot"></span>シアン</span> ／ 干渉中コライダー＝<span class="swatch sw-red"><span class="swatch-dot"></span>赤</span> ／ 接触点マーカー＆めり込み線分＝<span class="swatch sw-orange"><span class="swatch-dot"></span>オレンジ</span>
+  </div>
+  <div class="code-ex">from myext.robot.geometric_newton import GeometricRobot
+
+# 1. from_articulation だけで全設定を直接指定可能
+#    - auto_components=True (既定): IsaacRobotAPI から Component を生成時に自動構築
+#    - convex_meshes=False        : 凹形状 STL メッシュを凸包化せず元の三角形メッシュで判定
+#    - debug_draw_colliders=True  : デバッグ用 DebugDraw 可視化を ON (実行中も切替可)
+robot = GeometricRobot.from_articulation(
+    stage,
+    "/World/MultiArmRobot",
+    angle_unit="deg",
+    convex_meshes=False,
+    debug_draw_colliders=True,
+)
+
+# 2. 構成要素・全 DOF 番号/名前/mimic 関係/VariantSet を一覧表示
+print(robot.describe())
+print("自動生成された構成要素:", robot.component_names)
+print("独立軸のみ (mimic 従動軸を除外):", robot.independent_dof_names)
+
+# 3. 毎フレームのホットループ: Component (事前キャッシュ済み整数配列) + batch_update() で最速更新
+arm0 = robot.get_component("arm0")
+arm1 = robot.get_component("arm1")
+with robot.batch_update():
+    arm0.set_dof_positions([10.0, -20.0, 30.0, 0.0, 15.0, 0.0])  # FK 遅延
+    arm1.set_dof_positions([-10.0, 20.0, -30.0, 0.0, -15.0, 0.0])  # 終了時に 1 回だけ FK + Fabric 書込
+
+# 4. テスト・初期姿勢設定など低頻度操作では辞書や dof_names= で安全に部分更新
+robot.set_dof_positions({"arm0_s1": 25.0, "arm1_s1": -25.0})
+cur = robot.get_dof_positions_dict(independent_only=True)
+
+# 5. 0 フレーム遅延で干渉判定 -> debug_draw_colliders=True なので赤＆オレンジ接触点が自動更新
+pairs = robot.check_collisions()
+
+# 6. 実行時にデバッグ描画や凸包モードを切り替え可能 (OFF にすると即消去・負荷ゼロへ戻る)
+robot.debug_draw_colliders = False
+robot.convex_meshes = True</div>
+</section>
+
+<section id="recipe-11">
+  <h2>レシピ 11：毎フレーム駆動（async ループ版 / 更新イベント購読版）</h2>
+  <div class="prose">
+    <p>
+      <span class="code-chip">write_target="fabric"</span>（既定）でロボットを毎フレーム駆動する 2 通りの書き方（<span class="code-chip">async</span> ループ版と更新イベント購読版）です。
+    </p>
+  </div>
+  <div class="callout good">
+    <strong>Isaac Sim 6.2.0 実機検証結果（Stop / Play=ON 両方）：</strong><br>
+    1) <strong>姿勢保持：</strong><span class="code-chip">set_dof_positions()</span> を 1 回だけ呼び、続けて 60 フレーム進めたところ、Stop・Play=ON の両方で 1 フレーム目と 60 フレーム目の <span class="code-chip">GeometricFabricWriter.read_world()</span> の最大差は <span class="code-chip">0.0</span>（計算期待値との差 <span class="code-chip">5.55e-16 &lt;= 1e-6</span>）で姿勢がそのまま保たれました。したがって<strong>関節値を変えないフレームで毎フレーム <span class="code-chip">set_dof_positions()</span> を呼び直す必要はありません</strong>。Viewport スクリーンショット比較でも 2 フレーム目〜60 フレーム目は完全に同一姿勢を維持しました（1 フレーム目直後のキャプチャでは RTX 描画バッファの 1 フレーム反映遅延により変更前フレームが写る場合があります）。<br>
+    2) <strong>更新イベント購読による毎フレーム駆動：</strong><span class="code-chip">get_update_event_stream().create_subscription_to_pop(...)</span> のコールバック内で毎フレーム 1 軸目を <span class="code-chip">0.5 * sin(frame * 0.1)</span> [rad] に設定したところ、Stop・Play=ON ともに全 60 フレームで <span class="code-chip">read_world()</span> と <span class="code-chip">robot.get_link_world_matrices()</span> の最大差 <span class="code-chip">6.66e-16 &lt;= 1e-6</span> で指令どおり追従しました。
+  </div>
+
+  <h3>方式 A：async ループ版（スクリプト完結・逐次制御向け）</h3>
+  <div class="code-ex">import asyncio
+import math
+import numpy as np
+import omni.kit.app
+from myext.robot.geometric_newton import GeometricRobot
+
+async def drive_async(stage):
+    app = omni.kit.app.get_app()
+    robot = GeometricRobot.from_articulation(stage, "/World/UR10e")  # write_target="fabric"
+    q = np.array([0.0, -1.0, 1.2, -1.0, -1.57, 0.0], dtype=np.float64)
+
+    for frame in range(180):
+        q[0] = 0.5 * math.sin(frame * 0.1)  # rad
+        robot.set_dof_positions(q)          # 値が変わるフレームだけ呼べばよい
+        hits = robot.check_collisions()     # 0 フレーム遅延で即時判定
+        await app.next_update_async()
+
+    robot.close()
+
+asyncio.ensure_future(drive_async(stage))</div>
+
+  <h3>方式 B：更新イベント購読版（拡張機能常駐・外部状態同期向け）</h3>
+  <div class="code-ex">import math
+import numpy as np
+import omni.kit.app
+from myext.robot.geometric_newton import GeometricRobot
+
+app = omni.kit.app.get_app()
+robot = GeometricRobot.from_articulation(stage, "/World/UR10e")
+q = np.array([0.0, -1.0, 1.2, -1.0, -1.57, 0.0], dtype=np.float64)
+frame = 0
+
+def on_update(_event):
+    global frame
+    q[0] = 0.5 * math.sin(frame * 0.1)
+    robot.set_dof_positions(q)
+    frame += 1
+
+# 戻り値 sub を変数に保持している間だけ毎フレーム呼ばれる（None を代入すると購読解除）
+sub = app.get_update_event_stream().create_subscription_to_pop(on_update, name="my_geometric_drive")</div>
+</section>
+
+<section id="sec-sources">
+  <h2>公式出典・同梱ソース・実機検証の切り分け</h2>
+  <ul class="source-list">
+    <li>
+      <span class="source-tag official">同梱公式 Doc</span><span class="source-tag web">Web 公式</span>
+      <strong>USD / Fabric / USDRT Population（合成前 VariantSet は USD 必須・FSD 遅延同期・2 面キャッシュ）</strong>：<br>
+      <span class="code-chip">C:\isaacsim-6.2.0\extscache\usdrt.scenegraph-7.6.3...\docs\fabricsd\fsd_vs_omnihydra.md</span>・<span class="code-chip">fabric_overview.rst</span>・<span class="code-chip">fabric_hierarchy.rst</span> ／
+      <a href="https://docs.omniverse.nvidia.com/kit/docs/usdrt.scenegraph/latest/index.html" target="_blank" rel="noopener">Omniverse USDRT / Fabric Documentation</a>
+    </li>
+    <li>
+      <span class="source-tag official">同梱公式スキーマ</span>
+      <strong>IsaacRobotAPI（<code>isaac:physics:robotLinks</code> / <code>robotJoints</code> / 入れ子サブロボット構成）</strong>：<br>
+      <span class="code-chip">C:\isaacsim-6.2.0\exts\isaacsim.robot.schema\pip_prebundle\usd\schema\isaac\robot_schema\RobotSchema.usda</span>
+    </li>
+    <li>
+      <span class="source-tag official">同梱公式 Doc</span><span class="source-tag web">Web 公式</span>
+      <strong>PhysX 5（Articulation・MimicJoint・Scene Queries CPU 実行・Contact Reports・Collider 可視化色）</strong>：<br>
+      <span class="code-chip">C:\isaacsim-6.2.0\extscache\omni.physx.ui-110.4.4...\docs\dev_guide\collision_debug_vis.rst</span>・<span class="code-chip">viewport_overlays.rst</span>・<span class="code-chip">physics_debug_wnd.rst</span>・<span class="code-chip">omni.physx-110.4.4...\docs\dev_guide\scene_queries.rst</span> ／
+      <a href="https://nvidia-omniverse.github.io/PhysX/physx/5.4.1/index.html" target="_blank" rel="noopener">NVIDIA PhysX 5.4.1 SDK Documentation</a>
+    </li>
+    <li>
+      <span class="source-tag web">Web 公式</span><span class="source-tag official">同梱公式ソース</span>
+      <strong>Newton 1.6.1（<code>eval_fk</code>・<code>CollisionPipeline</code>・<code>GeoType.MESH</code> / <code>CONVEX_MESH</code>・<code>sdf_contact.py</code>）＆ Warp</strong>：<br>
+      <span class="code-chip">C:\isaacsim-6.2.0\exts\isaacsim.pip.newton\pip_prebundle\newton[sim]\newton-1.6.1-py3-none-any\newton\_src\sim\collide.py</span>・<span class="code-chip">geometry\narrow_phase.py</span>・<span class="code-chip">geometry\sdf_contact.py</span> ／
+      <a href="https://newton-physics.github.io/newton/1.6.1/guide/overview.html" target="_blank" rel="noopener">Newton 1.6.1 Documentation</a>・<a href="https://nvidia.github.io/warp/" target="_blank" rel="noopener">NVIDIA Warp Documentation</a>
+    </li>
+    <li>
+      <span class="source-tag official">同梱公式ソース</span>
+      <strong>Isaac Sim Experimental Articulation API・DebugDraw（RTX オーバーレイ描画）</strong>：<br>
+      <span class="code-chip">C:\isaacsim-6.2.0\exts\isaacsim.core.experimental.prims\...\articulation.py</span>・<span class="code-chip">extscache\isaacsim.util.debug_draw-3.2.8...\docs\Overview.md</span>
+    </li>
+    <li>
+      <span class="source-tag empirical">実機検証</span>
+      <strong>Isaac Sim 6.2.0（RTX 3060）での全テスト・U 字凹メッシュ実測</strong>：<br>
+      <span class="code-chip">tests_pure/</span>（73 本全通過）・<span class="code-chip">tests_kit/run_kit_tests.py</span>（34 本全通過）・U 字水密メッシュ対実測（<span class="code-chip">convex_meshes=True</span>: 溝誤検知 1 件 / 5 cm 貫通時 −0.45 m / 2.35 ms 対 <span class="code-chip">convex_meshes=False</span>: 溝非接触 0 件 / 5 cm 貫通時 −0.0500 m / 2.39 ms）。
+    </li>
+  </ul>
+</section>
+
+  </main>
+</div>
+<svg id="ref-connector-layer" style="position:fixed;inset:0;width:100vw;height:100vh;pointer-events:none;z-index:9990;"></svg>
+<button id="ref-return-btn" type="button">↩ 元の位置へ戻る</button>
+<script>
+(() => {
+  const svgLayer = document.getElementById('ref-connector-layer');
+  const returnBtn = document.getElementById('ref-return-btn');
+  let savedScrollY = null;
+  const colorMap = { '1': '#2563eb', '2': '#059669', '3': '#d97706', '4': '#7c3aed', '5': '#db2777' };
+  const isInViewport = (el) => {
+    const r = el.getBoundingClientRect();
+    return r.width > 0 && r.height > 0 && r.top >= 0 && r.bottom <= window.innerHeight && r.left >= 0 && r.right <= window.innerWidth;
+  };
+  const clearLines = () => { if (svgLayer) svgLayer.innerHTML = ''; };
+  const drawConnector = (fromEl, toEl) => {
+    if (!svgLayer || !isInViewport(fromEl) || !isInViewport(toEl)) return;
+    const a = fromEl.getBoundingClientRect(), b = toEl.getBoundingClientRect();
+    const x1 = a.left + a.width / 2, y1 = a.top + a.height / 2;
+    const x2 = b.left + b.width / 2, y2 = b.top + b.height / 2;
+    const mx = (x1 + x2) / 2;
+    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    path.setAttribute('d', `M ${x1} ${y1} C ${mx} ${y1}, ${mx} ${y2}, ${x2} ${y2}`);
+    path.setAttribute('fill', 'none');
+    path.setAttribute('stroke', colorMap[fromEl.dataset.color] || '#2563eb');
+    path.setAttribute('stroke-width', '2');
+    path.setAttribute('stroke-dasharray', '4 3');
+    path.setAttribute('opacity', '0.72');
+    svgLayer.appendChild(path);
+  };
+  const setActive = (refId, originEl) => {
+    const peers = Array.from(document.querySelectorAll(`[data-ref="${CSS.escape(refId)}"]`));
+    const scopes = new Set();
+    peers.forEach((el) => { el.classList.add('is-active'); const sc = el.closest('[data-ref-scope]'); if (sc) scopes.add(sc); });
+    scopes.forEach((sc) => sc.classList.add('is-dimming'));
+    clearLines();
+    if (originEl) peers.filter((el) => el !== originEl).forEach((peer) => drawConnector(originEl, peer));
+  };
+  const clearActive = () => {
+    document.querySelectorAll('[data-ref].is-active').forEach((el) => el.classList.remove('is-active'));
+    document.querySelectorAll('[data-ref-scope].is-dimming').forEach((sc) => sc.classList.remove('is-dimming'));
+    clearLines();
+  };
+  document.querySelectorAll('[data-ref]').forEach((el) => {
+    const refId = el.dataset.ref;
+    el.addEventListener('mouseenter', () => setActive(refId, el));
+    el.addEventListener('mouseleave', clearActive);
+    el.addEventListener('focus', () => setActive(refId, el));
+    el.addEventListener('blur', clearActive);
+    el.addEventListener('click', () => {
+      const peers = Array.from(document.querySelectorAll(`[data-ref="${CSS.escape(refId)}"]`)).filter((p) => p !== el);
+      if (peers.length === 0) return;
+      const target = peers.find((p) => p.dataset.refRole !== el.dataset.refRole) || peers[0];
+      if (!isInViewport(target) && returnBtn) { savedScrollY = window.scrollY; returnBtn.classList.add('is-visible'); }
+      target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      target.classList.remove('is-pulsing'); void target.offsetWidth; target.classList.add('is-pulsing');
+    });
+  });
+  if (returnBtn) {
+    returnBtn.addEventListener('click', () => {
+      if (savedScrollY !== null) { window.scrollTo({ top: savedScrollY, behavior: 'smooth' }); savedScrollY = null; }
+      returnBtn.classList.remove('is-visible');
+    });
+  }
+  const tocLinks = Array.from(document.querySelectorAll('.toc a[href^="#"]'));
+  const sections = tocLinks.map((a) => document.querySelector(a.getAttribute('href'))).filter(Boolean);
+  if (sections.length > 0) {
+    const obs = new IntersectionObserver((entries) => {
+      entries.forEach((e) => {
+        if (!e.isIntersecting) return;
+        tocLinks.forEach((a) => a.classList.toggle('is-current', a.getAttribute('href') === `#${e.target.id}`));
+      });
+    }, { rootMargin: '-14% 0px -75% 0px' });
+    sections.forEach((s) => obs.observe(s));
+  }
+  const filterInput = document.getElementById('api-filter-input');
+  const filterStatus = document.getElementById('api-filter-status');
+  if (filterInput) {
+    const cards = Array.from(document.querySelectorAll('.api-card'));
+    const runFilter = () => {
+      const q = filterInput.value.trim().toLowerCase();
+      let shown = 0;
+      cards.forEach((c) => {
+        const hit = !q || c.textContent.toLowerCase().includes(q);
+        c.classList.toggle('is-hidden', !hit);
+        if (hit) shown += 1;
+      });
+      if (filterStatus) filterStatus.textContent = q ? `${shown} / ${cards.length} 件表示` : `全 ${cards.length} 件`;
+    };
+    filterInput.addEventListener('input', runFilter);
+    runFilter();
+  }
+})();
+</script>
+</body>
+</html>

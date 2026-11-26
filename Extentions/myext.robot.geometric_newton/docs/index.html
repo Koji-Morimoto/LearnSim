@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ドキュメントポータル — myext.robot.geometric_newton</title>
+<style>
+:root {
+  --bg: #ffffff;
+  --surface: #f8fafc;
+  --surface-2: #f1f5f9;
+  --text: #1e293b;
+  --text-strong: #0f172a;
+  --muted: #64748b;
+  --border: #cbd5e1;
+  --border-light: #e2e8f0;
+  --c1: #2563eb; --c1-bg: #dbeafe;
+  --c2: #059669; --c2-bg: #d1fae5;
+  --c3: #d97706; --c3-bg: #fef3c7;
+  --c4: #7c3aed; --c4-bg: #ede9fe;
+  --c5: #db2777; --c5-bg: #fce7f3;
+}
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  font-family: "Segoe UI", "Hiragino Kaku Gothic ProN", "Yu Gothic UI", Meiryo, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.78;
+}
+.topbar {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(255,255,255,0.95);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--border-light);
+  padding: 0.6rem 1.4rem;
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 0.8rem; flex-wrap: wrap;
+}
+.topbar-title {
+  display: flex; align-items: center; gap: 0.6rem;
+  font-weight: 700; color: var(--text-strong); font-size: 0.94rem;
+}
+.doc-type-pill {
+  display: inline-block; padding: 0.12rem 0.6rem; border-radius: 999px;
+  font-size: 0.76rem; font-weight: 700;
+}
+.pill-portal { background: var(--c1-bg); color: var(--c1); }
+.pill-exp { background: var(--c4-bg); color: var(--c4); }
+.pill-howto { background: var(--c2-bg); color: var(--c2); }
+.pill-ref { background: var(--c3-bg); color: var(--c3); }
+
+.topbar-nav { display: flex; align-items: center; gap: 0.45rem; flex-wrap: wrap; }
+.nav-btn {
+  display: inline-flex; align-items: center; gap: 0.3rem;
+  padding: 0.32rem 0.72rem; border-radius: 7px;
+  border: 1px solid var(--border); background: var(--surface);
+  color: var(--text-strong); text-decoration: none;
+  font-size: 0.81rem; font-weight: 600;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+.nav-btn:hover { background: var(--c1-bg); border-color: var(--c1); color: var(--c1); }
+.nav-btn.is-active { background: var(--c1); border-color: var(--c1); color: #fff; }
+
+.subnav-bar {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border-light);
+  padding: 0.45rem 1.4rem;
+  display: flex; align-items: center; gap: 0.45rem; flex-wrap: wrap;
+  font-size: 0.8rem;
+}
+.subnav-label { color: var(--muted); font-weight: 700; margin-right: 0.3rem; }
+.subnav-link {
+  padding: 0.2rem 0.6rem; border-radius: 6px; text-decoration: none;
+  color: var(--text); border: 1px solid transparent; font-weight: 600;
+}
+.subnav-link:hover { background: var(--c1-bg); color: var(--c1); }
+.subnav-link.is-active { background: #fff; border-color: var(--c1); color: var(--c1); }
+
+.page-layout {
+  max-width: 1440px; margin: 0 auto;
+  display: grid; grid-template-columns: 260px minmax(0, 1fr);
+  gap: 2.2rem; padding: 1.8rem 1.5rem 5rem;
+}
+@media (max-width: 1060px) {
+  .page-layout { grid-template-columns: 1fr; }
+  .toc-rail { display: none; }
+}
+.toc-rail {
+  position: sticky; top: 4.6rem; align-self: start;
+  max-height: calc(100vh - 5.6rem); overflow-y: auto; padding-right: 0.4rem;
+}
+.toc-label {
+  font-size: 0.74rem; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.06em; color: var(--muted); margin: 0 0 0.55rem;
+}
+.toc ul { list-style: none; margin: 0; padding: 0; }
+.toc li { margin: 0.14rem 0; }
+.toc a {
+  display: block; padding: 0.28rem 0.6rem;
+  border-left: 2px solid var(--border-light);
+  color: var(--muted); text-decoration: none;
+  font-size: 0.81rem; line-height: 1.4;
+  transition: color 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+}
+.toc a:hover { color: var(--text-strong); border-left-color: var(--border); }
+.toc a.is-current {
+  color: var(--c1); border-left-color: var(--c1);
+  background: var(--c1-bg); font-weight: 700; border-radius: 0 6px 6px 0;
+}
+
+.filter-box { margin: 0 0 1rem; }
+.filter-input {
+  width: 100%; padding: 0.48rem 0.75rem; border-radius: 8px;
+  border: 1.5px solid var(--border); font-size: 0.86rem; color: var(--text-strong);
+  background: #fff;
+}
+.filter-input:focus { outline: none; border-color: var(--c1); box-shadow: 0 0 0 3px rgba(37,99,235,0.16); }
+.filter-status { font-size: 0.78rem; color: var(--muted); margin-top: 0.35rem; }
+
+.prose { max-width: 68ch; line-height: 1.82; color: var(--text); }
+.prose ul, .prose ol { padding-left: 1.35rem; margin: 0.35rem 0 1.05rem; }
+.prose li { margin-bottom: 0.42rem; }
+.hero { margin-bottom: 2rem; padding-bottom: 1.35rem; border-bottom: 1px solid var(--border-light); }
+.hero h1 { margin: 0 0 0.6rem; font-size: 1.85rem; line-height: 1.3; color: var(--text-strong); }
+.hero-lead { max-width: 68ch; color: var(--muted); font-size: 0.98rem; margin: 0; }
+
+section { scroll-margin-top: 5rem; }
+h2 {
+  margin-top: 3rem; margin-bottom: 0.75rem; font-size: 1.4rem;
+  color: var(--text-strong); padding-bottom: 0.35rem;
+  border-bottom: 2px solid var(--border-light);
+}
+h3 { margin-top: 2rem; margin-bottom: 0.48rem; font-size: 1.08rem; color: var(--text-strong); }
+p { margin-top: 0; margin-bottom: 1rem; }
+
+.ref-badge {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 1.42em; height: 1.42em; padding: 0 0.32em; border-radius: 999px;
+  font-size: 0.78em; font-weight: 700; color: #fff; background: var(--c1);
+  cursor: pointer; vertical-align: 0.06em; margin-right: 0.22em; user-select: none;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
+}
+.ref-badge[data-color="1"] { background: var(--c1); }
+.ref-badge[data-color="2"] { background: var(--c2); }
+.ref-badge[data-color="3"] { background: var(--c3); }
+.ref-badge[data-color="4"] { background: var(--c4); }
+.ref-badge[data-color="5"] { background: var(--c5); }
+
+.ui-chip {
+  display: inline-block; padding: 0.05em 0.46em; border-radius: 6px;
+  border: 1px solid #94a3b8; background: #f1f5f9;
+  font-weight: 600; font-size: 0.89em; color: #0f172a;
+}
+.code-chip {
+  display: inline-block; padding: 0.04em 0.36em; border-radius: 4px;
+  border: 1px solid #cbd5e1; background: #f8fafc;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.86em; color: #0f172a;
+}
+
+[data-ref-scope].is-dimming [data-ref]:not(.is-active),
+[data-ref-scope].is-dimming .dim-candidate:not(.is-active) {
+  opacity: 0.25; transition: opacity 0.15s ease;
+}
+[data-ref].is-active {
+  outline: 2px solid var(--c1); outline-offset: 2px;
+  box-shadow: 0 0 0 4px rgba(37,99,235,0.2);
+}
+[data-ref][data-color="2"].is-active { outline-color: var(--c2); box-shadow: 0 0 0 4px rgba(5,150,105,0.22); }
+[data-ref][data-color="3"].is-active { outline-color: var(--c3); box-shadow: 0 0 0 4px rgba(217,119,6,0.22); }
+[data-ref][data-color="4"].is-active { outline-color: var(--c4); box-shadow: 0 0 0 4px rgba(124,58,237,0.22); }
+[data-ref][data-color="5"].is-active { outline-color: var(--c5); box-shadow: 0 0 0 4px rgba(219,39,119,0.22); }
+svg g[data-ref] { cursor: pointer; transition: opacity 0.15s ease, filter 0.15s ease; }
+svg g[data-ref].is-active { outline: none; box-shadow: none; filter: drop-shadow(0 0 5px rgba(37,99,235,0.55)); }
+svg g[data-ref][data-color="2"].is-active { filter: drop-shadow(0 0 5px rgba(5,150,105,0.6)); }
+svg g[data-ref][data-color="3"].is-active { filter: drop-shadow(0 0 5px rgba(217,119,6,0.6)); }
+svg g[data-ref][data-color="4"].is-active { filter: drop-shadow(0 0 5px rgba(124,58,237,0.6)); }
+
+@keyframes ref-pulse {
+  0% { box-shadow: 0 0 0 0 rgba(37,99,235,0.55); }
+  100% { box-shadow: 0 0 0 12px rgba(37,99,235,0); }
+}
+.is-pulsing { animation: ref-pulse 0.8s ease-out 1; }
+
+.card-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(275px, 1fr));
+  gap: 1rem; margin: 1rem 0 1.6rem;
+}
+.nav-card {
+  display: block; text-decoration: none; color: inherit;
+  background: #fff; border: 1.5px solid var(--border); border-radius: 11px;
+  padding: 1rem 1.1rem; transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.nav-card:hover { border-color: var(--c1); box-shadow: 0 6px 18px rgba(37,99,235,0.1); }
+.nav-card h3 { margin: 0 0 0.35rem; font-size: 1rem; color: var(--text-strong); }
+.nav-card p { margin: 0; font-size: 0.86rem; color: var(--muted); line-height: 1.58; }
+
+.api-card {
+  background: #fff; border: 1.5px solid var(--border); border-radius: 11px;
+  padding: 1rem 1.15rem; margin: 1rem 0 1.4rem; scroll-margin-top: 5rem;
+}
+.api-card.is-hidden { display: none; }
+.api-head {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 0.6rem; flex-wrap: wrap; margin-bottom: 0.55rem;
+}
+.api-name {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 1rem; font-weight: 700; color: var(--text-strong);
+}
+.perf-pill {
+  display: inline-block; padding: 0.12rem 0.52rem; border-radius: 999px;
+  font-size: 0.74rem; font-weight: 700;
+}
+.perf-hot { background: #dcfce7; color: #166534; border: 1px solid #86efac; }
+.perf-fast { background: #dbeafe; color: #1e40af; border: 1px solid #93c5fd; }
+.perf-cold { background: #fef3c7; color: #92400e; border: 1px solid #fcd34d; }
+.perf-debug { background: #fce7f3; color: #9d174d; border: 1px solid #f9a8d4; }
+
+.sig-box {
+  background: #0f172a; color: #e2e8f0; border-radius: 8px;
+  padding: 0.65rem 0.9rem; margin: 0.45rem 0 0.75rem;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.81rem; line-height: 1.55; overflow-x: auto; white-space: pre;
+}
+.code-ex {
+  background: #0b1220; color: #e2e8f0; border-radius: 8px;
+  padding: 0.75rem 0.95rem; margin: 0.6rem 0 0.8rem;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.8rem; line-height: 1.55; overflow-x: auto; white-space: pre;
+}
+.api-meta-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 0.65rem; margin: 0.55rem 0;
+}
+.api-meta-box {
+  background: var(--surface); border: 1px solid var(--border-light);
+  border-radius: 8px; padding: 0.55rem 0.75rem; font-size: 0.85rem; line-height: 1.58;
+}
+.api-meta-box strong { color: var(--text-strong); display: block; margin-bottom: 0.2rem; font-size: 0.81rem; }
+
+.table-wrap { overflow-x: auto; margin: 0.85rem 0 1.35rem; border: 1px solid var(--border-light); border-radius: 10px; }
+table.ergo-table { width: 100%; border-collapse: collapse; font-size: 0.86rem; }
+table.ergo-table thead th {
+  position: sticky; top: 0; background: var(--surface);
+  border-bottom: 2px solid var(--border); text-align: left;
+  padding: 0.58rem 0.75rem; color: var(--text-strong); font-weight: 700;
+}
+table.ergo-table tbody tr { transition: background 0.12s ease; }
+table.ergo-table tbody tr:hover { background: #eff6ff; }
+table.ergo-table td { padding: 0.52rem 0.75rem; border-bottom: 1px solid var(--border-light); vertical-align: top; line-height: 1.58; }
+table.ergo-table tbody tr:last-child td { border-bottom: none; }
+table.ergo-table td.num, table.ergo-table th.num { text-align: right; font-variant-numeric: tabular-nums; }
+
+.callout {
+  border-left: 4px solid var(--c1); background: var(--surface);
+  border-radius: 0 10px 10px 0; padding: 0.85rem 1.05rem;
+  margin: 1rem 0 1.35rem; max-width: 68ch; font-size: 0.9rem; line-height: 1.72;
+}
+.callout.warn { border-left-color: var(--c3); background: #fffbeb; }
+.callout.good { border-left-color: var(--c2); background: #ecfdf5; }
+.callout.danger { border-left-color: #dc2626; background: #fef2f2; }
+.callout strong { color: var(--text-strong); }
+
+.diagram-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 12px; padding: 1rem 1.15rem; margin: 1rem 0 1.5rem;
+}
+.diagram-header {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 0.75rem; margin-bottom: 0.8rem; flex-wrap: wrap;
+}
+.diagram-title { font-weight: 700; font-size: 0.94rem; color: var(--text-strong); }
+.diagram-hint { font-size: 0.78rem; color: var(--muted); }
+.svg-wrap { width: 100%; overflow-x: auto; background: #fff; border: 1px solid var(--border-light); border-radius: 9px; padding: 0.5rem; }
+.diag-svg { display: block; width: 100%; min-width: 720px; height: auto; font-family: "Segoe UI", "Hiragino Kaku Gothic ProN", "Yu Gothic UI", Meiryo, sans-serif; }
+
+.swatch { display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.1rem 0.5rem; border-radius: 999px; font-size: 0.8rem; font-weight: 700; border: 1px solid transparent; }
+.swatch-dot { width: 0.7rem; height: 0.7rem; border-radius: 50%; display: inline-block; border: 1px solid rgba(15,23,42,0.25); }
+.sw-cyan { background: #ecfeff; color: #155e75; border-color: #22d3ee; } .sw-cyan .swatch-dot { background: #06b6d4; }
+.sw-red { background: #fef2f2; color: #991b1b; border-color: #f87171; } .sw-red .swatch-dot { background: #ef4444; }
+.sw-orange { background: #fff7ed; color: #9a3412; border-color: #fb923c; } .sw-orange .swatch-dot { background: #f97316; }
+
+.source-list { list-style: none; padding: 0; margin: 0.75rem 0 1.3rem; display: flex; flex-direction: column; gap: 0.55rem; }
+.source-list li {
+  background: var(--surface); border: 1px solid var(--border-light);
+  border-radius: 8px; padding: 0.62rem 0.9rem; font-size: 0.85rem; line-height: 1.58;
+}
+.source-tag {
+  display: inline-block; font-size: 0.71rem; font-weight: 700;
+  padding: 0.08rem 0.44rem; border-radius: 999px; margin-right: 0.4rem;
+}
+.source-tag.official { background: var(--c1-bg); color: var(--c1); }
+.source-tag.web { background: var(--c2-bg); color: var(--c2); }
+.source-tag.empirical { background: var(--c3-bg); color: var(--c3); }
+
+#ref-return-btn {
+  position: fixed; right: 1.25rem; bottom: 1.25rem; z-index: 9999;
+  display: none; padding: 0.52rem 0.92rem; border-radius: 999px;
+  border: 1px solid var(--c1); background: var(--c1); color: #fff;
+  font-size: 0.83rem; font-weight: 700; cursor: pointer;
+  box-shadow: 0 8px 20px rgba(37,99,235,0.3);
+}
+#ref-return-btn.is-visible { display: inline-flex; align-items: center; gap: 0.35rem; }
+</style>
+</head>
+<body>
+<header class="topbar">
+  <div class="topbar-title">
+    <span class="doc-type-pill pill-portal">ポータル / Home</span>
+    <span>myext.robot.geometric_newton</span>
+  </div>
+  <nav class="topbar-nav" aria-label="ドキュメント種別">
+    <a class="nav-btn is-active" href="index.html">ポータル</a>
+    <a class="nav-btn" href="explanation_architecture.html">アーキテクチャ解説</a>
+    <a class="nav-btn" href="howto_recipes.html">レシピ集</a>
+    <a class="nav-btn" href="api/index.html">API リファレンス</a>
+  </nav>
+</header>
+
+<div class="page-layout">
+  <aside class="toc-rail" aria-label="ページ内目次">
+    
+    <p class="toc-label">目次</p>
+    <nav class="toc">
+      <ul>
+        <li><a href="#sec-overview">全体像とドキュメント案内</a></li>
+        <li><a href="#sec-quickstart">最短クイックスタート</a></li>
+        <li><a href="#sec-bench">実機テスト・ベンチマーク</a></li>
+        <li><a href="#sec-sources">公式出典・実機検証</a></li>
+      </ul>
+    </nav>
+  </aside>
+  <main>
+    <div class="hero">
+      <h1>myext.robot.geometric_newton ドキュメント</h1>
+      <p class="hero-lead">物理ソルバ不要の幾何ロボット制御＋Newton 1.6.1 自前コリジョン空間（0 フレーム遅延）の完全自己完結ドキュメント群です。</p>
+    </div>
+    
+<section id="sec-overview">
+  <h2>拡張機能の全体像とドキュメント案内</h2>
+  <div class="callout warn">
+    <strong>適用ステージ前提（単位規約）：</strong>
+    本拡張は <strong><span class="code-chip">metersPerUnit=1</span> のステージ専用</strong>です。長さ・距離・直動関節位置はすべて <strong>m（<span class="code-chip">metersPerUnit=1</span> のステージ専用）</strong>、速度は <strong>m/s</strong> として扱います（ステージの <span class="code-chip">metersPerUnit</span> による自動換算は行いません）。
+  </div>
+  <div class="prose">
+    <p>
+      <span class="code-chip">myext.robot.geometric_newton</span> は、物理ソルバや Drive を使わずに関節値から全リンクの姿勢を計算して描画しつつ、<strong>Newton 1.6.1 の内部 FK（<span class="code-chip">eval_fk</span>）と自前コリジョン空間（<span class="code-chip">GeometricScene</span> / <span class="code-chip">CollisionPipeline</span>）</strong>により、<span class="code-chip">write_target="fabric"</span> のまま <span class="ui-chip">Stop</span> / <span class="ui-chip">Play=ON</span> の両方で <strong>0 フレーム遅延の干渉判定・めり込み深さ・クリアランス計測</strong> を実現する拡張機能です。
+    </p>
+  </div>
+  <div class="card-grid">
+    <a class="nav-card" href="api/index.html">
+      <h3>API リファレンス（6 分割・検索付き）</h3>
+      <p>全クラス・全プロパティ・全メソッドのシグネチャ、引数型・形状・単位、mimic 挙動、パフォーマンス区分（ホットパス可／低頻度向け）、import 一覧、例外一覧、最小コード例を網羅。</p>
+    </a>
+    <a class="nav-card" href="explanation_architecture.html">
+      <h3>アーキテクチャ解説・コード編集ガイド</h3>
+      <p>モジュール依存図・エンドツーエンドデータフロー図（SVG）、座標/四元数/行列規約、設計判断（Why）、公式出典と編集早見表。</p>
+    </a>
+    <a class="nav-card" href="howto_recipes.html">
+      <h3>ハウツー / レシピ集（全 11 レシピ）</h3>
+      <p>Script Editor へそのまま貼って動かせる実用コード集。Play=ON 0F 遅延、共有シーン、GPU バッチ、IsaacRobotAPI 自動 Component・batch_update・DebugDraw 可視化、毎フレーム駆動まで収録。</p>
+    </a>
+  </div>
+</section>
+
+<section id="sec-quickstart">
+  <h2>最短クイックスタート（パフォーマンス最優先の基本形）</h2>
+  <div class="prose">
+    <p>
+      既存 USD ロボットへ <span class="code-chip">IsaacRobotAPI</span> が付与されていれば、<span class="code-chip">from_articulation()</span> を呼ぶだけで構成要素（<span class="code-chip">GeometricRobotComponent</span>）が自動生成されます。毎フレームのホットループでは事前取得した Component へ NumPy 配列を渡し、複数アーム更新は <span class="code-chip">batch_update()</span> で 1 回に集約します。
+    </p>
+  </div>
+  <div class="code-ex">from myext.robot.geometric_newton import GeometricRobot
+
+# 既定値: write_target="fabric", collision_backend="newton",
+#         convex_meshes=True, auto_components=True, debug_draw_colliders=False
+robot = GeometricRobot.from_articulation(stage, "/World/Robot")
+print(robot.describe())  # 構成要素・全 DOF 番号/名前/mimic/VariantSet を一覧確認
+
+# 事前バインドした Component を使って高速に部分更新（multi-arm の例）
+arm0 = robot.get_component("arm0")
+arm1 = robot.get_component("arm1")
+with robot.batch_update():
+    arm0.set_dof_positions(q_arm0)  # FK + Fabric 書込を遅延
+    arm1.set_dof_positions(q_arm1)  # ブロック終了時に 1 回だけ実行
+
+# USD フラッシュ不要・0 フレーム遅延で干渉とめり込み深さ（m / metersPerUnit=1 専用）を取得
+pairs = robot.check_collisions()
+
+# デバッグ時だけ Newton 内部コライダー形状 (シアン / 干渉=赤 / 接触点=オレンジ) を可視化
+robot.debug_draw_colliders = True</div>
+</section>
+
+<section id="sec-bench">
+  <h2>実機テスト・ベンチマーク実績（Isaac Sim 6.2.0 / RTX 3060）</h2>
+  <div class="table-wrap">
+    <table class="ergo-table">
+      <thead>
+        <tr><th>項目</th><th>構成・条件</th><th class="num">実測値</th><th>備考</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>純粋テストスイート（<span class="code-chip">tests_pure/</span>）</td><td>NumPy モデル + OpenUSD + Newton</td><td class="num">73 / 73 PASS</td><td>IsaacRobotAPI 自動 Component・batch_update・U 字生メッシュ検証込み</td></tr>
+        <tr><td>Kit 統合テスト（<span class="code-chip">tests_kit/</span>）</td><td>Isaac Sim 6.2.0 headless / Play=ON</td><td class="num">34 / 34 PASS</td><td>PhysX Articulation 姿勢・mimic・Variant 切替・GPU Fabric 一致検証</td></tr>
+        <tr><td>姿勢書込（1 リンクあたり）</td><td><span class="code-chip">GeometricUsdWriter</span>（<span class="code-chip">Sdf.ChangeBlock</span>）</td><td class="num">約 12 µs</td><td>59 リンクで約 0.7 ms</td></tr>
+        <tr><td>Fabric 一括書込</td><td><span class="code-chip">GeometricFabricWriter</span> / <span class="code-chip">GeometricGpuFabricWriter</span></td><td class="num">0.13 / 0.09 ms</td><td>USD へ書き戻さず Viewport へ即時反映</td></tr>
+        <tr><td>U 字凹メッシュ対（水密 28 三角形）</td><td><span class="code-chip">convex_meshes=True</span> vs <span class="code-chip">False</span>（CUDA）</td><td class="num">2.35 / 2.39 ms</td><td><span class="code-chip">False</span> で溝誤検知 0 件・5 cm 貫通時 −0.0500 m（誤差 4 nm）</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section id="sec-sources">
+  <h2>公式出典・同梱ソース・実機検証の切り分け</h2>
+  <ul class="source-list">
+    <li>
+      <span class="source-tag official">同梱公式 Doc</span><span class="source-tag web">Web 公式</span>
+      <strong>USD / Fabric / USDRT Population（合成前 VariantSet は USD 必須・FSD 遅延同期・2 面キャッシュ）</strong>：<br>
+      <span class="code-chip">C:\isaacsim-6.2.0\extscache\usdrt.scenegraph-7.6.3...\docs\fabricsd\fsd_vs_omnihydra.md</span>・<span class="code-chip">fabric_overview.rst</span>・<span class="code-chip">fabric_hierarchy.rst</span> ／
+      <a href="https://docs.omniverse.nvidia.com/kit/docs/usdrt.scenegraph/latest/index.html" target="_blank" rel="noopener">Omniverse USDRT / Fabric Documentation</a>
+    </li>
+    <li>
+      <span class="source-tag official">同梱公式スキーマ</span>
+      <strong>IsaacRobotAPI（<code>isaac:physics:robotLinks</code> / <code>robotJoints</code> / 入れ子サブロボット構成）</strong>：<br>
+      <span class="code-chip">C:\isaacsim-6.2.0\exts\isaacsim.robot.schema\pip_prebundle\usd\schema\isaac\robot_schema\RobotSchema.usda</span>
+    </li>
+    <li>
+      <span class="source-tag official">同梱公式 Doc</span><span class="source-tag web">Web 公式</span>
+      <strong>PhysX 5（Articulation・MimicJoint・Scene Queries CPU 実行・Contact Reports・Collider 可視化色）</strong>：<br>
+      <span class="code-chip">C:\isaacsim-6.2.0\extscache\omni.physx.ui-110.4.4...\docs\dev_guide\collision_debug_vis.rst</span>・<span class="code-chip">viewport_overlays.rst</span>・<span class="code-chip">physics_debug_wnd.rst</span>・<span class="code-chip">omni.physx-110.4.4...\docs\dev_guide\scene_queries.rst</span> ／
+      <a href="https://nvidia-omniverse.github.io/PhysX/physx/5.4.1/index.html" target="_blank" rel="noopener">NVIDIA PhysX 5.4.1 SDK Documentation</a>
+    </li>
+    <li>
+      <span class="source-tag web">Web 公式</span><span class="source-tag official">同梱公式ソース</span>
+      <strong>Newton 1.6.1（<code>eval_fk</code>・<code>CollisionPipeline</code>・<code>GeoType.MESH</code> / <code>CONVEX_MESH</code>・<code>sdf_contact.py</code>）＆ Warp</strong>：<br>
+      <span class="code-chip">C:\isaacsim-6.2.0\exts\isaacsim.pip.newton\pip_prebundle\newton[sim]\newton-1.6.1-py3-none-any\newton\_src\sim\collide.py</span>・<span class="code-chip">geometry\narrow_phase.py</span>・<span class="code-chip">geometry\sdf_contact.py</span> ／
+      <a href="https://newton-physics.github.io/newton/1.6.1/guide/overview.html" target="_blank" rel="noopener">Newton 1.6.1 Documentation</a>・<a href="https://nvidia.github.io/warp/" target="_blank" rel="noopener">NVIDIA Warp Documentation</a>
+    </li>
+    <li>
+      <span class="source-tag official">同梱公式ソース</span>
+      <strong>Isaac Sim Experimental Articulation API・DebugDraw（RTX オーバーレイ描画）</strong>：<br>
+      <span class="code-chip">C:\isaacsim-6.2.0\exts\isaacsim.core.experimental.prims\...\articulation.py</span>・<span class="code-chip">extscache\isaacsim.util.debug_draw-3.2.8...\docs\Overview.md</span>
+    </li>
+    <li>
+      <span class="source-tag empirical">実機検証</span>
+      <strong>Isaac Sim 6.2.0（RTX 3060）での全テスト・U 字凹メッシュ実測</strong>：<br>
+      <span class="code-chip">tests_pure/</span>（73 本全通過）・<span class="code-chip">tests_kit/run_kit_tests.py</span>（34 本全通過）・U 字水密メッシュ対実測（<span class="code-chip">convex_meshes=True</span>: 溝誤検知 1 件 / 5 cm 貫通時 −0.45 m / 2.35 ms 対 <span class="code-chip">convex_meshes=False</span>: 溝非接触 0 件 / 5 cm 貫通時 −0.0500 m / 2.39 ms）。
+    </li>
+  </ul>
+</section>
+
+  </main>
+</div>
+<svg id="ref-connector-layer" style="position:fixed;inset:0;width:100vw;height:100vh;pointer-events:none;z-index:9990;"></svg>
+<button id="ref-return-btn" type="button">↩ 元の位置へ戻る</button>
+<script>
+(() => {
+  const svgLayer = document.getElementById('ref-connector-layer');
+  const returnBtn = document.getElementById('ref-return-btn');
+  let savedScrollY = null;
+  const colorMap = { '1': '#2563eb', '2': '#059669', '3': '#d97706', '4': '#7c3aed', '5': '#db2777' };
+  const isInViewport = (el) => {
+    const r = el.getBoundingClientRect();
+    return r.width > 0 && r.height > 0 && r.top >= 0 && r.bottom <= window.innerHeight && r.left >= 0 && r.right <= window.innerWidth;
+  };
+  const clearLines = () => { if (svgLayer) svgLayer.innerHTML = ''; };
+  const drawConnector = (fromEl, toEl) => {
+    if (!svgLayer || !isInViewport(fromEl) || !isInViewport(toEl)) return;
+    const a = fromEl.getBoundingClientRect(), b = toEl.getBoundingClientRect();
+    const x1 = a.left + a.width / 2, y1 = a.top + a.height / 2;
+    const x2 = b.left + b.width / 2, y2 = b.top + b.height / 2;
+    const mx = (x1 + x2) / 2;
+    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    path.setAttribute('d', `M ${x1} ${y1} C ${mx} ${y1}, ${mx} ${y2}, ${x2} ${y2}`);
+    path.setAttribute('fill', 'none');
+    path.setAttribute('stroke', colorMap[fromEl.dataset.color] || '#2563eb');
+    path.setAttribute('stroke-width', '2');
+    path.setAttribute('stroke-dasharray', '4 3');
+    path.setAttribute('opacity', '0.72');
+    svgLayer.appendChild(path);
+  };
+  const setActive = (refId, originEl) => {
+    const peers = Array.from(document.querySelectorAll(`[data-ref="${CSS.escape(refId)}"]`));
+    const scopes = new Set();
+    peers.forEach((el) => { el.classList.add('is-active'); const sc = el.closest('[data-ref-scope]'); if (sc) scopes.add(sc); });
+    scopes.forEach((sc) => sc.classList.add('is-dimming'));
+    clearLines();
+    if (originEl) peers.filter((el) => el !== originEl).forEach((peer) => drawConnector(originEl, peer));
+  };
+  const clearActive = () => {
+    document.querySelectorAll('[data-ref].is-active').forEach((el) => el.classList.remove('is-active'));
+    document.querySelectorAll('[data-ref-scope].is-dimming').forEach((sc) => sc.classList.remove('is-dimming'));
+    clearLines();
+  };
+  document.querySelectorAll('[data-ref]').forEach((el) => {
+    const refId = el.dataset.ref;
+    el.addEventListener('mouseenter', () => setActive(refId, el));
+    el.addEventListener('mouseleave', clearActive);
+    el.addEventListener('focus', () => setActive(refId, el));
+    el.addEventListener('blur', clearActive);
+    el.addEventListener('click', () => {
+      const peers = Array.from(document.querySelectorAll(`[data-ref="${CSS.escape(refId)}"]`)).filter((p) => p !== el);
+      if (peers.length === 0) return;
+      const target = peers.find((p) => p.dataset.refRole !== el.dataset.refRole) || peers[0];
+      if (!isInViewport(target) && returnBtn) { savedScrollY = window.scrollY; returnBtn.classList.add('is-visible'); }
+      target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      target.classList.remove('is-pulsing'); void target.offsetWidth; target.classList.add('is-pulsing');
+    });
+  });
+  if (returnBtn) {
+    returnBtn.addEventListener('click', () => {
+      if (savedScrollY !== null) { window.scrollTo({ top: savedScrollY, behavior: 'smooth' }); savedScrollY = null; }
+      returnBtn.classList.remove('is-visible');
+    });
+  }
+  const tocLinks = Array.from(document.querySelectorAll('.toc a[href^="#"]'));
+  const sections = tocLinks.map((a) => document.querySelector(a.getAttribute('href'))).filter(Boolean);
+  if (sections.length > 0) {
+    const obs = new IntersectionObserver((entries) => {
+      entries.forEach((e) => {
+        if (!e.isIntersecting) return;
+        tocLinks.forEach((a) => a.classList.toggle('is-current', a.getAttribute('href') === `#${e.target.id}`));
+      });
+    }, { rootMargin: '-14% 0px -75% 0px' });
+    sections.forEach((s) => obs.observe(s));
+  }
+  const filterInput = document.getElementById('api-filter-input');
+  const filterStatus = document.getElementById('api-filter-status');
+  if (filterInput) {
+    const cards = Array.from(document.querySelectorAll('.api-card'));
+    const runFilter = () => {
+      const q = filterInput.value.trim().toLowerCase();
+      let shown = 0;
+      cards.forEach((c) => {
+        const hit = !q || c.textContent.toLowerCase().includes(q);
+        c.classList.toggle('is-hidden', !hit);
+        if (hit) shown += 1;
+      });
+      if (filterStatus) filterStatus.textContent = q ? `${shown} / ${cards.length} 件表示` : `全 ${cards.length} 件`;
+    };
+    filterInput.addEventListener('input', runFilter);
+    runFilter();
+  }
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>API 仕様: 干渉判定・Newton / PhysX — myext.robot.geometric_newton</title>
+<style>
+:root {
+  --bg: #ffffff;
+  --surface: #f8fafc;
+  --surface-2: #f1f5f9;
+  --text: #1e293b;
+  --text-strong: #0f172a;
+  --muted: #64748b;
+  --border: #cbd5e1;
+  --border-light: #e2e8f0;
+  --c1: #2563eb; --c1-bg: #dbeafe;
+  --c2: #059669; --c2-bg: #d1fae5;
+  --c3: #d97706; --c3-bg: #fef3c7;
+  --c4: #7c3aed; --c4-bg: #ede9fe;
+  --c5: #db2777; --c5-bg: #fce7f3;
+}
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  font-family: "Segoe UI", "Hiragino Kaku Gothic ProN", "Yu Gothic UI", Meiryo, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.78;
+}
+.topbar {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(255,255,255,0.95);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--border-light);
+  padding: 0.6rem 1.4rem;
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 0.8rem; flex-wrap: wrap;
+}
+.topbar-title {
+  display: flex; align-items: center; gap: 0.6rem;
+  font-weight: 700; color: var(--text-strong); font-size: 0.94rem;
+}
+.doc-type-pill {
+  display: inline-block; padding: 0.12rem 0.6rem; border-radius: 999px;
+  font-size: 0.76rem; font-weight: 700;
+}
+.pill-portal { background: var(--c1-bg); color: var(--c1); }
+.pill-exp { background: var(--c4-bg); color: var(--c4); }
+.pill-howto { background: var(--c2-bg); color: var(--c2); }
+.pill-ref { background: var(--c3-bg); color: var(--c3); }
+
+.topbar-nav { display: flex; align-items: center; gap: 0.45rem; flex-wrap: wrap; }
+.nav-btn {
+  display: inline-flex; align-items: center; gap: 0.3rem;
+  padding: 0.32rem 0.72rem; border-radius: 7px;
+  border: 1px solid var(--border); background: var(--surface);
+  color: var(--text-strong); text-decoration: none;
+  font-size: 0.81rem; font-weight: 600;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+.nav-btn:hover { background: var(--c1-bg); border-color: var(--c1); color: var(--c1); }
+.nav-btn.is-active { background: var(--c1); border-color: var(--c1); color: #fff; }
+
+.subnav-bar {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border-light);
+  padding: 0.45rem 1.4rem;
+  display: flex; align-items: center; gap: 0.45rem; flex-wrap: wrap;
+  font-size: 0.8rem;
+}
+.subnav-label { color: var(--muted); font-weight: 700; margin-right: 0.3rem; }
+.subnav-link {
+  padding: 0.2rem 0.6rem; border-radius: 6px; text-decoration: none;
+  color: var(--text); border: 1px solid transparent; font-weight: 600;
+}
+.subnav-link:hover { background: var(--c1-bg); color: var(--c1); }
+.subnav-link.is-active { background: #fff; border-color: var(--c1); color: var(--c1); }
+
+.page-layout {
+  max-width: 1440px; margin: 0 auto;
+  display: grid; grid-template-columns: 260px minmax(0, 1fr);
+  gap: 2.2rem; padding: 1.8rem 1.5rem 5rem;
+}
+@media (max-width: 1060px) {
+  .page-layout { grid-template-columns: 1fr; }
+  .toc-rail { display: none; }
+}
+.toc-rail {
+  position: sticky; top: 4.6rem; align-self: start;
+  max-height: calc(100vh - 5.6rem); overflow-y: auto; padding-right: 0.4rem;
+}
+.toc-label {
+  font-size: 0.74rem; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.06em; color: var(--muted); margin: 0 0 0.55rem;
+}
+.toc ul { list-style: none; margin: 0; padding: 0; }
+.toc li { margin: 0.14rem 0; }
+.toc a {
+  display: block; padding: 0.28rem 0.6rem;
+  border-left: 2px solid var(--border-light);
+  color: var(--muted); text-decoration: none;
+  font-size: 0.81rem; line-height: 1.4;
+  transition: color 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+}
+.toc a:hover { color: var(--text-strong); border-left-color: var(--border); }
+.toc a.is-current {
+  color: var(--c1); border-left-color: var(--c1);
+  background: var(--c1-bg); font-weight: 700; border-radius: 0 6px 6px 0;
+}
+
+.filter-box { margin: 0 0 1rem; }
+.filter-input {
+  width: 100%; padding: 0.48rem 0.75rem; border-radius: 8px;
+  border: 1.5px solid var(--border); font-size: 0.86rem; color: var(--text-strong);
+  background: #fff;
+}
+.filter-input:focus { outline: none; border-color: var(--c1); box-shadow: 0 0 0 3px rgba(37,99,235,0.16); }
+.filter-status { font-size: 0.78rem; color: var(--muted); margin-top: 0.35rem; }
+
+.prose { max-width: 68ch; line-height: 1.82; color: var(--text); }
+.prose ul, .prose ol { padding-left: 1.35rem; margin: 0.35rem 0 1.05rem; }
+.prose li { margin-bottom: 0.42rem; }
+.hero { margin-bottom: 2rem; padding-bottom: 1.35rem; border-bottom: 1px solid var(--border-light); }
+.hero h1 { margin: 0 0 0.6rem; font-size: 1.85rem; line-height: 1.3; color: var(--text-strong); }
+.hero-lead { max-width: 68ch; color: var(--muted); font-size: 0.98rem; margin: 0; }
+
+section { scroll-margin-top: 5rem; }
+h2 {
+  margin-top: 3rem; margin-bottom: 0.75rem; font-size: 1.4rem;
+  color: var(--text-strong); padding-bottom: 0.35rem;
+  border-bottom: 2px solid var(--border-light);
+}
+h3 { margin-top: 2rem; margin-bottom: 0.48rem; font-size: 1.08rem; color: var(--text-strong); }
+p { margin-top: 0; margin-bottom: 1rem; }
+
+.ref-badge {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 1.42em; height: 1.42em; padding: 0 0.32em; border-radius: 999px;
+  font-size: 0.78em; font-weight: 700; color: #fff; background: var(--c1);
+  cursor: pointer; vertical-align: 0.06em; margin-right: 0.22em; user-select: none;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
+}
+.ref-badge[data-color="1"] { background: var(--c1); }
+.ref-badge[data-color="2"] { background: var(--c2); }
+.ref-badge[data-color="3"] { background: var(--c3); }
+.ref-badge[data-color="4"] { background: var(--c4); }
+.ref-badge[data-color="5"] { background: var(--c5); }
+
+.ui-chip {
+  display: inline-block; padding: 0.05em 0.46em; border-radius: 6px;
+  border: 1px solid #94a3b8; background: #f1f5f9;
+  font-weight: 600; font-size: 0.89em; color: #0f172a;
+}
+.code-chip {
+  display: inline-block; padding: 0.04em 0.36em; border-radius: 4px;
+  border: 1px solid #cbd5e1; background: #f8fafc;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.86em; color: #0f172a;
+}
+
+[data-ref-scope].is-dimming [data-ref]:not(.is-active),
+[data-ref-scope].is-dimming .dim-candidate:not(.is-active) {
+  opacity: 0.25; transition: opacity 0.15s ease;
+}
+[data-ref].is-active {
+  outline: 2px solid var(--c1); outline-offset: 2px;
+  box-shadow: 0 0 0 4px rgba(37,99,235,0.2);
+}
+[data-ref][data-color="2"].is-active { outline-color: var(--c2); box-shadow: 0 0 0 4px rgba(5,150,105,0.22); }
+[data-ref][data-color="3"].is-active { outline-color: var(--c3); box-shadow: 0 0 0 4px rgba(217,119,6,0.22); }
+[data-ref][data-color="4"].is-active { outline-color: var(--c4); box-shadow: 0 0 0 4px rgba(124,58,237,0.22); }
+[data-ref][data-color="5"].is-active { outline-color: var(--c5); box-shadow: 0 0 0 4px rgba(219,39,119,0.22); }
+svg g[data-ref] { cursor: pointer; transition: opacity 0.15s ease, filter 0.15s ease; }
+svg g[data-ref].is-active { outline: none; box-shadow: none; filter: drop-shadow(0 0 5px rgba(37,99,235,0.55)); }
+svg g[data-ref][data-color="2"].is-active { filter: drop-shadow(0 0 5px rgba(5,150,105,0.6)); }
+svg g[data-ref][data-color="3"].is-active { filter: drop-shadow(0 0 5px rgba(217,119,6,0.6)); }
+svg g[data-ref][data-color="4"].is-active { filter: drop-shadow(0 0 5px rgba(124,58,237,0.6)); }
+
+@keyframes ref-pulse {
+  0% { box-shadow: 0 0 0 0 rgba(37,99,235,0.55); }
+  100% { box-shadow: 0 0 0 12px rgba(37,99,235,0); }
+}
+.is-pulsing { animation: ref-pulse 0.8s ease-out 1; }
+
+.card-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(275px, 1fr));
+  gap: 1rem; margin: 1rem 0 1.6rem;
+}
+.nav-card {
+  display: block; text-decoration: none; color: inherit;
+  background: #fff; border: 1.5px solid var(--border); border-radius: 11px;
+  padding: 1rem 1.1rem; transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.nav-card:hover { border-color: var(--c1); box-shadow: 0 6px 18px rgba(37,99,235,0.1); }
+.nav-card h3 { margin: 0 0 0.35rem; font-size: 1rem; color: var(--text-strong); }
+.nav-card p { margin: 0; font-size: 0.86rem; color: var(--muted); line-height: 1.58; }
+
+.api-card {
+  background: #fff; border: 1.5px solid var(--border); border-radius: 11px;
+  padding: 1rem 1.15rem; margin: 1rem 0 1.4rem; scroll-margin-top: 5rem;
+}
+.api-card.is-hidden { display: none; }
+.api-head {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 0.6rem; flex-wrap: wrap; margin-bottom: 0.55rem;
+}
+.api-name {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 1rem; font-weight: 700; color: var(--text-strong);
+}
+.perf-pill {
+  display: inline-block; padding: 0.12rem 0.52rem; border-radius: 999px;
+  font-size: 0.74rem; font-weight: 700;
+}
+.perf-hot { background: #dcfce7; color: #166534; border: 1px solid #86efac; }
+.perf-fast { background: #dbeafe; color: #1e40af; border: 1px solid #93c5fd; }
+.perf-cold { background: #fef3c7; color: #92400e; border: 1px solid #fcd34d; }
+.perf-debug { background: #fce7f3; color: #9d174d; border: 1px solid #f9a8d4; }
+
+.sig-box {
+  background: #0f172a; color: #e2e8f0; border-radius: 8px;
+  padding: 0.65rem 0.9rem; margin: 0.45rem 0 0.75rem;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.81rem; line-height: 1.55; overflow-x: auto; white-space: pre;
+}
+.code-ex {
+  background: #0b1220; color: #e2e8f0; border-radius: 8px;
+  padding: 0.75rem 0.95rem; margin: 0.6rem 0 0.8rem;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.8rem; line-height: 1.55; overflow-x: auto; white-space: pre;
+}
+.api-meta-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 0.65rem; margin: 0.55rem 0;
+}
+.api-meta-box {
+  background: var(--surface); border: 1px solid var(--border-light);
+  border-radius: 8px; padding: 0.55rem 0.75rem; font-size: 0.85rem; line-height: 1.58;
+}
+.api-meta-box strong { color: var(--text-strong); display: block; margin-bottom: 0.2rem; font-size: 0.81rem; }
+
+.table-wrap { overflow-x: auto; margin: 0.85rem 0 1.35rem; border: 1px solid var(--border-light); border-radius: 10px; }
+table.ergo-table { width: 100%; border-collapse: collapse; font-size: 0.86rem; }
+table.ergo-table thead th {
+  position: sticky; top: 0; background: var(--surface);
+  border-bottom: 2px solid var(--border); text-align: left;
+  padding: 0.58rem 0.75rem; color: var(--text-strong); font-weight: 700;
+}
+table.ergo-table tbody tr { transition: background 0.12s ease; }
+table.ergo-table tbody tr:hover { background: #eff6ff; }
+table.ergo-table td { padding: 0.52rem 0.75rem; border-bottom: 1px solid var(--border-light); vertical-align: top; line-height: 1.58; }
+table.ergo-table tbody tr:last-child td { border-bottom: none; }
+table.ergo-table td.num, table.ergo-table th.num { text-align: right; font-variant-numeric: tabular-nums; }
+
+.callout {
+  border-left: 4px solid var(--c1); background: var(--surface);
+  border-radius: 0 10px 10px 0; padding: 0.85rem 1.05rem;
+  margin: 1rem 0 1.35rem; max-width: 68ch; font-size: 0.9rem; line-height: 1.72;
+}
+.callout.warn { border-left-color: var(--c3); background: #fffbeb; }
+.callout.good { border-left-color: var(--c2); background: #ecfdf5; }
+.callout.danger { border-left-color: #dc2626; background: #fef2f2; }
+.callout strong { color: var(--text-strong); }
+
+.diagram-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 12px; padding: 1rem 1.15rem; margin: 1rem 0 1.5rem;
+}
+.diagram-header {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 0.75rem; margin-bottom: 0.8rem; flex-wrap: wrap;
+}
+.diagram-title { font-weight: 700; font-size: 0.94rem; color: var(--text-strong); }
+.diagram-hint { font-size: 0.78rem; color: var(--muted); }
+.svg-wrap { width: 100%; overflow-x: auto; background: #fff; border: 1px solid var(--border-light); border-radius: 9px; padding: 0.5rem; }
+.diag-svg { display: block; width: 100%; min-width: 720px; height: auto; font-family: "Segoe UI", "Hiragino Kaku Gothic ProN", "Yu Gothic UI", Meiryo, sans-serif; }
+
+.swatch { display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.1rem 0.5rem; border-radius: 999px; font-size: 0.8rem; font-weight: 700; border: 1px solid transparent; }
+.swatch-dot { width: 0.7rem; height: 0.7rem; border-radius: 50%; display: inline-block; border: 1px solid rgba(15,23,42,0.25); }
+.sw-cyan { background: #ecfeff; color: #155e75; border-color: #22d3ee; } .sw-cyan .swatch-dot { background: #06b6d4; }
+.sw-red { background: #fef2f2; color: #991b1b; border-color: #f87171; } .sw-red .swatch-dot { background: #ef4444; }
+.sw-orange { background: #fff7ed; color: #9a3412; border-color: #fb923c; } .sw-orange .swatch-dot { background: #f97316; }
+
+.source-list { list-style: none; padding: 0; margin: 0.75rem 0 1.3rem; display: flex; flex-direction: column; gap: 0.55rem; }
+.source-list li {
+  background: var(--surface); border: 1px solid var(--border-light);
+  border-radius: 8px; padding: 0.62rem 0.9rem; font-size: 0.85rem; line-height: 1.58;
+}
+.source-tag {
+  display: inline-block; font-size: 0.71rem; font-weight: 700;
+  padding: 0.08rem 0.44rem; border-radius: 999px; margin-right: 0.4rem;
+}
+.source-tag.official { background: var(--c1-bg); color: var(--c1); }
+.source-tag.web { background: var(--c2-bg); color: var(--c2); }
+.source-tag.empirical { background: var(--c3-bg); color: var(--c3); }
+
+#ref-return-btn {
+  position: fixed; right: 1.25rem; bottom: 1.25rem; z-index: 9999;
+  display: none; padding: 0.52rem 0.92rem; border-radius: 999px;
+  border: 1px solid var(--c1); background: var(--c1); color: #fff;
+  font-size: 0.83rem; font-weight: 700; cursor: pointer;
+  box-shadow: 0 8px 20px rgba(37,99,235,0.3);
+}
+#ref-return-btn.is-visible { display: inline-flex; align-items: center; gap: 0.35rem; }
+</style>
+</head>
+<body>
+<header class="topbar">
+  <div class="topbar-title">
+    <span class="doc-type-pill pill-ref">API リファレンス</span>
+    <span>myext.robot.geometric_newton</span>
+  </div>
+  <nav class="topbar-nav" aria-label="ドキュメント種別">
+    <a class="nav-btn" href="../index.html">ポータル</a>
+    <a class="nav-btn" href="../explanation_architecture.html">アーキテクチャ解説</a>
+    <a class="nav-btn" href="../howto_recipes.html">レシピ集</a>
+    <a class="nav-btn is-active" href="index.html">API リファレンス</a>
+  </nav>
+</header>
+<nav class="subnav-bar" aria-label="API ページ切替"><span class="subnav-label">API 仕様書:</span><a class="subnav-link" href="index.html">目次・逆引き・設定</a>
+  <a class="subnav-link" href="robot_api.html">GeometricRobot / Component</a>
+  <a class="subnav-link is-active" href="collision_newton_api.html">干渉判定・Newton / PhysX</a>
+  <a class="subnav-link" href="view_batch_api.html">GeometricRobotView</a>
+  <a class="subnav-link" href="model_ik_command_api.html">Model / USD / IK / 変換</a>
+  <a class="subnav-link" href="layer_writer_internals.html">Layer / Writer / 座標規約</a></nav>
+<div class="page-layout">
+  <aside class="toc-rail" aria-label="ページ内目次">
+    <div class="filter-box"><input id="api-filter-input" class="filter-input" type="search" placeholder="API 名・引数・用語で絞り込み..."><div id="api-filter-status" class="filter-status"></div></div>
+    <p class="toc-label">目次</p>
+    <nav class="toc">
+      <ul>
+        <li><a href="#sec-scene-init">GeometricScene・resolve_newton_device</a></li>
+        <li><a href="#sec-convex-mesh-spec">convex_meshes=True vs False 実測仕様</a></li>
+        <li><a href="#sec-scene-methods">GeometricScene 同期・環境モード・判定・DebugDraw</a></li>
+        <li><a href="#sec-batched-scene">BatchedNewtonScene</a></li>
+        <li><a href="#sec-collision-pair">GeometricCollisionPair / GeometricLinkSet / find_colliders</a></li>
+        <li><a href="#sec-collision-filter">GeometricCollisionFilter</a></li>
+        <li><a href="#sec-physx-checker">PhysX バックエンド（GeometricCollisionChecker / Monitor）</a></li>
+        <li><a href="#sec-sources">公式出典・同梱ソース・実機検証</a></li>
+      </ul>
+    </nav>
+  </aside>
+  <main>
+    <div class="hero">
+      <h1>干渉判定・Newton / PhysX API</h1>
+      <p class="hero-lead">GeometricScene・BatchedNewtonScene の完全仕様、convex_meshes=True/False の実測差と水密メッシュ要件、GeometricCollisionPair・GeometricCollisionFilter・PhysX バックエンド（metersPerUnit=1 のステージ専用）。</p>
+    </div>
+    
+<section id="sec-scene-init">
+  <h2>GeometricScene・resolve_newton_device</h2>
+  <div class="prose">
+    <p><span class="code-chip">GeometricScene</span> は、Newton 1.6.1 の <span class="code-chip">ModelBuilder</span> と <span class="code-chip">CollisionPipeline</span> をラップした自前コリジョン空間です。PhysX の <span class="code-chip">PhysicsScene</span> に依存しないため、<span class="code-chip">write_target="fabric"</span> かつ <span class="code-chip">Play=OFF</span>（停止状態）でも <strong>0 フレーム遅延</strong>で自己干渉・環境干渉・ロボット間干渉・符号付き距離を計算できます（距離・座標はすべて <strong>m、<span class="code-chip">metersPerUnit=1</span> のステージ専用</strong>）。</p>
+  </div>
+
+  <article class="api-card" id="resolve-newton-device"><div class="api-head"><span class="api-name">resolve_newton_device</span><span class="perf-pill perf-cold">初期化時</span></div><div class="sig-box">resolve_newton_device(device: str = "auto") -&gt; str</div><div class="prose"><p>Newton / Warp の実行デバイス文字列を解決します。<span class='code-chip'>"auto"</span> 指定時は CUDA デバイスが利用可能なら <span class='code-chip'>"cuda:0"</span>、不可なら <span class='code-chip'>"cpu"</span> を返します。</p></div><div class="api-meta-grid"><div class="api-meta-box"><strong>戻り値 / 型</strong>解決済みデバイス文字列（例: <span class='code-chip'>"cuda:0"</span> または <span class='code-chip'>"cpu"</span>）。</div></div></article>
+
+  <article class="api-card" id="scene-init"><div class="api-head"><span class="api-name">GeometricScene.__init__</span><span class="perf-pill perf-cold">初期化時（複数ロボットで共有可）</span></div><div class="sig-box">GeometricScene(
+    stage: Usd.Stage,
+    *,
+    device: str = "auto",
+    broad_phase: Literal["auto", "explicit", "nxn", "sap"] = "auto",
+    convex_meshes: bool = True,
+    bake_adjacent_filter: bool = False,
+    auto_discover_environment: bool = True,
+)</div><div class="prose"><p>複数ロボット間で共有できる Newton コリジョン空間を生成します。単体ロボットで <span class='code-chip'>scene=None</span> の場合は <span class='code-chip'>GeometricRobot</span> が内部で自動生成します。</p></div><div class="table-wrap"><table class="ergo-table"><thead><tr><th>引数 / フィールド</th><th>型</th><th>既定値</th><th>意味・形状・単位・制約</th></tr></thead><tbody><tr><td><span class='code-chip'>stage</span></td><td><span class='code-chip'>Usd.Stage</span></td><td><span class='code-chip'>必須</span></td><td>対象 USD Stage（<span class='code-chip'>metersPerUnit=1</span> のステージ専用）。</td></tr>
+<tr><td><span class='code-chip'>device</span></td><td><span class='code-chip'>str</span></td><td><span class='code-chip'>"auto"</span></td><td>Warp/Newton 実行デバイス。</td></tr>
+<tr><td><span class='code-chip'>broad_phase</span></td><td><span class='code-chip'>"auto" | "explicit" | "nxn" | "sap"</span></td><td><span class='code-chip'>"auto"</span></td><td>Broad Phase アルゴリズム。<span class='code-chip'>"auto"</span> は形状数に応じて <span class='code-chip'>nxn</span>（小規模）/ <span class='code-chip'>sap</span>（大規模）を自動選択。</td></tr>
+<tr><td><span class='code-chip'>convex_meshes</span></td><td><span class='code-chip'>bool</span></td><td><span class='code-chip'>True</span></td><td><span class='code-chip'>True</span>: <span class='code-chip'>UsdGeom.Mesh</span> を単一 Convex Hull（<span class='code-chip'>GeoType.CONVEX_MESH</span>）として登録。<span class='code-chip'>False</span>: 三角メッシュそのまま（<span class='code-chip'>GeoType.MESH</span>）として登録。</td></tr>
+<tr><td><span class='code-chip'>bake_adjacent_filter</span></td><td><span class='code-chip'>bool</span></td><td><span class='code-chip'>False</span></td><td><span class='code-chip'>True</span> で隣接リンク除外ペアを Newton 側のフィルタテーブルへ焼き込む。</td></tr>
+<tr><td><span class='code-chip'>auto_discover_environment</span></td><td><span class='code-chip'>bool</span></td><td><span class='code-chip'>True</span></td><td><span class='code-chip'>True</span> で <span class='code-chip'>add_environment()</span> 未呼出時に <span class='code-chip'>/World</span>（なければ <span class='code-chip'>/</span>）配下のロボット外 <span class='code-chip'>PhysicsCollisionAPI</span> 付き Gprim を自動検出する。</td></tr></tbody></table></div><div class="api-meta-grid"><div class="api-meta-box"><strong>戻り値 / 型</strong><span class='code-chip'>GeometricScene</span>。プロパティ <span class='code-chip'>stage</span>, <span class='code-chip'>device</span>, <span class='code-chip'>convex_meshes</span>（切替可）, <span class='code-chip'>newton_model</span>, <span class='code-chip'>newton_state</span>, <span class='code-chip'>robots</span>, <span class='code-chip'>environment_collider_paths</span> を持つ。</div></div></article>
+</section>
+
+<section id="sec-convex-mesh-spec">
+  <h2>convex_meshes=True vs False 実測仕様</h2>
+  <div class="prose">
+    <p>USD の <span class="code-chip">UsdGeom.Mesh</span>（STL / CAD インポート由来のコライダー等）を Newton へ登録するとき、<span class="code-chip">convex_meshes</span> フラグが形状変換と Narrow Phase アルゴリズムを決定します。プリミティブ形状（<span class="code-chip">Cube</span> / <span class="code-chip">Sphere</span> / <span class="code-chip">Capsule</span> / <span class="code-chip">Cylinder</span> / <span class="code-chip">Cone</span>）はこのフラグの影響を受けず常に解析形状のまま登録されます。</p>
+  </div>
+  <div class="table-wrap">
+    <table class="ergo-table">
+      <thead>
+        <tr><th>比較項目</th><th><span class="code-chip">convex_meshes=True</span>（既定）</th><th><span class="code-chip">convex_meshes=False</span></th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Newton 内部登録型</td><td><span class="code-chip">GeoType.CONVEX_MESH</span>（<span class="code-chip">add_shape_convex_hull</span>）</td><td><span class="code-chip">GeoType.MESH</span>（<span class="code-chip">add_shape_mesh</span>、三角メッシュそのまま）</td></tr>
+        <tr><td>凹部・溝・穴の扱い</td><td>外殻を包む単一凸包になるため、溝や穴の空間も「中身あり」として衝突する</td><td>三角メッシュの凹み・溝・穴の空間を正確にすり抜け判定できる</td></tr>
+        <tr><td>Newton 1.6.1 狭域判定実装</td><td>GJK / MPR / SAT 凸体アルゴリズム</td><td>BVH 加速三角メッシュ対メッシュ（<span class="code-chip">sdf_contact.py</span> / <span class="code-chip">mesh_query_point_sign</span>）</td></tr>
+        <tr><td>U 字水密メッシュ実測：溝に非接触挿入（真値 0 件）</td><td><strong>誤検知 1 件</strong>（<span class="code-chip">separation = -0.2500 m</span>）</td><td><strong>0 件（正確）</strong>（<span class="code-chip">separation = None</span>）</td></tr>
+        <tr><td>U 字水密メッシュ実測：5 cm 貫通（真値 −0.0500 m）</td><td>過大評価（<span class="code-chip">separation = -0.4500 m</span>）</td><td><strong>1 件（<span class="code-chip">separation = -0.050000004 m</span>、誤差 4 nm）</strong></td></tr>
+        <tr><td>RTX 3060 処理時間（28 三角形ペア）</td><td><span class="code-chip">2.351 ms / call</span></td><td><span class="code-chip">2.391 ms / call</span></td></tr>
+        <tr><td>必須メッシュ品質条件</td><td>頂点集合から凸包を生成するため穴あきメッシュでも破綻しにくい</td><td><strong>閉じた水密（watertight）多様体メッシュで、内部に重複する共面（coplanar internal faces）が無いこと</strong></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="callout danger">
+    <strong><span class="code-chip">convex_meshes=False</span> 使用時の厳守事項（水密性）：</strong>
+    実機検証で確認した通り、複数ボックスの単純結合のように「内部に閉じた境界の共面が残る非水密メッシュ」や「法線反転・穴開きメッシュ」を <span class="code-chip">GeoType.MESH</span> に渡すと、<span class="code-chip">mesh_query_point_sign</span> の内外符号が反転して非接触でも誤検知が発生します。凹形状を精密判定したい場合は、CAD / Blender 等で boolean 結合・法線統一した水密 STL / USD メッシュを用意してください。
+  </div>
+</section>
+
+<section id="sec-scene-methods">
+  <h2>GeometricScene 同期・環境モード・判定・DebugDraw</h2>
+  <div class="callout">
+    <strong>環境障害物の 2 モードと手動姿勢上書きのルール：</strong><br>
+    1) <strong>自動検出モード vs 明示登録モード：</strong><span class="code-chip">add_environment()</span> を 1 回も呼んでいない状態では自動検出モード（<span class="code-chip">/World</span>、なければ <span class="code-chip">/</span> 配下のロボット外 <span class="code-chip">CollisionAPI</span> 付き Gprim を全検出）。<span class="code-chip">add_environment()</span> を 1 回でも呼ぶと明示登録モードへ切り替わり、渡したルート配下だけを対象にする。<span class="code-chip">clear_environment()</span> を呼ぶと自動検出モードに戻る。<br>
+    2) <strong>自動同期と <span class="code-chip">set_obstacle_pose()</span>：</strong><span class="code-chip">robot.check_collisions()</span> / <span class="code-chip">compute_clearances()</span> は環境を含む <span class="code-chip">scope</span> 時に毎回 <span class="code-chip">sync_environment(reset_manual_overrides=False)</span> を自動実行するため、USD で動かした障害物は自動追従する。一方 <span class="code-chip">set_obstacle_pose()</span> で置いた障害物には手動上書きフラグが付き自動同期では上書きされない。USD / Fabric 側へ戻すには <span class="code-chip">sync_environment()</span>（既定 <span class="code-chip">reset_manual_overrides=True</span>）を明示的に呼ぶ。未登録パスを渡すと <span class="code-chip">KeyError</span>。<br>
+    3) <strong><span class="code-chip">close()</span> 後の利用：</strong><span class="code-chip">close()</span> 済みの <span class="code-chip">GeometricScene</span> を使用すると <span class="code-chip">RuntimeError</span>。
+  </div>
+  <div class="table-wrap">
+    <table class="ergo-table">
+      <thead>
+        <tr><th>メソッド</th><th>シグネチャ・主な引数</th><th>役割・注意点</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="code-chip">add_robot</span> / <span class="code-chip">add_model</span> / <span class="code-chip">remove_robot</span></td>
+          <td><span class="code-chip">add_robot(robot)</span><br><span class="code-chip">add_model(model, link_prim_paths, *, name=None, collision_filter=None, base_matrix=None)</span><br><span class="code-chip">remove_robot(robot)</span></td>
+          <td>共有シーンへのロボット登録・解除。<span class="code-chip">add_model()</span> はモデル直接登録用の代理オブジェクトを返す。登録変化時は自動で <span class="code-chip">mark_dirty()</span> され次回判定時に <span class="code-chip">finalize()</span> で再構築される。</td>
+        </tr>
+        <tr>
+          <td><span class="code-chip">add_environment</span> / <span class="code-chip">clear_environment</span></td>
+          <td><span class="code-chip">add_environment(prim_paths_or_root, *, exclude_robots=True, exclude_prim_paths=()) -> int</span></td>
+          <td>明示登録モードで環境障害物 Prim（配下再帰探索）を登録し追加件数を返す。<span class="code-chip">clear_environment()</span> で自動検出モードへ戻す。</td>
+        </tr>
+        <tr>
+          <td><span class="code-chip">mark_dirty</span> / <span class="code-chip">invalidate</span> / <span class="code-chip">finalize</span></td>
+          <td>引数なし</td>
+          <td>Newton モデルの再構築予約または明示実行。通常は初回判定時に自動実行。</td>
+        </tr>
+        <tr>
+          <td><span class="code-chip">sync_robots</span> / <span class="code-chip">eval_fk</span> / <span class="code-chip">get_robot_body_indices</span></td>
+          <td><span class="code-chip">sync_robots()</span><br><span class="code-chip">eval_fk(robot, q=None, *, base_matrix=None, resolve_mimic=True)</span></td>
+          <td>登録ロボットの最新リンク姿勢を Newton <span class="code-chip">state.body_q</span> へ転送、または Newton 側で FK 評価。</td>
+        </tr>
+        <tr>
+          <td><span class="code-chip">sync_environment</span></td>
+          <td><span class="code-chip">sync_environment(*, use_fabric="auto", reset_manual_overrides=True)</span></td>
+          <td>外部障害物の最新姿勢を Newton へ反映。<span class="code-chip">use_fabric="auto"</span> は Play=ON や Fabric 更新時は Fabric から、停止時は USD から自動取得。</td>
+        </tr>
+        <tr>
+          <td><span class="code-chip">set_obstacle_pose</span></td>
+          <td><span class="code-chip">set_obstacle_pose(prim_path, position, orientation=(1,0,0,0))</span></td>
+          <td>環境障害物 1 個の姿勢を USD/Fabric 読み出しを介さず直接 Newton の <span class="code-chip">body_q</span> へ設定（手動上書きフラグ付き）。四元数は <strong><span class="code-chip">(w, x, y, z)</span></strong>。未登録パスは <span class="code-chip">KeyError</span>。</td>
+        </tr>
+        <tr>
+          <td><span class="code-chip">check_within</span> / <span class="code-chip">check_between</span> / <span class="code-chip">check_environment</span> / <span class="code-chip">touching_pairs</span></td>
+          <td><span class="code-chip">check_within(link_set, *, clearance=0.0, collision_filter=None, extra_filter=None, sync_env=False)</span><br><span class="code-chip">check_between(set_a, set_b, *, clearance=0.0, extra_filter=None, sync_env=False)</span><br><span class="code-chip">check_environment(link_set, *, clearance=0.0, exclude=(), ignore_prim_paths=(), sync_env=True)</span></td>
+          <td>任意の <span class="code-chip">GeometricLinkSet</span> 単位で集合内・2 集合間（複数ロボット間の <span class="code-chip">kind="between_robots"</span> を得る唯一の経路）・対環境を判定。戻り値は <span class="code-chip">list[GeometricCollisionPair]</span>。</td>
+        </tr>
+        <tr>
+          <td><span class="code-chip">check_collisions</span> / <span class="code-chip">compute_clearances</span></td>
+          <td><span class="code-chip">(robot=None, *, link_set=None, scope=None, clearance=0.0 / max_distance=0.05, collision_filter=None, extra_filter=None, ignore_prim_paths=(), sync_env=True)</span></td>
+          <td>シーン全体または指定ロボット／リンク集合の干渉検出・符号付きクリアランス計算。<span class="code-chip">scope="environment"</span> には共有シーン内の別ロボットのリンクも含まれる（<span class="code-chip">kind="environment"</span>）。</td>
+        </tr>
+        <tr>
+          <td><span class="code-chip">draw_colliders</span> / <span class="code-chip">clear_debug_draw</span></td>
+          <td><span class="code-chip">draw_colliders(pairs=None, *, robot=None, include_environment=True, clear=True, sync_robots=True, sync_env=True, line_width=1.5, point_size=9.0, contact_cross_radius=0.015) -> int</span></td>
+          <td>Newton 空間に登録された全コライダー形状（通常＝シアン・干渉中＝赤）と接触点マーカー＆貫通線分（オレンジ）を <span class="code-chip">DebugDraw</span> で描画し描画数を返す。メッシュ辺は安全上限 24,000 本で間引き保護。</td>
+        </tr>
+        <tr>
+          <td><span class="code-chip">close</span></td>
+          <td><span class="code-chip">scene.close()</span></td>
+          <td>DebugDraw 消去と Newton / Warp バッファの参照解放。以後このインスタンスを使うと <span class="code-chip">RuntimeError</span>。</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section id="sec-batched-scene">
+  <h2>BatchedNewtonScene</h2>
+  <article class="api-card" id="batched-newton-scene"><div class="api-head"><span class="api-name">BatchedNewtonScene</span><span class="perf-pill perf-hot">N 台同時 GPU バッチ（CUDA Graph 対応）</span></div><div class="sig-box">BatchedNewtonScene(
+    view: GeometricRobotView,
+    *,
+    device: str = "auto",
+    environment_roots: Sequence[str] | None = None,
+    broad_phase: Literal["auto", "explicit", "nxn", "sap"] = "auto",
+    convex_meshes: bool = True,
+    bake_adjacent_filter: bool = True,
+    use_cuda_graph: bool = True,
+)</div><div class="prose"><p><span class='code-chip'>GeometricRobotView</span>（同一構造のロボット <span class='code-chip'>N</span> 台）のために、<span class='code-chip'>N</span> 台分の FK と衝突判定を 1 回の GPU カーネル起動（CUDA Graph キャプチャ対応）で並列実行するバックエンドクラスです。通常は <span class='code-chip'>GeometricRobotView</span> 経由で利用します。</p></div><div class="table-wrap"><table class="ergo-table"><thead><tr><th>引数 / フィールド</th><th>型</th><th>既定値</th><th>意味・形状・単位・制約</th></tr></thead><tbody><tr><td><span class='code-chip'>view</span></td><td><span class='code-chip'>GeometricRobotView</span></td><td><span class='code-chip'>必須</span></td><td>対象となる同一構造ロボットのビュー（台数 <span class='code-chip'>N</span>）。</td></tr>
+<tr><td><span class='code-chip'>device</span></td><td><span class='code-chip'>str</span></td><td><span class='code-chip'>"auto"</span></td><td>Warp/Newton 実行デバイス（CUDA 利用可なら <span class='code-chip'>"cuda:0"</span>）。</td></tr>
+<tr><td><span class='code-chip'>environment_roots</span></td><td><span class='code-chip'>Sequence[str] | None</span></td><td><span class='code-chip'>None</span></td><td>全ロボット共通の障害物（Newton の <span class='code-chip'>world=-1</span>）としてまとめて登録するルート Prim パス列（ロボットごとの個別環境ではない）。<span class='code-chip'>None</span> のとき <span class='code-chip'>/World</span>（なければ <span class='code-chip'>/</span>）を自動探索。</td></tr>
+<tr><td><span class='code-chip'>broad_phase</span></td><td><span class='code-chip'>"auto" | "explicit" | "nxn" | "sap"</span></td><td><span class='code-chip'>"auto"</span></td><td>Broad Phase アルゴリズム選択。</td></tr>
+<tr><td><span class='code-chip'>convex_meshes</span></td><td><span class='code-chip'>bool</span></td><td><span class='code-chip'>True</span></td><td><span class='code-chip'>UsdGeom.Mesh</span> を単一 Convex Hull 化するか（<span class='code-chip'>True</span>）生三角メッシュにするか（<span class='code-chip'>False</span>）。</td></tr>
+<tr><td><span class='code-chip'>bake_adjacent_filter</span></td><td><span class='code-chip'>bool</span></td><td><span class='code-chip'>True</span></td><td><span class='code-chip'>True</span> のとき、隣り合うリンクの組を Broad Phase の段階で事前除外する（狭域負荷を削減）。</td></tr>
+<tr><td><span class='code-chip'>use_cuda_graph</span></td><td><span class='code-chip'>bool</span></td><td><span class='code-chip'>True</span></td><td>FK / 衝突カーネル列を CUDA Graph にキャプチャして起動オーバーヘッドを最小化。</td></tr></tbody></table></div><div class="api-meta-grid"><div class="api-meta-box"><strong>戻り値 / 型</strong>プロパティ: <span class='code-chip'>device</span>, <span class='code-chip'>newton_model</span>, <span class='code-chip'>newton_state</span>, <span class='code-chip'>prim_body_indices</span>。<br>主要メソッド: <span class='code-chip'>eval_fk_batch(q_batch, base_batch, *, resolve_mimic=True, return_matrices=True)</span>（<span class='code-chip'>q_batch</span> は <span class='code-chip'>(N, D)</span>、<span class='code-chip'>base_batch</span> は <span class='code-chip'>(N, 4, 4)</span>）、<span class='code-chip'>sync_environment(*, use_fabric='auto')</span>、<span class='code-chip'>check_collisions_batch(...)</span>、<span class='code-chip'>compute_clearances_batch(...)</span>、<span class='code-chip'>close()</span>。</div><div class="api-meta-box"><strong>副作用・前提・落とし穴</strong><strong>ロボット間干渉は判定しない：</strong>各ロボットは独立ワールド <span class='code-chip'>0..N-1</span> へ配置されるため、自ロボット内のリンク同士および全ロボット共通障害物（<span class='code-chip'>world=-1</span>）との干渉のみを並列判定する。</div></div></article>
+</section>
+
+<section id="sec-collision-pair">
+  <h2>GeometricCollisionPair / GeometricLinkSet / find_colliders</h2>
+  <article class="api-card" id="collision-pair"><div class="api-head"><span class="api-name">GeometricCollisionPair</span><span class="perf-pill perf-fast">判定結果データクラス</span></div><div class="sig-box">@dataclass(frozen=True)
+class GeometricCollisionPair:
+    link_a: str
+    link_b: str | None
+    path_a: str
+    path_b: str
+    kind: Literal["within_component", "between_components", "between_robots", "environment"]
+    component_a: str | None = None
+    component_b: str | None = None
+    robot_a: str = ""
+    robot_b: str | None = None
+    separation: float | None = None
+    point_a: tuple[float, float, float] | None = None
+    point_b: tuple[float, float, float] | None = None
+    normal: tuple[float, float, float] | None = None
+    # プロパティ: pair.names -&gt; tuple[str, str]</div><div class="prose"><p>1 組の接触・干渉・クリアランス検出結果を表します。</p></div><div class="table-wrap"><table class="ergo-table"><thead><tr><th>引数 / フィールド</th><th>型</th><th>既定値</th><th>意味・形状・単位・制約</th></tr></thead><tbody><tr><td><span class='code-chip'>link_a / link_b</span></td><td><span class='code-chip'>str / str | None</span></td><td><span class='code-chip'>必須</span></td><td>対象リンク名。相手が環境障害物（または共有シーン内別ロボットを <span class='code-chip'>scope="environment"</span> で検出した場合）は <span class='code-chip'>link_b=None</span>。</td></tr>
+<tr><td><span class='code-chip'>path_a / path_b</span></td><td><span class='code-chip'>str</span></td><td><span class='code-chip'>必須</span></td><td>対象リンクまたは環境コライダーの Prim パス。</td></tr>
+<tr><td><span class='code-chip'>kind</span></td><td><span class='code-chip'>PairKind</span></td><td><span class='code-chip'>必須</span></td><td><span class='code-chip'>"within_component"</span>・<span class='code-chip'>"between_components"</span>・<span class='code-chip'>"between_robots"</span>・<span class='code-chip'>"environment"</span>。</td></tr>
+<tr><td><span class='code-chip'>component_a / component_b</span></td><td><span class='code-chip'>str | None</span></td><td><span class='code-chip'>None</span></td><td>所属コンポーネント名（該当する場合）。</td></tr>
+<tr><td><span class='code-chip'>robot_a / robot_b</span></td><td><span class='code-chip'>str / str | None</span></td><td><span class='code-chip'>"" / None</span></td><td>所属ロボット名（環境障害物では <span class='code-chip'>robot_b=None</span>）。</td></tr>
+<tr><td><span class='code-chip'>separation</span></td><td><span class='code-chip'>float | None</span></td><td><span class='code-chip'>None</span></td><td><strong>符号付き表面距離（m、<span class='code-chip'>metersPerUnit=1</span> のステージ専用）</strong>。<strong>負値＝貫通（めり込み）</strong>、<span class='code-chip'>0.0</span>＝接触、<strong>正値＝クリアランス</strong>。PhysX <span class='code-chip'>overlap_shape</span> 経路のみ <span class='code-chip'>None</span>。</td></tr>
+<tr><td><span class='code-chip'>point_a / point_b</span></td><td><span class='code-chip'>tuple[float, float, float] | None</span></td><td><span class='code-chip'>None</span></td><td>ワールド座標での各コライダー表面上の接触点 / 最近接点（m、<span class='code-chip'>metersPerUnit=1</span> のステージ専用）。</td></tr>
+<tr><td><span class='code-chip'>normal</span></td><td><span class='code-chip'>tuple[float, float, float] | None</span></td><td><span class='code-chip'>None</span></td><td>単位法線ベクトル。<strong>向きは A → B</strong>（Newton の <span class='code-chip'>shape0 → shape1</span> の定義に一致）。</td></tr></tbody></table></div><div class="api-meta-grid"><div class="api-meta-box"><strong>戻り値 / 型</strong><span class='code-chip'>pair.names</span> は <span class='code-chip'>(link_a, link_b or path_b)</span> の 2 要素タプルを返す。</div><div class="api-meta-box"><strong>副作用・前提・落とし穴</strong><strong>重複集約・正規化・並び順の規約：</strong><br>1) 同一リンク組（対環境では「リンク × 環境コライダー Prim」組）ごとに <strong>1 件だけ</strong>返す。複数接触点がある場合は <span class='code-chip'>separation</span> が最小（最も深い）1 点を選出する。<br>2) <span class='code-chip'>within</span> の組は文字列順 <span class='code-chip'>link_a &lt; link_b</span> へ正規化し、<span class='code-chip'>point_a / point_b</span> と <span class='code-chip'>normal</span> も合わせて入れ替える。<br>3) <span class='code-chip'>check_collisions()</span> は <span class='code-chip'>separation &lt;= clearance</span> の組を <span class='code-chip'>(kind, link_a, link_b or path_b)</span> の昇順で返す。<br>4) <span class='code-chip'>compute_clearances()</span> は <span class='code-chip'>separation</span> の昇順（負＝めり込みが先頭）で返す。</div></div></article>
+
+  <article class="api-card" id="link-set-and-find"><div class="api-head"><span class="api-name">GeometricLinkSet / find_colliders</span><span class="perf-pill perf-fast">コライダー集合</span></div><div class="sig-box">find_colliders(stage: Usd.Stage, link_prim_path: str, other_link_paths: Sequence[str] = ()) -&gt; list[str]
+GeometricLinkSet(robot: GeometricRobot, link_names: Sequence[str], name: str)
+# プロパティ: link_set.collider_paths -&gt; dict[str, list[str]], link_set.link_paths -&gt; dict[str, str]
+# メソッド: link_set.union(other: GeometricLinkSet, name: str | None = None) -&gt; GeometricLinkSet</div><div class="prose"><p>ロボットのリンク群と配下の <span class='code-chip'>PhysicsCollisionAPI</span> 付きコライダー Prim を対応付ける集合です。<span class='code-chip'>find_colliders()</span> は他リンクのサブツリー（<span class='code-chip'>other_link_paths</span>）を除外しつつ指定リンク配下のコライダー Prim パス一覧を返します。</p></div><div class="api-meta-grid"><div class="api-meta-box"><strong>副作用・前提・落とし穴</strong>複数コンポーネントを束ねた集合（例：<span class='code-chip'>left.link_set.union(right.link_set, name="arms")</span>）を作り、<span class='code-chip'>scene.check_between(...)</span> へ渡す用途に使う。</div></div></article>
+</section>
+
+<section id="sec-collision-filter">
+  <h2>GeometricCollisionFilter</h2>
+  <article class="api-card" id="collision-filter-card"><div class="api-head"><span class="api-name">GeometricCollisionFilter（全 16 メソッド・プロパティ）</span><span class="perf-pill perf-fast">純粋 Python / JSON 永続化可</span></div><div class="sig-box">GeometricCollisionFilter.from_model(model: GeometricRobotModel) -&gt; GeometricCollisionFilter
+flt.copy() -&gt; GeometricCollisionFilter
+flt.merged_with(other: GeometricCollisionFilter, *, prefix: str = "", other_prefix: str = "") -&gt; GeometricCollisionFilter
+flt.add_pair(a: str, b: str, *, reason: str = "user") -&gt; None
+flt.remove_pair(a: str, b: str) -&gt; bool
+flt.add_pattern(pattern_a: str, pattern_b: str, *, reason: str = "user") -&gt; None
+flt.add_rule(rule: Callable[[str, str], bool], *, reason: str = "user") -&gt; None
+flt.remove_by_reason(reason: str) -&gt; int
+flt.clear() -&gt; None
+flt.reason_for(a: str, b: str) -&gt; str | None
+flt.is_ignored(a: str, b: str) -&gt; bool
+flt.pairs -&gt; dict[tuple[str, str], str]
+flt.patterns -&gt; list[tuple[str, str, str]]
+flt.num_rules -&gt; int
+flt.to_json(path: str | None = None) -&gt; str
+GeometricCollisionFilter.from_json(text_or_path: str) -&gt; GeometricCollisionFilter</div><div class="prose"><p>自己干渉判定から除外するリンクペア（隣接リンク・既定接触ペア・USD <span class='code-chip'>PhysicsFilteredPairsAPI</span>・ワイルドカードパターン・任意関数ルール）を理由ラベル付きで管理します。</p></div><div class="api-meta-grid"><div class="api-meta-box"><strong>副作用・前提・落とし穴</strong><strong>1) <span class='code-chip'>from_model(model)</span>：</strong><span class='code-chip'>model.adjacent_link_pairs()</span> で直接結ばれた隣接リンク組を自動登録する（<span class='code-chip'>/mount</span> 関節は <span class='code-chip'>reason="mount"</span>、他は <span class='code-chip'>"adjacent"</span>）。<br><strong>2) <span class='code-chip'>merged_with</span>：</strong><span class='code-chip'>GeometricRobotModel.attach()</span> と同じプレフィックス規約で 2 つのフィルタを結合する。<br><strong>3) 順序非依存・記法：</strong><span class='code-chip'>add_pair(a, b)</span> と <span class='code-chip'>is_ignored(b, a)</span> は対称。<span class='code-chip'>add_pattern</span> は大文字小文字を区別する <span class='code-chip'>fnmatch.fnmatchcase</span> 記法。<span class='code-chip'>to_json()</span> / <span class='code-chip'>from_json()</span> はペアとパターンを永続化する（Python 関数ルールは対象外）。</div></div><div class="code-ex">flt = robot.collision_filter
+flt.add_pair("wrist_3_link", "camera_bracket", reason="always_touch")
+saved_json = flt.to_json()</div></article>
+</section>
+
+<section id="sec-physx-checker">
+  <h2>PhysX バックエンド（GeometricCollisionChecker / GeometricContactMonitor）</h2>
+  <div class="callout warn">
+    <strong>PhysX バックエンドの動作条件と制約：</strong>
+    <span class="code-chip">GeometricCollisionChecker._prepare()</span> が判定直前に <span class="code-chip">robot.flush_to_usd()</span> を自動で呼ぶため、<strong><span class="code-chip">write_target="fabric"</span> のままで利用できます</strong>。また <span class="code-chip">collision_mode="static"</span>（既定）であれば <strong>Stop 中でも Play=ON 中でも動作</strong>します。一方 <span class="code-chip">collision_mode="kinematic"</span> で Stop 中に判定を呼ぶと <span class="code-chip">RuntimeError</span> になります。なお PhysX <span class="code-chip">overlap_shape</span> は 1 フレーム遅延・入力メッシュ凸包近似・距離 <span class="code-chip">separation=None</span> となるため、通常は既定の <span class="code-chip">collision_backend="newton"</span> を推奨します。
+  </div>
+  <div class="table-wrap">
+    <table class="ergo-table">
+      <thead>
+        <tr><th>クラス</th><th>生成シグネチャ・主要メソッド / プロパティ</th><th>仕様</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="code-chip">GeometricCollisionChecker</span></td>
+          <td><span class="code-chip">GeometricCollisionChecker(stage: Usd.Stage)</span><br><span class="code-chip">check_within(...)</span>, <span class="code-chip">check_between(...)</span>, <span class="code-chip">check_environment(...)</span>, <span class="code-chip">touching_pairs(...)</span>, <span class="code-chip">reload()</span></td>
+          <td>PhysX <span class="code-chip">get_physx_scene_query_interface().overlap_shape</span> による CPU シーンクエリ判定。<span class="code-chip">separation</span>・<span class="code-chip">point_a</span>・<span class="code-chip">point_b</span> は取得不可（<span class="code-chip">None</span>）。</td>
+        </tr>
+        <tr>
+          <td><span class="code-chip">GeometricContactMonitor</span></td>
+          <td><span class="code-chip">GeometricContactMonitor(robots: GeometricRobot | Sequence[GeometricRobot], max_events: int = 10000)</span><br><span class="code-chip">touching</span>, <span class="code-chip">penetrating</span>, <span class="code-chip">separations</span>, <span class="code-chip">clear()</span>, <span class="code-chip">close()</span></td>
+          <td>PhysX Contact Report コールバックを購読するモニタ。<span class="code-chip">robots</span> は単体または複数列を受け付ける。<span class="code-chip">GeometricLayerOptions(collision_mode="kinematic", report_contacts=True)</span> ＋ <span class="ui-chip">Play=ON</span> と組み合わせて使用する（静的コライダー同士の接触は PhysX 仕様上報告されない）。</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section id="sec-sources">
+  <h2>公式出典・同梱ソース・実機検証の切り分け</h2>
+  <ul class="source-list">
+    <li>
+      <span class="source-tag official">同梱公式 Doc</span><span class="source-tag web">Web 公式</span>
+      <strong>USD / Fabric / USDRT Population（合成前 VariantSet は USD 必須・FSD 遅延同期・2 面キャッシュ）</strong>：<br>
+      <span class="code-chip">C:\isaacsim-6.2.0\extscache\usdrt.scenegraph-7.6.3...\docs\fabricsd\fsd_vs_omnihydra.md</span>・<span class="code-chip">fabric_overview.rst</span>・<span class="code-chip">fabric_hierarchy.rst</span> ／
+      <a href="https://docs.omniverse.nvidia.com/kit/docs/usdrt.scenegraph/latest/index.html" target="_blank" rel="noopener">Omniverse USDRT / Fabric Documentation</a>
+    </li>
+    <li>
+      <span class="source-tag official">同梱公式スキーマ</span>
+      <strong>IsaacRobotAPI（<code>isaac:physics:robotLinks</code> / <code>robotJoints</code> / 入れ子サブロボット構成）</strong>：<br>
+      <span class="code-chip">C:\isaacsim-6.2.0\exts\isaacsim.robot.schema\pip_prebundle\usd\schema\isaac\robot_schema\RobotSchema.usda</span>
+    </li>
+    <li>
+      <span class="source-tag official">同梱公式 Doc</span><span class="source-tag web">Web 公式</span>
+      <strong>PhysX 5（Articulation・MimicJoint・Scene Queries CPU 実行・Contact Reports・Collider 可視化色）</strong>：<br>
+      <span class="code-chip">C:\isaacsim-6.2.0\extscache\omni.physx.ui-110.4.4...\docs\dev_guide\collision_debug_vis.rst</span>・<span class="code-chip">viewport_overlays.rst</span>・<span class="code-chip">physics_debug_wnd.rst</span>・<span class="code-chip">omni.physx-110.4.4...\docs\dev_guide\scene_queries.rst</span> ／
+      <a href="https://nvidia-omniverse.github.io/PhysX/physx/5.4.1/index.html" target="_blank" rel="noopener">NVIDIA PhysX 5.4.1 SDK Documentation</a>
+    </li>
+    <li>
+      <span class="source-tag web">Web 公式</span><span class="source-tag official">同梱公式ソース</span>
+      <strong>Newton 1.6.1（<code>eval_fk</code>・<code>CollisionPipeline</code>・<code>GeoType.MESH</code> / <code>CONVEX_MESH</code>・<code>sdf_contact.py</code>）＆ Warp</strong>：<br>
+      <span class="code-chip">C:\isaacsim-6.2.0\exts\isaacsim.pip.newton\pip_prebundle\newton[sim]\newton-1.6.1-py3-none-any\newton\_src\sim\collide.py</span>・<span class="code-chip">geometry\narrow_phase.py</span>・<span class="code-chip">geometry\sdf_contact.py</span> ／
+      <a href="https://newton-physics.github.io/newton/1.6.1/guide/overview.html" target="_blank" rel="noopener">Newton 1.6.1 Documentation</a>・<a href="https://nvidia.github.io/warp/" target="_blank" rel="noopener">NVIDIA Warp Documentation</a>
+    </li>
+    <li>
+      <span class="source-tag official">同梱公式ソース</span>
+      <strong>Isaac Sim Experimental Articulation API・DebugDraw（RTX オーバーレイ描画）</strong>：<br>
+      <span class="code-chip">C:\isaacsim-6.2.0\exts\isaacsim.core.experimental.prims\...\articulation.py</span>・<span class="code-chip">extscache\isaacsim.util.debug_draw-3.2.8...\docs\Overview.md</span>
+    </li>
+    <li>
+      <span class="source-tag empirical">実機検証</span>
+      <strong>Isaac Sim 6.2.0（RTX 3060）での全テスト・U 字凹メッシュ実測</strong>：<br>
+      <span class="code-chip">tests_pure/</span>（73 本全通過）・<span class="code-chip">tests_kit/run_kit_tests.py</span>（34 本全通過）・U 字水密メッシュ対実測（<span class="code-chip">convex_meshes=True</span>: 溝誤検知 1 件 / 5 cm 貫通時 −0.45 m / 2.35 ms 対 <span class="code-chip">convex_meshes=False</span>: 溝非接触 0 件 / 5 cm 貫通時 −0.0500 m / 2.39 ms）。
+    </li>
+  </ul>
+</section>
+
+
+  </main>
+</div>
+<svg id="ref-connector-layer" style="position:fixed;inset:0;width:100vw;height:100vh;pointer-events:none;z-index:9990;"></svg>
+<button id="ref-return-btn" type="button">↩ 元の位置へ戻る</button>
+<script>
+(() => {
+  const svgLayer = document.getElementById('ref-connector-layer');
+  const returnBtn = document.getElementById('ref-return-btn');
+  let savedScrollY = null;
+  const colorMap = { '1': '#2563eb', '2': '#059669', '3': '#d97706', '4': '#7c3aed', '5': '#db2777' };
+  const isInViewport = (el) => {
+    const r = el.getBoundingClientRect();
+    return r.width > 0 && r.height > 0 && r.top >= 0 && r.bottom <= window.innerHeight && r.left >= 0 && r.right <= window.innerWidth;
+  };
+  const clearLines = () => { if (svgLayer) svgLayer.innerHTML = ''; };
+  const drawConnector = (fromEl, toEl) => {
+    if (!svgLayer || !isInViewport(fromEl) || !isInViewport(toEl)) return;
+    const a = fromEl.getBoundingClientRect(), b = toEl.getBoundingClientRect();
+    const x1 = a.left + a.width / 2, y1 = a.top + a.height / 2;
+    const x2 = b.left + b.width / 2, y2 = b.top + b.height / 2;
+    const mx = (x1 + x2) / 2;
+    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    path.setAttribute('d', `M ${x1} ${y1} C ${mx} ${y1}, ${mx} ${y2}, ${x2} ${y2}`);
+    path.setAttribute('fill', 'none');
+    path.setAttribute('stroke', colorMap[fromEl.dataset.color] || '#2563eb');
+    path.setAttribute('stroke-width', '2');
+    path.setAttribute('stroke-dasharray', '4 3');
+    path.setAttribute('opacity', '0.72');
+    svgLayer.appendChild(path);
+  };
+  const setActive = (refId, originEl) => {
+    const peers = Array.from(document.querySelectorAll(`[data-ref="${CSS.escape(refId)}"]`));
+    const scopes = new Set();
+    peers.forEach((el) => { el.classList.add('is-active'); const sc = el.closest('[data-ref-scope]'); if (sc) scopes.add(sc); });
+    scopes.forEach((sc) => sc.classList.add('is-dimming'));
+    clearLines();
+    if (originEl) peers.filter((el) => el !== originEl).forEach((peer) => drawConnector(originEl, peer));
+  };
+  const clearActive = () => {
+    document.querySelectorAll('[data-ref].is-active').forEach((el) => el.classList.remove('is-active'));
+    document.querySelectorAll('[data-ref-scope].is-dimming').forEach((sc) => sc.classList.remove('is-dimming'));
+    clearLines();
+  };
+  document.querySelectorAll('[data-ref]').forEach((el) => {
+    const refId = el.dataset.ref;
+    el.addEventListener('mouseenter', () => setActive(refId, el));
+    el.addEventListener('mouseleave', clearActive);
+    el.addEventListener('focus', () => setActive(refId, el));
+    el.addEventListener('blur', clearActive);
+    el.addEventListener('click', () => {
+      const peers = Array.from(document.querySelectorAll(`[data-ref="${CSS.escape(refId)}"]`)).filter((p) => p !== el);
+      if (peers.length === 0) return;
+      const target = peers.find((p) => p.dataset.refRole !== el.dataset.refRole) || peers[0];
+      if (!isInViewport(target) && returnBtn) { savedScrollY = window.scrollY; returnBtn.classList.add('is-visible'); }
+      target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      target.classList.remove('is-pulsing'); void target.offsetWidth; target.classList.add('is-pulsing');
+    });
+  });
+  if (returnBtn) {
+    returnBtn.addEventListener('click', () => {
+      if (savedScrollY !== null) { window.scrollTo({ top: savedScrollY, behavior: 'smooth' }); savedScrollY = null; }
+      returnBtn.classList.remove('is-visible');
+    });
+  }
+  const tocLinks = Array.from(document.querySelectorAll('.toc a[href^="#"]'));
+  const sections = tocLinks.map((a) => document.querySelector(a.getAttribute('href'))).filter(Boolean);
+  if (sections.length > 0) {
+    const obs = new IntersectionObserver((entries) => {
+      entries.forEach((e) => {
+        if (!e.isIntersecting) return;
+        tocLinks.forEach((a) => a.classList.toggle('is-current', a.getAttribute('href') === `#${e.target.id}`));
+      });
+    }, { rootMargin: '-14% 0px -75% 0px' });
+    sections.forEach((s) => obs.observe(s));
+  }
+  const filterInput = document.getElementById('api-filter-input');
+  const filterStatus = document.getElementById('api-filter-status');
+  if (filterInput) {
+    const cards = Array.from(document.querySelectorAll('.api-card'));
+    const runFilter = () => {
+      const q = filterInput.value.trim().toLowerCase();
+      let shown = 0;
+      cards.forEach((c) => {
+        const hit = !q || c.textContent.toLowerCase().includes(q);
+        c.classList.toggle('is-hidden', !hit);
+        if (hit) shown += 1;
+      });
+      if (filterStatus) filterStatus.textContent = q ? `${shown} / ${cards.length} 件表示` : `全 ${cards.length} 件`;
+    };
+    filterInput.addEventListener('input', runFilter);
+    runFilter();
+  }
+})();
+</script>
+</body>
+</html>
