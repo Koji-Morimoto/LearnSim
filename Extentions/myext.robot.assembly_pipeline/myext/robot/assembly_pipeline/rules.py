@@ -1,12 +1,40 @@
-"""事前チェックの規則(判定)と、事後確認(症状が実際に起きたか)の評価。
+"""規則 R01〜R14 の事前チェック（``detect``）と事後確認（``symptom`` / ``evaluate``）を定義するモジュール。
 
-規則は 2 種類:
-  URDF の規則(R01 R03 R04 R06 R10 R13): 対象は URDF から作る usda(名前)
-  結合の規則(R02 R05 R07 R08 R09 R11 R12 R14): 対象は結合 1 回(「結合ファイル名/結合の名前」)
-規則ごとに 2 つの関数を持つ:
-  detect(ctx)              -> list[Finding]     静的に「このままだと○○が起きる」と判定する(結合ファイルを作る前)
-  symptom(ctx, target)     -> (公式のまま, 修正後) それぞれで症状が出たかを、測った値で決める
-症状の確認は判定の有無に関係なく毎回行う(判定が出なかったのに症状が出る = 新しい原因、も拾うため)。
+責務:
+  Isaac Sim の URDF Importer / Robot Assembler / RobotPoser で発生し得る既知の不具合 R01〜R14 を
+  統一的な規則テーブル ``RULES`` として管理し、以下 2 段階の評価を行う:
+    1. 事前チェック（``detect(ctx, phase)``）:
+       URDF パース直後（``phase="urdf"``）または import・正規化直後（``phase="usd"``）に
+       静的な構造から「このまま公式手順で進めると何が起きるか」を ``Finding`` として予測する。
+    2. 事後確認（``evaluate`` / ``evaluate_all``）:
+       ``probes.py``・``official.py``・``compose.py`` の実測値から、公式のまま（``official``）と
+       修正後（``fixed``）のそれぞれで症状が発生したかを判定し、6 種類の ``Verdict`` へ分類する。
+       事前チェックで予測が出なかった対象に対しても毎回 ``symptom`` を評価することで、
+       既知の条件に当てはまらない新たな不具合（``unexpected``）も見逃さない設計になっている。
+
+規則の分類（全 14 規則）:
+  - URDF / 部品規則（対象 = 部品名、R03 のみ ``部品名:follower名``）:
+    R01（空ルートリンク）、R03（mimic follower の drive）、R04（末端リンク座標ずれ）、
+    R06（Physics variant 未選択）、R10（衝突メッシュ可視重複）、R13（再 import 連番フォルダ）
+  - 結合規則（対象 = ``結合ファイル名/結合名``）:
+    R02（子のワールド固定 joint 残留）、R05（instanceable 配置先）、R07（Articulation Root 残留）、
+    R08（子リンク剛体なし）、R09（閉ループ）、R11（親との衝突除外なし）、
+    R12（RobotPoser teleport 置き去り）、R14（再結合時の固定関節増殖）
+
+主な公開 API:
+  - ``Finding`` / ``Side`` / ``Outcome`` / ``Context`` / ``Rule`` / ``JoinFacts``
+  - ``RULES``: R01〜R14 の規則定義辞書（``kinds.RuleId`` との完全一致を import 時に assert）
+  - ``join_facts(ctx)``: 全結合の親・子・配置先・剛体配下フラグを事前チェック用にまとめる
+  - ``detect(ctx, phase)`` / ``evaluate(ctx, findings)`` / ``evaluate_all(ctx, findings=None)``
+  - ``format_table(outcomes)``: ``Outcome`` 一覧を Markdown 表文字列へ整形する
+
+パイプライン全体での位置づけ:
+  ``pipeline.build_assembly`` の Step 1（``detect("urdf")``）・Step 3（``detect("usd")``）および
+  ``pipeline.run_pipeline`` の Step 9（``evaluate_all``）から呼ばれ、結果は ``report.py`` へ渡される。
+
+手を入れやすい箇所:
+  - 新しい規則 R15 を追加する場合は、``kinds.RuleId`` に ID を追加し、``_r15_detect`` と
+    ``_r15_symptom`` を実装して ``RULES`` に 1 エントリ足すだけでパイプラインとレポートへ自動統合される。
 """
 
 from __future__ import annotations
@@ -23,6 +51,8 @@ from .spec import PipelineSpec, join_id
 
 @dataclass
 class Finding:
+    """事前チェック（``detect``）が出した 1 件ぶんの予測結果。"""
+
     rule: RuleId
     target: str
     reason: str
@@ -31,7 +61,7 @@ class Finding:
 
 @dataclass
 class Side:
-    """公式のまま / 修正後 のどちらか一方での症状。occurred = None は測れなかった。"""
+    """公式のまま / 修正後 のどちらか一方での症状判定結果。``occurred=None`` は未測定・測定不能を表す。"""
 
     occurred: bool | None
     desc: str
@@ -39,6 +69,8 @@ class Side:
 
 @dataclass
 class Outcome:
+    """1 規則 × 1 対象に対する最終評価結果（事前予測・公式実測・修正後実測・最終 ``verdict``）。"""
+
     rule: RuleId
     title: str
     target: str
@@ -53,33 +85,38 @@ class Outcome:
 
 @dataclass
 class Context:
-    """判定と評価に使う材料。pipeline.py が埋める。"""
+    """事前チェックと事後評価に必要な全材料を保持するコンテナ。``pipeline.py`` が段階的に埋める。"""
 
     spec: PipelineSpec
-    models: dict[str, Any]  # URDF の名前 -> UrdfModel
-    builds: dict[str, Any] = field(default_factory=dict)  # URDF の名前 -> PartBuild
-    statics: dict[str, dict] = field(default_factory=dict)  # URDF の名前 -> probes.static_part
-    mimic_official: dict[str, dict] = field(default_factory=dict)
-    mimic_fixed: dict[str, dict] = field(default_factory=dict)
-    official: dict[str, dict] = field(default_factory=dict)  # 結合 -> probe_stage の結果(公式のまま)
-    official_join: dict[str, Any] = field(default_factory=dict)  # 結合 -> JoinResult(公式のまま)
-    official_skip: dict[str, str] = field(default_factory=dict)  # 結合 -> 公式のままを測らなかった理由
-    official_reassemble: dict[str, int | None] = field(default_factory=dict)
-    fixed: dict[str, dict] = field(default_factory=dict)  # 結合 -> probe_stage の結果(修正後。その結合が現れた測定)
-    fixed_join: dict[str, Any] = field(default_factory=dict)  # 結合 -> JoinResult(修正後)
-    recompose_changed: dict[str, bool] = field(default_factory=dict)  # 結合ファイル -> 作り直しで変化したか
+    models: dict[str, Any] = field(default_factory=dict)  # URDF 名 -> UrdfModel
+    builds: dict[str, Any] = field(default_factory=dict)  # 部品名 -> PartBuild
+    statics: dict[str, dict] = field(default_factory=dict)  # 部品名 -> probes.static_part の結果
+    mimic_official: dict[str, dict] = field(default_factory=dict)  # 部品名 -> 公式 mimic プローブ結果
+    mimic_fixed: dict[str, dict] = field(default_factory=dict)  # 部品名 -> 修正後 mimic プローブ結果
+    official: dict[str, dict] = field(default_factory=dict)  # 結合 ID -> probe_stage 結果（公式のまま）
+    official_join: dict[str, Any] = field(default_factory=dict)  # 結合 ID -> JoinResult（公式のまま）
+    official_skip: dict[str, str] = field(default_factory=dict)  # 結合 ID -> 公式のままを測らなかった理由
+    official_reassemble: dict[str, int | None] = field(default_factory=dict)  # 結合 ID -> R14 2回結合後の関節数
+    fixed: dict[str, dict] = field(default_factory=dict)  # 結合 ID -> probe_stage 結果（修正後）
+    fixed_join: dict[str, Any] = field(default_factory=dict)  # 結合 ID -> JoinResult（修正後）
+    recompose_changed: dict[str, bool] = field(default_factory=dict)  # 結合ファイル名 -> 2回目生成で変化したか
 
 
 @dataclass
 class Rule:
+    """規則 1 件のメタデータと ``detect`` / ``symptom`` 関数ペア。"""
+
     rid: RuleId
     title: str
-    kind: str  # "urdf" / "join"
-    phase: str  # "urdf" = import の前に判定できる / "usd" = import 後に判定
-    symptom_word: str  # 症状を表す言葉(報告で「」に入る)
-    not_occurred_hint: str  # 判定が出たのに公式のままで症状が出なかったときの説明
+    kind: str  # "urdf" | "join"
+    phase: str  # "urdf" = import の前に判定可能 / "usd" = import 後の静的検査結果を使って判定
+    symptom_word: str  # レポート文面で「」内に差し込む症状名
+    not_occurred_hint: str  # 事前予測あり・公式症状なしのときに添える補足説明（公式修正の可能性等）
     detect: Callable[[Context], list[Finding]]
     symptom: Callable[[Context, str], tuple[Side, Side]]
+
+
+RuleSpec = Rule
 
 
 # ================================================================ 共通
@@ -89,6 +126,16 @@ def _na(desc: str) -> Side:
 
 def _mm(v: float) -> str:
     return f"{v * 1000:.2f} mm"
+
+
+def _resolve_link(spec: PipelineSpec, usda_name: str, scoped: str) -> tuple[str, str]:
+    try:
+        res = static_resolve(spec, usda_name, scoped)  # type: ignore[call-arg]
+        if isinstance(res, tuple) and len(res) == 2:
+            return res
+    except TypeError:
+        pass
+    return spec.resolve_link(usda_name, scoped)
 
 
 @dataclass
@@ -107,20 +154,38 @@ class JoinFacts:
     under_rigid_body: bool | None  # 子を置く prim の位置か上に剛体があるか(分からなければ None)
 
 
+def _resolve_static_link_key(st: dict | None, link: str) -> str | None:
+    if not st:
+        return None
+    lps = st.get("link_prims", {})
+    if link in lps:
+        return link
+    if "/" in link:
+        leaf = link.rsplit("/", 1)[-1]
+        if leaf in lps and str(lps[leaf]).endswith("/" + link):
+            return leaf
+        for k, p in lps.items():
+            if str(p).endswith("/" + link):
+                return k
+    return None
+
+
 def join_facts(ctx: Context) -> list[JoinFacts]:
+    """仕様内の全結合について、事前チェックに必要な親・子・配置先・剛体配下フラグを整理して返す。副作用なし。"""
     out = []
     for f, j in ctx.spec.all_joins():
-        pu, pl = static_resolve(ctx.spec, f.parent, j.parent_link)
-        cu, cl = static_resolve(ctx.spec, j.child, j.child_link)
+        pu, pl = _resolve_link(ctx.spec, f.parent, j.parent_link)
+        cu, cl = _resolve_link(ctx.spec, j.child, j.child_link)
         if j.parent_prim == ".":
-            place_u, place_l, under = None, None, False  # 結合ファイルの一番上の prim(剛体ではない)
+            place_u, place_l, under = None, None, False  # 結合ファイル最上位 prim（剛体ではない）
         elif j.parent_prim and j.parent_prim.startswith("/"):
             place_u, place_l, under = None, None, None
         else:
-            place_u, place_l = static_resolve(ctx.spec, f.parent, j.parent_prim) if j.parent_prim else (pu, pl)
+            place_u, place_l = _resolve_link(ctx.spec, f.parent, j.parent_prim) if j.parent_prim else (pu, pl)
             st = ctx.statics.get(place_u)
-            under = None if st is None or place_l not in st.get("link_prims", {}) else place_l not in st["links_without_body_above"]
-        out.append(JoinFacts(join_id(f, j), j, pu, pl, ctx.spec.root_urdf(j.child).name, cu, cl, place_u, place_l, under))
+            lk = _resolve_static_link_key(st, place_l)
+            under = None if st is None or lk is None else lk not in st["links_without_body_above"]
+        out.append(JoinFacts(join_id(f, j), j, pu, pl, ctx.spec.root_source(j.child).name, cu, cl, place_u, place_l, under))
     return out
 
 
@@ -129,6 +194,7 @@ def _facts(ctx: Context, jid: str) -> JoinFacts:
 
 
 def _reach_side(probe: dict | None, prefixes: set[str] | None, tol_deg: float, tol_m: float) -> Side:
+    """Play プローブの ``reach`` 結果から、対象関節が目標値に許容誤差内で到達したか判定する。"""
     if not probe:
         return _na("測っていない")
     reach = {k: r for k, r in probe.get("reach", {}).items() if prefixes is None or r.get("prefix") in prefixes}
@@ -161,6 +227,7 @@ def _join_info(probe: dict | None, jid: str) -> dict | None:
 
 
 # ================================================================ R01 ルートリンクが空
+# 目的: 空（ghost）ルートリンクによりワールド固定 joint 名が root_joint でなくなるケースを検出する
 def _r01_detect(ctx: Context) -> list[Finding]:
     out = []
     for name, m in ctx.models.items():
@@ -193,11 +260,12 @@ def _r01_symptom(ctx: Context, target: str) -> tuple[Side, Side]:
 
 
 # ================================================================ R02 子のワールド固定 joint を Robot Assembler が無効にしない
+# 目的: body0・body1 とも埋まったワールド固定 joint が無効化されず親関節がロックする不具合を検出する
 def _r02_detect(ctx: Context) -> list[Finding]:
     out = []
     for x in join_facts(ctx):
         if x.under_rigid_body is not False:
-            continue  # 剛体の子に置くと、その joint は親の剛体につながる(ワールドではない)。こちらは R09(閉ループ)
+            continue  # 剛体の子に置くと、その joint は親の剛体につながる（ワールドではない）。このケースは R09（閉ループ）で扱う
         hard = [a for a in ctx.statics.get(x.child_urdf, {}).get("anchors", []) if a["both_targets_authored"]]
         if hard:
             out.append(Finding("R02", x.jid, f"子 {x.spec.child} のワールド固定 joint {[a['name'] for a in hard]} は body0 も body1 も空でないので、"
@@ -226,6 +294,24 @@ def _r02_symptom(ctx: Context, target: str) -> tuple[Side, Side]:
 
 
 # ================================================================ R03 mimic follower の drive
+# 目的: follower 関節に残った不要 drive が leader の目標到達を妨害・遅延させる不具合を検出する
+def _usd_mimic_entries(ctx: Context) -> list[tuple[str, str, str]]:
+    out: list[tuple[str, str, str]] = []
+    for name, st in ctx.statics.items():
+        if name in ctx.models:
+            continue
+        for item in st.get("mimic_followers", []) or []:
+            if isinstance(item, dict):
+                fname = str(item.get("follower") or item.get("name") or "")
+                lname = str(item.get("leader") or item.get("reference") or item.get("reference_joint") or "?")
+            else:
+                fname = str(item)
+                lname = "?"
+            if fname:
+                out.append((name, fname, lname))
+    return out
+
+
 def _r03_detect(ctx: Context) -> list[Finding]:
     # URDF の <dynamics damping> は newton:damping に入るだけで、PhysX の drive の damping にはならない
     # (urdf_usd_converter/_impl/link.py:489。実測でも drive の damping は 0)ので判定に使わない
@@ -236,6 +322,11 @@ def _r03_detect(ctx: Context) -> list[Finding]:
             if g and (g["stiffness"] or g["damping"]):
                 out.append(Finding("R03", f"{name}:{follower.name}", f"{name} の mimic follower {follower.name}(leader {leader.name})の drive が "
                                                                      f"stiffness={g['stiffness']}, damping={g['damping']} なので、follower が力を出して leader が目標に届かない・遅れる"))
+    for name, fname, lname in _usd_mimic_entries(ctx):
+        g = ctx.statics.get(name, {}).get("raw_follower_drive", {}).get(fname)
+        if g and (g["stiffness"] or g["damping"]):
+            out.append(Finding("R03", f"{name}:{fname}", f"{name} の mimic follower {fname}(leader {lname})の drive が "
+                                                         f"stiffness={g['stiffness']}, damping={g['damping']} なので、follower が力を出して leader が目標に届かない・遅れる"))
     return out
 
 
@@ -263,10 +354,16 @@ def _r03_symptom(ctx: Context, target: str) -> tuple[Side, Side]:
 
 
 def _r03_targets(ctx: Context) -> list[str]:
-    return [f"{n}:{f.name}" for n, m in ctx.models.items() for f, _ in m.mimic_pairs()]
+    targets = [f"{n}:{f.name}" for n, m in ctx.models.items() for f, _ in m.mimic_pairs()]
+    for name, fname, _lname in _usd_mimic_entries(ctx):
+        t = f"{name}:{fname}"
+        if t not in targets:
+            targets.append(t)
+    return targets
 
 
 # ================================================================ R04 末端リンクの座標ずれ
+# 目的: 形状が 1 つだけの末端リンクで prim 原点が形状原点へ移され結合面がずれる不具合を検出する
 def _r04_detect(ctx: Context) -> list[Finding]:
     out = []
     for name, m in ctx.models.items():
@@ -306,6 +403,7 @@ def _r04_symptom(ctx: Context, target: str) -> tuple[Side, Side]:
 
 
 # ================================================================ R05 instanceable な prim に子を作れない
+# 目的: 配置先または子リンクが instanceable のため instance proxy 書き込み失敗で結合が落ちる不具合を検出する
 def _r05_detect(ctx: Context) -> list[Finding]:
     out = []
     for x in join_facts(ctx):
@@ -333,6 +431,7 @@ def _r05_symptom(ctx: Context, target: str) -> tuple[Side, Side]:
 
 
 # ================================================================ R06 Physics variant が未選択
+# 目的: URDF Importer 出力の Physics VariantSet が未選択で剛体・関節が空になる不具合を検出する
 def _r06_detect(ctx: Context) -> list[Finding]:
     out = []
     for name in ctx.models:
@@ -352,6 +451,7 @@ def _r06_symptom(ctx: Context, target: str) -> tuple[Side, Side]:
 
 
 # ================================================================ R07 Articulation Root が消えない
+# 目的: NewtonArticulationRootAPI が残り、子ツリーにネストした Articulation Root が残留する不具合を検出する
 def _r07_detect(ctx: Context) -> list[Finding]:
     out = []
     for x in join_facts(ctx):
@@ -377,10 +477,25 @@ def _r07_symptom(ctx: Context, target: str) -> tuple[Side, Side]:
 
 
 # ================================================================ R08 子のリンクに剛体が無い
+# 目的: 子の接続リンク自体に剛体が無く、固定関節の body1 が剛体へ解決されない不具合を検出する
 def _r08_detect(ctx: Context) -> list[Finding]:
-    return [Finding("R08", x.jid, f"子のリンク {x.child_link_urdf}:{x.child_link} の位置にも上にも剛体が無いので、"
-                                  "Robot Assembler が結合できない(3.3.8 より前は固定されずに分離した)")
-            for x in join_facts(ctx) if x.child_link in ctx.statics.get(x.child_link_urdf, {}).get("links_without_body_above", [])]
+    out = []
+    for x in join_facts(ctx):
+        child_st = ctx.statics.get(x.child_urdf, {})
+        if child_st and child_st.get("fixed_rigid_bodies") == 0:
+            continue  # 剛体を 1 つも持たない compound 部品(例: Thor バックパック)は固定関節を作らない
+        link_st = ctx.statics.get(x.child_link_urdf, {})
+        lk = _resolve_static_link_key(link_st, x.child_link) or x.child_link
+        if lk in link_st.get("links_without_body_above", []):
+            out.append(
+                Finding(
+                    "R08",
+                    x.jid,
+                    f"子のリンク {x.child_link_urdf}:{x.child_link} の位置にも上にも剛体が無いので、"
+                    "Robot Assembler が結合できない(3.3.8 より前は固定されずに分離した)",
+                )
+            )
+    return out
 
 
 def _r08_symptom(ctx: Context, target: str) -> tuple[Side, Side]:
@@ -399,6 +514,7 @@ def _r08_symptom(ctx: Context, target: str) -> tuple[Side, Side]:
 
 
 # ================================================================ R09 閉ループ
+# 目的: 剛体配下に置いた子のワールド固定 joint が親剛体へ接続され意図しない閉ループになる不具合を検出する
 def _r09_detect(ctx: Context) -> list[Finding]:
     out = []
     for x in join_facts(ctx):
@@ -424,6 +540,7 @@ def _r09_symptom(ctx: Context, target: str) -> tuple[Side, Side]:
 
 
 # ================================================================ R10 衝突メッシュが見える
+# 目的: collision_from_visuals=False かつ同一メッシュ時に衝突側が guide でなく可視重複する不具合を検出する
 def _r10_detect(ctx: Context) -> list[Finding]:
     out = []
     for name, m in ctx.models.items():
@@ -447,6 +564,7 @@ def _r10_symptom(ctx: Context, target: str) -> tuple[Side, Side]:
 
 
 # ================================================================ R11 衝突除外が無い
+# 目的: 親剛体と子剛体の間に FilteredPairsAPI が設定されず Play 中に不要な接触が起きる不具合を検出する
 def _r11_detect(ctx: Context) -> list[Finding]:
     return [Finding("R11", x.jid, "Robot Assembler は親と子の間に衝突除外(FilteredPairs)を作らないので、子が親に当たる恐れがある")
             for x in join_facts(ctx)]
@@ -467,6 +585,7 @@ def _r11_symptom(ctx: Context, target: str) -> tuple[Side, Side]:
 
 
 # ================================================================ R12 RobotPoser の teleport で置いて行かれる
+# 目的: Stop 中の RobotPoser.apply_joint_state で子が追従しない・親が逆向きに動く不具合を検出する
 def _r12_detect(ctx: Context) -> list[Finding]:
     out = []
     for x in join_facts(ctx):
@@ -475,8 +594,6 @@ def _r12_detect(ctx: Context) -> list[Finding]:
             why.append("子を剛体の子に置かない(stage の親子が実際のリンクの親子と違う)うえ、Robot Assembler の固定関節には IsaacJointAPI が無い")
         m = ctx.models.get(x.child_link_urdf)
         if m is not None and (x.child_link_urdf != x.child_urdf or x.child_link != m.root_link):
-            # 子のルートリンクでないリンクで固定すると、RobotPoser の木は子の中の関節を逆向き(子 → 親)にたどる。
-            # 2026-11-19 の実測で、子のエンドエフェクタの指のリンクに結合したとき teleport で子が 2.1 m ずれた
             why.append(f"子のリンク {x.child_link_urdf}:{x.child_link} が子のルートリンクでない(RobotPoser の木が子の中の関節を逆向きにたどる)")
         if why:
             out.append(Finding("R12", x.jid, "、".join(why) + "ので、RobotPoser の apply_joint_state(Stop 中)で子が置いて行かれる"))
@@ -502,9 +619,10 @@ def _r12_symptom(ctx: Context, target: str) -> tuple[Side, Side]:
 
 
 # ================================================================ R13 再 import で別名のフォルダ
+# 目的: 既存出力先へ再 import した際に URDF Importer が _1 等の連番フォルダを作る不具合を検出する
 def _r13_detect(ctx: Context) -> list[Finding]:
     return [Finding("R13", name, f"出力先 {b.expected_dir} が空でないので、importer にそのまま出させると別名(_1 など)のフォルダになる")
-            for name, b in ctx.builds.items() if b.target_was_nonempty]
+            for name, b in ctx.builds.items() if name in ctx.models and b.target_was_nonempty]
 
 
 def _r13_symptom(ctx: Context, target: str) -> tuple[Side, Side]:
@@ -518,6 +636,7 @@ def _r13_symptom(ctx: Context, target: str) -> tuple[Side, Side]:
 
 
 # ================================================================ R14 やり直すと固定関節が増える
+# 目的: 同一結合をやり直した際に固定関節が複数本増殖する（冪等性が壊れる）不具合を検出する
 def _r14_detect(ctx: Context) -> list[Finding]:
     return [Finding("R14", x.jid, "Robot Assembler は固定関節に毎回空いている名前を付けるので、同じ結合をやり直すと固定関節が増える")
             for x in join_facts(ctx)]
@@ -562,6 +681,7 @@ assert set(RULES) == set(get_args(RuleId)), "RULES と RuleId の一覧が食い
 
 
 def targets_of(ctx: Context, r: Rule) -> list[str]:
+    """規則 ``r`` の事後評価対象 ID 一覧を返す（R03 は ``部品:follower``、URDF 規則は部品名、結合規則は結合 ID）。"""
     if r.rid == "R03":
         return _r03_targets(ctx)
     if r.kind == "urdf":
@@ -570,10 +690,22 @@ def targets_of(ctx: Context, r: Rule) -> list[str]:
 
 
 def detect(ctx: Context, phase: str) -> list[Finding]:
+    """指定フェーズ（``"urdf"`` または ``"usd"``）に該当する全規則の事前チェックを実行する。
+
+    R04 と R10 は URDF 段階でも仮判定するが、実際の ``collision_from_visuals`` 値は
+    ``build_part`` 実行後に確定するため、``phase="usd"`` で最新条件のもと再判定して上書きする。
+
+    Args:
+        ctx: 判定材料を格納した ``Context``。
+        phase: ``"urdf"``（import 前）または ``"usd"``（import・静的検査後）。
+
+    Returns:
+        ``(rule, target)`` ごとに重複排除された ``Finding`` の一覧。副作用なし。
+    """
     out: list[Finding] = []
     for r in RULES.values():
         if r.phase == phase or (phase == "usd" and r.rid in ("R04", "R10")):
-            # R04 / R10 は URDF でも判定し、import 後に collision_from_visuals の結果で判定し直す
+            # R04 / R10 は URDF でも判定し、import 後に確定した collision_from_visuals の結果で判定し直す
             out.extend(r.detect(ctx))
     seen: dict[tuple[str, str], Finding] = {}
     for f in out:
@@ -582,6 +714,15 @@ def detect(ctx: Context, phase: str) -> list[Finding]:
 
 
 def evaluate(ctx: Context, findings: list[Finding]) -> list[Outcome]:
+    """事前チェックの ``findings`` と ``ctx`` の実測値を突き合わせ、全規則×全対象の ``Outcome`` を返す。
+
+    Args:
+        ctx: 静的検査・動的プローブ結果まで埋まった ``Context``。
+        findings: 事前チェック（``detect``）で得た ``Finding`` 一覧。
+
+    Returns:
+        全規則・全対象に対する ``Outcome`` リスト。副作用なし。
+    """
     by = {(f.rule, f.target): f for f in findings}
     outcomes: list[Outcome] = []
     for r in RULES.values():
@@ -597,7 +738,35 @@ def evaluate(ctx: Context, findings: list[Finding]) -> list[Outcome]:
     return outcomes
 
 
+def evaluate_all(ctx: Context, findings: list[Finding] | None = None) -> list[Outcome]:
+    """事前チェック（``findings`` 省略時は ``urdf`` + ``usd`` の両フェーズを実行）と事後測定から全規則の ``Outcome`` を返す。"""
+    if findings is None:
+        early = detect(ctx, "urdf")
+        later = detect(ctx, "usd")
+        seen = {(f.rule, f.target) for f in later}
+        findings = [f for f in early if (f.rule, f.target) not in seen] + later
+    return evaluate(ctx, findings)
+
+
+def format_table(outcomes: list[Outcome]) -> str:
+    """``Outcome`` の一覧を読みやすい Markdown 表文字列に整形する。副作用なし。"""
+    lines = ["| 規則 | 対象 | 判定 | 内容 |", "|---|---|---|---|"]
+    for o in outcomes:
+        lines.append(f"| {o.rule} ({o.title}) | {o.target} | {o.verdict} | {o.message} |")
+    return "\n".join(lines)
+
+
 def _judge(r: Rule, target: str, f: Finding | None, off: Side, fixed: Side, mode: str) -> tuple[Verdict, str]:
+    """事前予測・公式症状・修正後症状の 3 つから最終 ``Verdict`` と人間向け説明文を決定する。
+
+    判定の優先順位:
+      1. ``fixed.occurred`` が True → ``still_broken``（修正後でも問題が残っている最優先異常）
+      2. 予測あり かつ 公式で症状あり → ``fixed``（期待どおり修正で解消）
+      3. 予測あり かつ 公式で症状なし → ``upstream_fixed``（Isaac Sim 側の公式修正等で再現しなくなった）
+      4. 予測なし かつ 公式で症状あり → ``unexpected``（事前チェックの漏れ・未知の原因）
+      5. 公式または両方が未測定 → ``not_measured``
+      6. それ以外 → ``ok``
+    """
     head = f"[{r.rid}] {target}: "
     reason = f"{f.reason} と判定した" if f else "判定は出なかった"
     fix_word = "修正後" if mode == "apply" else "修正を skip した出力"
@@ -615,3 +784,21 @@ def _judge(r: Rule, target: str, f: Finding | None, off: Side, fixed: Side, mode
     if f and off.occurred is None:
         return "not_measured", f"{head}{reason}。公式のままの症状は測れなかった({off.desc})。{fix_word}は起きなかった({fixed.desc})"
     return "ok", f"{head}判定なし・問題なし({off.desc} / {fixed.desc})"
+
+
+__all__ = [
+    "Finding",
+    "Side",
+    "Outcome",
+    "Context",
+    "Rule",
+    "RuleSpec",
+    "JoinFacts",
+    "RULES",
+    "join_facts",
+    "targets_of",
+    "detect",
+    "evaluate",
+    "evaluate_all",
+    "format_table",
+]

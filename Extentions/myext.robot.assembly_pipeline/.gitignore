@@ -1,6 +1,9 @@
-examples/out/
-tests_kit/out/
-*.log
-tests_kit/last_run.json
+_import/
+build/
+.staging/
 __pycache__/
-docs/LOCAL_NOTES.md
+*.pyc
+*.log
+out/
+tests_kit/out/
+tests_kit/last_run.json

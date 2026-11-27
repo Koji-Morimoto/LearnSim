@@ -1,3 +1,4 @@
+#:schema ../schema/assembly_pipeline.schema.json
 # 4 本アームのロボット。作る usda は 6 つ:
 #   base.usda / arm.usda / two_finger.usda / rod.usda : URDF から作る([[urdf_to_usda]])
 #   arm_unit.usda : 結合ファイル。arm.usda に、two_finger.usda か rod.usda を VariantSet の選択肢として結合

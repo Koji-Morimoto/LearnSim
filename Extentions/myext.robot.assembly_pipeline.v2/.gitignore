@@ -1,9 +1,0 @@
-_import/
-build/
-.staging/
-__pycache__/
-*.pyc
-*.log
-out/
-tests_kit/out/
-tests_kit/last_run.json

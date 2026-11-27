@@ -1,7 +1,7 @@
 [package]
-version = "0.1.0"
-title = "MyExt Robot Assembly Pipeline"
-description = "URDF から usda を作り、usda どうしを結合した結合ファイルを、何度実行しても同じ結果になる形で作る(結合ファイルは次の結合の親にも子にもでき、VariantSet で子を選び分けられる)。事前に URDF と usda を調べて既知の罠を判定し(止める / 進めるを選べる)、最後にその症状が実際に起きたかを、公式のまま(Robot Assembler)と修正後の両方で測って報告する"
+version = "0.2.0"
+title = "Robot Assembly Pipeline"
+description = "URDF / USD から部品 usda を作り、usda どうしを結合した結合ファイルを冪等に生成するパイプライン。事前チェック(R01〜R14)・公式 Robot Assembler との比較・自己完結した順運動学と PhysX の検証・構成要素ディスクリプタ出力を提供する。"
 category = "MyExt"
 keywords = ["myext", "robot", "urdf", "usd", "join", "variant", "pipeline", "articulation"]
 authors = ["myext"]

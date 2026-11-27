@@ -1,4 +1,0 @@
-<?xml version="1.0"?>
-<robot name="tool">
-  <link name="tool_link"><inertial><origin xyz="0 0 0"/><mass value="0.2"/><inertia ixx="0.01" ixy="0" ixz="0" iyy="0.01" iyz="0" izz="0.01"/></inertial><visual><origin xyz="0 0 0.075"/><geometry><mesh filename="../meshes/tool.stl"/></geometry></visual><collision><origin xyz="0 0 0.075"/><geometry><mesh filename="../meshes/tool.stl"/></geometry></collision></link>
-</robot>

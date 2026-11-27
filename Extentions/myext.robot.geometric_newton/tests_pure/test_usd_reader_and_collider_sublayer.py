@@ -474,9 +474,9 @@ class TestUsdReaderMultiArmAndRootResolution(unittest.TestCase):
         self.assertTrue(all(p.startswith("/World/RobotA/") for p in info.link_prim_paths.values()))
 
     def test_real_multi_arm_usda_if_present(self) -> None:
-        """ワークスペースに `assembly_pipeline.v2` の `multi_arm/robot.usda` があれば実ファイルで回帰検証する。"""
+        """ワークスペースに `assembly_pipeline` の `multi_arm/robot.usda` があれば実ファイルで回帰検証する。"""
         ext_root = Path(__file__).resolve().parents[1]
-        usda = ext_root.parent / "myext.robot.assembly_pipeline.v2" / "examples" / "out" / "multi_arm" / "robot.usda"
+        usda = ext_root.parent / "myext.robot.assembly_pipeline" / "examples" / "out" / "multi_arm" / "robot.usda"
         if not usda.exists():
             self.skipTest(f"実ファイルが存在しない: {usda}")
         stage = Usd.Stage.Open(str(usda))
